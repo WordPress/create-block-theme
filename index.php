@@ -206,12 +206,12 @@ function create_blockbase_theme_page() {
 			<h2>Create Blockbase Theme</h2>
 			<p>Save your current block templates and theme.json settings as a new theme.</p>
 			<form method="get" action="/wp-admin/admin.php">
-				<label>Theme name<br /><input type="text" name="theme[name]" /></label><br /><br />
-				<label>Theme slug<br /><input type="text" name="theme[slug]"/></label><br /><br />
-				<label>Theme description<br /><input type="text" name="theme[description]"/></label><br /><br />
-				<label>Theme URI<br /><input type="text" name="theme[uri]"/></label><br /><br />
-				<label>Author<br /><input type="text" name="theme[author]"/></label><br /><br />
-				<label>Author URI<br /><input type="text" name="theme[author_uri]"/></label><br /><br />
+				<label>Theme name<br /><input placeholder="Blockbase" type="text" name="theme[name]" /></label><br /><br />
+				<label>Theme slug<br /><input placeholder="blockbase" type="text" name="theme[slug]"/></label><br /><br />
+				<label>Theme description<br /><textarea placeholder="Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful." rows="4" cols="50" name="theme[description]"></textarea></label><br /><br />
+				<label>Theme URI<br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]"/></label><br /><br />
+				<label>Author<br /><input placeholder="Automattic" type="text" name="theme[author]"/></label><br /><br />
+				<label>Author URI<br /><input placeholder="https://automattic.com/" type="text" name="theme[author_uri]"/></label><br /><br />
 				<input type="hidden" name="page" value="create-theme" />
 				<input type="submit" value="Create Blockbase theme" />
 			</form>
