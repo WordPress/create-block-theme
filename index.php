@@ -91,7 +91,9 @@ add_action( 'wp_enqueue_scripts', '{$slug}_scripts' );";
 }
 
 function blockbase_get_theme_css( $theme ) {
-	return file_get_contents( get_stylesheet_directory() . '/assets/theme.css' );
+	if ( file_exists( get_stylesheet_directory() . '/assets/theme.css' ) ) {
+		return file_get_contents( get_stylesheet_directory() . '/assets/theme.css' );
+	}
 }
 
 /**
@@ -205,14 +207,14 @@ function create_blockbase_theme_page() {
 		<div class="wrap">
 			<h2>Create Blockbase Theme</h2>
 			<p>Save your current block templates and theme.json settings as a new theme.</p>
-			<form method="get" action="/wp-admin/admin.php">
+			<form method="get" action="/wp-admin/themes.php">
 				<label>Theme name<br /><input placeholder="Blockbase" type="text" name="theme[name]" /></label><br /><br />
 				<label>Theme slug<br /><input placeholder="blockbase" type="text" name="theme[slug]"/></label><br /><br />
 				<label>Theme description<br /><textarea placeholder="Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful." rows="4" cols="50" name="theme[description]"></textarea></label><br /><br />
 				<label>Theme URI<br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]"/></label><br /><br />
 				<label>Author<br /><input placeholder="Automattic" type="text" name="theme[author]"/></label><br /><br />
 				<label>Author URI<br /><input placeholder="https://automattic.com/" type="text" name="theme[author_uri]"/></label><br /><br />
-				<input type="hidden" name="page" value="create-theme" />
+				<input type="hidden" name="page" value="create-blockbase-theme" />
 				<input type="submit" value="Create Blockbase theme" />
 			</form>
 		</div>
@@ -226,7 +228,7 @@ add_action( 'admin_menu', 'blockbase_create_theme_menu' );
 
 function blockbase_save_theme() {
 	// I can't work out how to call the API but this works for now.
-	if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-theme' && ! empty( $_GET['theme'] ) ) {
+	if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-blockbase-theme' && ! empty( $_GET['theme'] ) ) {
 		gutenberg_edit_site_export_theme( $_GET['theme'] );
 	}
 }
