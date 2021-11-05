@@ -150,6 +150,11 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		return new WP_Error( 'Zip Export not supported.' );
 	}
 
+	// The gutenberg_get_block_templates function will get the parent theme templates too
+	// By filtering get_template_directory and setting it to be the same as get_stylesheet_directory
+	// We ensure that only the child theme templates are exported
+	add_filter( 'template_directory', 'create_blockbase_theme_reset_template_directory' );
+
 	$zip = new ZipArchive();
 	$zip->open( $filename, ZipArchive::OVERWRITE );
 	$zip->addEmptyDir( $theme['slug'] );
@@ -176,9 +181,10 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		);
 	}
 
-	// Add theme.json.
+	// Remove the filter we applied above.
+	remove_filter( 'template_directory', 'create_blockbase_theme_reset_template_directory' );
 
-	// TODO only get child theme settings not the parent.
+	// Add theme.json.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.json',
 		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export(), JSON_PRETTY_PRINT )
