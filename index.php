@@ -219,7 +219,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
  * and template parts from the site editor, and close the connection.
  */
 function gutenberg_edit_site_export_theme( $theme ) {
-	$theme['slug'] = str_replace( '-', '_', $theme['slug'] ); // Slugs can't contain -.
+	$theme['slug'] = str_replace( '-', '_', sanitize_title( $theme['name'] ) ); // Slugs can't contain -.
 	// Create ZIP file in the temporary directory.
 	$filename = tempnam( get_temp_dir(), $theme['slug'] );
 	gutenberg_edit_site_export_theme_create_zip( $filename, $theme );
@@ -258,7 +258,6 @@ function create_blockbase_theme_page() {
 			<p>Save your current block templates and theme.json settings as a new theme.</p>
 			<form method="get" action="/wp-admin/themes.php">
 				<label>Theme name<br /><input placeholder="Blockbase" type="text" name="theme[name]" /></label><br /><br />
-				<label>Theme slug<br /><input placeholder="blockbase" type="text" name="theme[slug]"/></label><br /><br />
 				<label>Theme description<br /><textarea placeholder="Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful." rows="4" cols="50" name="theme[description]"></textarea></label><br /><br />
 				<label>Theme URI<br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]"/></label><br /><br />
 				<label>Author<br /><input placeholder="Automattic" type="text" name="theme[author]"/></label><br /><br />
