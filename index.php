@@ -96,6 +96,48 @@ function blockbase_get_theme_css( $theme ) {
 	}
 }
 
+function blockbase_get_readme_txt( $theme ) {
+	$slug = $theme['slug'];
+	$name = $theme['name'];
+	$description = $theme['description'];
+	$uri = $theme['uri'];
+	$author = $theme['author'];
+	$author_uri = $theme['author_uri'];
+
+	return "=== {$name} ===
+Contributors: {$author}
+Requires at least: 5.8
+Tested up to: 5.8
+Requires PHP: 5.7
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+== Description ==
+
+{$description}
+
+== Changelog ==
+
+= 1.0.0 =
+* Initial release
+
+== Copyright ==
+
+{$name} WordPress Theme, (C) 2021 {$author}
+{$name} is distributed under the terms of the GNU GPL.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+";
+}
+
 /**
  * Creates an export of the current templates and
  * template parts from the site editor at the
@@ -160,6 +202,13 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		$theme['slug'] . '/functions.php',
 		blockbase_get_functions_php( $theme )
 	);
+
+	// Add functions.php.
+	$zip->addFromString(
+		$theme['slug'] . '/readme.txt',
+		blockbase_get_readme_txt( $theme )
+	);
+
 
 	// Save changes to the zip file.
 	$zip->close();
