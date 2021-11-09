@@ -104,17 +104,15 @@ function blockbase_get_theme_css( $theme ){
 	$current_theme = wp_get_theme( );
 	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
 		foreach ($current_theme->get_files('css', -1) as $key => $value) {
-			if (strpos($key, '.css') !== false ) {
-				if ( file_exists( $value ) ) {
-					$current_theme_css .= "
+			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
+				$current_theme_css .= "
 /*
 *
 * Styles from " . $current_theme->get_stylesheet() . "/" . $key . "
 *
 */
 ";
-					$current_theme_css .= file_get_contents( $value );
-				}
+				$current_theme_css .= file_get_contents( $value );
 			}
 		}
 	}
