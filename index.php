@@ -98,12 +98,11 @@ function {$slug}_scripts() {
 add_action( 'wp_enqueue_scripts', '{$slug}_scripts' );";
 }
 
-function get_current_theme_css( $theme ){
+function blockbase_get_theme_css( $theme ){
 
 	$current_theme_css = '';
 	$current_theme = wp_get_theme( );
-
-	if ( $current_theme->exists() ){
+	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
 		foreach ($current_theme->get_files('css', -1) as $key => $value) {
 			if (strpos($key, '.css') !== false ) {
 				if ( file_exists( $value ) ) {
@@ -119,15 +118,8 @@ function get_current_theme_css( $theme ){
 			}
 		}
 	}
-
 	return $current_theme_css;
 
-}
-
-function blockbase_get_theme_css( $theme ) {
-	if ( file_exists( get_stylesheet_directory() . '/assets/theme.css' ) ) {
-		return file_get_contents( get_stylesheet_directory() . '/assets/theme.css' );
-	}
 }
 
 function blockbase_get_readme_txt( $theme ) {
@@ -224,11 +216,10 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		blockbase_get_style_css( $theme )
 	);
 
-	// Add theme.css combining the current theme's css and Blockbase's.
-	$new_theme_css = blockbase_get_theme_css( $theme ) . get_current_theme_css( $theme );
+	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.css',
-		$new_theme_css
+		blockbase_get_theme_css( $theme )
 	);
 
 	// Add functions.php.
