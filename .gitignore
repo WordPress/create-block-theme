@@ -1,5 +1,6 @@
 # ignore node dependency directories
 node_modules/
+vendor/
 
 # ignore log files and databases
 .DS_Store
