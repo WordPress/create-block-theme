@@ -2,10 +2,6 @@
   "name": "create-blockbase-theme",
   "version": "1.0.0",
   "description": "A WordPress plugin to create Blockbase child themes",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Automattic/create-blockbase-theme.git"
@@ -15,5 +11,19 @@
   "bugs": {
     "url": "https://github.com/Automattic/create-blockbase-theme/issues"
   },
-  "homepage": "https://github.com/Automattic/create-blockbase-theme#readme"
+  "homepage": "https://github.com/Automattic/create-blockbase-theme#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && node pre-commit-hook.js"
+    }
+  },
+  "lint-staged": {
+    "*.{scss}": [
+      "wp-scripts lint-style --fix="
+    ]
+  },
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6"
+  }
 }
