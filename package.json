@@ -1,34 +1,30 @@
 {
-  "name": "create-blockbase-theme",
-  "version": "1.0.0",
-  "description": "A WordPress plugin to create Blockbase child themes",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Automattic/create-blockbase-theme.git"
-  },
-  "author": "automattic",
-  "license": "GPL-2.0",
-  "bugs": {
-    "url": "https://github.com/Automattic/create-blockbase-theme/issues"
-  },
-  "homepage": "https://github.com/Automattic/create-blockbase-theme#readme",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && node pre-commit-hook.js"
-    }
-  },
-  "lint-staged": {
-    "*.{scss}": [
-      "wp-scripts lint-style --fix="
-    ]
-  },
-  "devDependencies": {
-    "@wordpress/prettier-config": "^1.0.1",
-    "@wordpress/scripts": "^14.0.1",
-    "@wordpress/stylelint-config": "^19.0.1",
-    "husky": "^4.3.0",
-    "lint-staged": "^10.5.4",
-    "lodash": "^4.17.21",
-    "wp-prettier": "^2.0.5"
-  }
+	"name": "create-blockbase-theme",
+	"version": "1.0.0",
+	"description": "A WordPress plugin to create Blockbase child themes",
+	"author": "automattic",
+	"license": "GPL-2.0",
+	"prettier": "@wordpress/prettier-config",
+	"devDependencies": {
+		"@wordpress/prettier-config": "^1.0.1",
+		"@wordpress/scripts": "^14.0.1",
+		"@wordpress/stylelint-config": "^19.0.1",
+		"chokidar-cli": "^2.1.0",
+		"husky": "^4.3.0",
+		"lint-staged": "^10.5.4",
+		"lodash": "^4.17.21"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged && node pre-commit-hook.js"
+		}
+	},
+	"lint-staged": {
+		"*.{scss}": [
+			"wp-scripts lint-style --fix="
+		]
+	},
+	"dependencies": {
+		"wp-prettier": "^2.0.5"
+	}
 }
