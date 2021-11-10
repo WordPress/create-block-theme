@@ -27,7 +27,7 @@ function gutenberg_edit_site_get_theme_json_for_export() {
 
 	// I feel like there should be a function to do this in Gutenberg but I couldn't find it
 	function remove_theme_key( $data ) {
-		if ( is_array( $data ) ) {
+		if (is_array( $data ) ) {
 			if ( array_key_exists( 'theme', $data ) ) {
 				if ( array_key_exists( 'user', $data ) ) {
 					return $data['user'];
