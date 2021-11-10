@@ -19,23 +19,23 @@
  */
 
 function gutenberg_edit_site_get_theme_json_for_export() {
-	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
+	$child_theme_json                = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
 	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
-	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+	$user_theme_json                 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
 	// Merge the user theme.json into the child theme.json.
 	$child_theme_json_class_instance->merge( $user_theme_json );
 
 	// I feel like there should be a function to do this in Gutenberg but I couldn't find it
 	function remove_theme_key( $data ) {
-		if (is_array( $data ) ) {
-			if (array_key_exists( 'theme', $data ) ) {
+		if ( is_array( $data ) ) {
+			if ( array_key_exists( 'theme', $data ) ) {
 				if ( array_key_exists( 'user', $data ) ) {
 					return $data['user'];
 				}
 
 				return $data['theme'];
 			}
-			foreach( $data as $node_name => $node_value  ) {
+			foreach ( $data as $node_name => $node_value ) {
 				$data[ $node_name ] = remove_theme_key( $node_value );
 			}
 		}
@@ -47,12 +47,12 @@ function gutenberg_edit_site_get_theme_json_for_export() {
 }
 
 function blockbase_get_style_css( $theme ) {
-	$slug = $theme['slug'];
-	$name = $theme['name'];
+	$slug        = $theme['slug'];
+	$name        = $theme['name'];
 	$description = $theme['description'];
-	$uri = $theme['uri'];
-	$author = $theme['author'];
-	$author_uri = $theme['author_uri'];
+	$uri         = $theme['uri'];
+	$author      = $theme['author'];
+	$author_uri  = $theme['author_uri'];
 
 	return "/*
 Theme Name: {$name}
@@ -105,12 +105,12 @@ function blockbase_get_theme_css( $theme ) {
 }
 
 function blockbase_get_readme_txt( $theme ) {
-	$slug = $theme['slug'];
-	$name = $theme['name'];
+	$slug        = $theme['slug'];
+	$name        = $theme['name'];
 	$description = $theme['description'];
-	$uri = $theme['uri'];
-	$author = $theme['author'];
-	$author_uri = $theme['author_uri'];
+	$uri         = $theme['uri'];
+	$author      = $theme['author'];
+	$author_uri  = $theme['author_uri'];
 
 	return "=== {$name} ===
 Contributors: {$author}
@@ -217,7 +217,6 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		blockbase_get_readme_txt( $theme )
 	);
 
-
 	// Save changes to the zip file.
 	$zip->close();
 }
@@ -262,23 +261,23 @@ add_action(
 function create_blockbase_theme_page() {
 	?>
 		<div class="wrap">
-			<h2><?php _e('Create Blockbase Theme', 'create-blockbase-theme'); ?></h2>
-			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-blockbase-theme'); ?></p>
+			<h2><?php _e( 'Create Blockbase Theme', 'create-blockbase-theme' ); ?></h2>
+			<p><?php _e( 'Save your current block templates and theme.json settings as a new theme.', 'create-blockbase-theme' ); ?></p>
 			<form method="get" action="/wp-admin/themes.php">
-				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" /></label><br /><br />
-				<label><?php _e('Theme description', 'create-blockbase-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme'); ?>" rows="4" cols="50" name="theme[description]"></textarea></label><br /><br />
-				<label><?php _e('Theme URI', 'create-blockbase-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]"/></label><br /><br />
-				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]"/></label><br /><br />
-				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]"/></label><br /><br />
+				<label><?php _e( 'Theme name', 'create-blockbase-theme' ); ?><br /><input placeholder="<?php _e( 'Blockbase', 'create-blockbase-theme' ); ?>" type="text" name="theme[name]" /></label><br /><br />
+				<label><?php _e( 'Theme description', 'create-blockbase-theme' ); ?><br /><textarea placeholder="<?php _e( 'Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme' ); ?>" rows="4" cols="50" name="theme[description]"></textarea></label><br /><br />
+				<label><?php _e( 'Theme URI', 'create-blockbase-theme' ); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]"/></label><br /><br />
+				<label><?php _e( 'Author', 'create-blockbase-theme' ); ?><br /><input placeholder="<?php _e( 'Automattic', 'create-blockbase-theme' ); ?>" type="text" name="theme[author]"/></label><br /><br />
+				<label><?php _e( 'Author URI', 'create-blockbase-theme' ); ?><br /><input placeholder="<?php _e( 'https://automattic.com/', 'create-blockbase-theme' ); ?>" type="text" name="theme[author_uri]"/></label><br /><br />
 				<input type="hidden" name="page" value="create-blockbase-theme" />
-				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" />
+				<input type="submit" value="<?php _e( 'Create Blockbase theme', 'create-blockbase-theme' ); ?>" />
 			</form>
 		</div>
 	<?php
 }
 function blockbase_create_theme_menu() {
-	$page_title=__('Create Blockbase Theme', 'create-blockbase-theme');
-	$menu_title=__('Create Blockbase Theme', 'create-blockbase-theme');
+	$page_title = __( 'Create Blockbase Theme', 'create-blockbase-theme' );
+	$menu_title = __( 'Create Blockbase Theme', 'create-blockbase-theme' );
 	add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-blockbase-theme', 'create_blockbase_theme_page' );
 }
 
@@ -290,4 +289,4 @@ function blockbase_save_theme() {
 		gutenberg_edit_site_export_theme( $_GET['theme'] );
 	}
 }
-add_action( 'admin_init', 'blockbase_save_theme');
+add_action( 'admin_init', 'blockbase_save_theme' );
