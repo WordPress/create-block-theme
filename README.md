@@ -4,7 +4,7 @@ A WordPress plugin to create Blockbase child themes
 Find out more about Blockbase at [blockbasetheme.com](https://blockbasetheme.com)
 
 ### Step 1 – Setup
-Install and activate [Blockbase](https://github.com/Automattic/themes/tree/trunk/blockbase), and the [Create Blockbase Theme](https://github.com/Automattic/create-blockbase-theme) plugin.
+Install and activate [Blockbase](https://github.com/Automattic/themes/tree/trunk/blockbase) (or a Blockbase child theme if you want your new theme based on it instead), and the [Create Blockbase Theme](https://github.com/Automattic/create-blockbase-theme) plugin.
 
 ### Step 2 – Style Customizations
 Make changes to your site design using the Customizer and Site Editor. 
