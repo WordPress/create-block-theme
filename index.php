@@ -98,10 +98,26 @@ function {$slug}_scripts() {
 add_action( 'wp_enqueue_scripts', '{$slug}_scripts' );";
 }
 
-function blockbase_get_theme_css( $theme ) {
-	if ( file_exists( get_stylesheet_directory() . '/assets/theme.css' ) ) {
-		return file_get_contents( get_stylesheet_directory() . '/assets/theme.css' );
+function blockbase_get_theme_css( $theme ){
+
+	$current_theme_css = '';
+	$current_theme = wp_get_theme( );
+	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
+		foreach ($current_theme->get_files('css', -1) as $key => $value) {
+			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
+				$current_theme_css .= "
+/*
+*
+* Styles from " . $current_theme->get_stylesheet() . "/" . $key . "
+*
+*/
+";
+				$current_theme_css .= file_get_contents( $value );
+			}
+		}
 	}
+	return $current_theme_css;
+
 }
 
 function blockbase_get_readme_txt( $theme ) {
@@ -198,8 +214,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		blockbase_get_style_css( $theme )
 	);
 
-	// Add theme.css.
-	// TODO get any CSS that the theme is already using
+	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.css',
 		blockbase_get_theme_css( $theme )
@@ -240,7 +255,7 @@ function gutenberg_edit_site_export_theme( $theme ) {
 	die();
 }
 
-// In Gutenberg a simialr route is called from the frontend to export template parts
+// In Gutenberg a similar route is called from the frontend to export template parts
 // I've left this in although we aren't using it at the moment, as I think eventually this will become part of Gutenberg.
 add_action(
 	'rest_api_init',
