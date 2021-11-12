@@ -18,6 +18,17 @@
  * @package gutenberg
  */
 
+/*
+ if theme is blockbase don't export any templates/parts
+ if theme is a blockbase child export all templates/parts
+ no matter the theme, always export MODIFIED templates/parts
+*/
+
+/*
+ if theme is blockbase only export theme.json settings that have been modified.
+ if theme is blockbase child export all theme.json settings as well as any settings that have been modified.
+*/
+
 function gutenberg_edit_site_get_theme_json_for_export() {
 	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
 	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
@@ -183,8 +194,15 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Load templates into the zip file.
 	$templates = gutenberg_get_block_templates();
 	foreach ( $templates as $template ) {
-		$template->content = _remove_theme_attribute_from_content( $template->content );
 
+		//Currently, when building against CHILD themes of Blockbase, block templates provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
+		//if the theme is blockbase and the source is "theme" we don't want it
+		if ($template->source === 'theme' && $template->theme === 'blockbase') {
+			continue;
+		}
+
+		// _remove_theme_attribute_from_content is provided by Gutenberg in the Site Editor's template export workflow.
+		$template->content = _remove_theme_attribute_from_content( $template->content );
 		$zip->addFromString(
 			$theme['slug'] . '/block-templates/' . $template->slug . '.html',
 			$template->content
@@ -194,6 +212,13 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Load template parts into the zip file.
 	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
+
+		//Currently, when building against CHILD themes of Blockbase, block template parts provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
+		//if the theme is blockbase and the source is "theme" we don't want it
+		if ($template_part->source === 'theme' && $template_part->theme === 'blockbase') {
+			continue;
+		}
+
 		$zip->addFromString(
 			$theme['slug'] . '/block-template-parts/' . $template_part->slug . '.html',
 			$template_part->content
