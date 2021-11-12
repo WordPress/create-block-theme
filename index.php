@@ -216,7 +216,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 
 	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
-		$theme['slug'] . '/theme.css',
+		$theme['slug'] . '/assets/theme.css',
 		blockbase_get_theme_css( $theme )
 	);
 
