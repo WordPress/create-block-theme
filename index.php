@@ -18,41 +18,38 @@
  * @package gutenberg
  */
 
-/*
- if theme is blockbase don't export any templates/parts
- if theme is a blockbase child export all templates/parts
- no matter the theme, always export MODIFIED templates/parts
-*/
 
-/*
- if theme is blockbase only export theme.json settings that have been modified.
- if theme is blockbase child export all theme.json settings as well as any settings that have been modified.
-*/
+// I feel like there should be a function to do this in Gutenberg but I couldn't find it
+function remove_theme_key( $data ) {
+	if ( is_array( $data ) ) {
+		if ( array_key_exists( 'theme', $data ) ) {
+			if ( array_key_exists( 'user', $data ) ) {
+				return $data['user'];
+			}
+
+			return $data['theme'];
+		}
+		foreach( $data as $node_name => $node_value  ) {
+			$data[ $node_name ] = remove_theme_key( $node_value );
+		}
+	}
+
+	return $data;
+}
 
 function gutenberg_edit_site_get_theme_json_for_export() {
+
+	$base_theme = wp_get_theme()->get('TextDomain');
 	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
 	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
 	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+
+	if ( $base_theme === 'blockbase' ) {
+		return $user_theme_json->get_raw_data();
+	}
+	
 	// Merge the user theme.json into the child theme.json.
 	$child_theme_json_class_instance->merge( $user_theme_json );
-
-	// I feel like there should be a function to do this in Gutenberg but I couldn't find it
-	function remove_theme_key( $data ) {
-		if ( is_array( $data ) ) {
-			if ( array_key_exists( 'theme', $data ) ) {
-				if ( array_key_exists( 'user', $data ) ) {
-					return $data['user'];
-				}
-
-				return $data['theme'];
-			}
-			foreach( $data as $node_name => $node_value  ) {
-				$data[ $node_name ] = remove_theme_key( $node_value );
-			}
-		}
-
-		return $data;
-	}
 
 	return remove_theme_key( $child_theme_json_class_instance->get_raw_data() );
 }
