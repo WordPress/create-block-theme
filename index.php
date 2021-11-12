@@ -265,13 +265,13 @@ function create_blockbase_theme_page() {
 			<h2><?php _e('Create Blockbase Theme', 'create-blockbase-theme'); ?></h2>
 			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-blockbase-theme'); ?></p>
 			<form method="get" action="/wp-admin/themes.php">
-				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" /></label><br /><br />
-				<label><?php _e('Theme description', 'create-blockbase-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme'); ?>" rows="4" cols="50" name="theme[description]"></textarea></label><br /><br />
-				<label><?php _e('Theme URI', 'create-blockbase-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]"/></label><br /><br />
-				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]"/></label><br /><br />
-				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]"/></label><br /><br />
+				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" class="regular-text" /></label><br /><br />
+				<label><?php _e('Theme description', 'create-blockbase-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
+				<label><?php _e('Theme URI', 'create-blockbase-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
+				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
+				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
 				<input type="hidden" name="page" value="create-blockbase-theme" />
-				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" />
+				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
 	<?php
