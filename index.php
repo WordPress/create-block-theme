@@ -271,7 +271,7 @@ function create_blockbase_theme_page() {
 				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]"/></label><br /><br />
 				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]"/></label><br /><br />
 				<input type="hidden" name="page" value="create-blockbase-theme" />
-				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" />
+				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
 	<?php
