@@ -191,6 +191,9 @@ GNU General Public License for more details.
  * @param string $filename path of the ZIP file.
  */
 function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
+
+	$base_theme = wp_get_theme()->get('TextDomain');
+	
 	if ( ! class_exists( 'ZipArchive' ) ) {
 		return new WP_Error( 'Zip Export not supported.' );
 	}
@@ -206,8 +209,9 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	foreach ( $templates as $template ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block templates provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
+
 		//if the theme is blockbase and the source is "theme" we don't want it
-		if ($template->source === 'theme' && $template->theme === 'blockbase') {
+		if ($template->source === 'theme' && strpos($template->theme, 'blockbase') !== false) {
 			continue;
 		}
 
@@ -225,7 +229,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block template parts provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
 		//if the theme is blockbase and the source is "theme" we don't want it
-		if ($template_part->source === 'theme' && $template_part->theme === 'blockbase') {
+		if ($template_part->source === 'theme' && strpos($template_part->theme, 'blockbase') !== false) {
 			continue;
 		}
 
