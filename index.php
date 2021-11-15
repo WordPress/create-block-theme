@@ -138,6 +138,11 @@ GNU General Public License for more details.
 ";
 }
 
+// Switches the template directory to the stylesheet directory.
+function create_blockbase_theme_reset_template_directory() {
+	return get_stylesheet_directory();
+}
+
 /**
  * Creates an export of the current templates and
  * template parts from the site editor at the
