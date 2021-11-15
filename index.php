@@ -18,32 +18,53 @@
  * @package gutenberg
  */
 
-function gutenberg_edit_site_get_theme_json_for_export() {
-	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
-	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
-	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
-	// Merge the user theme.json into the child theme.json.
-	$child_theme_json_class_instance->merge( $user_theme_json );
 
-	// I feel like there should be a function to do this in Gutenberg but I couldn't find it
-	function remove_theme_key( $data ) {
-		if ( is_array( $data ) ) {
-			if ( array_key_exists( 'theme', $data ) ) {
-				if ( array_key_exists( 'user', $data ) ) {
-					return $data['user'];
-				}
+/*
+	'Flatten' theme data that expresses both theme and user data.
+	change property.[user|theme].value to property.value
+	Uses user value if available, otherwise theme value
+	I feel like there should be a function to do this in Gutenberg but I couldn't find it
+*/
+function flatten_theme_json( $data ) {
+	if ( is_array( $data ) ) {
 
-				return $data['theme'];
-			}
-			foreach( $data as $node_name => $node_value  ) {
-				$data[ $node_name ] = remove_theme_key( $node_value );
-			}
+		if ( array_key_exists( 'user', $data ) ) {
+			return $data['user'];
 		}
 
-		return $data;
+		if ( array_key_exists( 'theme', $data ) ) {
+			
+			if ( array_key_exists( 'user', $data ) ) {
+				return $data['user'];
+			}
+
+			return $data['theme'];
+		}
+
+		foreach( $data as $node_name => $node_value  ) {
+			$data[ $node_name ] = flatten_theme_json( $node_value );
+		}
 	}
 
-	return remove_theme_key( $child_theme_json_class_instance->get_raw_data() );
+	return $data;
+}
+
+function gutenberg_edit_site_get_theme_json_for_export() {
+
+	$base_theme = wp_get_theme()->get('TextDomain');
+	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+
+	if ( $base_theme === 'blockbase' ) {
+		return flatten_theme_json( $user_theme_json->get_raw_data() );
+	}
+	
+	// Merge the user theme.json into the child theme.json.
+	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
+	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
+
+	$child_theme_json_class_instance->merge( $user_theme_json );
+
+	return flatten_theme_json( $child_theme_json_class_instance->get_raw_data() );
 }
 
 function blockbase_get_style_css( $theme ) {
@@ -170,6 +191,9 @@ GNU General Public License for more details.
  * @param string $filename path of the ZIP file.
  */
 function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
+
+	$base_theme = wp_get_theme()->get('TextDomain');
+	
 	if ( ! class_exists( 'ZipArchive' ) ) {
 		return new WP_Error( 'Zip Export not supported.' );
 	}
@@ -183,8 +207,16 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Load templates into the zip file.
 	$templates = gutenberg_get_block_templates();
 	foreach ( $templates as $template ) {
-		$template->content = _remove_theme_attribute_from_content( $template->content );
 
+		//Currently, when building against CHILD themes of Blockbase, block templates provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
+
+		//if the theme is blockbase and the source is "theme" we don't want it
+		if ($template->source === 'theme' && strpos($template->theme, 'blockbase') !== false) {
+			continue;
+		}
+
+		// _remove_theme_attribute_from_content is provided by Gutenberg in the Site Editor's template export workflow.
+		$template->content = _remove_theme_attribute_from_content( $template->content );
 		$zip->addFromString(
 			$theme['slug'] . '/block-templates/' . $template->slug . '.html',
 			$template->content
@@ -194,6 +226,13 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Load template parts into the zip file.
 	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
+
+		//Currently, when building against CHILD themes of Blockbase, block template parts provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
+		//if the theme is blockbase and the source is "theme" we don't want it
+		if ($template_part->source === 'theme' && strpos($template_part->theme, 'blockbase') !== false) {
+			continue;
+		}
+
 		$zip->addFromString(
 			$theme['slug'] . '/block-template-parts/' . $template_part->slug . '.html',
 			$template_part->content
