@@ -33,7 +33,7 @@ function flatten_theme_json( $data ) {
 		}
 
 		if ( array_key_exists( 'theme', $data ) ) {
-			
+
 			if ( array_key_exists( 'user', $data ) ) {
 				return $data['user'];
 			}
@@ -57,7 +57,7 @@ function gutenberg_edit_site_get_theme_json_for_export() {
 	if ( $base_theme === 'blockbase' ) {
 		return flatten_theme_json( $user_theme_json->get_raw_data() );
 	}
-	
+
 	// Merge the user theme.json into the child theme.json.
 	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
 	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
@@ -93,31 +93,6 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 */";
 }
 
-function blockbase_get_functions_php( $theme ) {
-	$slug = $theme['slug'];
-	return "<?php
-/**
- * Add Editor Styles
- */
-function {$slug}_editor_styles() {
-	// Enqueue editor styles.
-	add_editor_style(
-		array(
-			'/assets/theme.css',
-		)
-	);
-}
-add_action( 'after_setup_theme', '{$slug}_editor_styles' );
-
-/**
- *
- * Enqueue scripts and styles.
- */
-function {$slug}_scripts() {
-	wp_enqueue_style( '{$slug}-styles', get_stylesheet_directory_uri() . '/assets/theme.css', array( 'blockbase-ponyfill' ), wp_get_theme()->get( 'Version' ) );
-}
-add_action( 'wp_enqueue_scripts', '{$slug}_scripts' );";
-}
 
 function blockbase_get_theme_css( $theme ){
 
@@ -193,7 +168,7 @@ GNU General Public License for more details.
 function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 
 	$base_theme = wp_get_theme()->get('TextDomain');
-	
+
 	if ( ! class_exists( 'ZipArchive' ) ) {
 		return new WP_Error( 'Zip Export not supported.' );
 	}
@@ -259,18 +234,17 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		blockbase_get_theme_css( $theme )
 	);
 
-	// Add functions.php.
-	$zip->addFromString(
-		$theme['slug'] . '/functions.php',
-		blockbase_get_functions_php( $theme )
-	);
-
-	// Add functions.php.
+	// Add readme.txt.
 	$zip->addFromString(
 		$theme['slug'] . '/readme.txt',
 		blockbase_get_readme_txt( $theme )
 	);
 
+	// Add screenshot.png.
+	$zip->addFile(
+		__DIR__ . '/screenshot.png',
+		$theme['slug'] . '/screenshot.png'
+	);
 
 	// Save changes to the zip file.
 	$zip->close();
