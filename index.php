@@ -338,7 +338,7 @@ function blockbase_save_theme() {
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
 		}
 
-		return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_success' );
+		add_action( 'admin_notices', 'create_blockbase_child_admin_notice_success' );
 		gutenberg_edit_site_export_theme( $_GET['theme'] );
 	}
 }
