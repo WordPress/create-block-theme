@@ -255,6 +255,13 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
  * and template parts from the site editor, and close the connection.
  */
 function gutenberg_edit_site_export_theme( $theme ) {
+	// Sanitize inputs.
+	$theme['name'] = sanitize_text_field( $theme['name'] );
+	$theme['description'] = sanitize_text_field( $theme['description'] );
+	$theme['uri'] = sanitize_text_field( $theme['uri'] );
+	$theme['author'] = sanitize_text_field( $theme['author'] );
+	$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+
 	$theme['slug'] = str_replace( '-', '_', sanitize_title( $theme['name'] ) ); // Slugs can't contain -.
 	// Create ZIP file in the temporary directory.
 	$filename = tempnam( get_temp_dir(), $theme['slug'] );
@@ -293,12 +300,13 @@ function create_blockbase_theme_page() {
 			<h2><?php _e('Create Blockbase Theme', 'create-blockbase-theme'); ?></h2>
 			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-blockbase-theme'); ?></p>
 			<form method="get">
-				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" class="regular-text" /></label><br /><br />
+				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
 				<label><?php _e('Theme description', 'create-blockbase-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
 				<label><?php _e('Theme URI', 'create-blockbase-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
 				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
 				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
 				<input type="hidden" name="page" value="create-blockbase-theme" />
+				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_blockbase_theme' ); ?>" />
 				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
@@ -315,7 +323,38 @@ add_action( 'admin_menu', 'blockbase_create_theme_menu' );
 function blockbase_save_theme() {
 	// I can't work out how to call the API but this works for now.
 	if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-blockbase-theme' && ! empty( $_GET['theme'] ) ) {
+
+		// Check user capabilities.
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
+		}
+
+		// Check nonce
+		if ( ! wp_verify_nonce( $_GET['nonce'], 'create_blockbase_theme' ) ) {
+			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
+		}
+
+		if ( empty( $_GET['theme']['name'] ) ) {
+			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
+		}
+
+		add_action( 'admin_notices', 'create_blockbase_child_admin_notice_success' );
 		gutenberg_edit_site_export_theme( $_GET['theme'] );
 	}
 }
 add_action( 'admin_init', 'blockbase_save_theme');
+
+function create_blockbase_child_admin_notice_error() {
+	$class = 'notice notice-error';
+	$message = __( 'Please specify a theme name.', 'create-blockbase-theme' );
+
+	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+}
+
+function create_blockbase_child_admin_notice_success() {
+	?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php _e( 'New Blockbase child theme created!', 'create-blockbase-child' ); ?></p>
+		</div>
+	<?php
+}
