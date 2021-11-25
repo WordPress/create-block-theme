@@ -190,8 +190,8 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 			continue;
 		}
 
-		// _remove_theme_attribute_from_content is provided by Gutenberg in the Site Editor's template export workflow.
-		$template->content = _remove_theme_attribute_from_content( $template->content );
+		// _remove_theme_attribute_in_block_template_content is provided by Gutenberg in the Site Editor's template export workflow.
+		$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 		$zip->addFromString(
 			$theme['slug'] . '/block-templates/' . $template->slug . '.html',
 			$template->content
