@@ -262,7 +262,7 @@ function gutenberg_edit_site_export_theme( $theme ) {
 	$theme['author'] = sanitize_text_field( $theme['author'] );
 	$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
 
-	$theme['slug'] = str_replace( '-', '_', sanitize_title( $theme['name'] ) ); // Slugs can't contain -.
+	$theme['slug'] = sanitize_title( $theme['name'] );
 	// Create ZIP file in the temporary directory.
 	$filename = tempnam( get_temp_dir(), $theme['slug'] );
 	gutenberg_edit_site_export_theme_create_zip( $filename, $theme );
