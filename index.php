@@ -57,14 +57,6 @@ function gutenberg_edit_site_get_theme_json_for_export() {
 	if ( $base_theme === 'blockbase' ) {
 		return flatten_theme_json( $user_theme_json->get_raw_data() );
 	}
-
-	// Merge the user theme.json into the child theme.json.
-	$child_theme_json = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
-	$child_theme_json_class_instance = new WP_Theme_JSON_Gutenberg( $child_theme_json );
-
-	$child_theme_json_class_instance->merge( $user_theme_json );
-
-	return flatten_theme_json( $child_theme_json_class_instance->get_raw_data() );
 }
 
 function blockbase_get_style_css( $theme ) {
@@ -91,29 +83,6 @@ Template: blockbase
 Text Domain: {$slug}
 Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
 */";
-}
-
-
-function blockbase_get_theme_css( $theme ){
-
-	$current_theme_css = '';
-	$current_theme = wp_get_theme( );
-	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
-		foreach ($current_theme->get_files('css', -1) as $key => $value) {
-			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
-				$current_theme_css .= "
-/*
-*
-* Styles from " . $current_theme->get_stylesheet() . "/" . $key . "
-*
-*/
-";
-				$current_theme_css .= file_get_contents( $value );
-			}
-		}
-	}
-	return $current_theme_css;
-
 }
 
 function blockbase_get_readme_txt( $theme ) {
@@ -235,7 +204,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
 		$theme['slug'] . '/assets/theme.css',
-		blockbase_get_theme_css( $theme )
+		''
 	);
 
 	// Add readme.txt.
