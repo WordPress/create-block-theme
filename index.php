@@ -342,11 +342,22 @@ function blockbase_save_theme() {
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
 		}
 
+		if ( wp_get_theme()->get( 'Name' ) !== 'Blockbase' ) {
+			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error_wrong_theme' );
+		}
+
 		add_action( 'admin_notices', 'create_blockbase_child_admin_notice_success' );
 		gutenberg_edit_site_export_theme( $_GET['theme'] );
 	}
 }
 add_action( 'admin_init', 'blockbase_save_theme');
+
+function create_blockbase_child_admin_notice_error_wrong_theme() {
+	$class = 'notice notice-error';
+	$message = __( 'You can only create a Blockbase child theme from Blockbase. Please switch your theme to Blockbase.', 'create-blockbase-theme' );
+
+	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+}
 
 function create_blockbase_child_admin_notice_error() {
 	$class = 'notice notice-error';
