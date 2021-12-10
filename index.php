@@ -27,15 +27,20 @@
 */
 function flatten_theme_json( $data ) {
 	if ( is_array( $data ) ) {
-
 		if ( array_key_exists( 'user', $data ) ) {
 			return $data['user'];
 		}
+		if ( array_key_exists( 'custom', $data ) ) {
+			var_dump( $data['custom'] );
+			return $data['custom'];
+		}
 
 		if ( array_key_exists( 'theme', $data ) ) {
-
 			if ( array_key_exists( 'user', $data ) ) {
 				return $data['user'];
+			}
+			if ( array_key_exists( 'custom', $data ) ) {
+				return $data['custom'];
 			}
 
 			return $data['theme'];
