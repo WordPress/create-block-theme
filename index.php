@@ -31,7 +31,6 @@ function flatten_theme_json( $data ) {
 			return $data['user'];
 		}
 		if ( array_key_exists( 'custom', $data ) ) {
-			var_dump( $data['custom'] );
 			return $data['custom'];
 		}
 
