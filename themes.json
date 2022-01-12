@@ -1,0 +1,156 @@
+[
+	{
+		"name": "Geologist",
+		"description": "Geologist is a streamlined theme for modern bloggers. It consists of a simple single column of posts, paired with a sophisticated color palette and beautiful sans-serif typography.",
+		"slug": "geologist"
+	},
+	{
+		"name": "Mayland (Blocks)",
+		"description": "Make your online portfolio wonderfully uncluttered with Mayland. Gracefully highlight your photography and other projects. Mayland is versatile enough to be your personal site too.",
+		"slug": "mayland-blocks"
+	},
+	{
+		"name": "Quadrat",
+		"description": "Quadrat is a simple, versatile WordPress theme, designed for blogs and podcasts. Inspired by squared shapes and colourful, minimalist flat illustrations, Quadrat bundles a set of images you can use on your site with the theme’s default color palette. Quadrat’s default styles are bold and playful, relying on a simple sans-serif font and a strong color scheme that you can customize.",
+		"slug": "quadrat"
+	},
+	{
+		"name": "Seedlet (Blocks)",
+		"description": "A simple, text-driven, single-column block-based theme.",
+		"slug": "seedlet-blocks"
+	},
+	{
+		"name": "Skatepark",
+		"description": "Skatepark is a bold and exciting WordPress theme designed for modern events and organizations. With its simple but vivid color default scheme, duotone support, and playful grid, Skatepark is a theme designed for work and play. Customize its colors or try out different font pairings to create your own unique look and feel.",
+		"slug": "skatepark"
+	},
+	{
+		"name": "Videomaker",
+		"description": "Videomaker is a free, minimalistic WordPress theme ideal for film directors and video creators.",
+		"slug": "videomaker",
+		"headerSpace": "110px",
+		"parts": {
+			"header": "header-minimal",
+			"footer": "footer-with-navigation"
+		},
+		"templates": {
+			"index": "videomaker",
+			"archive": "videomaker",
+			"page": "videomaker",
+			"single": "videomaker"
+		},
+		"assets": "videomaker",
+		"patterns": "videomaker",
+		"themeJson": {
+			"settings": {
+				"color": {
+					"palette": {
+						"foreground": "#FFFFFF",
+						"background": "#000000",
+						"primary": "#FFFFFF",
+						"tertiary": "#282828"
+					},
+					"colorPalettes": [
+						"blue/yellow",
+						"olive-green/light-pink",
+						"grey/mint-green",
+						"light-grey/bordeaux"
+					]
+				},
+				"custom": {
+					"button": {
+						"border": {
+							"color": "var(--wp--custom--color--foreground)",
+							"radius": "0",
+							"width": "1.5px"
+						},
+						"color": {
+							"background": "var(--wp--custom--color--foreground)",
+							"text": "var(--wp--custom--color--background)"
+						},
+						"hover": {
+							"color": {
+								"text": "var(--wp--custom--color--foreground)",
+								"background": "var(--wp--custom--color--background)"
+							},
+							"border": {
+								"color": "var(--wp--custom--color--foreground)"
+							}
+						},
+						"typography": {
+							"fontWeight": 700
+						}
+					},
+					"gap": {
+						"baseline": "10px"
+					}
+				},
+				"layout": {
+					"contentSize": "800px",
+					"wideSize": "1300px"
+				},
+				"typography": {
+					"fontFamilies": {
+						"body": "inter",
+						"heading": "inter"
+					},
+					"fontSizes": [ "16px", "16px", "18px", "25px", "45px", "60px" ]
+				}
+			},
+			"styles": {
+				"blocks": {
+					"core/navigation-link": {
+						"color": {
+							"background": "transparent",
+							"text": "var(--wp--custom--color--foreground)"
+						}
+					},
+					"core/post-date": {
+						"typography": {
+							"fontSize": "var(--wp--preset--font-size--small)"
+						}
+					},
+					"core/post-terms": {
+						"typography": {
+							"fontSize": "var(--wp--preset--font-size--small)"
+						}
+					},
+					"core/post-title": {
+						"typography": {
+							"fontSize": "var(--wp--preset--font-size--huge)"
+						}
+					},
+					"core/site-tagline": {
+						"typography": {
+							"fontSize": "var(--wp--preset--font-size--small)"
+						}
+					},
+					"core/site-title": {
+						"typography": {
+							"textTransform": "uppercase"
+						}
+					}
+				},
+				"elements": {
+					"headings": {
+						"typography": {
+							"fontWeight": 600
+						},
+						"spacing": {
+							"margin": {
+								"top": "var(--wp--style--block-gap)",
+								"bottom": "var(--wp--style--block-gap)"
+							}
+						}
+					}
+				}
+
+			}
+		}
+	},
+	{
+		"name": "Zoologist",
+		"description": "Zoologist is a simple blogging theme that supports full-site editing.",
+		"slug": "zoologist"
+	}
+]

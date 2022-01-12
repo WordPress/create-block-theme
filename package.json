@@ -1,0 +1,21 @@
+{
+  "name": "create-blockbase-theme",
+  "version": "0.0.1",
+  "description": "Create Blockbase Theme",
+  "bugs": {
+    "url": "https://github.com/Automattic/create-blockbase-theme/issues/new"
+  },
+  "homepage": "https://github.com/Automattic/create-blockbase-theme/blob/trunk/README.md",
+  "browserslist": [
+    "extends @wordpress/browserslist-config"
+  ],
+  "scripts": {
+    "build:children": "node generate-children.mjs"
+  },
+  "author": "Automattic",
+  "license": "GPLv2",
+  "dependencies": {},
+  "devDependencies": {
+    "fs-extra": "^10.0.0"
+  }
+}
