@@ -26,8 +26,10 @@
 	},
 	{
 		"name": "Videomaker",
+		"version": "1.0.7",
 		"description": "Videomaker is a free, minimalistic WordPress theme ideal for film directors and video creators.",
 		"slug": "videomaker",
+		"template": "blockbase",
 		"headerSpace": "110px",
 		"parts": {
 			"header": "header-minimal",

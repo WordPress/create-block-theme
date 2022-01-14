@@ -34,6 +34,10 @@ async function getPackageJson( directory ) {
     return JSON.parse( packageJsonString );
 }
 
+async function getStyleCss( directory ) {
+    return await fs.readFile( directory + '/style.css', 'utf8' );
+}
+
 async function getThemeJson( directory ) {
     const themeJsonString = await fs.readFile( directory + '/theme.json', 'utf8' );
     return JSON.parse( themeJsonString );
@@ -269,6 +273,17 @@ async function generateAssets( childTheme ) {
 	fsExtra.copy( './assets/' + childTheme.assets, assetsDirectory );
 }
 
+async function generateStyleCss( childTheme ) {
+	let styleCss = await getStyleCss( '../themes/blockbase' );
+	const themeDir = '../themes/' + childTheme.slug;
+	styleCss = styleCss.replace( 'Theme Name: Blockbase', 'Theme Name: ' + childTheme.name );
+	styleCss = styleCss.replace( 'trunk/blockbase', 'trunk/' + childTheme.slug );
+	styleCss = styleCss.replace( /Description: (.+)/, 'Description: ' + childTheme.description );
+	styleCss = styleCss.replace( /Version: (.+)/, 'Version: ' + childTheme.version );
+	styleCss = styleCss.replace( 'Text Domain: blockbase', 'Template: ' + childTheme.template + '\r\nText Domain: ' + childTheme.slug );
+	styleCss = styleCss.replace( /Blockbase/g, childTheme.name );
+	await fs.writeFile( themeDir + '/style.css', styleCss );
+}
 
 async function generateChildren() {
 	const children = await getThemes();
@@ -277,6 +292,7 @@ async function generateChildren() {
 		await generatePackageJson( childTheme );
 		await generatePatterns( childTheme );
 		await generateAssets( childTheme );
+		await generateStyleCss( childTheme );
 		await generateThemeJson( childTheme );
 		if ( childTheme.templates ) {
 			await generateTemplates( childTheme );
