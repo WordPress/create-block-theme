@@ -7,10 +7,6 @@ const fontNameConventions = [
 		"slug": "small"
 	},
 	{
-		"name": "Normal",
-		"slug": "normal"
-	},
-	{
 		"name": "Medium",
 		"slug": "medium"
 	},
@@ -19,8 +15,8 @@ const fontNameConventions = [
 		"slug": "large"
 	},
 	{
-		"name": "Huge",
-		"slug": "huge"
+		"name": "Extra Large",
+		"slug": "x-large"
 	}
 ];
 
@@ -175,9 +171,10 @@ async function generateThemeJson( childTheme ) {
 
 		if ( childTheme.themeJson.settings.typography.fontSizes ) {
 			themeJson.settings.custom.fontSizes = {
-				"tiny": childTheme.themeJson.settings.typography.fontSizes[0]
+				"x-small": childTheme.themeJson.settings.typography.fontSizes[0],
+				"normal": childTheme.themeJson.settings.typography.fontSizes[2]
 			};
-			const fontSizes = childTheme.themeJson.settings.typography.fontSizes.slice( 1 );
+			const fontSizes = [ childTheme.themeJson.settings.typography.fontSizes[1] ].concat( childTheme.themeJson.settings.typography.fontSizes.slice( 3 ) );
 			themeJson.settings.typography.fontSizes = fontSizes.map( ( fontSize, index ) => ( {
 				"name": fontNameConventions[ index ].name,
 				"size": fontSize,
