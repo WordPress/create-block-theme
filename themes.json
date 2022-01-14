@@ -2,33 +2,43 @@
 	{
 		"name": "Geologist",
 		"description": "Geologist is a streamlined theme for modern bloggers. It consists of a simple single column of posts, paired with a sophisticated color palette and beautiful sans-serif typography.",
-		"slug": "geologist"
+		"slug": "geologist",
+		"version": "1.0.21",
+		"template": "blockbase"
 	},
 	{
 		"name": "Mayland (Blocks)",
 		"description": "Make your online portfolio wonderfully uncluttered with Mayland. Gracefully highlight your photography and other projects. Mayland is versatile enough to be your personal site too.",
-		"slug": "mayland-blocks"
+		"slug": "mayland-blocks",
+		"version": "2.1.23",
+		"template": "blockbase"
 	},
 	{
 		"name": "Quadrat",
 		"description": "Quadrat is a simple, versatile WordPress theme, designed for blogs and podcasts. Inspired by squared shapes and colourful, minimalist flat illustrations, Quadrat bundles a set of images you can use on your site with the theme’s default color palette. Quadrat’s default styles are bold and playful, relying on a simple sans-serif font and a strong color scheme that you can customize.",
-		"slug": "quadrat"
+		"slug": "quadrat",
+		"version": "1.1.33",
+		"template": "blockbase"
 	},
 	{
 		"name": "Seedlet (Blocks)",
 		"description": "A simple, text-driven, single-column block-based theme.",
-		"slug": "seedlet-blocks"
+		"slug": "seedlet-blocks",
+		"version": "2.1.22",
+		"template": "blockbase"
 	},
 	{
 		"name": "Skatepark",
 		"description": "Skatepark is a bold and exciting WordPress theme designed for modern events and organizations. With its simple but vivid color default scheme, duotone support, and playful grid, Skatepark is a theme designed for work and play. Customize its colors or try out different font pairings to create your own unique look and feel.",
-		"slug": "skatepark"
+		"slug": "skatepark",
+		"version": "1.0.29",
+		"template": "blockbase"
 	},
 	{
 		"name": "Videomaker",
-		"version": "1.0.7",
 		"description": "Videomaker is a free, minimalistic WordPress theme ideal for film directors and video creators.",
 		"slug": "videomaker",
+		"version": "1.0.7",
 		"template": "blockbase",
 		"headerSpace": "110px",
 		"parts": {
@@ -153,6 +163,8 @@
 	{
 		"name": "Zoologist",
 		"description": "Zoologist is a simple blogging theme that supports full-site editing.",
-		"slug": "zoologist"
+		"slug": "zoologist",
+		"version": "1.0.22",
+		"template": "blockbase"
 	}
 ]
