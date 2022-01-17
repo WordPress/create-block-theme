@@ -341,6 +341,10 @@ async function generateStyleCss( childTheme ) {
 	await fs.writeFile( themeDir + '/style.css', styleCss );
 }
 
+async function getScreenshot( childTheme ) {
+	fsExtra.copy( './screenshots/' + childTheme.slug + '.png', getThemeDir( childTheme.slug ) + '/screenshot.png' );
+}
+
 async function generateChildren() {
 	const children = await getThemes();
 	children.forEach( async childTheme => {
@@ -351,6 +355,7 @@ async function generateChildren() {
 		await generateThemeJson( childTheme );
 		await generateTemplates( childTheme );
 		await generateParts( childTheme );
+		await getScreenshot( childTheme );
 		console.log( "\x1b[32m", "Rebuilt " + childTheme.name );
 	} );
 }
