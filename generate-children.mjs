@@ -1,6 +1,10 @@
 import { promises as fs, constants } from 'fs';
 import fsExtra from 'fs-extra';
 
+const getThemeDir = ( slug ) => {
+	return '../themes/' + slug;
+}
+
 const fontNameConventions = [
 	{
 		"name": "Small",
@@ -91,8 +95,8 @@ async function getPalettes() {
 }
 
 async function generatePackageJson( childTheme ) {
-	const packageJson = await getPackageJson( '../themes/blockbase' );
-	const themeDir = '../themes/' + childTheme.slug;
+	const packageJson = await getPackageJson( getThemeDir( 'blockbase' ) );
+	const themeDir = getThemeDir( childTheme.slug );
 	const newPackageJson = {};
 	newPackageJson.name = childTheme.slug;
 	newPackageJson.description = childTheme.description;
@@ -108,7 +112,7 @@ async function generatePackageJson( childTheme ) {
 const capitalize = string => string && string[0].toUpperCase() + string.slice(1);
 
 async function generateThemeJson( childTheme ) {
-	const themeDir = '../themes/' + childTheme.slug;
+	const themeDir = getThemeDir( childTheme.slug );
 	if ( ! childTheme.themeJson ) {
 		return;
 	}
@@ -239,7 +243,11 @@ async function generateThemeJson( childTheme ) {
 }
 
 async function generateTemplates( childTheme ) {
-	const templateDirectory = '../themes/' + childTheme.slug + '/block-templates/';
+	if ( ! childTheme.templates ) {
+		return;
+	}
+
+	const templateDirectory = getThemeDir( childTheme.slug ) + '/block-templates/';
 	const templateDirectoryExists = await fs.access( templateDirectory, constants.F_OK ).then( () => true ).catch( () => false );
 	if ( ! templateDirectoryExists ) {
 		await fs.mkdir( templateDirectory );
@@ -263,7 +271,11 @@ async function generateTemplates( childTheme ) {
 }
 
 async function generateParts( childTheme ) {
-	const partsDirectory = '../themes/' + childTheme.slug + '/block-template-parts/';
+	if ( ! childTheme.parts ) {
+		return;
+	}
+
+	const partsDirectory = getThemeDir( childTheme.slug ) + '/block-template-parts/';
 	const partsDirectoryExists = await fs.access( partsDirectory, constants.F_OK ).then( () => true ).catch( () => false );
 	if ( ! partsDirectoryExists ) {
 		await fs.mkdir( partsDirectory );
@@ -283,8 +295,8 @@ async function generatePatterns( childTheme ) {
 		return;
 	}
 
-	const themeDir = '../themes/' + childTheme.slug;
-	const patternsDirectory = '../themes/' + childTheme.slug + '/inc/patterns/';
+	const themeDir = getThemeDir( childTheme.slug );
+	const patternsDirectory = themeDir + '/inc/patterns/';
 	const patternsDirectoryExists = await fs.access( patternsDirectory, constants.F_OK ).then( () => true ).catch( () => false );
 	if ( ! patternsDirectoryExists ) {
 		await fs.mkdir( patternsDirectory );
@@ -308,7 +320,7 @@ async function generateAssets( childTheme ) {
 		return;
 	}
 
-	const assetsDirectory = '../themes/' + childTheme.slug + '/assets/';
+	const assetsDirectory = getThemeDir( childTheme.slug ) + '/assets/';
 	const assetsDirectoryExists = await fs.access( assetsDirectory, constants.F_OK ).then( () => true ).catch( () => false );
 	if ( ! assetsDirectoryExists ) {
 		await fs.mkdir( assetsDirectory );
@@ -318,8 +330,8 @@ async function generateAssets( childTheme ) {
 }
 
 async function generateStyleCss( childTheme ) {
-	let styleCss = await getStyleCss( '../themes/blockbase' );
-	const themeDir = '../themes/' + childTheme.slug;
+	let styleCss = await getStyleCss( getThemeDir( 'blockbase' ) );
+	const themeDir = getThemeDir( childTheme.slug );
 	styleCss = styleCss.replace( 'Theme Name: Blockbase', 'Theme Name: ' + childTheme.name );
 	styleCss = styleCss.replace( 'trunk/blockbase', 'trunk/' + childTheme.slug );
 	styleCss = styleCss.replace( /Description: (.+)/, 'Description: ' + childTheme.description );
@@ -332,18 +344,13 @@ async function generateStyleCss( childTheme ) {
 async function generateChildren() {
 	const children = await getThemes();
 	children.forEach( async childTheme => {
-		const themeDir = '../themes/' + childTheme.slug;
 		await generatePackageJson( childTheme );
 		await generatePatterns( childTheme );
 		await generateAssets( childTheme );
 		await generateStyleCss( childTheme );
 		await generateThemeJson( childTheme );
-		if ( childTheme.templates ) {
-			await generateTemplates( childTheme );
-		}
-		if ( childTheme.parts ) {
-			await generateParts( childTheme );
-		}
+		await generateTemplates( childTheme );
+		await generateParts( childTheme );
 		console.log( "\x1b[32m", "Rebuilt " + childTheme.name );
 	} );
 }
