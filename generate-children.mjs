@@ -25,6 +25,42 @@ const fontNameConventions = [
 	return await generateChildren();
 })();
 
+function getBlockPatternsPhp( childTheme, patterns ) {
+	return `<?php
+/**
+ * ${childTheme.name} Theme: Block Patterns
+ *
+ * @package ${childTheme.name}
+ * @since   1.0.0
+ */
+if ( ! function_exists( '${childTheme.slug}_register_block_patterns' ) ) :
+
+	function ${childTheme.slug}_register_block_patterns() {
+
+		if ( function_exists( 'register_block_pattern_category' ) ) {
+			register_block_pattern_category(
+				'${childTheme.slug}',
+				array( 'label' => __( '${childTheme.name}', '${childTheme.slug}' ) )
+			);
+		}
+
+		if ( function_exists( 'register_block_pattern' ) ) {
+			$block_patterns = array( ${patterns} );
+
+			foreach ( $block_patterns as $block_pattern ) {
+				register_block_pattern(
+					'${childTheme.slug}/' . $block_pattern,
+					require __DIR__ . '/patterns/' . $block_pattern . '.php'
+				);
+			}
+		}
+	}
+endif;
+
+add_action( 'init', '${childTheme.slug}_register_block_patterns', 9 );`
+
+}
+
 async function getPackageJson( directory ) {
     const packageJsonString = await fs.readFile( directory + '/package.json', 'utf8' );
     return JSON.parse( packageJsonString );
@@ -247,6 +283,7 @@ async function generatePatterns( childTheme ) {
 		return;
 	}
 
+	const themeDir = '../themes/' + childTheme.slug;
 	const patternsDirectory = '../themes/' + childTheme.slug + '/inc/patterns/';
 	const patternsDirectoryExists = await fs.access( patternsDirectory, constants.F_OK ).then( () => true ).catch( () => false );
 	if ( ! patternsDirectoryExists ) {
@@ -254,6 +291,16 @@ async function generatePatterns( childTheme ) {
 	}
 
 	fsExtra.copy( './patterns/' + childTheme.patterns, patternsDirectory );
+
+		const dir = await fs.opendir( patternsDirectory );
+		const patternNames = [];
+		for await (const dirent of dir) {
+			patternNames.push( dirent.name );
+		}
+		const patternNamesString = patternNames.join( ',' );
+
+	const blockPatternsPhp = getBlockPatternsPhp( childTheme, patternNamesString );
+	await fs.writeFile( themeDir + '/inc/block-patterns.php', blockPatternsPhp );
 }
 
 async function generateAssets( childTheme ) {
