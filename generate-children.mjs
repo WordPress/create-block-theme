@@ -1,6 +1,9 @@
 import { promises as fs, constants } from 'fs';
 import fsExtra from 'fs-extra';
 
+// Used to track the sources for each theme.
+let sources = [];
+
 const getThemeDir = ( slug ) => {
 	return '../themes/' + slug;
 }
@@ -65,9 +68,76 @@ add_action( 'init', '${childTheme.slug}_register_block_patterns', 9 );`
 
 }
 
-async function getPackageJson( directory ) {
-    const packageJsonString = await fs.readFile( directory + '/package.json', 'utf8' );
-    return JSON.parse( packageJsonString );
+function getReadmeTxt ( childTheme ) {
+	return `=== ${childTheme.name} ===
+Contributors: Automattic
+Requires at least: 5.8
+Tested up to: 5.8
+Requires PHP: 5.7
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+== Description ==
+
+${childTheme.descriptionLong}
+
+== Changelog ==
+
+= 1.0.0 =
+* Initial release
+
+== Copyright ==
+
+${childTheme.name} WordPress Theme, (C) 2021 Automattic, Inc.
+${childTheme.name} is distributed under the terms of the GNU GPL.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+${childTheme.name} uses the following resources:
+
+License: CC0
+${sources.join('')}
+Included in theme screenshot and in block patterns.`;
+
+}
+
+function getPackageJson( childTheme ) {
+return `{
+  "name": "${childTheme.slug}",
+  "version": "${childTheme.version}",
+  "description": "${childTheme.description}",
+  "bugs": {
+    "url": "https://github.com/Automattic/themes/issues/new?label=[Theme]%20${childTheme.name}"
+  },
+  "homepage": "https://github.com/Automattic/themes/blob/trunk/${childTheme.slug}",
+  "devDependencies": {
+    "@wordpress/base-styles": "^4.0.4",
+    "@wordpress/browserslist-config": "^4.1.0",
+    "autoprefixer": "^10.4.2",
+    "chokidar-cli": "^3.0.0",
+    "postcss": "^8.2.12",
+    "postcss-cli": "^9.1.0",
+    "sass": "^1.47.0"
+  },
+  "browserslist": [
+    "extends @wordpress/browserslist-config"
+  ],
+  "scripts": {
+    "start": "chokidar \\"**/*.scss\\" -c \\"npm run build\\" --initial",
+    "build": "npm run build:scss",
+    "build:scss": "sass sass/theme.scss assets/theme.css --style=expanded && postcss assets/theme.css --use autoprefixer --output assets/theme.css --map"
+  },
+  "author": "Automattic",
+  "license": "GPLv2"
+}`
 }
 
 async function getStyleCss( directory ) {
@@ -95,18 +165,9 @@ async function getPalettes() {
 }
 
 async function generatePackageJson( childTheme ) {
-	const packageJson = await getPackageJson( getThemeDir( 'blockbase' ) );
 	const themeDir = getThemeDir( childTheme.slug );
-	const newPackageJson = {};
-	newPackageJson.name = childTheme.slug;
-	newPackageJson.description = childTheme.description;
-	newPackageJson.bugs = packageJson.bugs;
-	newPackageJson.bugs.url = packageJson.bugs.url.replace( 'Blockbase', childTheme.name );
-	newPackageJson.homepage = packageJson.homepage.replace( packageJson.name, childTheme.slug );
-	const themePackageJson = await getPackageJson( themeDir );
-	newPackageJson.version = themePackageJson.version;
-	const combinedPackageJson = Object.assign( {}, packageJson, newPackageJson );
-	await fs.writeFile( themeDir + '/package.json', JSON.stringify( combinedPackageJson, null, 2 ) )
+	const themePackageJson = getPackageJson( childTheme );
+	await fs.writeFile( themeDir + '/package.json', themePackageJson )
 }
 
 const capitalize = string => string && string[0].toUpperCase() + string.slice(1);
@@ -299,17 +360,27 @@ async function generatePatterns( childTheme ) {
 	const patternsDirectory = themeDir + '/inc/patterns/';
 	const patternsDirectoryExists = await fs.access( patternsDirectory, constants.F_OK ).then( () => true ).catch( () => false );
 	if ( ! patternsDirectoryExists ) {
+		await fs.mkdir( themeDir + '/inc/' );
 		await fs.mkdir( patternsDirectory );
 	}
 
 	fsExtra.copy( './patterns/' + childTheme.patterns, patternsDirectory );
 
-		const dir = await fs.opendir( patternsDirectory );
-		const patternNames = [];
-		for await (const dirent of dir) {
-			patternNames.push( dirent.name );
+	const dir = await fs.opendir( patternsDirectory );
+	const patternNames = [];
+	for await (const dirent of dir) {
+		patternNames.push( dirent.name );
+		const patternString = await fs.readFile( patternsDirectory + '/' + dirent.name, 'utf8' );
+		const sourcesMatch = patternString.match( 'Sources:' );
+		const packageMatch = patternString.match( '@package' );
+		if ( sourcesMatch && sourcesMatch.index && packageMatch && packageMatch.index ) {
+			const sourcesForPattern = patternString.slice( sourcesMatch.index, packageMatch.index ).replace( / /g, '' ).split( '*' );
+			sources = sources.concat( sourcesForPattern );
 		}
-		const patternNamesString = patternNames.join( ',' );
+	}
+	const patternNamesString = patternNames.join( ',' );
+	sources = [...new Set(sources)].sort().filter( source => source !== '' && source !== '\n' );
+
 
 	const blockPatternsPhp = getBlockPatternsPhp( childTheme, patternNamesString );
 	await fs.writeFile( themeDir + '/inc/block-patterns.php', blockPatternsPhp );
@@ -345,9 +416,23 @@ async function getScreenshot( childTheme ) {
 	fsExtra.copy( './screenshots/' + childTheme.slug + '.png', getThemeDir( childTheme.slug ) + '/screenshot.png' );
 }
 
+async function generateReadmeTxt( childTheme ) {
+	const readmeText = getReadmeTxt( childTheme );
+	const themeDir = getThemeDir( childTheme.slug );
+	await fs.writeFile( themeDir + '/readme.txt', readmeText );
+}
+
 async function generateChildren() {
 	const children = await getThemes();
 	children.forEach( async childTheme => {
+		const childThemeDirectory = getThemeDir( childTheme.slug );
+		const childThemeDirectoryExists = await fs.access( childThemeDirectory, constants.F_OK ).then( () => true ).catch( () => false );
+		if ( ! childThemeDirectoryExists ) {
+			await fs.mkdir( childThemeDirectory );
+		}
+
+		// Reset the sources array for each theme.
+		sources = [];
 		await generatePackageJson( childTheme );
 		await generatePatterns( childTheme );
 		await generateAssets( childTheme );
@@ -355,6 +440,7 @@ async function generateChildren() {
 		await generateThemeJson( childTheme );
 		await generateTemplates( childTheme );
 		await generateParts( childTheme );
+		await generateReadmeTxt( childTheme );
 		await getScreenshot( childTheme );
 		console.log( "\x1b[32m", "Rebuilt " + childTheme.name );
 	} );

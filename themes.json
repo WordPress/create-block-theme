@@ -2,13 +2,15 @@
 	{
 		"name": "Geologist",
 		"description": "Geologist is a streamlined theme for modern bloggers. It consists of a simple single column of posts, paired with a sophisticated color palette and beautiful sans-serif typography.",
+		"descriptionLong": "Geologist is a streamlined theme for modern bloggers. It consists of a simple single column of posts, paired with a sophisticated color palette and beautiful sans-serif typography.",
 		"slug": "geologist",
-		"version": "1.0.21",
+		"version": "1.0.22",
 		"template": "blockbase"
 	},
 	{
 		"name": "Mayland (Blocks)",
 		"description": "Make your online portfolio wonderfully uncluttered with Mayland. Gracefully highlight your photography and other projects. Mayland is versatile enough to be your personal site too.",
+		"descriptionLong": "Make your online portfolio wonderfully uncluttered with Mayland. Gracefully highlight your photography and other projects. Mayland is versatile enough to be your personal site too.",
 		"slug": "mayland-blocks",
 		"version": "2.1.23",
 		"template": "blockbase"
@@ -16,6 +18,7 @@
 	{
 		"name": "Quadrat",
 		"description": "Quadrat is a simple, versatile WordPress theme, designed for blogs and podcasts. Inspired by squared shapes and colourful, minimalist flat illustrations, Quadrat bundles a set of images you can use on your site with the theme’s default color palette. Quadrat’s default styles are bold and playful, relying on a simple sans-serif font and a strong color scheme that you can customize.",
+		"descriptionLong": "Quadrat is a simple, versatile WordPress theme, designed for blogs and podcasts. Inspired by squared shapes and colourful, minimalist flat illustrations, Quadrat bundles a set of images you can use on your site with the theme’s default color palette. Quadrat’s default styles are bold and playful, relying on a simple sans-serif font and a strong color scheme that you can customize.",
 		"slug": "quadrat",
 		"version": "1.1.33",
 		"template": "blockbase"
@@ -23,6 +26,7 @@
 	{
 		"name": "Seedlet (Blocks)",
 		"description": "A simple, text-driven, single-column block-based theme.",
+		"descriptionLong": "A simple, text-driven, single-column block-based theme.",
 		"slug": "seedlet-blocks",
 		"version": "2.1.22",
 		"template": "blockbase"
@@ -30,13 +34,15 @@
 	{
 		"name": "Skatepark",
 		"description": "Skatepark is a bold and exciting WordPress theme designed for modern events and organizations. With its simple but vivid color default scheme, duotone support, and playful grid, Skatepark is a theme designed for work and play. Customize its colors or try out different font pairings to create your own unique look and feel.",
+		"descriptionLong": "Skatepark is a bold and exciting WordPress theme designed for modern events and organizations. With its simple but vivid color default scheme, duotone support, and playful grid, Skatepark is a theme designed for work and play. Customize its colors or try out different font pairings to create your own unique look and feel.",
 		"slug": "skatepark",
-		"version": "1.0.29",
+		"version": "1.0.30",
 		"template": "blockbase"
 	},
 	{
 		"name": "Videomaker",
 		"description": "Videomaker is a free, minimalistic WordPress theme ideal for film directors and video creators.",
+		"descriptionLong": "Videomaker is a free, minimalistic WordPress theme ideal for film directors and video creators.\nIt features a variety of block patterns created specifically for film releases and video portfolios, and allows the traditional blogging experience with a single column layout for blog posts.\nWith simple, customizable typography, and alternative color palettes, Videomaker lets your videos stand out both on desktop and mobile devices.\nVideomaker is designed to work with the VideoPress plugin, although it will work well without it.",
 		"slug": "videomaker",
 		"version": "1.0.7",
 		"template": "blockbase",
@@ -164,7 +170,7 @@
 		"name": "Zoologist",
 		"description": "Zoologist is a simple blogging theme that supports full-site editing.",
 		"slug": "zoologist",
-		"version": "1.0.22",
+		"version": "1.0.23",
 		"template": "blockbase"
 	}
 ]
