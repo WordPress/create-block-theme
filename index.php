@@ -53,14 +53,9 @@ function flatten_theme_json( $data ) {
 	return $data;
 }
 
-function gutenberg_edit_site_get_theme_json_for_export() {
-
-	$base_theme = wp_get_theme()->get('TextDomain');
+function gutenberg_edit_site_get_theme_json_for_export($theme) {
 	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
-
-	if ( $base_theme === 'blockbase' ) {
-		return flatten_theme_json( $user_theme_json->get_raw_data() );
-	}
+	return flatten_theme_json( $user_theme_json->get_raw_data() );
 }
 
 function blockbase_get_style_css( $theme ) {
@@ -197,7 +192,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// TODO only get child theme settings not the parent.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.json',
-		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export(), JSON_PRETTY_PRINT )
+		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export($theme), JSON_PRETTY_PRINT )
 	);
 
 	// Add style.css.
