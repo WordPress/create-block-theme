@@ -53,7 +53,7 @@ function flatten_theme_json( $data ) {
 	return $data;
 }
 
-function gutenberg_edit_site_get_theme_json_for_export($theme) {
+function gutenberg_edit_site_get_theme_json_for_export() {
 	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
 	return flatten_theme_json( $user_theme_json->get_raw_data() );
 }
@@ -153,9 +153,8 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	foreach ( $templates as $template ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block templates provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
-
-		//if the theme is blockbase and the source is "theme" we don't want it
-		if ($template->source === 'theme' && strpos($template->theme, 'blockbase') !== false) {
+		//if the theme is a child and the source is "theme" we don't want it
+		if ($template->source === 'theme' && $theme['type'] === 'child') {
 			continue;
 		}
 
@@ -176,8 +175,8 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	foreach ( $template_parts as $template_part ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block template parts provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
-		//if the theme is blockbase and the source is "theme" we don't want it
-		if ($template_part->source === 'theme' && strpos($template_part->theme, 'blockbase') !== false) {
+		//if the theme is a child and the source is "theme" we don't want it
+		if ($template->source === 'theme' && $theme['type'] === 'child') {
 			continue;
 		}
 
@@ -192,7 +191,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// TODO only get child theme settings not the parent.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.json',
-		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export($theme), JSON_PRETTY_PRINT )
+		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export(), JSON_PRETTY_PRINT )
 	);
 
 	// Add style.css.
