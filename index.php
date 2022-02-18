@@ -53,8 +53,14 @@ function flatten_theme_json( $data ) {
 	return $data;
 }
 
-function gutenberg_edit_site_get_theme_json_for_export() {
+function gutenberg_edit_site_get_theme_json_for_export( $theme ) {
 	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+	$theme_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+
+	//for grand children or standalone themes we want to copy the user data + the active theme data too
+	if(  $theme['grandchild'] || $theme['type'] == 'block' ) {
+		return $theme_theme_json->get_raw_data();
+	}
 	return flatten_theme_json( $user_theme_json->get_raw_data() );
 }
 
@@ -191,7 +197,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// TODO only get child theme settings not the parent.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.json',
-		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export(), JSON_PRETTY_PRINT )
+		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export( $theme ), JSON_PRETTY_PRINT )
 	);
 
 	// Add style.css.
@@ -217,6 +223,14 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		__DIR__ . '/screenshot.png',
 		$theme['slug'] . '/screenshot.png'
 	);
+
+	//Standalone themes need an index.php file
+	if( $theme['type'] === 'block' ) {
+		$zip->addFromString(
+			$theme['slug'] . '/index.php',
+			'<?php //Silence is golden'
+		);
+	}
 
 	// Save changes to the zip file.
 	$zip->close();
