@@ -65,7 +65,7 @@ function blockbase_get_style_css( $theme ) {
 	$uri = $theme['uri'];
 	$author = $theme['author'];
 	$author_uri = $theme['author_uri'];
-	$template = $theme['type'] == 'child' ? "Template: ". wp_get_theme()->get( 'Name' ) ."\n" : "";
+	$template = !create_blockbase_get_new_parent( $theme ) ? "" : "Template: ". create_blockbase_get_new_parent( $theme ) ."\n";
 
 	return "/*\n" .
 	"Theme Name: {$name}\n" .
@@ -96,7 +96,7 @@ function blockbase_get_readme_txt( $theme ) {
 	return "=== {$name} ===
 Contributors: {$author}
 Requires at least: 5.8
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -233,7 +233,8 @@ function gutenberg_edit_site_export_theme( $theme ) {
 	$theme['uri'] = sanitize_text_field( $theme['uri'] );
 	$theme['author'] = sanitize_text_field( $theme['author'] );
 	$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-
+	$theme['type'] = sanitize_text_field( $theme['type'] );
+	$theme['grandchild'] = filter_var( sanitize_text_field( $theme['grandchild'] ), FILTER_VALIDATE_BOOLEAN);
 	$theme['slug'] = sanitize_title( $theme['name'] );
 	// Create ZIP file in the temporary directory.
 	$filename = tempnam( get_temp_dir(), $theme['slug'] );
@@ -304,7 +305,7 @@ function create_blockbase_theme_page() {
 				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
 				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
 				<input type="hidden" name="page" value="create-blockbase-theme" />
-				<input type="hidden" name="grandchild" value="<?php echo is_child_theme() === 1 ? 'true' : 'false'; ?>" />
+				<input type="hidden" name="theme[grandchild]" value="<?php echo is_child_theme(); ?>" />
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_blockbase_theme' ); ?>" />
 				<input type="submit" value="<?php _e('Create Block theme', 'create-blockbase-theme'); ?>" class="button button-primary" />
 >>>>>>> d5ea34f (hide options when active theme is a child theme)
@@ -370,4 +371,15 @@ function create_blockbase_child_admin_notice_success() {
 			<p><?php _e( 'New block theme created!', 'create-block-theme' ); ?></p>
 		</div>
 	<?php
+}
+
+function create_blockbase_get_new_parent( $theme ) {
+
+	if( $theme['grandchild'] == true ) {
+		return wp_get_theme()->get( 'Template' );
+	} elseif( $theme['type'] == 'child' ) {
+		return wp_get_theme()->get( 'TextDomain' );
+	}
+
+	return false;
 }
