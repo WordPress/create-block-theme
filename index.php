@@ -274,6 +274,9 @@ function create_blockbase_theme_page() {
 			<form method="get">
 			<label><?php _e('Theme name', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-block-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
 				<label><?php _e('Theme description', 'create-block-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-block-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
+				<p>The new theme will be based on whatever theme you have active at the moment. <br />If you want a fresh start, try using <a href="https://github.com/WordPress/theme-experiments/tree/master/emptytheme">Empty Theme</a> as a base.</p>
+				<label><input checked value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-blockbase-theme'); ?></label><br /><br />
+				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme of the current active theme', 'create-blockbase-theme'); ?></label><br /><br />
 				<label><input checked value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-block-theme'); ?></label><br /><br />
 				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme (make sure the parent theme is currently active)', 'create-blockbase-theme'); ?></label><br /><br />
 				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
