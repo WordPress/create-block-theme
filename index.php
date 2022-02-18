@@ -65,24 +65,24 @@ function blockbase_get_style_css( $theme ) {
 	$uri = $theme['uri'];
 	$author = $theme['author'];
 	$author_uri = $theme['author_uri'];
-	$template = $theme['type'] == 'child' ? 'Template: '. wp_get_theme()->get( 'Name' ) : '';
+	$template = $theme['type'] == 'child' ? "Template: ". wp_get_theme()->get( 'Name' ) ."\n" : "";
 
-	return "/*
-Theme Name: {$name}
-Theme URI: {$uri}
-Author: {$author}
-Author URI: {$author_uri}
-Description: {$description}
-Requires at least: 5.8
-Tested up to: 5.8
-Requires PHP: 5.7
-Version: 0.0.1
-License: GNU General Public License v2 or later
-License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE
-{$template}
-Text Domain: {$slug}
-Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
-*/";
+	return "/*\n" .
+	"Theme Name: {$name}\n" .
+	"Theme URI: {$uri}\n" .
+	"Author: {$author}\n" .
+	"Author URI: {$author_uri}\n" .
+	"Description: {$description}\n" .
+	"Requires at least: 5.8\n" .
+	"Tested up to: 5.8\n" .
+	"Requires PHP: 5.7\n" .
+	"Version: 0.0.1\n" .
+	"License: GNU General Public License v2 or later\n" .
+	"License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE\n" .
+	$template .
+	"Text Domain: {$slug}\n" .
+	"Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks\n" .
+	"*/";
 }
 
 function blockbase_get_readme_txt( $theme ) {
