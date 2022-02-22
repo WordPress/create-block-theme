@@ -103,6 +103,34 @@ GNU General Public License for more details.
 }
 
 /**
+ * Build the CSS that a generated theme will include.
+ * When building a STANDALONE theme from Blockbase the ponyfill.css will be included.
+ * When building a GRANDCHILD theme the CURRENT theme's CSS is included.
+ * When building a CHILD theme no extra CSS is included.
+ */
+function create_block_theme_get_theme_css( $theme ) {
+	// NOTE: Themes that keep their CSS in a structure other than Blockbase's will need something different...
+
+	// if we are building a STANDALONE theme we need the CURRENT theme's CSS OR ponyfill.css (if our theme is Blockbase)
+	// if we are building a GRANDCHILD theme we need the CURRENT theme's CSS
+	if ($theme['type'] == 'block' || is_child_theme()) {
+		if ( get_stylesheet() === 'blockbase' ) {
+			//return Blockbase's /assets/ponyfill.css
+			return file_get_contents(get_stylesheet_directory() . '/assets/ponyfill.css');
+		}
+		else if (file_exists(get_stylesheet_directory() . '/assets/theme.css')) {
+			//return the current theme's /assets/theme.css
+			return file_get_contents(get_stylesheet_directory() . '/assets/theme.css');
+		}
+		// It's a child theme but there's no theme.css so I dunno what to do. :)
+		return '';
+	}
+
+	// if we are building a CHILD theme we don't need any CSS
+	return '';
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
@@ -177,7 +205,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
 		$theme['slug'] . '/assets/theme.css',
-		''
+		create_block_theme_get_theme_css( $theme )
 	);
 
 	// Add readme.txt.
