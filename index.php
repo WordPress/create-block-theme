@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Plugin Name: Create Blockbase theme.
- * Plugin URI: https://github.com/Automattic/create-blockbase-theme
- * Description: Generates a Blockbase child theme
+ * Plugin Name: Create Block theme.
+ * Plugin URI: https://github.com/Automattic/create-block-theme
+ * Description: Generates a block theme
  * Version: 0.0.1
  * Author: Automattic
  * Author URI: https://automattic.com/
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: create-blockbase-theme
+ * Text Domain: create-block-theme
  */
 
 /**
@@ -274,32 +274,32 @@ add_action(
 function create_blockbase_theme_page() {
 	?>
 		<div class="wrap">
-			<h2><?php _e('Create Blockbase Theme', 'create-blockbase-theme'); ?></h2>
-			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-blockbase-theme'); ?></p>
+			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
+			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-block-theme'); ?></p>
 			<form method="get">
-				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
-				<label><?php _e('Theme description', 'create-blockbase-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
-				<label><?php _e('Theme URI', 'create-blockbase-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
-				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
-				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
-				<input type="hidden" name="page" value="create-blockbase-theme" />
-				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_blockbase_theme' ); ?>" />
-				<input type="submit" value="<?php _e('Create Blockbase theme', 'create-blockbase-theme'); ?>" class="button button-primary" />
+				<label><?php _e('Theme name', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-block-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
+				<label><?php _e('Theme description', 'create-block-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-block-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
+				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
+				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-block-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
+				<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
+				<input type="hidden" name="page" value="create-block-theme" />
+				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+				<input type="submit" value="<?php _e('Create block theme', 'create-block-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
 	<?php
 }
 function blockbase_create_theme_menu() {
-	$page_title=__('Create Blockbase Theme', 'create-blockbase-theme');
-	$menu_title=__('Create Blockbase Theme', 'create-blockbase-theme');
-	add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-blockbase-theme', 'create_blockbase_theme_page' );
+	$page_title=__('Create Block Theme', 'create-block-theme');
+	$menu_title=__('Create Block Theme', 'create-block-theme');
+	add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', 'create_blockbase_theme_page' );
 }
 
 add_action( 'admin_menu', 'blockbase_create_theme_menu' );
 
 function blockbase_save_theme() {
 	// I can't work out how to call the API but this works for now.
-	if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-blockbase-theme' && ! empty( $_GET['theme'] ) ) {
+	if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
 
 		// Check user capabilities.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -307,16 +307,14 @@ function blockbase_save_theme() {
 		}
 
 		// Check nonce
-		if ( ! wp_verify_nonce( $_GET['nonce'], 'create_blockbase_theme' ) ) {
+		if ( ! wp_verify_nonce( $_GET['nonce'], 'create_block_theme' ) ) {
+			var_dump('this>asdfs');
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
 		}
 
 		if ( empty( $_GET['theme']['name'] ) ) {
+			var_dump('this>23cc');
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
-		}
-
-		if ( wp_get_theme()->get( 'Name' ) !== 'Blockbase' ) {
-			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error_wrong_theme' );
 		}
 
 		add_action( 'admin_notices', 'create_blockbase_child_admin_notice_success' );
@@ -327,14 +325,14 @@ add_action( 'admin_init', 'blockbase_save_theme');
 
 function create_blockbase_child_admin_notice_error_wrong_theme() {
 	$class = 'notice notice-error';
-	$message = __( 'You can only create a Blockbase child theme from Blockbase. Please switch your theme to Blockbase.', 'create-blockbase-theme' );
+	$message = __( 'You can only create a Blockbase child theme from Blockbase. Please switch your theme to Blockbase.', 'create-block-theme' );
 
 	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }
 
 function create_blockbase_child_admin_notice_error() {
 	$class = 'notice notice-error';
-	$message = __( 'Please specify a theme name.', 'create-blockbase-theme' );
+	$message = __( 'Please specify a theme name.', 'create-block-theme' );
 
 	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }
@@ -342,7 +340,7 @@ function create_blockbase_child_admin_notice_error() {
 function create_blockbase_child_admin_notice_success() {
 	?>
 		<div class="notice notice-success is-dismissible">
-			<p><?php _e( 'New Blockbase child theme created!', 'create-blockbase-child' ); ?></p>
+			<p><?php _e( 'New block theme created!', 'create-block-theme' ); ?></p>
 		</div>
 	<?php
 }
