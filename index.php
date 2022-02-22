@@ -134,6 +134,28 @@ function gutenberg_edit_site_get_theme_json_for_export( $theme ) {
 
 }
 
+function create_block_theme_get_theme_css( $theme ) {
+	// NOTE: Themes that keep their CSS in a structure other than Blockbase's will need something different...
+
+	// if we are building a STANDALONE theme we need the CURRENT theme's CSS OR ponyfill.css (if our theme is Blockbase)	
+	// if we are building a GRANDCHILD theme we need the CURRENT theme's CSS
+	if ($theme['type'] == 'block' || is_child_theme()) {
+		if ( get_stylesheet() === 'blockbase' ) {
+			//return Blockbase's /assets/ponyfill.css
+			return file_get_contents(get_stylesheet_directory() . '/assets/ponyfill.css');
+		} 
+		else if (file_exists(get_stylesheet_directory() . '/assets/theme.css')) {
+			//return the current theme's /assets/theme.css
+			return file_get_contents(get_stylesheet_directory() . '/assets/theme.css');
+		}
+		// It's a child theme but there's no theme.css so I dunno what to do. :)
+		return '';
+	}
+
+	// if we are building a CHILD theme we don't need any CSS
+	return '';
+}
+
 function blockbase_get_style_css( $theme ) {
 	$slug = $theme['slug'];
 	$name = $theme['name'];
@@ -264,7 +286,6 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 
 	// Add theme.json.
 
-	// TODO only get child theme settings not the parent.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.json',
 		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export( $theme ), JSON_PRETTY_PRINT )
@@ -279,7 +300,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
 		$theme['slug'] . '/assets/theme.css',
-		''
+		create_block_theme_get_theme_css( $theme )
 	);
 
 	// Add readme.txt.
