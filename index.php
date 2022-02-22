@@ -45,7 +45,7 @@ function augment_gutenberg_with_utilities() {
 									$sluglist[] = $item['slug'];
 									$filtered[] = $item;
 								}
-							} 
+							}
 							else {
 								$filtered[] = $item;
 							}
@@ -58,7 +58,7 @@ function augment_gutenberg_with_utilities() {
 						return MY_Theme_JSON_Resolver::flatten_theme_json($data['custom'], $name);
 					}
 
-					// When there is THEME but no CUSTOM return theme 
+					// When there is THEME but no CUSTOM return theme
 					if ( array_key_exists( 'theme', $data ) ) {
 						return MY_Theme_JSON_Resolver::flatten_theme_json($data['theme'], $name);
 					}
@@ -75,9 +75,9 @@ function augment_gutenberg_with_utilities() {
 
 		/**
 		 * Export the combined (and flattened) THEME and CUSTOM data.
-		 * 
+		 *
 		 * @param string $content ['all', 'current', 'user'] Determines which settings content to include in the export.
-		 * All options include user settings.  
+		 * All options include user settings.
 		 * 'current' will include settings from the currently installed theme but NOT from the parent theme.
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
 		 */
@@ -137,13 +137,13 @@ function gutenberg_edit_site_get_theme_json_for_export( $theme ) {
 function create_block_theme_get_theme_css( $theme ) {
 	// NOTE: Themes that keep their CSS in a structure other than Blockbase's will need something different...
 
-	// if we are building a STANDALONE theme we need the CURRENT theme's CSS OR ponyfill.css (if our theme is Blockbase)	
+	// if we are building a STANDALONE theme we need the CURRENT theme's CSS OR ponyfill.css (if our theme is Blockbase)
 	// if we are building a GRANDCHILD theme we need the CURRENT theme's CSS
 	if ($theme['type'] == 'block' || is_child_theme()) {
 		if ( get_stylesheet() === 'blockbase' ) {
 			//return Blockbase's /assets/ponyfill.css
 			return file_get_contents(get_stylesheet_directory() . '/assets/ponyfill.css');
-		} 
+		}
 		else if (file_exists(get_stylesheet_directory() . '/assets/theme.css')) {
 			//return the current theme's /assets/theme.css
 			return file_get_contents(get_stylesheet_directory() . '/assets/theme.css');
@@ -375,45 +375,26 @@ add_action(
 function create_blockbase_theme_page() {
 	?>
 		<div class="wrap">
-<<<<<<< HEAD
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
 			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-block-theme'); ?></p>
+			<p><?php wp_kses_post( _e( 'The new theme will be based on whatever theme you have active at the moment. <br />If you want a fresh start, try using <a href="https://github.com/WordPress/theme-experiments/tree/master/emptytheme">Empty Theme</a> as a base.', 'create-block-theme' ) ); ?></p>
+			<p><?php _e('The current active theme is:', 'create-block-theme'); ?> <?php echo wp_get_theme()->get('Name'); ?></p>
 			<form method="get">
-			<label><?php _e('Theme name', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-block-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
+				<label><?php _e('Theme name', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-block-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
 				<label><?php _e('Theme description', 'create-block-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-block-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
-				<p>The new theme will be based on whatever theme you have active at the moment. <br />If you want a fresh start, try using <a href="https://github.com/WordPress/theme-experiments/tree/master/emptytheme">Empty Theme</a> as a base.</p>
-				<label><input checked value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-blockbase-theme'); ?></label><br /><br />
-				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme of the current active theme', 'create-blockbase-theme'); ?></label><br /><br />
-				<label><input checked value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-block-theme'); ?></label><br /><br />
-				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme (make sure the parent theme is currently active)', 'create-blockbase-theme'); ?></label><br /><br />
-				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
-				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-block-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
-				<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
-				<input type="hidden" name="page" value="create-block-theme" />
-				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-				<input type="submit" value="<?php _e('Create block theme', 'create-block-theme'); ?>" class="button button-primary" />
-=======
-			<h2><?php _e('Create Block Theme', 'create-blockbase-theme'); ?></h2>
-			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-blockbase-theme'); ?></p>
-			<p><?php wp_kses_post( _e( 'The new theme will be based on whatever theme you have active at the moment. <br />If you want a fresh start, try using <a href="https://github.com/WordPress/theme-experiments/tree/master/emptytheme">Empty Theme</a> as a base.', 'create-blockbase-theme' ) ); ?></p>
-			<p><?php _e('The current active theme is:', 'create-blockbase-theme'); ?> <?php echo wp_get_theme()->get('Name'); ?></p>
-			<form method="get">
-				<label><?php _e('Theme name', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-blockbase-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
-				<label><?php _e('Theme description', 'create-blockbase-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-blockbase-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
 				<?php if ( ! is_child_theme() ): ?>
 				<label><input checked value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-blockbase-theme'); ?></label><br /><br />
 				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme of the current active theme', 'create-blockbase-theme'); ?></label><br /><br />
 				<?php else: ?>
 				<input type="hidden" name="theme[type]" value="child" />
 				<?php endif; ?>
-				<label><?php _e('Theme URI', 'create-blockbase-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
-				<label><?php _e('Author', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-blockbase-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
-				<label><?php _e('Author URI', 'create-blockbase-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-blockbase-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
-				<input type="hidden" name="page" value="create-blockbase-theme" />
+				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
+				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-block-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
+				<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
+				<input type="hidden" name="page" value="create-block-theme" />
 				<input type="hidden" name="theme[grandchild]" value="<?php echo is_child_theme(); ?>" />
-				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_blockbase_theme' ); ?>" />
-				<input type="submit" value="<?php _e('Create Block theme', 'create-blockbase-theme'); ?>" class="button button-primary" />
->>>>>>> d5ea34f (hide options when active theme is a child theme)
+				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+				<input type="submit" value="<?php _e('Create block theme', 'create-block-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
 	<?php
