@@ -124,7 +124,8 @@ function gutenberg_edit_site_get_theme_json_for_export( $theme ) {
 
 	// For GRANDCHILDREN themes we want all of the CURRENT theme settings, the USER theme settings but NOT the PARENT settings
 	// (since those will continue to be provided by the parent)
-	if ( $theme['grandchild']) {
+	// If the theme we are building from is a child theme then we are building a grandchild theme
+	if ( is_child_theme() ) {
 		return MY_Theme_JSON_Resolver::export_theme_data('current');
 	}
 
@@ -458,7 +459,7 @@ function create_blockbase_child_admin_notice_success() {
 
 function create_blockbase_get_new_parent( $theme ) {
 
-	if( $theme['grandchild'] == true ) {
+	if( is_child_theme() ) {
 		return wp_get_theme()->get( 'Template' );
 	} elseif( $theme['type'] == 'child' ) {
 		return wp_get_theme()->get( 'TextDomain' );
