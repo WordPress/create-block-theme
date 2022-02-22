@@ -150,7 +150,7 @@ function blockbase_get_style_css( $theme ) {
 	"Author URI: {$author_uri}\n" .
 	"Description: {$description}\n" .
 	"Requires at least: 5.8\n" .
-	"Tested up to: 5.8\n" .
+	"Tested up to: 5.9\n" .
 	"Requires PHP: 5.7\n" .
 	"Version: 0.0.1\n" .
 	"License: GNU General Public License v2 or later\n" .
