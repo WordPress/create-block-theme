@@ -278,6 +278,13 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 			continue;
 		}
 
+		// _remove_theme_attribute_in_block_template_content is provided by Gutenberg in the Site Editor's template export workflow.
+		if ( function_exists( '_remove_theme_attribute_in_block_template_content' ) ) {
+			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
+		} else if ( function_exists( '_remove_theme_attribute_from_content' ) ) {
+			$template_part->content = _remove_theme_attribute_from_content( $template_part->content );
+		}
+	
 		$zip->addFromString(
 			$theme['slug'] . '/parts/' . $template_part->slug . '.html',
 			$template_part->content
