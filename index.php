@@ -78,7 +78,7 @@ Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
 Requires at least: 5.8
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
@@ -100,7 +100,7 @@ function blockbase_get_readme_txt( $theme ) {
 	return "=== {$name} ===
 Contributors: {$author}
 Requires at least: 5.8
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
