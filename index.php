@@ -149,8 +149,8 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	$zip = new ZipArchive();
 	$zip->open( $filename, ZipArchive::OVERWRITE );
 	$zip->addEmptyDir( $theme['slug'] );
-	$zip->addEmptyDir( $theme['slug'] . '/block-templates' );
-	$zip->addEmptyDir( $theme['slug'] . '/block-template-parts' );
+	$zip->addEmptyDir( $theme['slug'] . '/templates' );
+	$zip->addEmptyDir( $theme['slug'] . '/parts' );
 
 	// Load templates into the zip file.
 	$templates = gutenberg_get_block_templates();
@@ -170,7 +170,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 			$template->content = _remove_theme_attribute_from_content( $template->content );
 		}
 		$zip->addFromString(
-			$theme['slug'] . '/block-templates/' . $template->slug . '.html',
+			$theme['slug'] . '/templates/' . $template->slug . '.html',
 			$template->content
 		);
 	}
@@ -186,7 +186,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		}
 
 		$zip->addFromString(
-			$theme['slug'] . '/block-template-parts/' . $template_part->slug . '.html',
+			$theme['slug'] . '/parts/' . $template_part->slug . '.html',
 			$template_part->content
 		);
 	}
