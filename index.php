@@ -17,10 +17,9 @@ require_once (__DIR__ . '/gutenberg_additions.php');
 function create_block_theme_get_theme_json_for_export( $theme ) {
 
 	// For STANDALONE themes we want all of the user and theme settings (including current and parent)
-	// NOTE: We aren't yet exporting 'standalone' themes but this is how it would be exported
-	// if ($theme['type'] == 'block') {
-	// 	return MY_Theme_JSON_Resolver::export_theme_data('all');
-	// }
+	if ($theme['type'] == 'block') {
+		return MY_Theme_JSON_Resolver::export_theme_data('all');
+	}
 
 	// For GRANDCHILDREN themes we want all of the CURRENT theme settings, the USER theme settings but NOT the PARENT settings
 	// (since those will continue to be provided by the parent)
@@ -41,7 +40,7 @@ function blockbase_get_style_css( $theme ) {
 	$uri = $theme['uri'];
 	$author = $theme['author'];
 	$author_uri = $theme['author_uri'];
-
+	$template = !create_block_theme_get_new_parent( $theme ) ? "" : "\nTemplate: " . create_block_theme_get_new_parent( $theme ) ."\n";
 	return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -53,9 +52,9 @@ Tested up to: 5.9
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
-License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE
-Template: blockbase
-Text Domain: {$slug}
+License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE" . 
+$template .
+"Text Domain: {$slug}
 Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
 */";
 }
@@ -152,6 +151,81 @@ function create_block_theme_get_theme_css( $theme ) {
 }
 
 /**
+ * Standalone themes need a little extra logic to:
+ *  - Load the theme.css
+ *  - Load fonts from theme.json
+ * This is that logic.
+ */
+function create_block_theme_get_functions( $theme ) {
+
+	if ($theme['type'] !== 'block') {
+		return null;
+	}
+	return '<?php
+
+// TODO: Add Theme Supports that are not yet represented in theme.json
+
+// TODO: No patterns are copied (or loaded) and we may want to consider that.
+
+// Add Editor Styles
+function '.$theme["slug"].'_editor_styles() {
+	// Add the child theme CSS if it exists.
+	if ( file_exists( get_stylesheet_directory() . "/assets/theme.css" ) ) {
+		add_editor_style(
+			"/assets/theme.css"
+		);
+	}
+	add_editor_style(
+		array(
+			'.$theme["slug"].'_get_fonts_url(),
+		)
+	);
+}
+add_action( "admin_init", "'.$theme['slug'].'_editor_styles" );
+
+// Add View Styles
+function '.$theme['slug'].'_scripts() {
+	wp_enqueue_style( "'.$theme["slug"].'-fonts", '.$theme["slug"].'_get_fonts_url(), array(), null );
+	// Add the theme CSS if it exists.
+	if ( file_exists( get_stylesheet_directory() . "/assets/theme.css" ) ) {
+		wp_enqueue_style( "'.$theme['slug'].'-styles", get_stylesheet_directory_uri() . "/assets/theme.css", array(), wp_get_theme()->get( "Version" ) );
+	}
+}
+add_action( "wp_enqueue_scripts", "'.$theme['slug'].'_scripts" );
+
+function '.$theme['slug'].'_get_fonts_url() {
+
+	$font_families = [];
+
+	if ( ! class_exists( "WP_Theme_JSON_Resolver_Gutenberg" ) ) {
+		return "";
+	}
+
+	$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+	if ( empty( $theme_data ) || empty( $theme_data["typography"] ) || empty( $theme_data["typography"]["fontFamilies"] ) ) {
+		return "";
+	}
+
+	
+	if ( ! empty( $theme_data["typography"]["fontFamilies"]["theme"] ) ) {
+		foreach( $theme_data["typography"]["fontFamilies"]["theme"] as $font ) {
+			if ( ! empty( $font["google"] ) ) {
+				$font_families[] = $font["google"];
+			}
+		}
+	}
+
+	if ( empty( $font_families ) ) {
+		return "";
+	}
+
+	// Make a single request for the theme or user fonts.
+	return esc_url_raw( "https://fonts.googleapis.com/css2?" . implode( "&", array_unique( $font_families ) ) . "&display=swap" );
+}	
+ 	';
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
@@ -177,9 +251,8 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	foreach ( $templates as $template ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block templates provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
-
-		//if the theme is blockbase and the source is "theme" we don't want it
-		if ($template->source === 'theme' && strpos($template->theme, 'blockbase') !== false) {
+		//if the theme we are building is a child and the source of the template is "theme" we don't want to include it
+		if ($template->source === 'theme' && $theme['type'] === 'child') {
 			continue;
 		}
 
@@ -200,8 +273,8 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	foreach ( $template_parts as $template_part ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block template parts provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
-		//if the theme is blockbase and the source is "theme" we don't want it
-		if ($template_part->source === 'theme' && strpos($template_part->theme, 'blockbase') !== false) {
+		//if the theme we are building is a child and the source of the template is "theme" we don't want to include it
+		if ($template_part->source === 'theme' && $theme['type'] === 'child') {
 			continue;
 		}
 
@@ -240,6 +313,18 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		__DIR__ . '/screenshot.png',
 		$theme['slug'] . '/screenshot.png'
 	);
+
+	//Standalone themes need an index.php file and functions.php
+	if( $theme['type'] === 'block' ) {
+		$zip->addFromString(
+			$theme['slug'] . '/index.php',
+			'<?php //Silence is golden'
+		);
+		$zip->addFromString(
+			$theme['slug'] . '/functions.php',
+			create_block_theme_get_functions( $theme )
+		);
+	}
 
 	// Save changes to the zip file.
 	$zip->close();
@@ -294,9 +379,17 @@ function create_blockbase_theme_page() {
 		<div class="wrap">
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
 			<p><?php _e('Save your current block templates and theme.json settings as a new theme.', 'create-block-theme'); ?></p>
+			<p><?php wp_kses_post( _e( 'The new theme will be based on whatever theme you have active at the moment. <br />If you want a fresh start, try using <a href="https://github.com/WordPress/theme-experiments/tree/master/emptytheme">Empty Theme</a> as a base.', 'create-block-theme' ) ); ?></p>
+			<p><?php _e('The current active theme is:', 'create-block-theme'); ?> <?php echo wp_get_theme()->get('Name'); ?></p>
 			<form method="get">
 				<label><?php _e('Theme name', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-block-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
 				<label><?php _e('Theme description', 'create-block-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-block-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
+				<?php if ( ! is_child_theme() ): ?>
+				<label><input checked value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme of the current active theme', 'create-block-theme'); ?></label><br /><br />
+				<label><input value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-block-theme'); ?></label><br /><br />
+				<?php else: ?>
+				<input type="hidden" name="theme[type]" value="child" />
+				<?php endif; ?>
 				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
 				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-block-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
 				<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
@@ -333,15 +426,26 @@ function blockbase_save_theme() {
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
 		}
 
+		if( $_GET['theme']['type'] === 'child' && !wp_is_block_theme() ) {
+			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error_wrong_parent' );
+		}
+
 		add_action( 'admin_notices', 'create_blockbase_child_admin_notice_success' );
 		gutenberg_edit_site_export_theme( $_GET['theme'] );
 	}
 }
 add_action( 'admin_init', 'blockbase_save_theme');
 
+function create_blockbase_child_admin_notice_error_wrong_parent() {
+	$class = 'notice notice-error';
+	$message = __( 'You can only create a child theme from a Block theme. Please switch your theme to a Block theme.', 'create-blockbase-theme' );
+
+	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+}
+
 function create_blockbase_child_admin_notice_error_wrong_theme() {
 	$class = 'notice notice-error';
-	$message = __( 'You can only create a Blockbase child theme from Blockbase. Please switch your theme to Blockbase.', 'create-block-theme' );
+	$message = __( 'You can only create a child theme from a Block theme. Please switch your theme to a Block theme.', 'create-block-theme' );
 
 	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }
@@ -359,4 +463,16 @@ function create_blockbase_child_admin_notice_success() {
 			<p><?php _e( 'New block theme created!', 'create-block-theme' ); ?></p>
 		</div>
 	<?php
+}
+
+function create_block_theme_get_new_parent( $theme ) {
+
+
+	if( is_child_theme() ) {
+		return wp_get_theme()->get( 'Template' );
+	} elseif( $theme['type'] == 'child' ) {
+		return wp_get_theme()->get( 'TextDomain' );
+	}
+
+	return false;
 }
