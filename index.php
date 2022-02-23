@@ -109,25 +109,32 @@ GNU General Public License for more details.
  * When building a CHILD theme no extra CSS is included.
  */
 function create_block_theme_get_theme_css( $theme ) {
-	// NOTE: Themes that keep their CSS in a structure other than Blockbase's will need something different...
+
+	// if we are building a CHILD theme we don't need any CSS
+	if ( $theme['type'] === 'child' ) {
+		return '';
+	}
+
+	$css_string = '';
+
+	// For those themes that keep styles in styles.css include anything that isn't metadata.
+	$style_string = file_get_contents(get_stylesheet_directory() . '/style.css');
+	$css_string .= substr( $style_string, strpos( $style_string, "*/" ) + 2 ) . "\n";
 
 	// if we are building a STANDALONE theme we need the CURRENT theme's CSS OR ponyfill.css (if our theme is Blockbase)
 	// if we are building a GRANDCHILD theme we need the CURRENT theme's CSS
 	if ($theme['type'] == 'block' || is_child_theme()) {
-		if ( get_stylesheet() === 'blockbase' ) {
+		if ( strpos(get_stylesheet(), 'blockbase') !== false ) {
 			//return Blockbase's /assets/ponyfill.css
-			return file_get_contents(get_stylesheet_directory() . '/assets/ponyfill.css');
+			$css_string .= file_get_contents(get_stylesheet_directory() . '/assets/ponyfill.css');
 		}
 		else if (file_exists(get_stylesheet_directory() . '/assets/theme.css')) {
 			//return the current theme's /assets/theme.css
-			return file_get_contents(get_stylesheet_directory() . '/assets/theme.css');
+			$css_string .= file_get_contents(get_stylesheet_directory() . '/assets/theme.css');
 		}
-		// It's a child theme but there's no theme.css so I dunno what to do. :)
-		return '';
 	}
 
-	// if we are building a CHILD theme we don't need any CSS
-	return '';
+	return $css_string;
 }
 
 /**
