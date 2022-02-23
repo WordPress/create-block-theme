@@ -4,6 +4,9 @@ function augment_gutenberg_with_utilities() {
 
 	//Ultimately it is desireable for Gutenberg to have this functionality natively.
 	// In the meantime we are patching the functionality we are expecting into the Theme JSON Resolver here
+	if ( ! class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+		return;
+	}
 
 	class MY_Theme_JSON_Resolver extends WP_Theme_JSON_Resolver_Gutenberg {
 
@@ -33,7 +36,7 @@ function augment_gutenberg_with_utilities() {
 									$sluglist[] = $item['slug'];
 									$filtered[] = $item;
 								}
-							} 
+							}
 							else {
 								$filtered[] = $item;
 							}
@@ -46,7 +49,7 @@ function augment_gutenberg_with_utilities() {
 						return MY_Theme_JSON_Resolver::flatten_theme_json($data['custom'], $name);
 					}
 
-					// When there is THEME but no CUSTOM return theme 
+					// When there is THEME but no CUSTOM return theme
 					if ( array_key_exists( 'theme', $data ) ) {
 						return MY_Theme_JSON_Resolver::flatten_theme_json($data['theme'], $name);
 					}
@@ -63,9 +66,9 @@ function augment_gutenberg_with_utilities() {
 
 		/**
 		 * Export the combined (and flattened) THEME and CUSTOM data.
-		 * 
+		 *
 		 * @param string $content ['all', 'current', 'user'] Determines which settings content to include in the export.
-		 * All options include user settings.  
+		 * All options include user settings.
 		 * 'current' will include settings from the currently installed theme but NOT from the parent theme.
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
 		 */
