@@ -12,55 +12,26 @@
  * Text Domain: create-block-theme
  */
 
-/**
- * REST endpoint for exporting the contents of the Edit Site Page editor.
- *
- * @package gutenberg
- */
+require_once (__DIR__ . '/gutenberg_additions.php');
 
+function create_block_theme_get_theme_json_for_export( $theme ) {
 
-/*
-	'Flatten' theme data that expresses both theme and user data.
-	change property.[user|theme].value to property.value
-	Uses user value if available, otherwise theme value
-	I feel like there should be a function to do this in Gutenberg but I couldn't find it
-*/
-function flatten_theme_json( $data ) {
-	if ( is_array( $data ) ) {
-		if ( array_key_exists( 'user', $data ) ) {
-			return $data['user'];
-		}
-		if ( array_key_exists( 'custom', $data ) ) {
-			return $data['custom'];
-		}
+	// For STANDALONE themes we want all of the user and theme settings (including current and parent)
+	// NOTE: We aren't yet exporting 'standalone' themes but this is how it would be exported
+	// if ($theme['type'] == 'block') {
+	// 	return MY_Theme_JSON_Resolver::export_theme_data('all');
+	// }
 
-		if ( array_key_exists( 'theme', $data ) ) {
-			if ( array_key_exists( 'user', $data ) ) {
-				return $data['user'];
-			}
-			if ( array_key_exists( 'custom', $data ) ) {
-				return $data['custom'];
-			}
-
-			return $data['theme'];
-		}
-
-		foreach( $data as $node_name => $node_value  ) {
-			$data[ $node_name ] = flatten_theme_json( $node_value );
-		}
+	// For GRANDCHILDREN themes we want all of the CURRENT theme settings, the USER theme settings but NOT the PARENT settings
+	// (since those will continue to be provided by the parent)
+	// If the theme we are building from is a child theme then we are building a grandchild theme
+	if ( is_child_theme() ) {
+		return MY_Theme_JSON_Resolver::export_theme_data('current');
 	}
 
-	return $data;
-}
+	// For CHILD themes we only want the USER settings
+	return MY_Theme_JSON_Resolver::export_theme_data('user');
 
-function gutenberg_edit_site_get_theme_json_for_export() {
-
-	$base_theme = wp_get_theme()->get('TextDomain');
-	$user_theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
-
-	if ( $base_theme === 'blockbase' ) {
-		return flatten_theme_json( $user_theme_json->get_raw_data() );
-	}
 }
 
 function blockbase_get_style_css( $theme ) {
@@ -192,11 +163,9 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	}
 
 	// Add theme.json.
-
-	// TODO only get child theme settings not the parent.
 	$zip->addFromString(
 		$theme['slug'] . '/theme.json',
-		wp_json_encode( gutenberg_edit_site_get_theme_json_for_export(), JSON_PRETTY_PRINT )
+		wp_json_encode( create_block_theme_get_theme_json_for_export( $theme ), JSON_PRETTY_PRINT )
 	);
 
 	// Add style.css.
