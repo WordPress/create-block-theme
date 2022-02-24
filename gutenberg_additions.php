@@ -95,8 +95,6 @@ function augment_gutenberg_with_utilities() {
 
 			$data = MY_Theme_JSON_Resolver::flatten_theme_json($theme->get_raw_data(), null);
 
-			// die(json_encode($data));
-
 			return $data;
 
 		}
