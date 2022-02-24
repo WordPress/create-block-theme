@@ -117,23 +117,21 @@ function create_block_theme_get_theme_css( $theme ) {
 
 	$css_string = '';
 
-	// For those themes that keep styles in styles.css include anything that isn't metadata.
-	$style_string = file_get_contents(get_stylesheet_directory() . '/style.css');
-	$css_string .= substr( $style_string, strpos( $style_string, "*/" ) + 2 ) . "\n";
-
-	// if we are building a STANDALONE theme we need the CURRENT theme's CSS OR ponyfill.css (if our theme is Blockbase)
-	// if we are building a GRANDCHILD theme we need the CURRENT theme's CSS
-	if ($theme['type'] == 'block' || is_child_theme()) {
-		if ( strpos(get_stylesheet(), 'blockbase') !== false ) {
-			//return Blockbase's /assets/ponyfill.css
-			$css_string .= file_get_contents(get_stylesheet_directory() . '/assets/ponyfill.css');
-		}
-		else if (file_exists(get_stylesheet_directory() . '/assets/theme.css')) {
-			//return the current theme's /assets/theme.css
-			$css_string .= file_get_contents(get_stylesheet_directory() . '/assets/theme.css');
+	$current_theme = wp_get_theme( );
+	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
+		foreach ($current_theme->get_files('css', -1) as $key => $value) {
+			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
+				$css_string .= "
+/*
+*
+* Styles from " . $current_theme->get_stylesheet() . "/" . $key . "
+*
+*/
+";
+				$css_string .= file_get_contents( $value );
+			}
 		}
 	}
-
 	return $css_string;
 }
 
