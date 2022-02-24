@@ -103,21 +103,22 @@ GNU General Public License for more details.
 
 /**
  * Build the CSS that a generated theme will include.
- * When building a STANDALONE theme from Blockbase the ponyfill.css will be included.
- * When building a GRANDCHILD theme the CURRENT theme's CSS is included.
+ * When building a STANDALONE theme (from a parent theme) the CURRENT (parent) theme's CSS is included.
+ * When building a GRANDCHILD theme the CURRENT (child) theme's CSS is included.
  * When building a CHILD theme no extra CSS is included.
  */
 function create_block_theme_get_theme_css( $theme ) {
 
 	// if we are building a CHILD theme we don't need any CSS
-	if ( $theme['type'] === 'child' ) {
+	if ( $theme['type'] === 'child' && !$theme['template'] ) {
 		return '';
 	}
 
 	$css_string = '';
 
-	$current_theme = wp_get_theme( );
-	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
+	$current_theme = wp_get_theme();
+
+	if ( $current_theme->exists() ){
 		foreach ($current_theme->get_files('css', -1) as $key => $value) {
 			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
 
@@ -396,6 +397,7 @@ function create_blockbase_theme_page() {
 				<label><input value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-block-theme'); ?></label><br /><br />
 				<?php else: ?>
 				<input type="hidden" name="theme[type]" value="child" />
+				<input type="hidden" name="theme[template]" value="<?php echo wp_get_theme()->get('Template'); ?>" />
 				<?php endif; ?>
 				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
 				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-block-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
