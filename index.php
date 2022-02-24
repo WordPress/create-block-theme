@@ -390,8 +390,8 @@ function create_blockbase_theme_page() {
 			<p><?php wp_kses_post( _e( 'The new theme will be based on whatever theme you have active at the moment. <br />If you want a fresh start, try using <a href="https://github.com/WordPress/theme-experiments/tree/master/emptytheme">Empty Theme</a> as a base.', 'create-block-theme' ) ); ?></p>
 			<p><?php _e('The current active theme is:', 'create-block-theme'); ?> <?php echo wp_get_theme()->get('Name'); ?></p>
 			<form method="get">
-				<label><?php _e('Theme name', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Blockbase', 'create-block-theme'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
-				<label><?php _e('Theme description', 'create-block-theme'); ?><br /><textarea placeholder="<?php _e('Blockbase is a simple theme that supports full-site editing. Use it to build something beautiful.', 'create-block-theme'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
+				<label><?php _e('Theme Name', 'create-block-theme'); ?><br /><input required placeholder="<?php echo wp_get_theme()->get('Name'); ?>" type="text" name="theme[name]" class="regular-text" required /></label><br /><br />
+				<label><?php _e('Theme Description', 'create-block-theme'); ?><br /><textarea placeholder="<?php echo wp_get_theme()->get('Description'); ?>" rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
 				<?php if ( ! is_child_theme() ): ?>
 				<label><input checked value="child" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Child theme of the current active theme', 'create-block-theme'); ?></label><br /><br />
 				<label><input value="block" type="radio" name="theme[type]" class="regular-text code" /><?php _e('Standalone theme', 'create-block-theme'); ?></label><br /><br />
@@ -399,9 +399,9 @@ function create_blockbase_theme_page() {
 				<input type="hidden" name="theme[type]" value="child" />
 				<input type="hidden" name="theme[template]" value="<?php echo wp_get_theme()->get('Template'); ?>" />
 				<?php endif; ?>
-				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="https://github.com/automattic/themes/tree/trunk/blockbase" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
-				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php _e('Automattic', 'create-block-theme'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
-				<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input placeholder="<?php _e('https://automattic.com/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
+				<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input placeholder="<?php echo wp_get_theme()->get('ThemeURI'); ?>" type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
+				<label><?php _e('Author', 'create-block-theme'); ?><br /><input placeholder="<?php echo wp_get_theme()->get('Author'); ?>" type="text" name="theme[author]" class="regular-text" /></label><br /><br />
+				<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input placeholder="<?php echo wp_get_theme()->get('AuthorURI'); ?>" type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
 				<input type="hidden" name="page" value="create-block-theme" />
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
 				<input type="submit" value="<?php _e('Create block theme', 'create-block-theme'); ?>" class="button button-primary" />
