@@ -277,12 +277,10 @@ function blockbase_save_theme() {
 
 		// Check nonce
 		if ( ! wp_verify_nonce( $_GET['nonce'], 'create_block_theme' ) ) {
-			var_dump('this>asdfs');
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
 		}
 
 		if ( empty( $_GET['theme']['name'] ) ) {
-			var_dump('this>23cc');
 			return add_action( 'admin_notices', 'create_blockbase_child_admin_notice_error' );
 		}
 
