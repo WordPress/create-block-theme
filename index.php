@@ -121,17 +121,33 @@ function create_block_theme_get_theme_css( $theme ) {
 	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
 		foreach ($current_theme->get_files('css', -1) as $key => $value) {
 			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
+
+				$css_contents = file_get_contents( $value );
+
+				if ($key === "style.css") {
+					// Remove metadata from style.css file
+					$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
+				}
+
+				// If there is nothing but metadata in the style.css file don't include it.
+				if ( strlen($css_contents) === 0 ) {
+					continue;
+				}
+
 				$css_string .= "
+
 /*
 *
 * Styles from " . $current_theme->get_stylesheet() . "/" . $key . "
 *
 */
+
 ";
-				$css_string .= file_get_contents( $value );
+				$css_string .= $css_contents;
 			}
 		}
 	}
+
 	return $css_string;
 }
 
