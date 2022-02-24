@@ -103,6 +103,55 @@ GNU General Public License for more details.
 }
 
 /**
+ * Build the CSS that a generated theme will include.
+ * When building a STANDALONE theme from Blockbase the ponyfill.css will be included.
+ * When building a GRANDCHILD theme the CURRENT theme's CSS is included.
+ * When building a CHILD theme no extra CSS is included.
+ */
+function create_block_theme_get_theme_css( $theme ) {
+
+	// if we are building a CHILD theme we don't need any CSS
+	if ( $theme['type'] === 'child' ) {
+		return '';
+	}
+
+	$css_string = '';
+
+	$current_theme = wp_get_theme( );
+	if ( $current_theme->exists() && $current_theme->get( 'TextDomain' ) !== 'blockbase' ){
+		foreach ($current_theme->get_files('css', -1) as $key => $value) {
+			if (strpos($key, '.css') !== false && file_exists( $value ) ) {
+
+				$css_contents = file_get_contents( $value );
+
+				if ($key === "style.css") {
+					// Remove metadata from style.css file
+					$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
+				}
+
+				// If there is nothing but metadata in the style.css file don't include it.
+				if ( strlen($css_contents) === 0 ) {
+					continue;
+				}
+
+				$css_string .= "
+
+/*
+*
+* Styles from " . $current_theme->get_stylesheet() . "/" . $key . "
+*
+*/
+
+";
+				$css_string .= $css_contents;
+			}
+		}
+	}
+
+	return $css_string;
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
@@ -177,7 +226,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	// Add theme.css combining all the current theme's css files.
 	$zip->addFromString(
 		$theme['slug'] . '/assets/theme.css',
-		''
+		create_block_theme_get_theme_css( $theme )
 	);
 
 	// Add readme.txt.
