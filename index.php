@@ -40,7 +40,7 @@ function blockbase_get_style_css( $theme ) {
 	$uri = $theme['uri'];
 	$author = $theme['author'];
 	$author_uri = $theme['author_uri'];
-	$template = !create_block_theme_get_new_parent( $theme ) ? "" : "\nTemplate: " . create_block_theme_get_new_parent( $theme ) ."\n";
+	$template = !create_block_theme_get_new_parent( $theme ) ? "" : "\nTemplate: " . create_block_theme_get_new_parent( $theme );
 	return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -52,9 +52,8 @@ Tested up to: 5.9
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
-License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE" .
-$template .
-"Text Domain: {$slug}
+License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE{$template}
+Text Domain: {$slug}
 Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
 */";
 }
@@ -226,6 +225,39 @@ function '.$theme['slug'].'_get_fonts_url() {
  	';
 }
 
+function zip_the_whole_theme( $filename, $theme ) {
+	// Get real path for our folder
+	$rootPath = get_stylesheet_directory();
+
+	// Initialize archive object
+	$zip = new ZipArchive();
+	$zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+	// Create recursive directory iterator
+	/** @var SplFileInfo[] $files */
+	$files = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator($rootPath),
+		RecursiveIteratorIterator::LEAVES_ONLY
+	);
+
+	foreach ($files as $name => $file)
+	{
+		// Skip directories (they would be added automatically)
+		if (!$file->isDir())
+		{
+			// Get real and relative path for current file
+			$filePath = $file->getRealPath();
+			$relativePath = substr($filePath, strlen($rootPath) + 1);
+
+			// Add current file to archive
+			$zip->addFile($filePath, $relativePath);
+		}
+	}
+
+	// Zip archive will be created only after closing object
+	$zip->close();
+}
+
 /**
  * Creates an export of the current templates and
  * template parts from the site editor at the
@@ -234,7 +266,6 @@ function '.$theme['slug'].'_get_fonts_url() {
  * @param string $filename path of the ZIP file.
  */
 function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
-
 	$base_theme = wp_get_theme()->get('TextDomain');
 
 	if ( ! class_exists( 'ZipArchive' ) ) {
@@ -242,13 +273,40 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 	}
 
 	$zip = new ZipArchive();
-	$zip->open( $filename, ZipArchive::OVERWRITE );
-	$zip->addEmptyDir( $theme['slug'] );
-	$zip->addEmptyDir( $theme['slug'] . '/templates' );
-	$zip->addEmptyDir( $theme['slug'] . '/parts' );
+	$zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE );
+
+	// If this is a standalone theme then copy the whole theme into a zip folder.
+	if ( $theme['type'] === "block" ) {
+		// Get real path for our folder
+		$theme_path = get_stylesheet_directory();
+
+		// Create recursive directory iterator
+		/** @var SplFileInfo[] $files */
+		$files = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $theme_path ),
+			RecursiveIteratorIterator::LEAVES_ONLY
+		);
+
+		foreach ( $files as $name => $file )
+		{
+			// Skip directories (they would be added automatically)
+			if ( ! $file->isDir() )
+			{
+				// Get real and relative path for current file
+				$file_path = $file->getRealPath();
+				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
+
+				// Add current file to archive
+				$zip->addFile( $file_path, $relative_path );
+			}
+		}
+	}
 
 	// Load templates into the zip file.
 	$templates = gutenberg_get_block_templates();
+	if ( $templates ) {
+		$zip->addEmptyDir( 'templates' );
+	}
 	foreach ( $templates as $template ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block templates provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
@@ -264,13 +322,16 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 			$template->content = _remove_theme_attribute_from_content( $template->content );
 		}
 		$zip->addFromString(
-			$theme['slug'] . '/templates/' . $template->slug . '.html',
+			'templates/' . $template->slug . '.html',
 			$template->content
 		);
 	}
 
 	// Load template parts into the zip file.
 	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+	if ( $template_parts ) {
+		$zip->addEmptyDir( 'parts' );
+	}
 	foreach ( $template_parts as $template_part ) {
 
 		//Currently, when building against CHILD themes of Blockbase, block template parts provided by Blockbase, not modified by the child theme or the user are included in the page. This is a bug.
@@ -287,52 +348,64 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		}
 
 		$zip->addFromString(
-			$theme['slug'] . '/parts/' . $template_part->slug . '.html',
+			'parts/' . $template_part->slug . '.html',
 			$template_part->content
 		);
 	}
 
 	// Add theme.json.
-	$zip->addFromString(
-		$theme['slug'] . '/theme.json',
-		wp_json_encode( create_block_theme_get_theme_json_for_export( $theme ), JSON_PRETTY_PRINT )
-	);
-
-	// Add style.css.
-	$zip->addFromString(
-		$theme['slug'] . '/style.css',
-		blockbase_get_style_css( $theme )
-	);
-
-	// Add theme.css combining all the current theme's css files.
-	$zip->addFromString(
-		$theme['slug'] . '/assets/theme.css',
-		create_block_theme_get_theme_css( $theme )
-	);
+	if ( wp_is_block_theme() ) {
+		$zip->addFromString(
+			'theme.json',
+			wp_json_encode( create_block_theme_get_theme_json_for_export( $theme ), JSON_PRETTY_PRINT )
+		);
+	}
 
 	// Add readme.txt.
 	$zip->addFromString(
-		$theme['slug'] . '/readme.txt',
+		'readme.txt',
 		blockbase_get_readme_txt( $theme )
 	);
 
-	// Add screenshot.png.
-	$zip->addFile(
-		__DIR__ . '/screenshot.png',
-		$theme['slug'] . '/screenshot.png'
-	);
+	// If this is a standalone theme then use the CSS files and screenshot we already have:
+	if ( $theme['type'] === "block" ) {
+		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
 
-	//Standalone themes need an index.php file and functions.php
-	if( $theme['type'] === 'block' ) {
+		// Remove metadata from style.css file.
+		$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
+
+		// Add new meta data for this theme.
+		$css_contents = blockbase_get_style_css( $theme ) . $css_contents;
+
+		// Update style.css.
 		$zip->addFromString(
-			$theme['slug'] . '/index.php',
-			'<?php //Silence is golden'
+			'style.css',
+			$css_contents
 		);
+	} else {
+		// Create our own CSS files and screenshot.
+
+		// Add style.css.
 		$zip->addFromString(
-			$theme['slug'] . '/functions.php',
-			create_block_theme_get_functions( $theme )
+			'style.css',
+			blockbase_get_style_css( $theme )
 		);
+
+		// Add theme.css combining all the current theme's css files.
+		$zip->addFromString(
+			'assets/theme.css',
+			create_block_theme_get_theme_css( $theme )
+		);
+
+		// Add screenshot.png.
+		$zip->addFile(
+			'screenshot.png',
+			$theme['slug'] . '/screenshot.png'
+		);
+
 	}
+
+
 
 	// Save changes to the zip file.
 	$zip->close();
