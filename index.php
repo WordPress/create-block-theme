@@ -475,8 +475,6 @@ function create_blockbase_child_admin_notice_success() {
 }
 
 function create_block_theme_get_new_parent( $theme ) {
-
-
 	if( is_child_theme() ) {
 		return wp_get_theme()->get( 'Template' );
 	} elseif( $theme['type'] == 'child' ) {

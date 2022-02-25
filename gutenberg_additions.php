@@ -90,12 +90,11 @@ function augment_gutenberg_with_utilities() {
  				$theme->merge( $theme_theme );
 			}
 
-	        	$theme->merge( static::get_user_data() );
+	        $theme->merge( static::get_user_data() );
 
 			$data = MY_Theme_JSON_Resolver::flatten_theme_json($theme->get_raw_data(), null);
 
 			return $data;
-
 		}
 
 	}
