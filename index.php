@@ -14,9 +14,15 @@
 
 require_once (__DIR__ . '/gutenberg_additions.php');
 
+/**
+ * Get the theme.json needed for a theme for a given type.
+ * For a CHILD theme we only want USER settings.
+ * For a GRANDCHILD theme we want USER settings and settings from the CURRENT (not parent) theme.
+ * For a THEME EXPORT we want ALL of the settings.
+ */
 function create_block_theme_get_theme_json_for_export( $theme ) {
 
-	// For STANDALONE themes we want all of the user and theme settings (including current and parent)
+	// For a THEME EXPORT we want all of the user and theme settings (including current and parent)
 	if ($theme['type'] == 'block') {
 		return MY_Theme_JSON_Resolver::export_theme_data('all');
 	}
@@ -33,6 +39,9 @@ function create_block_theme_get_theme_json_for_export( $theme ) {
 
 }
 
+/**
+ * Build a style.css file for CHILD/GRANDCHILD themes.
+ */
 function blockbase_get_style_css( $theme ) {
 	$slug = $theme['slug'];
 	$name = $theme['name'];
@@ -58,6 +67,9 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 */";
 }
 
+/**
+ * Build a readme.txt file for CHILD/GRANDCHILD themes.
+ */
 function blockbase_get_readme_txt( $theme ) {
 	$slug = $theme['slug'];
 	$name = $theme['name'];
@@ -102,9 +114,8 @@ GNU General Public License for more details.
 
 /**
  * Build the CSS that a generated theme will include.
- * When building a STANDALONE theme (from a parent theme) the CURRENT (parent) theme's CSS is included.
- * When building a GRANDCHILD theme the CURRENT (child) theme's CSS is included.
  * When building a CHILD theme no extra CSS is included.
+ * When building a GRANDCHILD theme the CURRENT (child) theme's CSS is included.
  */
 function create_block_theme_get_theme_css( $theme ) {
 
@@ -148,81 +159,6 @@ function create_block_theme_get_theme_css( $theme ) {
 	}
 
 	return $css_string;
-}
-
-/**
- * Standalone themes need a little extra logic to:
- *  - Load the theme.css
- *  - Load fonts from theme.json
- * This is that logic.
- */
-function create_block_theme_get_functions( $theme ) {
-
-	if ($theme['type'] !== 'block') {
-		return null;
-	}
-	return '<?php
-
-// TODO: Add Theme Supports that are not yet represented in theme.json
-
-// TODO: No patterns are copied (or loaded) and we may want to consider that.
-
-// Add Editor Styles
-function '.$theme["slug"].'_editor_styles() {
-	// Add the child theme CSS if it exists.
-	if ( file_exists( get_stylesheet_directory() . "/assets/theme.css" ) ) {
-		add_editor_style(
-			"/assets/theme.css"
-		);
-	}
-	add_editor_style(
-		array(
-			'.$theme["slug"].'_get_fonts_url(),
-		)
-	);
-}
-add_action( "admin_init", "'.$theme['slug'].'_editor_styles" );
-
-// Add View Styles
-function '.$theme['slug'].'_scripts() {
-	wp_enqueue_style( "'.$theme["slug"].'-fonts", '.$theme["slug"].'_get_fonts_url(), array(), null );
-	// Add the theme CSS if it exists.
-	if ( file_exists( get_stylesheet_directory() . "/assets/theme.css" ) ) {
-		wp_enqueue_style( "'.$theme['slug'].'-styles", get_stylesheet_directory_uri() . "/assets/theme.css", array(), wp_get_theme()->get( "Version" ) );
-	}
-}
-add_action( "wp_enqueue_scripts", "'.$theme['slug'].'_scripts" );
-
-function '.$theme['slug'].'_get_fonts_url() {
-
-	$font_families = [];
-
-	if ( ! class_exists( "WP_Theme_JSON_Resolver_Gutenberg" ) ) {
-		return "";
-	}
-
-	$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
-	if ( empty( $theme_data ) || empty( $theme_data["typography"] ) || empty( $theme_data["typography"]["fontFamilies"] ) ) {
-		return "";
-	}
-
-
-	if ( ! empty( $theme_data["typography"]["fontFamilies"]["theme"] ) ) {
-		foreach( $theme_data["typography"]["fontFamilies"]["theme"] as $font ) {
-			if ( ! empty( $font["google"] ) ) {
-				$font_families[] = $font["google"];
-			}
-		}
-	}
-
-	if ( empty( $font_families ) ) {
-		return "";
-	}
-
-	// Make a single request for the theme or user fonts.
-	return esc_url_raw( "https://fonts.googleapis.com/css2?" . implode( "&", array_unique( $font_families ) ) . "&display=swap" );
-}
- 	';
 }
 
 function zip_the_whole_theme( $filename, $theme ) {
@@ -295,6 +231,16 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 				// Get real and relative path for current file
 				$file_path = $file->getRealPath();
 				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
+
+				// If the path is for templates/parts ignore it
+				if ( 
+					strpos($relative_path, 'block-template-parts/' ) || 
+					strpos($relative_path, 'block-templates/' ) || 
+					strpos($relative_path, 'templates/' ) || 
+					strpos($relative_path, 'parts/' )
+				) {
+					continue;
+				}
 
 				// Add current file to archive
 				$zip->addFile( $file_path, $relative_path );
