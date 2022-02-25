@@ -52,7 +52,7 @@ Tested up to: 5.9
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
-License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE" . 
+License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE" .
 $template .
 "Text Domain: {$slug}
 Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
@@ -207,7 +207,7 @@ function '.$theme['slug'].'_get_fonts_url() {
 		return "";
 	}
 
-	
+
 	if ( ! empty( $theme_data["typography"]["fontFamilies"]["theme"] ) ) {
 		foreach( $theme_data["typography"]["fontFamilies"]["theme"] as $font ) {
 			if ( ! empty( $font["google"] ) ) {
@@ -222,7 +222,7 @@ function '.$theme['slug'].'_get_fonts_url() {
 
 	// Make a single request for the theme or user fonts.
 	return esc_url_raw( "https://fonts.googleapis.com/css2?" . implode( "&", array_unique( $font_families ) ) . "&display=swap" );
-}	
+}
  	';
 }
 
@@ -285,7 +285,7 @@ function gutenberg_edit_site_export_theme_create_zip( $filename, $theme ) {
 		} else if ( function_exists( '_remove_theme_attribute_from_content' ) ) {
 			$template_part->content = _remove_theme_attribute_from_content( $template_part->content );
 		}
-	
+
 		$zip->addFromString(
 			$theme['slug'] . '/parts/' . $template_part->slug . '.html',
 			$template_part->content

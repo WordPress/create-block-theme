@@ -73,8 +73,7 @@ function augment_gutenberg_with_utilities() {
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
 		 */
 		public static function export_theme_data( $content ) {
-
-	        	$theme = new WP_Theme_JSON_Gutenberg();
+	        $theme = new WP_Theme_JSON_Gutenberg();
 
 			if ( $content === 'all' && wp_get_theme()->parent() ) {
 				// Get parent theme.json.
