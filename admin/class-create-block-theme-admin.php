@@ -441,17 +441,20 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		<div class="wrap">
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
 			<p><?php _e('Save your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
-			<?php if ( is_child_theme() ): ?>
-			<p><b><?php _e('NOTE: You have a CHILD theme activated.  The templates exported from this tool will currently include those provided by the PARENT theme as well.  This is a bug.  Those should be removed manually from the exported theme until this bug can be resolved.', 'create-block-theme'); ?></b></p>
-			<?php endif; ?>
 			<form method="get">
 
-				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
+				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
+				<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?></label><br /><br />
 				<?php if ( is_child_theme() ): ?>
-				<label><input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
+				<label><input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label> 
+				<?php _e('[Create a new theme cloning the activated child theme.  The parent theme will be the same as the parent of the currently activated theme. The resulting theme will have all of the assets of the activated theme, none of the assets provided by the parent theme, as well as user changes.]', 'create-block-theme'); ?>
+				<p><b><?php _e('NOTE: Sibling themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p><br />
 				<?php else: ?>
-				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
-				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
+				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
+				<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?><br /><br />
+				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
+				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
+				<p><b><?php _e('NOTE: Cloned themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p></label><br /><br />
 				<?php endif; ?>
 			
 				<div hidden id="new_theme_metadata_form">
