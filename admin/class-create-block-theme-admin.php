@@ -66,6 +66,9 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
+		// TODO: This must have namespaces changed to be complete
+		$zip = $this->copy_theme_to_zip( $zip );
+
 		$zip = $this->add_templates_to_zip( $zip, 'current' );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
@@ -75,10 +78,15 @@ class Create_Block_Theme_Admin {
 			$this->build_readme_txt( $theme )
 		);
 
-		// Add style.css.
+		// Augment style.css
+		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
+		// Remove metadata from style.css file
+		$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
+		// Add new metadata
+		$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
 		$zip->addFromString(
 			'style.css',
-			$this->build_child_style_css( $theme )
+			$css_contents	
 		);
 
 		// Add screenshot.png.
@@ -97,6 +105,61 @@ class Create_Block_Theme_Admin {
 		die();
 	}
 
+	/**
+	 * Clone the activated theme to create a new theme
+	 */
+	function clone_theme( $theme ) {
+		// Sanitize inputs.
+		$theme['name'] = sanitize_text_field( $theme['name'] );
+		$theme['description'] = sanitize_text_field( $theme['description'] );
+		$theme['uri'] = sanitize_text_field( $theme['uri'] );
+		$theme['author'] = sanitize_text_field( $theme['author'] );
+		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['template'] = wp_get_theme()->get( 'Template' );
+
+		// Create ZIP file in the temporary directory.
+		$filename = tempnam( get_temp_dir(), $theme['slug'] );
+		$zip = $this->create_zip( $filename );
+
+		// TODO: This must have namespaces changed to be complete
+		$zip = $this->copy_theme_to_zip( $zip );
+
+		$zip = $this->add_templates_to_zip( $zip, 'all' );
+		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
+
+		// Add readme.txt.
+		$zip->addFromString(
+			'readme.txt',
+			$this->build_readme_txt( $theme )
+		);
+
+		// Augment style.css
+		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
+		// Remove metadata from style.css file
+		$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
+		// Add new metadata
+		$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
+		$zip->addFromString(
+			'style.css',
+			$css_contents	
+		);
+
+		// Add screenshot.png.
+		$zip->addFile(
+			'screenshot.png',
+			$theme['slug'] . '/screenshot.png'
+		);
+
+		$zip->close();
+
+		header( 'Content-Type: application/zip' );
+		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
+		header( 'Content-Length: ' . filesize( $filename ) );
+		flush();
+		echo readfile( $filename );
+		die();
+	}
 	/**
 	 * Create a child theme of the activated theme
 	 */
@@ -353,11 +416,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			<?php endif; ?>
 			<form method="get">
 
-				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code"onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
+				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
 				<?php if ( is_child_theme() ): ?>
 				<label><input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
 				<?php else: ?>
 				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
+				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label><br /><br />
 				<?php endif; ?>
 			
 				<div hidden id="new_theme_metadata_form">
@@ -393,14 +457,19 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			if ( is_child_theme() ) {
 				if ( $_GET['theme']['type'] === 'sibling' ) {
 					$this->create_sibling_theme( $_GET['theme'] );
-				} else {
+				} 
+				else {
 					$this->export_child_theme( $_GET['theme'] );
 				}
 	
 			} else {
 				if( $_GET['theme']['type'] === 'child' ) {
 					$this->create_child_theme( $_GET['theme'] );
-				} else {
+				} 
+				else if( $_GET['theme']['type'] === 'clone' ) {
+					$this->clone_theme( $_GET['theme'] );
+				} 
+				else {
 					$this->export_theme( $_GET['theme'] );
 				}
 			}
