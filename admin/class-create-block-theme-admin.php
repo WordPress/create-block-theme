@@ -281,6 +281,16 @@ class Create_Block_Theme_Admin {
 		return $zip;
 	}
 
+	/**
+	 * Add block templates and parts to the zip.
+	 *
+	 * @since    0.0.2
+	 * @param    object               $zip          The zip archive to add the templates to.
+	 * @param    string               $export_type  Determine the templates that should be exported.
+	 * 						current = templates from currently activated theme (but not a parent theme if there is one) as well as user edited templates
+	 * 						user = only user edited templates
+	 * 						all = all templates no matter what
+	 */
 	function add_templates_to_zip( $zip, $export_type ) {
 
 		$templates = gutenberg_get_block_templates();
@@ -294,12 +304,25 @@ class Create_Block_Theme_Admin {
 			$zip->addEmptyDir( 'parts' );
 		}
 
+
+		// build collection of templates/parts in currently activated theme
+		$templates_paths = get_block_theme_folders();
+		$templates_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template'] . '/';
+		$parts_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
+
 		foreach ( $templates as $template ) {
 			if ($template->source === 'theme' && $export_type === 'user') {
 				continue;
 			}
-			// TODO: If the export_type is 'current' then we WANT the template if it can from the ACTIVATED them
-			// but NOT if it came from the PARENT theme.
+
+			if ( 
+				$template->source === 'theme' && 
+				$export_type === 'current' && 
+				! file_exists( $templates_path . $template->slug . '.html' ) 
+			) {
+				continue;
+			}
+
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
@@ -311,8 +334,15 @@ class Create_Block_Theme_Admin {
 			if ($template_part->source === 'theme' && $export_type === 'user') {
 				continue;
 			}
-			// TODO: If the export_type is 'current' then we WANT the template if it can from the ACTIVATED them
-			// but NOT if it came from the PARENT theme.
+
+			if ( 
+				$template->source === 'theme' && 
+				$export_type === 'current' && 
+				! file_exists( $parts_path . $template->slug . '.html' ) 
+			) {
+				continue;
+			}
+
 			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
