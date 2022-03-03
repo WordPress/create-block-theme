@@ -94,8 +94,8 @@ class Create_Block_Theme_Admin {
 
 		// Add screenshot.png.
 		$zip->addFile(
-			'screenshot.png',
-			$theme['slug'] . '/screenshot.png'
+			__DIR__ . '/../screenshot.png',
+			'screenshot.png'
 		);
 
 		$zip->close();
@@ -150,8 +150,8 @@ class Create_Block_Theme_Admin {
 
 		// Add screenshot.png.
 		$zip->addFile(
-			'screenshot.png',
-			$theme['slug'] . '/screenshot.png'
+			__DIR__ . '/../screenshot.png',
+			'screenshot.png'
 		);
 
 		$zip->close();
@@ -197,8 +197,8 @@ class Create_Block_Theme_Admin {
 
 		// Add screenshot.png.
 		$zip->addFile(
-			'screenshot.png',
-			$theme['slug'] . '/screenshot.png'
+			__DIR__ . '/../screenshot.png',
+			'screenshot.png'
 		);
 
 		$zip->close();
