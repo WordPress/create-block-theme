@@ -387,12 +387,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Changelog ==
 
-= 1.0.0 =
+= 0.0.1 =
 * Initial release
 
 == Copyright ==
 
-{$name} WordPress Theme, (C) 2021 {$author}
+{$name} WordPress Theme, (C) 2022 {$author}
 {$name} is distributed under the terms of the GNU GPL.
 
 This program is free software: you can redistribute it and/or modify
