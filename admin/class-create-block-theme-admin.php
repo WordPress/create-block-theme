@@ -20,6 +20,9 @@ class Create_Block_Theme_Admin {
 	}
 
 	function create_admin_menu() {
+		if ( ! wp_is_block_theme() ) {
+			return;
+		}
 		$page_title=__('Create Block Theme', 'create-block-theme');
 		$menu_title=__('Create Block Theme', 'create-block-theme');
 		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', [ $this, 'create_admin_form_page' ] );
@@ -437,7 +440,16 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	}
 
 	function create_admin_form_page() {
-	?>
+		if ( ! wp_is_block_theme() ) {
+			?>
+			<div class="wrap">
+				<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
+				<p><?php _e('Activate a block theme to use this tool.', 'create-block-theme'); ?></p>
+			</div>
+			<?php
+			return;
+		}
+		?>
 		<div class="wrap">
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
 			<p><?php _e('Save your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
