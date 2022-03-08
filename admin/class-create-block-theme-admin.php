@@ -339,9 +339,9 @@ class Create_Block_Theme_Admin {
 			}
 
 			if ( 
-				$template->source === 'theme' && 
+				$template_part->source === 'theme' && 
 				$export_type === 'current' && 
-				! file_exists( $parts_path . $template->slug . '.html' ) 
+				! file_exists( $parts_path . $template_part->slug . '.html' ) 
 			) {
 				continue;
 			}
