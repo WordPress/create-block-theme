@@ -28,6 +28,15 @@ class Create_Block_Theme_Admin {
 		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', [ $this, 'create_admin_form_page' ] );
 	}
 
+	function save_theme_locally( $export_type ) {
+		$this->add_templates_to_local( $export_type );
+		$this->add_theme_json_to_local( $export_type );
+	}
+
+	function clear_user_customizations() {
+		//TODO
+	}
+
 	/**
 	 * Export activated child theme
 	 */
@@ -239,9 +248,17 @@ class Create_Block_Theme_Admin {
 		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type );
 		$zip->addFromString(
 			'theme.json',
-			wp_json_encode( $theme_json, JSON_PRETTY_PRINT )
+			wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES  )
 		);
 		return $zip;
+	}
+
+	function add_theme_json_to_local ( $export_type ) {
+		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type );
+		file_put_contents(
+			get_template_directory() . '/theme.json',
+			wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
+		);
 	}
 
 	function copy_theme_to_zip( $zip ) {
@@ -327,6 +344,11 @@ class Create_Block_Theme_Admin {
 			}
 
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
+
+			//NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again.
+			$template->content = str_replace( '\u002d', '-', $template->content );
+
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
 				$template->content
@@ -347,6 +369,11 @@ class Create_Block_Theme_Admin {
 			}
 
 			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
+
+			//NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again.
+			$template_part->content = str_replace( '\u002d', '-', $template_part->content );
+
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
 				$template_part->content
@@ -354,6 +381,70 @@ class Create_Block_Theme_Admin {
 		}
 
 		return $zip;
+	}
+
+	function add_templates_to_local( $export_type ) {
+		//NOTE: This was heavily copied from add_templates_to_zip
+		// and much of this logic can probably be refactored into a common spot
+
+		$templates = gutenberg_get_block_templates();
+		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+
+		// build collection of templates/parts in currently activated theme
+		$templates_paths = get_block_theme_folders();
+		$templates_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template'] . '/';
+		$parts_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
+
+		foreach ( $templates as $template ) {
+			if ($template->source === 'theme' && $export_type === 'user') {
+				continue;
+			}
+
+			if ( 
+				$template->source === 'theme' && 
+				$export_type === 'current' && 
+				! file_exists( $templates_path . $template->slug . '.html' ) 
+			) {
+				continue;
+			}
+
+			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
+
+			//NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again.
+			$template->content = str_replace( '\u002d', '-', $template->content );
+
+			file_put_contents(
+				get_template_directory() . '/templates/' . $template->slug . '.html',
+				$template->content
+			);
+		}
+
+		foreach ( $template_parts as $template_part ) {
+			if ($template_part->source === 'theme' && $export_type === 'user') {
+				continue;
+			}
+
+			if ( 
+				$template_part->source === 'theme' && 
+				$export_type === 'current' && 
+				! file_exists( $parts_path . $template_part->slug . '.html' ) 
+			) {
+				continue;
+			}
+
+
+			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
+
+			//NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again.
+			$template_part->content = str_replace( '\u002d', '-', $template_part->content );
+
+			file_put_contents(
+				get_template_directory() . '/parts/' . $template_part->slug . '.html',
+				$template_part->content
+			);
+		}
 	}
 
 	function create_zip( $filename ) {
@@ -452,7 +543,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 		<div class="wrap">
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
-			<p><?php _e('Save your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
+			<p><?php _e('Export your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
 			<form method="get">
 
 				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
@@ -466,7 +557,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?><br /><br />
 				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
 				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
-				<p><b><?php _e('NOTE: Cloned themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p></label><br /><br />
+				<p><b><?php _e('NOTE: Cloned themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p></label>
 				<?php endif; ?>
 			
 				<div hidden id="new_theme_metadata_form">
@@ -478,7 +569,17 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				</div>
 				<input type="hidden" name="page" value="create-block-theme" />
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-				<input type="submit" value="<?php _e('Create block theme', 'create-block-theme'); ?>" class="button button-primary" />
+				<input type="submit" value="<?php _e('Export theme', 'create-block-theme'); ?>" class="button button-primary" />
+			</form>
+
+			<br><br>
+			<h2><?php _e('Save Block Theme', 'create-block-theme'); ?></h2>
+			<p><?php _e('Save your current block them with changes you made to Templates, Template Parts and Global Styles.  This saves your user changes to the theme and removes all user customizations.', 'create-block-theme'); ?></p>
+			<form method="get">
+			<input type="hidden" name="page" value="create-block-theme" />
+				<input type="hidden" name="save-locally" value="true" />
+				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+				<input type="submit" value="<?php _e('Save theme', 'create-block-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
 	<?php
@@ -486,8 +587,29 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function blockbase_save_theme() {
 
-		// I can't work out how to call the API but this works for now.
-		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
+		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['save-locally'] ) && $_GET['save-locally'] === 'true' ) {
+
+			// Check user capabilities.
+			if ( ! current_user_can( 'edit_theme_options' ) ) {
+				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+			}
+
+			// Check nonce
+			if ( ! wp_verify_nonce( $_GET['nonce'], 'create_block_theme' ) ) {
+				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+			}
+
+			if ( is_child_theme() ) {
+				$this->save_theme_locally( 'current' );
+				$this->clear_user_customizations();
+			} 
+			else {
+				$this->save_theme_locally( 'all' );
+				$this->clear_user_customizations();
+			}
+		}
+
+		else if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
