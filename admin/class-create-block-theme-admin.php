@@ -34,7 +34,22 @@ class Create_Block_Theme_Admin {
 	}
 
 	function clear_user_customizations() {
-		//TODO
+
+		// Clear all values in the user theme.json
+		$user_custom_post_type_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+		$global_styles_controller = new Gutenberg_REST_Global_Styles_Controller();
+		$update_request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' );
+		$update_request->set_param( 'id', $user_custom_post_type_id );
+		$update_request->set_param( 'settings', [] );
+		$update_request->set_param( 'styles', [] );
+		$updated_global_styles = $global_styles_controller->update_item( $update_request );
+		delete_transient( 'global_styles' );
+		delete_transient( 'global_styles_' . get_stylesheet() );
+		delete_transient( 'gutenberg_global_styles' );
+		delete_transient( 'gutenberg_global_styles_' . get_stylesheet() );
+
+
+
 	}
 
 	/**
