@@ -69,10 +69,8 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		// TODO: This must have namespaces changed to be complete
-		$zip = $this->copy_theme_to_zip( $zip );
-
-		$zip = $this->add_templates_to_zip( $zip, 'current' );
+		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'] );
+		$zip = $this->add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
 		// Add readme.txt.
@@ -125,10 +123,9 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		// TODO: This must have namespaces changed to be complete
-		$zip = $this->copy_theme_to_zip( $zip );
+		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'] );
 
-		$zip = $this->add_templates_to_zip( $zip, 'all' );
+		$zip = $this->add_templates_to_zip( $zip, 'all', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
 
 		// Add readme.txt.
@@ -244,7 +241,7 @@ class Create_Block_Theme_Admin {
 		return $zip;
 	}
 
-	function copy_theme_to_zip( $zip ) {
+	function copy_theme_to_zip( $zip, $new_slug ) {
 
 		// Get real path for our folder
 		$theme_path = get_stylesheet_directory();
@@ -275,13 +272,44 @@ class Create_Block_Theme_Admin {
 					continue;
 				}
 
-				// Add current file to archive
 				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
-				$zip->addFile( $file_path, $relative_path );
+				$contents = file_get_contents( $file_path );
+
+				// Replace namespace values if provided
+				if ( $new_slug ) {
+					$contents = $this->replace_namespace( $contents, $new_slug );
+				}
+
+				// Add current file to archive
+				$zip->addFromString( $relative_path, $contents );
 			}
 		}
 
 		return $zip;
+	}
+
+	function replace_namespace( $content, $new_slug ) {
+
+		// NOTE: This has the potential of renaming functions with mixed-separators.
+		// If the source theme has a single-word slug but the new theme has a multi-word slug
+		// then function will look like: function apple-bumpkin_support() 
+		// There are no issues if it is multi-word>single-word or multi>multi or single>single.
+		// Due to the complexity of this situation (compared to the simplicity of the others)
+		// this will throw an error in that situation.  
+		// Perhaps this can be addressed in the future.
+		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
+			add_action( 'admin_notices', [ $this, 'admin_notice_incompatible_names' ] );
+			die('TODO: Uh.. return to the page because of an error without downloading anything. <br><br> Because the source theme has a single name the new theme name must also have a single name.  Please either rename your theme or clone a theme that has a multi-word name.');
+		}
+
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+		$new_slug_underscore = str_replace( '-', '_', $new_slug );
+		$old_slug_underscore = str_replace( '-', '_', $old_slug );
+
+		$content = str_replace( $old_slug, $new_slug, $content );
+		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
+
+		return $content;
 	}
 
 	/**
@@ -294,11 +322,12 @@ class Create_Block_Theme_Admin {
 	 * 						user = only user edited templates
 	 * 						all = all templates no matter what
 	 */
-	function add_templates_to_zip( $zip, $export_type ) {
+	function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 
 		$templates = gutenberg_get_block_templates();
 		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
-
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+	
 		if ( $templates ) {
 			$zip->addEmptyDir( 'templates' );
 		}
@@ -327,6 +356,11 @@ class Create_Block_Theme_Admin {
 			}
 
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
+
+			if ( $new_slug ) {
+				$template->content = str_replace( $old_slug, $new_slug, $template->content );
+			}
+
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
 				$template->content
@@ -347,6 +381,11 @@ class Create_Block_Theme_Admin {
 			}
 
 			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
+
+			if ( $new_slug ) {
+				$template_part->content = str_replace( $old_slug, $new_slug, $template_part->content );
+			}
+
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
 				$template_part->content
@@ -521,6 +560,13 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			add_action( 'admin_notices', [ $this, 'admin_notice_success' ] );
 		}
+	}
+
+	function admin_notice_incompatible_names() {
+		$class = 'notice notice-error';
+		$message = __( 'Because the source theme has a single name the new theme name must also have a single name.  Please either rename your theme or clone a theme that has a multi-word name.', 'create-block-theme' );
+
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}
 
 	function admin_notice_error() {
