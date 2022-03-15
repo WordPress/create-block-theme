@@ -48,7 +48,22 @@ class Create_Block_Theme_Admin {
 		delete_transient( 'gutenberg_global_styles' );
 		delete_transient( 'gutenberg_global_styles_' . get_stylesheet() );
 
+		//remove all user templates (they have been saved in the theme)
+		$templates = gutenberg_get_block_templates();
+		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+		foreach ( $template_parts as $template ) {
+			if ( $template->source !== 'custom' ) {
+				continue;
+			}
+			wp_delete_post($template->wp_id, true);
+		}
 
+		foreach ( $templates as $template ) {
+			if ( $template->source !== 'custom' ) {
+				continue;
+			}
+			wp_delete_post($template->wp_id, true);
+		}
 
 	}
 
@@ -574,6 +589,8 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
 				<p><b><?php _e('NOTE: Cloned themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p></label>
 				<?php endif; ?>
+				<label><input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
+				<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?></label><br /><br />
 			
 				<div hidden id="new_theme_metadata_form">
 					<label><?php _e('Theme Name', 'create-block-theme'); ?><br /><input type="text" name="theme[name]" class="regular-text" /></label><br /><br />
@@ -586,23 +603,13 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
 				<input type="submit" value="<?php _e('Export theme', 'create-block-theme'); ?>" class="button button-primary" />
 			</form>
-
-			<br><br>
-			<h2><?php _e('Save Block Theme', 'create-block-theme'); ?></h2>
-			<p><?php _e('Save your current block them with changes you made to Templates, Template Parts and Global Styles.  This saves your user changes to the theme and removes all user customizations.', 'create-block-theme'); ?></p>
-			<form method="get">
-			<input type="hidden" name="page" value="create-block-theme" />
-				<input type="hidden" name="save-locally" value="true" />
-				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-				<input type="submit" value="<?php _e('Save theme', 'create-block-theme'); ?>" class="button button-primary" />
-			</form>
 		</div>
 	<?php
 	}
 
 	function blockbase_save_theme() {
 
-		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['save-locally'] ) && $_GET['save-locally'] === 'true' ) {
+		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -614,29 +621,17 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
 			}
 
-			if ( is_child_theme() ) {
-				$this->save_theme_locally( 'current' );
+			if ( $_GET['theme']['type'] === 'save' ) {
+				if ( is_child_theme() ) {
+					$this->save_theme_locally( 'current' );
+				} 
+				else {
+					$this->save_theme_locally( 'all' );
+				}
 				$this->clear_user_customizations();
-			} 
-			else {
-				$this->save_theme_locally( 'all' );
-				$this->clear_user_customizations();
 			}
-		}
-
-		else if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
-
-			// Check user capabilities.
-			if ( ! current_user_can( 'edit_theme_options' ) ) {
-				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
-			}
-
-			// Check nonce
-			if ( ! wp_verify_nonce( $_GET['nonce'], 'create_block_theme' ) ) {
-				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
-			}
-
-			if ( is_child_theme() ) {
+	
+			else if ( is_child_theme() ) {
 				if ( $_GET['theme']['type'] === 'sibling' ) {
 					$this->create_sibling_theme( $_GET['theme'] );
 				} 
