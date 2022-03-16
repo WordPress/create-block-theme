@@ -257,11 +257,11 @@ class Create_Block_Theme_Admin {
 		);
 
 		// Add all the files (except for templates)
-		foreach ( $files as $name => $file )
-		{
+		foreach ( $files as $name => $file ) {
+
 			// Skip directories (they would be added automatically)
-			if ( ! $file->isDir() )
-			{
+			if ( ! $file->isDir() ) {
+
 				// Get real and relative path for current file
 				$file_path = $file->getRealPath();
 
@@ -276,15 +276,26 @@ class Create_Block_Theme_Admin {
 				}
 
 				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
-				$contents = file_get_contents( $file_path );
 
-				// Replace namespace values if provided
-				if ( $new_slug ) {
-					$contents = $this->replace_namespace( $contents, $new_slug );
+				// Replace only text files, skip png's and other stuff.
+				$valid_extensions = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
+				$valid_extensions_regex = implode( '|', $valid_extensions );
+				if ( ! preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
+					$zip->addFile( $file_path, $relative_path );
+				}
+				
+				else {
+					$contents = file_get_contents( $file_path );
+
+					// Replace namespace values if provided
+					if ( $new_slug ) {
+						$contents = $this->replace_namespace( $contents, $new_slug );
+					}
+
+					// Add current file to archive
+					$zip->addFromString( $relative_path, $contents );
 				}
 
-				// Add current file to archive
-				$zip->addFromString( $relative_path, $contents );
 			}
 		}
 
