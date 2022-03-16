@@ -62,7 +62,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
 		// Create ZIP file in the temporary directory.
@@ -116,7 +116,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
 		// Create ZIP file in the temporary directory.
@@ -170,6 +170,9 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		//NOTE: We aren't using get_theme_slug() here because there's no issues 
+		//if themes created in this situation have different word counts since
+		//we aren't doing any refactoring of namespaces.
 		$theme['slug'] = sanitize_title( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
@@ -290,18 +293,6 @@ class Create_Block_Theme_Admin {
 
 	function replace_namespace( $content, $new_slug ) {
 
-		// NOTE: This has the potential of renaming functions with mixed-separators.
-		// If the source theme has a single-word slug but the new theme has a multi-word slug
-		// then function will look like: function apple-bumpkin_support() 
-		// There are no issues if it is multi-word>single-word or multi>multi or single>single.
-		// Due to the complexity of this situation (compared to the simplicity of the others)
-		// this will throw an error in that situation.  
-		// Perhaps this can be addressed in the future.
-		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
-			add_action( 'admin_notices', [ $this, 'admin_notice_incompatible_names' ] );
-			die('TODO: Uh.. return to the page because of an error without downloading anything. <br><br> Because the source theme has a single name the new theme name must also have a single name.  Please either rename your theme or clone a theme that has a multi-word name.');
-		}
-
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
@@ -310,6 +301,24 @@ class Create_Block_Theme_Admin {
 		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
 
 		return $content;
+	}
+
+	function get_theme_slug( $new_theme_name ) {
+
+		// If the source theme has a single-word slug but the new theme has a multi-word slug
+		// then function will look like: function apple-bumpkin_support() and that won't work.
+		// There are no issues if it is multi-word>single-word or multi>multi or single>single.
+		// Due to the complexity of this situation (compared to the simplicity of the others)
+		// this will enforce the usage of a singleword slug for those themes.
+
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+ 		$new_slug = sanitize_title( $new_theme_name );
+
+		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
+			return str_replace( '-', '', $new_slug );
+		}
+
+		return $new_slug;
 	}
 
 	/**
