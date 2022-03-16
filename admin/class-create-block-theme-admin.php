@@ -513,8 +513,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
 				<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?><br /><br />
 				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
-				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
-				<p><b><?php _e('NOTE: Cloned themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p></label><br /><br />
+				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?></label><br /><br />
 				<?php endif; ?>
 			
 				<div hidden id="new_theme_metadata_form">
