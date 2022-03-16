@@ -39,7 +39,7 @@ class Create_Block_Theme_Admin {
 		$zip = $this->create_zip( $filename );
 
 		$zip = $this->copy_theme_to_zip( $zip );
-		$zip = $this->add_templates_to_zip( $zip, 'current' );
+		$zip = $this->add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
 		$zip->close();
@@ -177,7 +177,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->add_templates_to_zip( $zip, 'user' );
+		$zip = $this->add_templates_to_zip( $zip, 'user', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'user' );
 
 		// Add readme.txt.
@@ -219,7 +219,7 @@ class Create_Block_Theme_Admin {
 		$zip = $this->create_zip( $filename );
 
 		$zip = $this->copy_theme_to_zip( $zip );
-		$zip = $this->add_templates_to_zip( $zip, 'all' );
+		$zip = $this->add_templates_to_zip( $zip, 'all', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
 
 		$zip->close();
@@ -290,6 +290,8 @@ class Create_Block_Theme_Admin {
 
 	function replace_namespace( $content, $new_slug ) {
 
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+
 		// NOTE: This has the potential of renaming functions with mixed-separators.
 		// If the source theme has a single-word slug but the new theme has a multi-word slug
 		// then function will look like: function apple-bumpkin_support() 
@@ -302,7 +304,6 @@ class Create_Block_Theme_Admin {
 			die('TODO: Uh.. return to the page because of an error without downloading anything. <br><br> Because the source theme has a single name the new theme name must also have a single name.  Please either rename your theme or clone a theme that has a multi-word name.');
 		}
 
-		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
 
