@@ -39,7 +39,7 @@ class Create_Block_Theme_Admin {
 		$zip = $this->create_zip( $filename );
 
 		$zip = $this->copy_theme_to_zip( $zip );
-		$zip = $this->add_templates_to_zip( $zip, 'current' );
+		$zip = $this->add_templates_to_zip( $zip, 'current', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
 		$zip->close();
@@ -180,7 +180,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->add_templates_to_zip( $zip, 'user' );
+		$zip = $this->add_templates_to_zip( $zip, 'user', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'user' );
 
 		// Add readme.txt.
@@ -222,7 +222,7 @@ class Create_Block_Theme_Admin {
 		$zip = $this->create_zip( $filename );
 
 		$zip = $this->copy_theme_to_zip( $zip );
-		$zip = $this->add_templates_to_zip( $zip, 'all' );
+		$zip = $this->add_templates_to_zip( $zip, 'all', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
 
 		$zip->close();
