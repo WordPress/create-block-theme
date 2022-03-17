@@ -170,10 +170,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		//NOTE: We aren't using get_theme_slug() here because there's no issues 
-		//if themes created in this situation have different word counts since
-		//we aren't doing any refactoring of namespaces.
-		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
 		// Create ZIP file in the temporary directory.
@@ -581,13 +578,6 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			add_action( 'admin_notices', [ $this, 'admin_notice_success' ] );
 		}
-	}
-
-	function admin_notice_incompatible_names() {
-		$class = 'notice notice-error';
-		$message = __( 'Because the source theme has a single name the new theme name must also have a single name.  Please either rename your theme or clone a theme that has a multi-word name.', 'create-block-theme' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}
 
 	function admin_notice_error() {
