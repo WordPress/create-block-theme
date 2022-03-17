@@ -263,7 +263,7 @@ class Create_Block_Theme_Admin {
 			if ( ! $file->isDir() ) {
 
 				// Get real and relative path for current file
-				$file_path = $file->getRealPath();
+				$file_path = wp_normalize_path( $file );
 
 				// If the path is for templates/parts ignore it
 				if ( 
