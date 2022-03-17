@@ -38,8 +38,8 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->copy_theme_to_zip( $zip );
-		$zip = $this->add_templates_to_zip( $zip, 'current' );
+		$zip = $this->copy_theme_to_zip( $zip, null, null );
+		$zip = $this->add_templates_to_zip( $zip, 'current', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
 		$zip->close();
@@ -62,17 +62,15 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		// TODO: This must have namespaces changed to be complete
-		$zip = $this->copy_theme_to_zip( $zip );
-
-		$zip = $this->add_templates_to_zip( $zip, 'current' );
+		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
+		$zip = $this->add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
 		// Add readme.txt.
@@ -118,17 +116,16 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		// TODO: This must have namespaces changed to be complete
-		$zip = $this->copy_theme_to_zip( $zip );
+		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'], $theme['name']);
 
-		$zip = $this->add_templates_to_zip( $zip, 'all' );
+		$zip = $this->add_templates_to_zip( $zip, 'all', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
 
 		// Add readme.txt.
@@ -173,14 +170,14 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['slug'] = sanitize_title( $theme['name'] );
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->add_templates_to_zip( $zip, 'user' );
+		$zip = $this->add_templates_to_zip( $zip, 'user', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'user' );
 
 		// Add readme.txt.
@@ -221,8 +218,8 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->copy_theme_to_zip( $zip );
-		$zip = $this->add_templates_to_zip( $zip, 'all' );
+		$zip = $this->copy_theme_to_zip( $zip, null, null );
+		$zip = $this->add_templates_to_zip( $zip, 'all', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
 
 		$zip->close();
@@ -244,7 +241,7 @@ class Create_Block_Theme_Admin {
 		return $zip;
 	}
 
-	function copy_theme_to_zip( $zip ) {
+	function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
 
 		// Get real path for our folder
 		$theme_path = get_stylesheet_directory();
@@ -257,13 +254,13 @@ class Create_Block_Theme_Admin {
 		);
 
 		// Add all the files (except for templates)
-		foreach ( $files as $name => $file )
-		{
+		foreach ( $files as $name => $file ) {
+
 			// Skip directories (they would be added automatically)
-			if ( ! $file->isDir() )
-			{
+			if ( ! $file->isDir() ) {
+
 				// Get real and relative path for current file
-				$file_path = $file->getRealPath();
+				$file_path = wp_normalize_path( $file );
 
 				// If the path is for templates/parts ignore it
 				if ( 
@@ -275,13 +272,63 @@ class Create_Block_Theme_Admin {
 					continue;
 				}
 
-				// Add current file to archive
 				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
-				$zip->addFile( $file_path, $relative_path );
+
+				// Replace only text files, skip png's and other stuff.
+				$valid_extensions = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
+				$valid_extensions_regex = implode( '|', $valid_extensions );
+				if ( ! preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
+					$zip->addFile( $file_path, $relative_path );
+				}
+				
+				else {
+					$contents = file_get_contents( $file_path );
+
+					// Replace namespace values if provided
+					if ( $new_slug ) {
+						$contents = $this->replace_namespace( $contents, $new_slug, $new_name );
+					}
+
+					// Add current file to archive
+					$zip->addFromString( $relative_path, $contents );
+				}
+
 			}
 		}
 
 		return $zip;
+	}
+
+	function replace_namespace( $content, $new_slug, $new_name ) {
+
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+		$new_slug_underscore = str_replace( '-', '_', $new_slug );
+		$old_slug_underscore = str_replace( '-', '_', $old_slug );
+		$old_name = wp_get_theme()->get( 'Name' );
+
+		$content = str_replace( $old_slug, $new_slug, $content );
+		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
+		$content = str_replace( $old_name, $new_name, $content );
+
+		return $content;
+	}
+
+	function get_theme_slug( $new_theme_name ) {
+
+		// If the source theme has a single-word slug but the new theme has a multi-word slug
+		// then function will look like: function apple-bumpkin_support() and that won't work.
+		// There are no issues if it is multi-word>single-word or multi>multi or single>single.
+		// Due to the complexity of this situation (compared to the simplicity of the others)
+		// this will enforce the usage of a singleword slug for those themes.
+
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+ 		$new_slug = sanitize_title( $new_theme_name );
+
+		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
+			return str_replace( '-', '', $new_slug );
+		}
+
+		return $new_slug;
 	}
 
 	/**
@@ -294,11 +341,12 @@ class Create_Block_Theme_Admin {
 	 * 						user = only user edited templates
 	 * 						all = all templates no matter what
 	 */
-	function add_templates_to_zip( $zip, $export_type ) {
+	function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 
 		$templates = gutenberg_get_block_templates();
 		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
-
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+	
 		if ( $templates ) {
 			$zip->addEmptyDir( 'templates' );
 		}
@@ -327,6 +375,11 @@ class Create_Block_Theme_Admin {
 			}
 
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
+
+			if ( $new_slug ) {
+				$template->content = str_replace( $old_slug, $new_slug, $template->content );
+			}
+
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
 				$template->content
@@ -347,6 +400,11 @@ class Create_Block_Theme_Admin {
 			}
 
 			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
+
+			if ( $new_slug ) {
+				$template_part->content = str_replace( $old_slug, $new_slug, $template_part->content );
+			}
+
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
 				$template_part->content
@@ -465,8 +523,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<label><input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
 				<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?><br /><br />
 				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
-				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
-				<p><b><?php _e('NOTE: Cloned themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p></label><br /><br />
+				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?></label><br /><br />
 				<?php endif; ?>
 			
 				<div hidden id="new_theme_metadata_form">
