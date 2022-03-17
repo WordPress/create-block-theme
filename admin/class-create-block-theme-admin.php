@@ -38,7 +38,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->copy_theme_to_zip( $zip );
+		$zip = $this->copy_theme_to_zip( $zip, null, null );
 		$zip = $this->add_templates_to_zip( $zip, 'current', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
@@ -69,7 +69,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'] );
+		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
 		$zip = $this->add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'current' );
 
@@ -123,7 +123,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'] );
+		$zip = $this->copy_theme_to_zip( $zip, $theme['slug'], $theme['name']);
 
 		$zip = $this->add_templates_to_zip( $zip, 'all', $theme['slug'] );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
@@ -221,7 +221,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip = $this->create_zip( $filename );
 
-		$zip = $this->copy_theme_to_zip( $zip );
+		$zip = $this->copy_theme_to_zip( $zip, null, null );
 		$zip = $this->add_templates_to_zip( $zip, 'all', null );
 		$zip = $this->add_theme_json_to_zip( $zip, 'all' );
 
@@ -244,7 +244,7 @@ class Create_Block_Theme_Admin {
 		return $zip;
 	}
 
-	function copy_theme_to_zip( $zip, $new_slug ) {
+	function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
 
 		// Get real path for our folder
 		$theme_path = get_stylesheet_directory();
@@ -289,7 +289,7 @@ class Create_Block_Theme_Admin {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = $this->replace_namespace( $contents, $new_slug );
+						$contents = $this->replace_namespace( $contents, $new_slug, $new_name );
 					}
 
 					// Add current file to archive
@@ -302,14 +302,16 @@ class Create_Block_Theme_Admin {
 		return $zip;
 	}
 
-	function replace_namespace( $content, $new_slug ) {
+	function replace_namespace( $content, $new_slug, $new_name ) {
 
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
+		$old_name = wp_get_theme()->get( 'Name' );
 
 		$content = str_replace( $old_slug, $new_slug, $content );
 		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
+		$content = str_replace( $old_name, $new_name, $content );
 
 		return $content;
 	}
