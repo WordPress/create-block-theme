@@ -423,8 +423,8 @@ class Create_Block_Theme_Admin {
 
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 
-			// NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
-			// This replaces that with dashes again.
+			// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 			$template->content = str_replace( '\u002d', '-', $template->content );
 
 			if ( $new_slug ) {
@@ -452,8 +452,8 @@ class Create_Block_Theme_Admin {
 
 			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
 
-			// NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
-			// This replaces that with dashes again.
+			// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 			$template_part->content = str_replace( '\u002d', '-', $template_part->content );
 
 			if ( $new_slug ) {
@@ -496,8 +496,8 @@ class Create_Block_Theme_Admin {
 
 			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 
-			//NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
-			// This replaces that with dashes again.
+			// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 			$template->content = str_replace( '\u002d', '-', $template->content );
 
 			file_put_contents(
@@ -522,8 +522,8 @@ class Create_Block_Theme_Admin {
 
 			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
 
-			//NOTE: Dashes are replaced with \u002d in the content that we get (noteably in things like css variables used in templates)
-			// This replaces that with dashes again.
+			// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
+			// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 			$template_part->content = str_replace( '\u002d', '-', $template_part->content );
 
 			file_put_contents(
