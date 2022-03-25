@@ -402,6 +402,8 @@ class Create_Block_Theme_Admin {
 		if ( $new_slug ) {
 			$template->content = str_replace( $old_slug, $new_slug, $template->content );
 		}
+
+		return $template;
 	}
 
 	/*
@@ -467,22 +469,22 @@ class Create_Block_Theme_Admin {
 
 		$theme_templates = $this->get_theme_templates( $export_type, $new_slug );
 
-		if ( $theme_templates['templates'] ) {
+		if ( $theme_templates->templates ) {
 			$zip->addEmptyDir( 'templates' );
 		}
 
-		if ( $theme_templates['parts'] ) {
+		if ( $theme_templates->parts ) {
 			$zip->addEmptyDir( 'parts' );
 		}
 
-		foreach ( $theme_templates['templates'] as $template ) {
+		foreach ( $theme_templates->templates as $template ) {
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
 				$template->content
 			);
 		}
 
-		foreach ( $theme_templates['parts'] as $template_part ) {
+		foreach ( $theme_templates->parts as $template_part ) {
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
 				$template_part->content
@@ -496,14 +498,14 @@ class Create_Block_Theme_Admin {
 
 		$theme_templates = $this->get_theme_templates( $export_type, null );
 
-		foreach ( $theme_templates['templates'] as $template ) {
+		foreach ( $theme_templates->templates as $template ) {
 			file_put_contents(
 				get_template_directory() . '/templates/' . $template->slug . '.html',
 				$template->content
 			);
 		}
 
-		foreach ( $theme_templates['parts'] as $template_part ) {
+		foreach ( $theme_templates->parts as $template_part ) {
 			file_put_contents(
 				get_template_directory() . '/parts/' . $template_part->slug . '.html',
 				$template_part->content
