@@ -273,18 +273,22 @@ class Create_Block_Theme_Admin {
 
 	function add_theme_json_to_zip ( $zip, $export_type ) {
 		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type );
+		$theme_json = wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		$theme_json = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
 		$zip->addFromString(
 			'theme.json',
-			wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES  )
+			$theme_json
 		);
 		return $zip;
 	}
 
 	function add_theme_json_to_local ( $export_type ) {
 		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type );
+		$theme_json = wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		$theme_json = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
 		file_put_contents(
 			get_template_directory() . '/theme.json',
-			wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
+			$theme_json
 		);
 	}
 
