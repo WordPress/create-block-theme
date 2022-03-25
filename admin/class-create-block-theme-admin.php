@@ -662,6 +662,8 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 					$this->save_theme_locally( 'all' );
 				}
 				$this->clear_user_customizations();
+
+				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
 			}
 	
 			else if ( is_child_theme() ) {
@@ -671,7 +673,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				else {
 					$this->export_child_theme( $_GET['theme'] );
 				}
-	
+				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			} else {
 				if( $_GET['theme']['type'] === 'child' ) {
 					$this->create_child_theme( $_GET['theme'] );
@@ -682,9 +684,9 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				else {
 					$this->export_theme( $_GET['theme'] );
 				}
+				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			}
 
-			add_action( 'admin_notices', [ $this, 'admin_notice_success' ] );
 		}
 	}
 
@@ -695,10 +697,18 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}	
 
-	function admin_notice_success() {
+	function admin_notice_export_success() {
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php _e( 'New block theme created!', 'create-block-theme' ); ?></p>
+				<p><?php _e( 'Block theme exported sucessfuly!', 'create-block-theme' ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_save_success() {
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( 'Block theme saved and user customizations cleared!', 'create-block-theme' ); ?></p>
 			</div>
 		<?php
 	}
