@@ -28,6 +28,45 @@ class Create_Block_Theme_Admin {
 		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', [ $this, 'create_admin_form_page' ] );
 	}
 
+	function save_theme_locally( $export_type ) {
+		$this->add_templates_to_local( $export_type );
+		$this->add_theme_json_to_local( $export_type );
+	}
+
+	function clear_user_customizations() {
+
+		// Clear all values in the user theme.json
+		$user_custom_post_type_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+		$global_styles_controller = new Gutenberg_REST_Global_Styles_Controller();
+		$update_request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' );
+		$update_request->set_param( 'id', $user_custom_post_type_id );
+		$update_request->set_param( 'settings', [] );
+		$update_request->set_param( 'styles', [] );
+		$updated_global_styles = $global_styles_controller->update_item( $update_request );
+		delete_transient( 'global_styles' );
+		delete_transient( 'global_styles_' . get_stylesheet() );
+		delete_transient( 'gutenberg_global_styles' );
+		delete_transient( 'gutenberg_global_styles_' . get_stylesheet() );
+
+		//remove all user templates (they have been saved in the theme)
+		$templates = gutenberg_get_block_templates();
+		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+		foreach ( $template_parts as $template ) {
+			if ( $template->source !== 'custom' ) {
+				continue;
+			}
+			wp_delete_post($template->wp_id, true);
+		}
+
+		foreach ( $templates as $template ) {
+			if ( $template->source !== 'custom' ) {
+				continue;
+			}
+			wp_delete_post($template->wp_id, true);
+		}
+
+	}
+
 	/**
 	 * Export activated child theme
 	 */
@@ -233,12 +272,18 @@ class Create_Block_Theme_Admin {
 	}
 
 	function add_theme_json_to_zip ( $zip, $export_type ) {
-		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type );
 		$zip->addFromString(
 			'theme.json',
-			wp_json_encode( $theme_json, JSON_PRETTY_PRINT )
+			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 		return $zip;
+	}
+
+	function add_theme_json_to_local ( $export_type ) {
+		file_put_contents(
+			get_template_directory() . '/theme.json',
+			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
+		);
 	}
 
 	function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
@@ -331,6 +376,86 @@ class Create_Block_Theme_Admin {
 		return $new_slug;
 	}
 
+	/*
+	 * Filter a template out (return false) based on the export_type expected and the templates origin.
+	 * Templates not filtered out are modified based on the slug information provided and cleaned up
+	 * to have the expected exported value.
+	 */
+	function filter_theme_template( $template, $export_type, $path, $old_slug, $new_slug ) {
+		if ($template->source === 'theme' && $export_type === 'user') {
+			return false;
+		}
+		if ( 
+			$template->source === 'theme' && 
+			$export_type === 'current' && 
+			! file_exists( $path . $template->slug . '.html' ) 
+		) {
+			return false;
+		}
+
+		$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
+
+		// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
+		// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
+		$template->content = str_replace( '\u002d', '-', $template->content );
+
+		if ( $new_slug ) {
+			$template->content = str_replace( $old_slug, $new_slug, $template->content );
+		}
+
+		return $template;
+	}
+
+	/*
+	 * Build a collection of templates and template-parts that should be exported (and modified) based on the given export_type and new slug
+	 */
+	function get_theme_templates( $export_type, $new_slug ) {
+
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+		$templates = gutenberg_get_block_templates();
+		$template_parts = gutenberg_get_block_templates ( array(), 'wp_template_part' );
+		$exported_templates = [];
+		$exported_parts = [];
+
+		// build collection of templates/parts in currently activated theme
+		$templates_paths = get_block_theme_folders();
+		$templates_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template'] . '/';
+		$parts_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
+
+		foreach ( $templates as $template ) {
+			$template = $this->filter_theme_template( 
+				$template,
+				$export_type,
+				$templates_path,
+				$old_slug,
+				$new_slug
+			);
+			if ( $template ) {
+				$exported_templates[] = $template;
+			}
+		}
+
+		foreach ( $template_parts as $template ) {
+			$template = $this->filter_theme_template( 
+				$template,
+				$export_type,
+				$parts_path,
+				$old_slug,
+				$new_slug
+	
+			);
+			if ( $template ) {
+				$exported_parts[] = $template;
+			}
+		}
+
+		return (object)[
+			'templates'=>$exported_templates,
+			'parts'=>$exported_parts
+		];
+	
+	}
+
 	/**
 	 * Add block templates and parts to the zip.
 	 *
@@ -343,68 +468,24 @@ class Create_Block_Theme_Admin {
 	 */
 	function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 
-		$templates = gutenberg_get_block_templates();
-		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
-		$old_slug = wp_get_theme()->get( 'TextDomain' );
-	
-		if ( $templates ) {
+		$theme_templates = $this->get_theme_templates( $export_type, $new_slug );
+
+		if ( $theme_templates->templates ) {
 			$zip->addEmptyDir( 'templates' );
 		}
 
-		if ( $template_parts ) {
+		if ( $theme_templates->parts ) {
 			$zip->addEmptyDir( 'parts' );
 		}
 
-
-		// build collection of templates/parts in currently activated theme
-		$templates_paths = get_block_theme_folders();
-		$templates_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template'] . '/';
-		$parts_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
-
-		foreach ( $templates as $template ) {
-			if ($template->source === 'theme' && $export_type === 'user') {
-				continue;
-			}
-
-			if ( 
-				$template->source === 'theme' && 
-				$export_type === 'current' && 
-				! file_exists( $templates_path . $template->slug . '.html' ) 
-			) {
-				continue;
-			}
-
-			$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
-
-			if ( $new_slug ) {
-				$template->content = str_replace( $old_slug, $new_slug, $template->content );
-			}
-
+		foreach ( $theme_templates->templates as $template ) {
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
 				$template->content
 			);
 		}
 
-		foreach ( $template_parts as $template_part ) {
-			if ($template_part->source === 'theme' && $export_type === 'user') {
-				continue;
-			}
-
-			if ( 
-				$template_part->source === 'theme' && 
-				$export_type === 'current' && 
-				! file_exists( $parts_path . $template_part->slug . '.html' ) 
-			) {
-				continue;
-			}
-
-			$template_part->content = _remove_theme_attribute_in_block_template_content( $template_part->content );
-
-			if ( $new_slug ) {
-				$template_part->content = str_replace( $old_slug, $new_slug, $template_part->content );
-			}
-
+		foreach ( $theme_templates->parts as $template_part ) {
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
 				$template_part->content
@@ -412,6 +493,25 @@ class Create_Block_Theme_Admin {
 		}
 
 		return $zip;
+	}
+
+	function add_templates_to_local( $export_type ) {
+
+		$theme_templates = $this->get_theme_templates( $export_type, null );
+
+		foreach ( $theme_templates->templates as $template ) {
+			file_put_contents(
+				get_template_directory() . '/templates/' . $template->slug . '.html',
+				$template->content
+			);
+		}
+
+		foreach ( $theme_templates->parts as $template_part ) {
+			file_put_contents(
+				get_template_directory() . '/parts/' . $template_part->slug . '.html',
+				$template_part->content
+			);
+		}
 	}
 
 	function create_zip( $filename ) {
@@ -510,7 +610,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 		<div class="wrap">
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
-			<p><?php _e('Save your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
+			<p><?php _e('Export your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
 			<form method="get">
 
 				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
@@ -525,6 +625,8 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<label><input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
 				<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?></label><br /><br />
 				<?php endif; ?>
+				<label><input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
+				<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?></label><br /><br />
 			
 				<div hidden id="new_theme_metadata_form">
 					<label><?php _e('Theme Name', 'create-block-theme'); ?><br /><input type="text" name="theme[name]" class="regular-text" /></label><br /><br />
@@ -535,7 +637,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				</div>
 				<input type="hidden" name="page" value="create-block-theme" />
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-				<input type="submit" value="<?php _e('Create block theme', 'create-block-theme'); ?>" class="button button-primary" />
+				<input type="submit" value="<?php _e('Export theme', 'create-block-theme'); ?>" class="button button-primary" />
 			</form>
 		</div>
 	<?php
@@ -543,7 +645,6 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function blockbase_save_theme() {
 
-		// I can't work out how to call the API but this works for now.
 		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
 
 			// Check user capabilities.
@@ -556,14 +657,26 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
 			}
 
-			if ( is_child_theme() ) {
+			if ( $_GET['theme']['type'] === 'save' ) {
+				if ( is_child_theme() ) {
+					$this->save_theme_locally( 'current' );
+				} 
+				else {
+					$this->save_theme_locally( 'all' );
+				}
+				$this->clear_user_customizations();
+
+				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
+			}
+	
+			else if ( is_child_theme() ) {
 				if ( $_GET['theme']['type'] === 'sibling' ) {
 					$this->create_sibling_theme( $_GET['theme'] );
 				} 
 				else {
 					$this->export_child_theme( $_GET['theme'] );
 				}
-	
+				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			} else {
 				if( $_GET['theme']['type'] === 'child' ) {
 					$this->create_child_theme( $_GET['theme'] );
@@ -574,9 +687,9 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				else {
 					$this->export_theme( $_GET['theme'] );
 				}
+				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			}
 
-			add_action( 'admin_notices', [ $this, 'admin_notice_success' ] );
 		}
 	}
 
@@ -587,10 +700,18 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}	
 
-	function admin_notice_success() {
+	function admin_notice_export_success() {
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php _e( 'New block theme created!', 'create-block-theme' ); ?></p>
+				<p><?php _e( 'Block theme exported sucessfuly!', 'create-block-theme' ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_save_success() {
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( 'Block theme saved and user customizations cleared!', 'create-block-theme' ); ?></p>
 			</div>
 		<?php
 	}

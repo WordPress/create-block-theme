@@ -94,7 +94,9 @@ function augment_gutenberg_with_utilities() {
 
 			$data = MY_Theme_JSON_Resolver::flatten_theme_json($theme->get_raw_data(), null);
 
-			return $data;
+			$theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			return preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
+
 		}
 
 	}
