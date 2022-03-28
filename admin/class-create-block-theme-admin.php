@@ -411,6 +411,7 @@ class Create_Block_Theme_Admin {
 	 */
 	function get_theme_templates( $export_type, $new_slug ) {
 
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		$templates = gutenberg_get_block_templates();
 		$template_parts = gutenberg_get_block_templates ( array(), 'wp_template_part' );
 		$exported_templates = [];
