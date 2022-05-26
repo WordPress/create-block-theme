@@ -9,7 +9,7 @@ Export the activated theme including the user changes.
 ### 2. Create a child theme
 Creates a new child theme with the currently activated theme as a parent.
 
-### 3. Clone the current thme
+### 3. Clone the current theme
 Creates a new theme by cloning the activated theme. The resulting theme will have all of the assets of the activated theme combined with the user's changes.
 
 ### 4. Overwrite theme files
