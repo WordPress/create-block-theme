@@ -1,6 +1,6 @@
 <?php
 
-require_once (__DIR__ . '/gutenberg_additions.php');
+require_once (__DIR__ . '/resolver_additions.php');
 
 /**
  * The admin-specific functionality of the plugin.
@@ -36,8 +36,8 @@ class Create_Block_Theme_Admin {
 	function clear_user_customizations() {
 
 		// Clear all values in the user theme.json
-		$user_custom_post_type_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
-		$global_styles_controller = new Gutenberg_REST_Global_Styles_Controller();
+		$user_custom_post_type_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+		$global_styles_controller = new WP_REST_Global_Styles_Controller();
 		$update_request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' );
 		$update_request->set_param( 'id', $user_custom_post_type_id );
 		$update_request->set_param( 'settings', [] );
@@ -49,8 +49,8 @@ class Create_Block_Theme_Admin {
 		delete_transient( 'gutenberg_global_styles_' . get_stylesheet() );
 
 		//remove all user templates (they have been saved in the theme)
-		$templates = gutenberg_get_block_templates();
-		$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+		$templates = get_block_templates();
+		$template_parts = get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template ) {
 			if ( $template->source !== 'custom' ) {
 				continue;
@@ -412,8 +412,8 @@ class Create_Block_Theme_Admin {
 	function get_theme_templates( $export_type, $new_slug ) {
 
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
-		$templates = gutenberg_get_block_templates();
-		$template_parts = gutenberg_get_block_templates ( array(), 'wp_template_part' );
+		$templates = get_block_templates();
+		$template_parts = get_block_templates ( array(), 'wp_template_part' );
 		$exported_templates = [];
 		$exported_parts = [];
 
@@ -498,17 +498,18 @@ class Create_Block_Theme_Admin {
 	function add_templates_to_local( $export_type ) {
 
 		$theme_templates = $this->get_theme_templates( $export_type, null );
+		$template_folders = get_block_theme_folders();
 
 		foreach ( $theme_templates->templates as $template ) {
 			file_put_contents(
-				get_template_directory() . '/templates/' . $template->slug . '.html',
+				get_template_directory() . '/' . $template_folders['wp_template'] . '/' . $template->slug . '.html',
 				$template->content
 			);
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
 			file_put_contents(
-				get_template_directory() . '/parts/' . $template_part->slug . '.html',
+				get_template_directory() . '/' . $template_folders['wp_template_part'] . '/' . $template_part->slug . '.html',
 				$template_part->content
 			);
 		}

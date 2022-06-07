@@ -1,14 +1,14 @@
 <?php
 
-function augment_gutenberg_with_utilities() {
+function augment_resolver_with_utilities() {
 
-	//Ultimately it is desireable for Gutenberg to have this functionality natively.
+	//Ultimately it is desireable for Core to have this functionality natively.
 	// In the meantime we are patching the functionality we are expecting into the Theme JSON Resolver here
-	if ( ! class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+	if ( ! class_exists( 'WP_Theme_JSON_Resolver' ) ) {
 		return;
 	}
 
-	class MY_Theme_JSON_Resolver extends WP_Theme_JSON_Resolver_Gutenberg {
+	class MY_Theme_JSON_Resolver extends WP_Theme_JSON_Resolver {
 
 		/**
 		 * Export the combined (and flattened) THEME and CUSTOM data.
@@ -19,20 +19,20 @@ function augment_gutenberg_with_utilities() {
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
 		 */
 		public static function export_theme_data( $content ) {
-			$theme = new WP_Theme_JSON_Gutenberg();
+			$theme = new WP_Theme_JSON();
 
 			if ( $content === 'all' && wp_get_theme()->parent() ) {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
 				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
-				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+				$parent_theme           = new WP_Theme_JSON( $parent_theme_json_data );
 				$theme->merge ($parent_theme);
 			}
 
 			if ( $content === 'all' || $content === 'current' ) {
 				$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 				$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-				$theme_theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+				$theme_theme     = new WP_Theme_JSON( $theme_json_data );
  				$theme->merge( $theme_theme );
 			}
 
@@ -48,4 +48,4 @@ function augment_gutenberg_with_utilities() {
 	}
 }
 
-add_action( 'plugins_loaded', 'augment_gutenberg_with_utilities' );
+add_action( 'plugins_loaded', 'augment_resolver_with_utilities' );
