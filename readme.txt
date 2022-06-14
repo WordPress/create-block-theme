@@ -1,8 +1,9 @@
 === Create Block Theme ===
+Author: @wordpressdotorg
 Contributors: @chaosexanima, @mikachan, @onemaggie, @pbking, @scruffian
 Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
-Requires at least: 6.0 
+Requires at least: 6.0
 Tested up to: 6.0
 Stable tag: 1.0
 Requires PHP: 7.0
