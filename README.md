@@ -16,7 +16,7 @@ Creates a new theme by cloning the activated theme. The resulting theme will hav
 Saves user's changes to the theme files and deletes the user's changes.
 
 ### Step 1 – Setup
-Install and activate the [Create Block Theme](https://github.com/Automattic/create-block-theme) plugin. You will also need to be running the latest version of the Gutenberg plugin.
+Install and activate the [Create Block Theme](https://github.com/WordPress/create-block-theme) plugin. You will also need to be running the latest version of the Gutenberg plugin.
 
 ### Step 2 – Style Customizations
 Make changes to your site design using the Site Editor.
