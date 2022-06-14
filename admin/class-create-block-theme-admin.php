@@ -281,7 +281,7 @@ class Create_Block_Theme_Admin {
 
 	function add_theme_json_to_local ( $export_type ) {
 		file_put_contents(
-			get_template_directory() . '/theme.json',
+			get_stylesheet_directory() . '/theme.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 	}
@@ -502,14 +502,14 @@ class Create_Block_Theme_Admin {
 
 		foreach ( $theme_templates->templates as $template ) {
 			file_put_contents(
-				get_template_directory() . '/' . $template_folders['wp_template'] . '/' . $template->slug . '.html',
+				get_stylesheet_directory() . '/' . $template_folders['wp_template'] . '/' . $template->slug . '.html',
 				$template->content
 			);
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
 			file_put_contents(
-				get_template_directory() . '/' . $template_folders['wp_template_part'] . '/' . $template_part->slug . '.html',
+				get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] . '/' . $template_part->slug . '.html',
 				$template_part->content
 			);
 		}

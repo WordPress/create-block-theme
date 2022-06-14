@@ -3,7 +3,7 @@
 /**
  * @wordpress-plugin
  * Plugin Name: Create Block Theme
- * Plugin URI: https://github.com/Automattic/create-block-theme
+ * Plugin URI: https://github.com/WordPress/create-block-theme
  * Description: Generates a block theme
  * Version: 0.0.2
  * Author: Automattic

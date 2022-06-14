@@ -17,7 +17,7 @@ A WordPress plugin to create block themes.
 This tool can create standalone block themes and Blockbase child themes. Find out more about Blockbase at [blockbasetheme.com](https://blockbasetheme.com)
 
 = Step 1 – Setup =
-Install and activate the [Create Block Theme](https://github.com/Automattic/create-block-theme) plugin. If you want to create Blockbase child themes, you will need to install [Blockbase](https://github.com/Automattic/themes/tree/trunk/blockbase) (or a Blockbase child theme if you want your new theme based on it instead). You will also need to be running the latest version of the Gutenberg plugin.
+Install and activate the [Create Block Theme](https://github.com/WordPress/create-block-theme) plugin. If you want to create Blockbase child themes, you will need to install [Blockbase](https://github.com/Automattic/themes/tree/trunk/blockbase) (or a Blockbase child theme if you want your new theme based on it instead). You will also need to be running the latest version of the Gutenberg plugin.
 
 = Step 2 – Style Customizations =
 Make changes to your site design using the Customizer and Site Editor.
