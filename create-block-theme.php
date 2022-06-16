@@ -6,8 +6,8 @@
  * Plugin URI: https://github.com/WordPress/create-block-theme
  * Description: Generates a block theme
  * Version: 0.0.2
- * Author: Automattic
- * Author URI: https://automattic.com/
+ * Author: WordPress.org
+ * Author URI: https://wordpress.org/
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: create-block-theme

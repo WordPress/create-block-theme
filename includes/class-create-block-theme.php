@@ -1,12 +1,12 @@
 <?php
 
 /**
- * The core Create Blockbase Theme plugin class.
+ * The core Create Block Theme plugin class.
  *
  * @since      0.0.2
- * @package    Create_Block_Theme 
+ * @package    Create_Block_Theme
  * @subpackage Create_Block_Theme/includes
- * @author     Automattic
+ * @author     WordPress.org
  */
 class Create_Block_Theme {
 
