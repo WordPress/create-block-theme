@@ -3,9 +3,9 @@
 /**
  * Register all actions and filters for the plugin.
  *
- * @package    Create_Block_Theme 
+ * @package    Create_Block_Theme
  * @subpackage Create_Block_Theme/includes
- * @author     Automattic
+ * @author     WordPress.org
  */
 class Create_Block_Theme_Loader {
 

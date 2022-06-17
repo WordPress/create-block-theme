@@ -5,9 +5,9 @@ require_once (__DIR__ . '/resolver_additions.php');
 /**
  * The admin-specific functionality of the plugin.
  *
- * @package    Create_Block_Theme 
+ * @package    Create_Block_Theme
  * @subpackage Create_Block_Theme/admin
- * @author     Automattic
+ * @author     WordPress.org
  */
 class Create_Block_Theme_Admin {
 
@@ -126,7 +126,7 @@ class Create_Block_Theme_Admin {
 		$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
 		$zip->addFromString(
 			'style.css',
-			$css_contents	
+			$css_contents
 		);
 
 		// Add screenshot.png.
@@ -181,7 +181,7 @@ class Create_Block_Theme_Admin {
 		$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
 		$zip->addFromString(
 			'style.css',
-			$css_contents	
+			$css_contents
 		);
 
 		// Add screenshot.png.
@@ -308,10 +308,10 @@ class Create_Block_Theme_Admin {
 				$file_path = wp_normalize_path( $file );
 
 				// If the path is for templates/parts ignore it
-				if ( 
-					strpos($file_path, 'block-template-parts/' ) || 
-					strpos($file_path, 'block-templates/' ) || 
-					strpos($file_path, 'templates/' ) || 
+				if (
+					strpos($file_path, 'block-template-parts/' ) ||
+					strpos($file_path, 'block-templates/' ) ||
+					strpos($file_path, 'templates/' ) ||
 					strpos($file_path, 'parts/' )
 				) {
 					continue;
@@ -325,7 +325,7 @@ class Create_Block_Theme_Admin {
 				if ( ! preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
 					$zip->addFile( $file_path, $relative_path );
 				}
-				
+
 				else {
 					$contents = file_get_contents( $file_path );
 
@@ -385,10 +385,10 @@ class Create_Block_Theme_Admin {
 		if ($template->source === 'theme' && $export_type === 'user') {
 			return false;
 		}
-		if ( 
-			$template->source === 'theme' && 
-			$export_type === 'current' && 
-			! file_exists( $path . $template->slug . '.html' ) 
+		if (
+			$template->source === 'theme' &&
+			$export_type === 'current' &&
+			! file_exists( $path . $template->slug . '.html' )
 		) {
 			return false;
 		}
@@ -423,7 +423,7 @@ class Create_Block_Theme_Admin {
 		$parts_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
 
 		foreach ( $templates as $template ) {
-			$template = $this->filter_theme_template( 
+			$template = $this->filter_theme_template(
 				$template,
 				$export_type,
 				$templates_path,
@@ -436,13 +436,13 @@ class Create_Block_Theme_Admin {
 		}
 
 		foreach ( $template_parts as $template ) {
-			$template = $this->filter_theme_template( 
+			$template = $this->filter_theme_template(
 				$template,
 				$export_type,
 				$parts_path,
 				$old_slug,
 				$new_slug
-	
+
 			);
 			if ( $template ) {
 				$exported_parts[] = $template;
@@ -453,7 +453,7 @@ class Create_Block_Theme_Admin {
 			'templates'=>$exported_templates,
 			'parts'=>$exported_parts
 		];
-	
+
 	}
 
 	/**
@@ -617,7 +617,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
 				<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?></label><br /><br />
 				<?php if ( is_child_theme() ): ?>
-				<label><input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label> 
+				<label><input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/><?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
 				<?php _e('[Create a new theme cloning the activated child theme.  The parent theme will be the same as the parent of the currently activated theme. The resulting theme will have all of the assets of the activated theme, none of the assets provided by the parent theme, as well as user changes.]', 'create-block-theme'); ?>
 				<p><b><?php _e('NOTE: Sibling themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p><br />
 				<?php else: ?>
@@ -628,7 +628,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<?php endif; ?>
 				<label><input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
 				<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?></label><br /><br />
-			
+
 				<div hidden id="new_theme_metadata_form">
 					<label><?php _e('Theme Name', 'create-block-theme'); ?><br /><input type="text" name="theme[name]" class="regular-text" /></label><br /><br />
 					<label><?php _e('Theme Description', 'create-block-theme'); ?><br /><textarea rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
@@ -661,7 +661,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			if ( $_GET['theme']['type'] === 'save' ) {
 				if ( is_child_theme() ) {
 					$this->save_theme_locally( 'current' );
-				} 
+				}
 				else {
 					$this->save_theme_locally( 'all' );
 				}
@@ -669,11 +669,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
 			}
-	
+
 			else if ( is_child_theme() ) {
 				if ( $_GET['theme']['type'] === 'sibling' ) {
 					$this->create_sibling_theme( $_GET['theme'] );
-				} 
+				}
 				else {
 					$this->export_child_theme( $_GET['theme'] );
 				}
@@ -681,10 +681,10 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			} else {
 				if( $_GET['theme']['type'] === 'child' ) {
 					$this->create_child_theme( $_GET['theme'] );
-				} 
+				}
 				else if( $_GET['theme']['type'] === 'clone' ) {
 					$this->clone_theme( $_GET['theme'] );
-				} 
+				}
 				else {
 					$this->export_theme( $_GET['theme'] );
 				}
@@ -699,7 +699,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		$message = __( 'Please specify a theme name.', 'create-block-theme' );
 
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-	}	
+	}
 
 	function admin_notice_export_success() {
 		?>
@@ -718,4 +718,3 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	}
 
 }
-
