@@ -611,7 +611,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 		<div class="wrap">
 			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
-			<p><?php _e('Export your current block them with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
+			<p><?php _e('Export your current block theme with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
 			<form method="get">
 
 				<label><input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
