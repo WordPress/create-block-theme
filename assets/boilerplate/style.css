@@ -1,42 +1,4 @@
 /*
- * Font smoothing
- */
-
- body {
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-
-/*
- * Button hover styles.
- * Necessary until the following issue is resolved in Gutenberg:
- * https://github.com/WordPress/gutenberg/issues/27075
- */
-
-.wp-block-search__button:hover,
-.wp-block-file .wp-block-file__button:hover,
-.wp-block-button__link:hover {
-	background-color: var(--wp--preset--color--secondary);
-}
-
-/*
- * Search and File Block button styles.
- * Necessary until the following issues are resolved in Gutenberg:
- * https://github.com/WordPress/gutenberg/issues/36444
- * https://github.com/WordPress/gutenberg/issues/27760
- */
-
-.wp-block-search__button,
-.wp-block-file .wp-block-file__button {
-	background-color: var(--wp--preset--color--foreground);
-	border-radius: 0;
-	border: none;
-	color: var(--wp--preset--color--background);
-	font-size: var(--wp--preset--typography--font-size--normal);
-	padding: calc(0.667em + 2px) calc(1.333em + 2px);
-}
-
-/*
  * Alignment styles, borrowed from Twenty Twenty-Two.
  * These rules are temporary, and should not be relied on or
  * modified too heavily by themes or plugins that build on
@@ -86,18 +48,4 @@ body > .is-root-container > .wp-block-template-part > .wp-block-cover,
 	margin-left: auto !important;
 	margin-right: auto !important;
 	width: inherit;
-}
-
-/*
- * Responsive menu container padding.
- * This ensures the responsive container inherits the same
- * spacing defined above. This behavior may be built into
- * the Block Editor in the future.
- */
-
-.wp-block-navigation__responsive-container.is-menu-open {
-	padding-top: var(--wp--custom--gap--horizontal);
-	padding-bottom: var(--wp--custom--gap--vertical);
-	padding-right: var(--wp--custom--gap--horizontal);
-	padding-left: var(--wp--custom--gap--horizontal);
 }
