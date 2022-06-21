@@ -292,22 +292,13 @@ class Create_Block_Theme_Admin {
 				$this->build_readme_txt( $theme )
 			);
 
-			// Augment style.css
-			$css_contents = file_get_contents( $source . DIRECTORY_SEPARATOR . 'style.css' );
+			// Add new metadata.
+			$css_contents = $this->build_child_style_css( $theme );
 
-			// Add new metadata
-			$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
-
-			// Add style.css
+			// Add style.css.
 			file_put_contents( 
 				$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css', 
 				$css_contents
-			);
-
-			// Add functions.php
-			file_put_contents(
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'functions.php',
-				$this->build_blank_functions( $theme )
 			);
 
 			foreach (
@@ -318,9 +309,7 @@ class Create_Block_Theme_Admin {
 				if ($item->isDir()) {
 					mkdir( $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
 				} else {
-					if ( $item->getFilename() !== 'style.css' ) {
-						copy($item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
-					}
+					copy($item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
 				}
 			}
 		}
@@ -652,69 +641,6 @@ Template: {$template}
 Text Domain: {$slug}
 Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
 */";
-	}
-
-	function build_blank_functions( $theme ) {
-		$slug = $theme['slug'];
-		$name = $theme['name'];
-	
-	return "<?php
-/**
- * {$name} functions and definitions
- *
- * @link https://developer.wordpress.org/themes/basics/theme-functions/
- *
- * @package {$name} 
- * @since {$name} 1.0
- */
-
-if ( ! function_exists( '{$slug}_support' ) ) :
-
-	/**
-	 * Sets up theme defaults and registers support for various WordPress features.
-	 *
-	 * @since {$name} 1.0
-	 *
-	 * @return void
-	 */
-	function {$slug}_support() {
-
-		// Enqueue editor styles.
-		add_editor_style( 'style.css' );
-
-	}
-
-endif;
-
-add_action( 'after_setup_theme', '{$slug}_support' );
-
-if ( ! function_exists( '{$slug}_styles' ) ) :
-
-	/**
-	 * Enqueue styles.
-	 *
-	 * @since {$name} 1.0
-	 *
-	 * @return void
-	 */
-	function {$slug}_styles() {
-
-		// Register theme stylesheet.
-		wp_register_style(
-			'{$slug}-style',
-			get_template_directory_uri() . '/style.css',
-			array(),
-			wp_get_theme()->get( 'Version' )
-		);
-
-		// Enqueue theme stylesheet.
-		wp_enqueue_style( '{$slug}-style' );
-
-	}
-
-endif;
-
-add_action( 'wp_enqueue_scripts', '{$slug}_styles' );";
 	}
 
 	function create_admin_form_page() {
