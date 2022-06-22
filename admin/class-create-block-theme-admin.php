@@ -271,6 +271,51 @@ class Create_Block_Theme_Admin {
 		die();
 	}
 
+	function create_blank_theme( $theme ) {
+		// Sanitize inputs.
+		$theme['name'] = sanitize_text_field( $theme['name'] );
+		$theme['description'] = sanitize_text_field( $theme['description'] );
+		$theme['uri'] = sanitize_text_field( $theme['uri'] );
+		$theme['author'] = sanitize_text_field( $theme['author'] );
+		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['template'] = '';
+		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
+
+		// Create theme directory.
+		$source = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
+		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
+		if ( ! file_exists( $blank_theme_path ) ) {
+			mkdir( $blank_theme_path, 0755 );
+			// Add readme.txt.
+			file_put_contents( 
+				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt', 
+				$this->build_readme_txt( $theme )
+			);
+
+			// Add new metadata.
+			$css_contents = $this->build_child_style_css( $theme );
+
+			// Add style.css.
+			file_put_contents( 
+				$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css', 
+				$css_contents
+			);
+
+			foreach (
+				$iterator = new \RecursiveIteratorIterator(
+					new \RecursiveDirectoryIterator( $source, \RecursiveDirectoryIterator::SKIP_DOTS),
+					\RecursiveIteratorIterator::SELF_FIRST) as $item
+				) {
+				if ($item->isDir()) {
+					mkdir( $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+				} else {
+					copy($item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+				}
+			}
+		}
+
+	}
+
 	function add_theme_json_to_zip ( $zip, $export_type ) {
 		$zip->addFromString(
 			'theme.json',
@@ -628,6 +673,8 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<?php endif; ?>
 				<label><input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" /><?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?></label>
 				<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?></label><br /><br />
+				<label><input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden', null);" /><?php _e('Create blank theme ', 'create-block-theme'); ?></label>
+				<?php _e('[Generates a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?></label><br /><br />
 
 				<div hidden id="new_theme_metadata_form">
 					<label><?php _e('Theme Name', 'create-block-theme'); ?><br /><input type="text" name="theme[name]" class="regular-text" /></label><br /><br />
@@ -668,6 +715,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				$this->clear_user_customizations();
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
+			}
+
+			else if ( $_GET['theme']['type'] === 'blank' ) {
+				$this->create_blank_theme( $_GET['theme'] );
+
+				add_action( 'admin_notices', [ $this, 'admin_notice_blank_success' ] );
 			}
 
 			else if ( is_child_theme() ) {
@@ -713,6 +766,14 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p><?php _e( 'Block theme saved and user customizations cleared!', 'create-block-theme' ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_blank_success() {
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( 'Blank theme created, head over to Appearance > Themes to activate it!', 'create-block-theme' ); ?></p>
 			</div>
 		<?php
 	}
