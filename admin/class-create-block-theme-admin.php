@@ -677,11 +677,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<?php _e('[Generates a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?></label><br /><br />
 
 				<div hidden id="new_theme_metadata_form">
-					<label><?php _e('Theme Name', 'create-block-theme'); ?><br /><input type="text" name="theme[name]" class="regular-text" /></label><br /><br />
-					<label><?php _e('Theme Description', 'create-block-theme'); ?><br /><textarea rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
-					<label><?php _e('Theme URI', 'create-block-theme'); ?><br /><input type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
-					<label><?php _e('Author', 'create-block-theme'); ?><br /><input type="text" name="theme[author]" class="regular-text" /></label><br /><br />
-					<label><?php _e('Author URI', 'create-block-theme'); ?><br /><input type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
+                    <p><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></p>
+					<label><?php _e('Theme Name (*): The name of the theme.', 'create-block-theme'); ?><br />  <input type="text" name="theme[name]" class="regular-text" /></label><br /><br />
+					<label><?php _e('Theme Description: A short description of the theme.', 'create-block-theme'); ?><br /><textarea rows="4" cols="50" name="theme[description]" class="regular-text"></textarea></label><br /><br />
+					<label><?php _e('Theme URI: The URL of a public web page where users can find more information about the theme.', 'create-block-theme'); ?><br /><input type="text" name="theme[uri]" class="regular-text code" /></label><br /><br />
+					<label><?php _e('Author: The name of the individual or organization who developed the theme.', 'create-block-theme'); ?><br /><input type="text" name="theme[author]" class="regular-text" /></label><br /><br />
+					<label><?php _e('Author URI: The URL of the authoring individual or organization.', 'create-block-theme'); ?><br /><input type="text" name="theme[author_uri]" class="regular-text code" /></label><br /><br />
 				</div>
 				<input type="hidden" name="page" value="create-block-theme" />
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
