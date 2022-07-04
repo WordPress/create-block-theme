@@ -713,7 +713,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<div hidden id="new_theme_metadata_form">
 								<label>
 									<?php _e('Theme Name (*):', 'create-block-theme'); ?><br />
-									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" required />
+									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" />
 								</label>
 								<br /><br />
 								<label>
@@ -784,6 +784,9 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			else if ( is_child_theme() ) {
 				if ( $_GET['theme']['type'] === 'sibling' ) {
+					if ( $_GET['theme']['name'] === '' ) {
+						return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+					}
 					$this->create_sibling_theme( $_GET['theme'] );
 				}
 				else {
@@ -792,9 +795,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			} else {
 				if( $_GET['theme']['type'] === 'child' ) {
+					if ( $_GET['theme']['name'] === '' ) {
+						return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+					}
 					$this->create_child_theme( $_GET['theme'] );
 				}
 				else if( $_GET['theme']['type'] === 'clone' ) {
+					if ( $_GET['theme']['name'] === '' ) {
+						return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+					}
 					$this->clone_theme( $_GET['theme'] );
 				}
 				else {
