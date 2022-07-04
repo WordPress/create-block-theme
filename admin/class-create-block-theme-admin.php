@@ -655,11 +655,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		}
 		?>
 		<div class="wrap">
+			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
 			<form method="get">
 				<div id="col-container">
 					<div id="col-left">
 						<div class="col-wrap">
-							<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
 							<p><?php _e('Export your current block theme with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
 
 							<label>
