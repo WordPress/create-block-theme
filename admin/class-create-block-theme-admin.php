@@ -664,7 +664,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 							<label>
 								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
-								<?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
+								<?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
@@ -673,6 +673,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/>
 									<?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
 								</label>
+								<br />
 								<?php _e('[Create a new theme cloning the activated child theme.  The parent theme will be the same as the parent of the currently activated theme. The resulting theme will have all of the assets of the activated theme, none of the assets provided by the parent theme, as well as user changes.]', 'create-block-theme'); ?>
 								<p><b><?php _e('NOTE: Sibling themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme'); ?></b></p>
 								<br />
@@ -681,25 +682,25 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/>
 									<?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
 								</label>
+								<br />
 								<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?>
 								<br /><br />
 								<label>
 									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/>
-									<?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
+									<?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 									<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
 								</label>
 								<br /><br />
 							<?php endif; ?>
 							<label>
 								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
-								<?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
-
+								<?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
 								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden', null);" />
-								<?php _e('Create blank theme ', 'create-block-theme'); ?>
+								<?php _e('Create blank theme ', 'create-block-theme'); ?><br />
 								<?php _e('[Generates a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
