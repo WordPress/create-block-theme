@@ -705,7 +705,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							</label>
 							<br /><br />
 
-							<input type="submit" value="<?php _e('Export theme', 'create-block-theme'); ?>" class="button button-primary" />
+							<input type="submit" value="<?php _e('Create theme', 'create-block-theme'); ?>" class="button button-primary" />
 
 						</div>
 					</div>
