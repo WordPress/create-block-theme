@@ -660,7 +660,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				<div id="col-container">
 					<div id="col-left">
 						<div class="col-wrap">
-							<p><?php _e('Export your current block theme with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'); ?></p>
+							<p><?php printf( esc_html__('Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></p>
 
 							<label>
 								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
