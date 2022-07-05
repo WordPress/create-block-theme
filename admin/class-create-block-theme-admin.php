@@ -778,6 +778,9 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			}
 
 			else if ( $_GET['theme']['type'] === 'blank' ) {
+				if ( $_GET['theme']['name'] === '' ) {
+					return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+				}
 				$this->create_blank_theme( $_GET['theme'] );
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_blank_success' ] );
