@@ -843,9 +843,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	}
 
 	function admin_notice_blank_success() {
+		$theme_name = $_GET['theme']['name'];
+
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php _e( 'Blank theme created, head over to Appearance > Themes to activate it!', 'create-block-theme' ); ?></p>
+				<p><?php printf( esc_html__( 'Blank theme created, head over to Appearance > Themes to activate %1$s', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
