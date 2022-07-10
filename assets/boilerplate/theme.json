@@ -29,11 +29,11 @@
     "templateParts": [
         {
             "area": "header",
-            "name": "header"
+            "name": "Header"
         },
         {
             "area": "footer",
-            "name": "footer"
+            "name": "Footer"
         }
     ],
     "version": 2
