@@ -829,7 +829,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	function admin_notice_export_success() {
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php _e( 'Block theme exported sucessfuly!', 'create-block-theme' ); ?></p>
+				<p><?php _e( 'Block theme exported successfully!', 'create-block-theme' ); ?></p>
 			</div>
 		<?php
 	}
