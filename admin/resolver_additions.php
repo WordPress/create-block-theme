@@ -38,7 +38,7 @@ function augment_resolver_with_utilities() {
 
 			$theme->merge( static::get_user_data() );
 
-			$data = MY_Theme_JSON_Resolver::$theme->get_data();
+			$data = $theme->get_data();
 
 			$theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 			return preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
