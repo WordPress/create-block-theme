@@ -33,8 +33,9 @@ class Create_Block_Theme_Admin {
 		$this->add_theme_json_to_local( $export_type );
 	}
 
-	function save_variation_locally ( $export_type ) {
+	function save_variation ( $export_type, $theme ) {
 		$this->add_theme_json_variation_to_local( $export_type );
+		$this->export_theme( $theme );
 	}
 
 	function clear_user_customizations() {
@@ -801,12 +802,13 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			else if ( $_GET['theme']['type'] === 'variation' ) {
 				if ( is_child_theme() ) {
-					$this->save_variation_locally( 'current' );
+					$this->save_variation( 'current', $_GET['theme'] );
 				}
 				else {
-					$this->save_variation_locally( 'all' );
+					$this->save_variation( 'all', $_GET['theme'] );
 				}
-				die('eeeee');
+
+				add_action( 'admin_notices', [ $this, 'admin_notice_variation_success' ] );
 			}
 
 			else if ( $_GET['theme']['type'] === 'blank' ) {
@@ -880,6 +882,16 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p><?php printf( esc_html__( 'Blank theme created, head over to Appearance > Themes to activate %1$s', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_variation_success() {
+		$theme_name = $_GET['theme']['name'];
+
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php printf( esc_html__( 'Your variation of %1$s has been created succesfully', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
