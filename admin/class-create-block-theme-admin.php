@@ -26,6 +26,7 @@ class Create_Block_Theme_Admin {
 		$page_title=__('Create Block Theme', 'create-block-theme');
 		$menu_title=__('Create Block Theme', 'create-block-theme');
 		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', [ $this, 'create_admin_form_page' ] );
+		add_action('admin_enqueue_scripts', [ $this, 'form_script' ] );
 	}
 
 	function save_theme_locally( $export_type ) {
@@ -680,14 +681,14 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<p><?php printf( esc_html__('Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></p>
 
 							<label>
-								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
+								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );" />
 								<?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<?php if ( is_child_theme() ): ?>
 								<label>
-									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/>
+									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
 									<?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
 								</label>
 								<br />
@@ -696,35 +697,35 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<br />
 							<?php else: ?>
 								<label>
-									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/>
+									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
 									<?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
 								</label>
 								<br />
 								<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?>
 								<br /><br />
 								<label>
-									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden');"/>
+									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
 									<?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 									<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
 								</label>
 								<br /><br />
 							<?php endif; ?>
 							<label>
-								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
+								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );" />
 								<?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
-								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').removeAttribute('hidden', null);" />
+								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );" />
 								<?php _e('Create blank theme ', 'create-block-theme'); ?><br />
 								<?php _e('[Generates a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
-								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
+								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_variation_metadata_form', false );" />
 								<?php _e('Create a style variation ', 'create-block-theme'); ?><br />
-								<?php _e('[Generates a style variation for the current theme. Any template changes will be ignored.]', 'create-block-theme'); ?>
+								<?php printf( esc_html__('[Saves user changes as a style variation of %1$s.]', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?>
 							</label>
 							<br /><br />
 
@@ -734,6 +735,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 					</div>
 					<div id="col-right">
 						<div class="col-wrap">
+							<div hidden id="new_variation_metadata_form">
+								<label>
+									<?php _e('Variation Name (*):', 'create-block-theme'); ?><br />
+									<input placeholder="<?php _e('Variation Name', 'create-block-theme'); ?>" type="text" name="theme[variation]" class="large-text" />
+								</label>
+							</div>
 							<div hidden id="new_theme_metadata_form">
 								<label>
 									<?php _e('Theme Name (*):', 'create-block-theme'); ?><br />
@@ -772,6 +779,10 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			</form>
 		</div>
 	<?php
+	}
+
+	function form_script() {
+		wp_enqueue_script('form-script', plugin_dir_url(__FILE__) . '/js/form-script.js');
 	}
 
 	function blockbase_save_theme() {
@@ -888,10 +899,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function admin_notice_variation_success() {
 		$theme_name = $_GET['theme']['name'];
+		$variation_name = get_stylesheet_directory() . '/styles/' . $_GET['theme']['variation'] .'.json';
 
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Your variation of %1$s has been created succesfully', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+				<p><?php printf( esc_html__( 'Your variation of %1$s has been created succesfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $variation_name )  ); ?></p>
 			</div>
 		<?php
 	}
