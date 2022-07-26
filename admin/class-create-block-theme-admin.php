@@ -33,6 +33,10 @@ class Create_Block_Theme_Admin {
 		$this->add_theme_json_to_local( $export_type );
 	}
 
+	function save_variation_locally ( $export_type ) {
+		$this->add_theme_json_variation_to_local( $export_type );
+	}
+
 	function clear_user_customizations() {
 
 		// Clear all values in the user theme.json
@@ -327,6 +331,18 @@ class Create_Block_Theme_Admin {
 	function add_theme_json_to_local ( $export_type ) {
 		file_put_contents(
 			get_stylesheet_directory() . '/theme.json',
+			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
+		);
+	}
+
+	function add_theme_json_variation_to_local ( $export_type ) {
+		$variation_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR;
+		if ( ! file_exists( $variation_path ) ) {
+			mkdir( $variation_path, 0755, true );
+		}
+
+		file_put_contents(
+			$variation_path . '/variation.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 	}
@@ -704,6 +720,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<?php _e('[Generates a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
+							<label>
+								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="document.getElementById('new_theme_metadata_form').setAttribute('hidden', null);" />
+								<?php _e('Create a style variation ', 'create-block-theme'); ?><br />
+								<?php _e('[Generates a style variation for the current theme. Any template changes will be ignored.]', 'create-block-theme'); ?>
+							</label>
+							<br /><br />
 
 							<input type="submit" value="<?php _e('Create theme', 'create-block-theme'); ?>" class="button button-primary" />
 
@@ -775,6 +797,16 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				$this->clear_user_customizations();
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
+			}
+
+			else if ( $_GET['theme']['type'] === 'variation' ) {
+				if ( is_child_theme() ) {
+					$this->save_variation_locally( 'current' );
+				}
+				else {
+					$this->save_variation_locally( 'all' );
+				}
+				die('eeeee');
 			}
 
 			else if ( $_GET['theme']['type'] === 'blank' ) {
