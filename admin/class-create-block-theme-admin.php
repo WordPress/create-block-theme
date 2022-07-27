@@ -681,7 +681,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<p><?php printf( esc_html__('Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></p>
 
 							<label>
-								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );" />
+								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
 								<?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?>
 							</label>
@@ -711,7 +711,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<br /><br />
 							<?php endif; ?>
 							<label>
-								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );" />
+								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true ):" />
 								<?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?>
 							</label>
