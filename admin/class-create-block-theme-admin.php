@@ -869,7 +869,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		}
 	}
 
-	function admin_notice_error_theme_name_theme_name() {
+	function admin_notice_error_theme_name() {
 		$class = 'notice notice-error';
 		$message = __( 'Please specify a theme name.', 'create-block-theme' );
 
