@@ -35,8 +35,7 @@ class Create_Block_Theme_Admin {
 	}
 
 	function save_variation ( $export_type, $theme ) {
-		$this->add_theme_json_variation_to_local( $export_type );
-		$this->export_theme( $theme );
+		$this->add_theme_json_variation_to_local( $export_type, $theme );
 	}
 
 	function clear_user_customizations() {
@@ -337,14 +336,14 @@ class Create_Block_Theme_Admin {
 		);
 	}
 
-	function add_theme_json_variation_to_local ( $export_type ) {
+	function add_theme_json_variation_to_local ( $export_type, $theme ) {
 		$variation_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR;
 		if ( ! file_exists( $variation_path ) ) {
 			mkdir( $variation_path, 0755, true );
 		}
 
 		file_put_contents(
-			$variation_path . '/variation.json',
+			$variation_path . '/' . $theme['variation'] . '.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 	}
@@ -791,12 +790,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
-				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+				return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 			}
 
 			// Check nonce
 			if ( ! wp_verify_nonce( $_GET['nonce'], 'create_block_theme' ) ) {
-				return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+				return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 			}
 
 			if ( $_GET['theme']['type'] === 'save' ) {
@@ -812,6 +811,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			}
 
 			else if ( $_GET['theme']['type'] === 'variation' ) {
+
+				if ( $_GET['theme']['variation'] === '' ) {
+					return add_action( 'admin_notices', [ $this, 'admin_notice_error_variation_name' ] );
+				}
+
 				if ( is_child_theme() ) {
 					$this->save_variation( 'current', $_GET['theme'] );
 				}
@@ -824,7 +828,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			else if ( $_GET['theme']['type'] === 'blank' ) {
 				if ( $_GET['theme']['name'] === '' ) {
-					return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 				}
 				$this->create_blank_theme( $_GET['theme'] );
 
@@ -834,7 +838,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			else if ( is_child_theme() ) {
 				if ( $_GET['theme']['type'] === 'sibling' ) {
 					if ( $_GET['theme']['name'] === '' ) {
-						return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
 					$this->create_sibling_theme( $_GET['theme'] );
 				}
@@ -845,13 +849,13 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			} else {
 				if( $_GET['theme']['type'] === 'child' ) {
 					if ( $_GET['theme']['name'] === '' ) {
-						return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
 					$this->create_child_theme( $_GET['theme'] );
 				}
 				else if( $_GET['theme']['type'] === 'clone' ) {
 					if ( $_GET['theme']['name'] === '' ) {
-						return add_action( 'admin_notices', [ $this, 'admin_notice_error' ] );
+						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
 					$this->clone_theme( $_GET['theme'] );
 				}
@@ -864,9 +868,16 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		}
 	}
 
-	function admin_notice_error() {
+	function admin_notice_error_theme_name_theme_name() {
 		$class = 'notice notice-error';
 		$message = __( 'Please specify a theme name.', 'create-block-theme' );
+
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+	}
+
+	function admin_notice_error_variation_name() {
+		$class = 'notice notice-error';
+		$message = __( 'Please specify a variation name.', 'create-block-theme' );
 
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}
