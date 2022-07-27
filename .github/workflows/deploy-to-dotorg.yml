@@ -9,7 +9,7 @@ jobs:
     name: New tag
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@trunk
+    - uses: actions/checkout@v3
     - name: Create Block Theme Plugin Deploy to WordPress.org
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:
