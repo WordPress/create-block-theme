@@ -711,7 +711,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<br /><br />
 							<?php endif; ?>
 							<label>
-								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true ):" />
+								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
 								<?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?>
 							</label>
