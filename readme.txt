@@ -5,7 +5,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.0
-Stable tag: 1.0
+Stable tag: 1.0.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -31,6 +31,12 @@ In the WordPress Admin Dashboard, under Appearance there will be a new page call
 You can add the details for the theme here. These details will be used in the style.css file. When you click the “Create Block Theme” button, a zip file will be downloaded which will contain all the files for your theme.
 
 == Changelog ==
+
+= 1.0.1 = 
+Add option to create blank theme. (#70)
+Improve form instructions (#76)
+Form cleanup and Theme name check (#77) 
+Get the correct merged theme.json data (#88)
 
 = 1.0 =
 * Initial version.
