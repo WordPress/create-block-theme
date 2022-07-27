@@ -822,6 +822,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				else {
 					$this->save_variation( 'all', $_GET['theme'] );
 				}
+				$this->clear_user_customizations();
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_variation_success' ] );
 			}
