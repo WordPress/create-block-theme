@@ -337,13 +337,14 @@ class Create_Block_Theme_Admin {
 	}
 
 	function add_theme_json_variation_to_local ( $export_type, $theme ) {
+		$variation_slug = sanitize_title( $theme['variation'] );
 		$variation_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR;
 		if ( ! file_exists( $variation_path ) ) {
 			mkdir( $variation_path, 0755, true );
 		}
 
 		file_put_contents(
-			$variation_path . '/' . $theme['variation'] . '.json',
+			$variation_path . $variation_slug . '.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 	}
@@ -718,13 +719,13 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<label>
 								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );" />
 								<?php _e('Create blank theme ', 'create-block-theme'); ?><br />
-								<?php _e('[Generates a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
+								<?php _e('[Generate a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
 								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_variation_metadata_form', false );" />
 								<?php _e('Create a style variation ', 'create-block-theme'); ?><br />
-								<?php printf( esc_html__('[Saves user changes as a style variation of %1$s.]', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?>
+								<?php printf( esc_html__('[Save user changes as a style variation of %1$s.]', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?>
 							</label>
 							<br /><br />
 
@@ -911,7 +912,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function admin_notice_variation_success() {
 		$theme_name = wp_get_theme()->get( 'Name' );
-		$variation_name = get_stylesheet_directory() . '/styles/' . $_GET['theme']['variation'] .'.json';
+		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . sanitize_title( $_GET['theme']['variation'] ) .'.json';
 
 		?>
 			<div class="notice notice-success is-dismissible">
