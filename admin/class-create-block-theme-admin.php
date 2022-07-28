@@ -23,8 +23,8 @@ class Create_Block_Theme_Admin {
 		if ( ! wp_is_block_theme() ) {
 			return;
 		}
-		$page_title=__('Create Block Theme', 'create-block-theme');
-		$menu_title=__('Create Block Theme', 'create-block-theme');
+		$page_title=_x('Create Block Theme', 'UI String', 'create-block-theme');
+		$menu_title=_x('Create Block Theme', 'UI String', 'create-block-theme');
 		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', [ $this, 'create_admin_form_page' ] );
 	}
 
@@ -647,7 +647,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		if ( ! wp_is_block_theme() ) {
 			?>
 			<div class="wrap">
-				<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
+				<h2><?php _ex('Create Block Theme', 'UI String', 'create-block-theme'); ?></h2>
 				<p><?php _e('Activate a block theme to use this tool.', 'create-block-theme'); ?></p>
 			</div>
 			<?php
@@ -655,7 +655,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		}
 		?>
 		<div class="wrap">
-			<h2><?php _e('Create Block Theme', 'create-block-theme'); ?></h2>
+			<h2><?php _ex('Create Block Theme', 'UI String', 'create-block-theme'); ?></h2>
 			<form method="get">
 				<div id="col-container">
 					<div id="col-left">
