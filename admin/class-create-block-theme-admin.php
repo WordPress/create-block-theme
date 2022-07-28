@@ -339,10 +339,22 @@ class Create_Block_Theme_Admin {
 	function add_theme_json_variation_to_local ( $export_type, $theme ) {
 		$variation_slug = sanitize_title( $theme['variation'] );
 		$variation_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR;
+		$file_counter = 0;
+
 		if ( ! file_exists( $variation_path ) ) {
 			mkdir( $variation_path, 0755, true );
 		}
+		
+		if ( file_exists( $variation_path . $variation_slug . '.json' ) ) {
+			$file_counter++;
+			while ( file_exists( $variation_path . $variation_slug . '_' . $file_counter . '.json' ) ) {
+				$file_counter++;
+		   	}
+			$variation_slug = $variation_slug . '_' . $file_counter;
+		}
 
+		$_GET['theme']['variation_slug'] = $variation_slug;
+		
 		file_put_contents(
 			$variation_path . $variation_slug . '.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
@@ -912,7 +924,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function admin_notice_variation_success() {
 		$theme_name = wp_get_theme()->get( 'Name' );
-		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . sanitize_title( $_GET['theme']['variation'] ) .'.json';
+		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . $_GET['theme']['variation_slug'] .'.json';
 
 		?>
 			<div class="notice notice-success is-dismissible">
