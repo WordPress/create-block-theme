@@ -910,12 +910,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	}
 
 	function admin_notice_variation_success() {
-		$theme_name = $_GET['theme']['name'];
+		$theme_name = wp_get_theme()->get( 'Name' );
 		$variation_name = get_stylesheet_directory() . '/styles/' . $_GET['theme']['variation'] .'.json';
 
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Your variation of %1$s has been created succesfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $variation_name )  ); ?></p>
+				<p><?php printf( esc_html__( 'Your variation of %1$s has been created successfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $variation_name )  ); ?></p>
 			</div>
 		<?php
 	}
