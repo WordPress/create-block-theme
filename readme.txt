@@ -32,6 +32,10 @@ You can add the details for the theme here. These details will be used in the st
 
 == Changelog ==
 
+= 1.1.0 =
+Save a theme variation (#90)
+Make UI string 'Create Block Theme' can be translatable (#92)
+
 = 1.0.1 = 
 Add option to create blank theme. (#70)
 Improve form instructions (#76)
