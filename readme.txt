@@ -5,7 +5,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.0
-Stable tag: 1.0.1
+Stable tag: 1.1.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -32,7 +32,7 @@ You can add the details for the theme here. These details will be used in the st
 
 == Changelog ==
 
-= 1.1.1 =
+= 1.1.2 =
 Save a theme variation (#90)
 Make UI string 'Create Block Theme' can be translatable (#92)
 
