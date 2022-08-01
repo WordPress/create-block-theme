@@ -242,7 +242,13 @@ const StyleVariations = () => {
 
       onReset(); // Reload variations
       // We need to invalidate and maybe refetch __experimentalGetCurrentThemeGlobalStylesVariations(),
-    } catch (errorResponse) {
+
+      if (response.req.status === 200) {
+        createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Variation created successfully'), {
+          type: 'snackbar'
+        });
+      }
+    } catch (error) {
       const errorMessage = error.message && error.code !== 'unknown_error' ? error.message : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('An error occurred while creating the site export.');
       createErrorNotice(errorMessage, {
         type: 'snackbar'
@@ -250,14 +256,86 @@ const StyleVariations = () => {
     }
   }
 
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.MenuGroup, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.PanelBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.MenuGroup, {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create style variation')
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.MenuItem, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
     onChange: value => setVariationName(value),
     placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Variation name')
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.Button, {
+    variant: "secondary",
     onClick: () => createVariation()
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create variation'))));
+};
+
+const BlankTheme = () => {
+  const {
+    createErrorNotice
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_7__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_6__.store);
+  const [theme, setTheme] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    "name": "",
+    "description": "",
+    "uri": "",
+    "author": "",
+    "author_uri": ""
+  });
+
+  async function createBlankTheme() {
+    try {
+      const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+        path: '/create-block-theme/v1/blank-theme',
+        method: 'POST',
+        data: theme
+      });
+
+      if (response.req.status === 200) {
+        createErrorNotice((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('New theme created'), {
+          type: 'snackbar'
+        });
+      }
+    } catch (error) {
+      const errorMessage = error.message && error.code !== 'unknown_error' ? error.message : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('An error occurred while creating the site export.');
+      createErrorNotice(errorMessage, {
+        type: 'snackbar'
+      });
+    }
+  }
+
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.PanelBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.MenuGroup, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create a blank theme')
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Theme name'),
+    onChange: value => setTheme({ ...theme,
+      "name": value
+    }),
+    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Theme name')
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Theme description'),
+    onChange: value => setTheme({ ...theme,
+      "description": value
+    }),
+    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('A short description of the theme')
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Theme URI'),
+    onChange: value => setTheme({ ...theme,
+      "uri": value
+    }),
+    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('https://github.com/wordpress/twentytwentytwo/')
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Author'),
+    onChange: value => setTheme({ ...theme,
+      "author": value
+    }),
+    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('the WordPress team')
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Author URI'),
+    onChange: value => setTheme({ ...theme,
+      "author_uri": value
+    }),
+    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('https://wordpress.org/')
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.Button, {
+    variant: "secondary",
+    onClick: () => createBlankTheme()
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create blank theme'))));
 };
 
 const CreateBlockThemePlugin = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_edit_site__WEBPACK_IMPORTED_MODULE_2__.PluginSidebarMoreMenuItem, {
@@ -267,7 +345,7 @@ const CreateBlockThemePlugin = () => (0,_wordpress_element__WEBPACK_IMPORTED_MOD
   name: "create-block-theme-sidebar",
   icon: _wordpress_icons__WEBPACK_IMPORTED_MODULE_8__["default"],
   title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create Block Theme')
-}, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(GlobalStylesProvider, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(StyleVariations, null))));
+}, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(GlobalStylesProvider, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(StyleVariations, null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(BlankTheme, null))));
 
 (0,_wordpress_plugins__WEBPACK_IMPORTED_MODULE_1__.registerPlugin)('plugin-sidebar-expanded-test', {
   render: CreateBlockThemePlugin
