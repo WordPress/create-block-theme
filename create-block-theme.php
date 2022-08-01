@@ -48,14 +48,17 @@ function create_variation( $data ) {
 		$plugin_admin->save_variation( 'all', $data );
 	}
 	$plugin_admin->clear_user_customizations();
+
 	$result = new stdClass();
 	$result->variation = $data['variation'];
-	return $result;
+	$res = new WP_REST_Response( $result );
+	$res->set_status( 200 );
+	return [ 'req' => $res ];
 }
 
 add_action( 'rest_api_init', function () {
 	register_rest_route( 'create-block-theme/v1', '/variation/(?P<variation>[a-z0-9-]++)', array(
-		'methods' => 'GET',
+		'methods' => 'GET', // TODO - should be POST
 		'callback' => 'create_variation',
 		'permission_callback' => function () {
 			return current_user_can( 'edit_others_posts' );
@@ -69,6 +72,57 @@ add_action( 'rest_api_init', function () {
 		),
 	) );
 } );
+
+function create_blank_theme( $data ) {
+	$plugin_admin = new Create_Block_Theme_Admin();
+	$plugin_admin->create_blank_theme( $data );
+	$result = new stdClass();
+	$result->name = $data['name'];
+	$res = new WP_REST_Response( $result );
+	$res->set_status( 200 );
+	return [ 'req' => $res ];
+
+}
+
+add_action( 'rest_api_init', function () {
+	register_rest_route( 'create-block-theme/v1', '/blank-theme', array(
+		'methods' => 'POST',
+		'callback' => 'create_blank_theme',
+		'permission_callback' => function () {
+			return current_user_can( 'edit_others_posts' );
+		},
+		'args' => array(
+			'name' => array(
+				'validate_callback' => function($param, $request, $key) {
+					return is_string( $param );
+				}
+			),
+			'description' => array(
+				'validate_callback' => function($param, $request, $key) {
+					return is_string( $param );
+				}
+			),
+			'uri' => array(
+				'validate_callback' => function($param, $request, $key) {
+					return is_string( $param );
+				}
+			),
+			'author' => array(
+				'validate_callback' => function($param, $request, $key) {
+					return is_string( $param );
+				}
+			),
+			'author_uri' => array(
+				'validate_callback' => function($param, $request, $key) {
+					return is_string( $param );
+				}
+			),
+		),
+	) );
+} );
+
+
+
 
 function create_block_theme_enqueue() {
 	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');

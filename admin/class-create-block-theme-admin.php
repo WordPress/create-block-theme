@@ -292,8 +292,8 @@ class Create_Block_Theme_Admin {
 		if ( ! file_exists( $blank_theme_path ) ) {
 			mkdir( $blank_theme_path, 0755 );
 			// Add readme.txt.
-			file_put_contents( 
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt', 
+			file_put_contents(
+				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
 				$this->build_readme_txt( $theme )
 			);
 
@@ -301,8 +301,8 @@ class Create_Block_Theme_Admin {
 			$css_contents = $this->build_child_style_css( $theme );
 
 			// Add style.css.
-			file_put_contents( 
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css', 
+			file_put_contents(
+				$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css',
 				$css_contents
 			);
 
@@ -344,7 +344,7 @@ class Create_Block_Theme_Admin {
 		if ( ! file_exists( $variation_path ) ) {
 			mkdir( $variation_path, 0755, true );
 		}
-		
+
 		if ( file_exists( $variation_path . $variation_slug . '.json' ) ) {
 			$file_counter++;
 			while ( file_exists( $variation_path . $variation_slug . '_' . $file_counter . '.json' ) ) {
@@ -354,7 +354,7 @@ class Create_Block_Theme_Admin {
 		}
 
 		$_GET['theme']['variation_slug'] = $variation_slug;
-		
+
 		file_put_contents(
 			$variation_path . $variation_slug . '.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
