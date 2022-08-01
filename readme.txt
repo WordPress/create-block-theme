@@ -14,10 +14,10 @@ A WordPress plugin to create block themes.
 
 == Description ==
 
-This tool can create standalone block themes and child themes.
+This tool can create standalone block themes, child themes and variations.
 
 = Step 1 – Setup =
-Install and activate the [Create Block Theme](https://github.com/WordPress/create-block-theme) plugin. You will also need to be running the latest version of the Gutenberg plugin.
+Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
 = Step 2 – Style Customizations =
 Make changes to your site design using the Customizer and Site Editor.
@@ -26,9 +26,11 @@ Make changes to your site design using the Customizer and Site Editor.
 Edit your templates using the Site Editor. For some things you might need to edit the template files again later.
 
 = Step 4 – Export =
-In the WordPress Admin Dashboard, under Appearance there will be a new page called “Create Block Theme”.
+In the WordPress Admin Dashboard, navigate to Appearance > “Create Block Theme”.
 
-You can add the details for the theme here. These details will be used in the style.css file. When you click the “Create Block Theme” button, a zip file will be downloaded which will contain all the files for your theme.
+Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file.
+
+Click "Create theme” button, to save the theme containing all the files.
 
 == Changelog ==
 

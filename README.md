@@ -16,7 +16,7 @@ Creates a new theme by cloning the activated theme. The resulting theme will hav
 Saves user's changes to the theme files and deletes the user's changes.
 
 ### Step 1 – Setup
-Install and activate the [Create Block Theme](https://github.com/WordPress/create-block-theme) plugin. You will also need to be running the latest version of the Gutenberg plugin.
+Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
 ### Step 2 – Style Customizations
 Make changes to your site design using the Site Editor.
@@ -27,4 +27,4 @@ Edit your templates using the Site Editor. For some things you might need to edi
 ### Step 4 – Save
 In the WordPress Admin Dashboard, under Appearance there will be a new page called “Create Block Theme”.
 
-Select one of the 4 options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. When you click the "Export Theme” button, your theme will be saved.
+Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Create theme” button, to save the theme.
