@@ -609,6 +609,7 @@ class Create_Block_Theme_Admin {
 		$uri = $theme['uri'];
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
+		$copyYear = date('Y');
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -629,7 +630,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Copyright ==
 
-{$name} WordPress Theme, (C) 2022 {$author}
+{$name} WordPress Theme, (C) {$copyYear} {$author}
 {$name} is distributed under the terms of the GNU GPL.
 
 This program is free software: you can redistribute it and/or modify
