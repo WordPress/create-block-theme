@@ -1,7 +1,7 @@
 # Create Block Theme
 A WordPress plugin to create block themes.
 
-This tool can be used in 4 different ways:
+This tool can be used in six ways:
 
 ### 1.Export
 Export the activated theme including the user changes.
@@ -14,6 +14,14 @@ Creates a new theme by cloning the activated theme. The resulting theme will hav
 
 ### 4. Overwrite theme files
 Saves user's changes to the theme files and deletes the user's changes.
+
+### 5. Generate blank theme
+Generate a boilerplate "empty" theme inside of current site's themes directory.
+
+### 6. Create a style variation
+Saves user's changes as a [style variation](https://developer.wordpress.org/themes/advanced-topics/theme-json/#global-styles-variations) of the current theme.
+
+## Get Started
 
 ### Step 1 – Setup
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
