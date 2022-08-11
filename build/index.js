@@ -234,6 +234,10 @@ const StyleVariations = () => {
     createErrorNotice
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_7__.useDispatch)(_wordpress_notices__WEBPACK_IMPORTED_MODULE_6__.store);
 
+  if (!canReset) {
+    return null; // This requires the Gutenberg plugin.
+  }
+
   async function createVariation() {
     try {
       const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
@@ -338,14 +342,20 @@ const BlankTheme = () => {
   }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create blank theme'))));
 };
 
-const CreateBlockThemePlugin = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_edit_site__WEBPACK_IMPORTED_MODULE_2__.PluginSidebarMoreMenuItem, {
-  target: "create-block-theme-sidebar",
-  icon: _wordpress_icons__WEBPACK_IMPORTED_MODULE_8__["default"]
-}, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create Block Theme')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_edit_site__WEBPACK_IMPORTED_MODULE_2__.PluginSidebar, {
-  name: "create-block-theme-sidebar",
-  icon: _wordpress_icons__WEBPACK_IMPORTED_MODULE_8__["default"],
-  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create Block Theme')
-}, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(GlobalStylesProvider, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(StyleVariations, null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(BlankTheme, null))));
+const CreateBlockThemePlugin = () => {
+  if (!GlobalStylesProvider) {
+    return null; // This feature requires the latest version of Gutenberg.
+  }
+
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_edit_site__WEBPACK_IMPORTED_MODULE_2__.PluginSidebarMoreMenuItem, {
+    target: "create-block-theme-sidebar",
+    icon: _wordpress_icons__WEBPACK_IMPORTED_MODULE_8__["default"]
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create Block Theme')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_edit_site__WEBPACK_IMPORTED_MODULE_2__.PluginSidebar, {
+    name: "create-block-theme-sidebar",
+    icon: _wordpress_icons__WEBPACK_IMPORTED_MODULE_8__["default"],
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Create Block Theme')
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(GlobalStylesProvider, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(StyleVariations, null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(BlankTheme, null))));
+};
 
 (0,_wordpress_plugins__WEBPACK_IMPORTED_MODULE_1__.registerPlugin)('plugin-sidebar-expanded-test', {
   render: CreateBlockThemePlugin
