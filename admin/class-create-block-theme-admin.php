@@ -667,7 +667,7 @@ Tested up to: 5.9
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
-License URI: https://raw.githubusercontent.com/Automattic/themes/trunk/LICENSE
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
 Text Domain: {$slug}
 Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
