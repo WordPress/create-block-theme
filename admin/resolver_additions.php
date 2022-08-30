@@ -67,7 +67,12 @@ function augment_resolver_with_utilities() {
 
 			// Add the schema.
 			if ( empty( $schema ) ) {
-				$schema = 'https://schemas.wp.org/trunk/theme.json';
+				global $wp_version;
+				$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
+				if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+					$theme_json_version = 'trunk';
+				}
+				$schema = 'https://schemas.wp.org/' . $theme_json_version . '/theme.json';
 			}
 			$data['$schema'] = $schema;
 			$theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
