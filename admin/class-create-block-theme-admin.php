@@ -317,6 +317,16 @@ class Create_Block_Theme_Admin {
 					copy($item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
 				}
 			}
+
+			if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+				global $wp_version;
+				$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
+    				$schema = '"$schema": "https://schemas.wp.org/' . $theme_json_version . '/theme.json"';
+				$theme_json_path = $blank_theme_path . DIRECTORY_SEPARATOR . 'theme.json';
+				$theme_json_string = file_get_contents( $theme_json_path );
+				$theme_json_string = str_replace('"$schema": "https://schemas.wp.org/trunk/theme.json"', $schema, $theme_json_string );
+				file_put_contents( $theme_json_path, $theme_json_string );
+			}
 		}
 
 	}
