@@ -5,7 +5,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.0
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -33,6 +33,12 @@ Select one of the available options and then, if necessary, add the details for 
 Click "Create theme” button, to save the theme containing all the files.
 
 == Changelog ==
+
+= 1.1.3 = 
+update links, screenshots of the new changes (#97)
+Add $schema and use Gutenberg classes (#99)
+Update readme to include latest features (#100)
+Generate $schema URL in the same way as core. (#105)
 
 = 1.1.2 =
 Save a theme variation (#90)
