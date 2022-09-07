@@ -9,10 +9,16 @@ import {
 
 const GlobalStylesProvider = wp.editSite.GlobalStylesProvider;
 
-export default StyleVariations = () => {
+export default GlobalStylesProvider = wp.editSite.unstableGlobalStylesProvider;
+
+const StyleVariations = () => {
 	const [ variationName, setVariationName ] = useState( '' );
-	const [ canReset, onReset ] = wp.editSite.useGlobalStylesReset();
+	const [ canReset, onReset ] = wp.editSite.unstableUseGlobalStylesReset();
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	if ( ! canReset ) {
+		return null; // This requires the Gutenberg plugin.
+	}
 
 	async function createVariation() {
 		try {
@@ -25,7 +31,12 @@ export default StyleVariations = () => {
 
 			// Reload variations
 			// We need to invalidate and maybe refetch __experimentalGetCurrentThemeGlobalStylesVariations(),
-		} catch ( errorResponse ) {
+			if ( response.req.status === 200 ) {
+				createErrorNotice( __( 'Variation created successfully' ), {
+					type: 'snackbar',
+				} );
+			}
+		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
