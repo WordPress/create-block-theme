@@ -585,11 +585,21 @@ class Create_Block_Theme_Admin {
 		$theme_templates = $this->get_theme_templates( $export_type, null );
 		$template_folders = get_block_theme_folders();
 
+		// If there is no templates folder, create it.
+		if ( ! is_dir( get_stylesheet_directory() . '/' . $template_folders['wp_template']  ) ) {
+			wp_mkdir_p( get_stylesheet_directory() . '/' . $template_folders['wp_template'] );
+		}
+
 		foreach ( $theme_templates->templates as $template ) {
 			file_put_contents(
 				get_stylesheet_directory() . '/' . $template_folders['wp_template'] . '/' . $template->slug . '.html',
 				$template->content
 			);
+		}
+
+		// If there is no parts folder, create it.
+		if ( ! is_dir( get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] ) ) {
+			wp_mkdir_p( get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] );
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
