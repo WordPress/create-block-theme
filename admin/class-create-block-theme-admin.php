@@ -17,6 +17,7 @@ class Create_Block_Theme_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
 		add_action( 'admin_init', [ $this, 'blockbase_save_theme' ] );
+		add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
 	}
 
 	function create_admin_menu() {
@@ -26,6 +27,11 @@ class Create_Block_Theme_Admin {
 		$page_title=_x('Create Block Theme', 'UI String', 'create-block-theme');
 		$menu_title=_x('Create Block Theme', 'UI String', 'create-block-theme');
 		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', [ $this, 'create_admin_form_page' ] );
+
+		$google_fonts_page_title=_x('Embed Google Font in current Theme', 'UI String', 'add-google-font-to-theme-json');
+		$google_fonts_menu_title=_x('Embed Google Font in current Theme', 'UI String', 'add-google-font-to-theme-json');
+		add_theme_page( $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
+		
 		add_action('admin_enqueue_scripts', [ $this, 'form_script' ] );
 	}
 
@@ -814,6 +820,150 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	<?php
 	}
 
+	function save_google_fonts_to_theme () {
+		if (
+			! empty( $_GET['page'] ) &&
+			$_GET['page'] === 'add-google-font-to-theme-json' &&
+			! empty( $_GET['google-font-variants'] ) &&
+			! empty( $_GET['google-font-name'] )
+		) {
+			// Gets data from the form
+			$google_font_name = $_GET['google-font-name'];
+			$font_slug = strtolower( str_replace( ' ', '-', $google_font_name ) );
+			$google_font_variants = $_GET['google-font-variants'];
+			$variants = explode(',', $google_font_variants);
+			
+			// Get the current Theme.json data
+			$theme_data = WP_Theme_JSON_Resolver::get_theme_data();
+			$theme_settings = $theme_data->get_settings();
+			$theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+			// Create the font assets folder if it doesn't exist
+			$assets_path = get_stylesheet_directory() . '/assets';
+			$font_assets_path = $assets_path . '/fonts';
+			if ( ! is_dir( $assets_path ) ) {
+				mkdir( $assets_path, 0755 );
+			}
+			if ( ! is_dir( $font_assets_path ) ) {
+				mkdir( $font_assets_path, 0755 );
+			}
+
+			$new_font_faces = array();
+			foreach ($variants as $variant) {
+				// variant name is $variant_and_url[0] and font asset url is $variant_and_url[1]
+				$variant_and_url = explode ('::', $variant);
+				$file_extension = pathinfo($variant_and_url[1], PATHINFO_EXTENSION);
+				$filename = $font_slug.'_'.$variant_and_url[0].'.'.$file_extension;
+
+				// Write file assets to the theme folder
+				$file = file_put_contents( 
+					get_stylesheet_directory().'/assets/fonts/'.$filename,
+					file_get_contents( $variant_and_url[1] )
+				);
+
+				// Get the font style and weight
+				$variant_style  = str_contains($variant_and_url[0], 'italic') ? 'italic' : 'normal';
+				$variant_weight = ($variant_and_url[0] === 'regular' || $variant_and_url[0] === 'italic') ? '400' : $variant_and_url[0];
+				$variant_weight = str_replace('italic', '', $variant_weight);
+
+				// Add each variant as one font face
+				$new_font_faces[] = array (
+					'fontFamily' => $google_font_name,
+					'fontStyle'  => $variant_style,
+					'fontWeight' => $variant_weight,
+					'src' => array (
+						'file:./assets/fonts/'.$filename
+					),
+				);
+			}
+
+			// Add the new font faces to the theme.json
+			$theme_font_families[] = array (
+				'fontFamily' => $google_font_name,
+				'name' => $google_font_name,
+				'slug' => $font_slug,
+				'fontFace' => $new_font_faces,
+			);
+			$new_theme_json_content = array(
+				'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array (
+						'fontFamilies' => $theme_font_families
+					)
+				)
+			);
+
+			// Creates the new theme.json file
+			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
+				$new_json = new WP_Theme_JSON_Gutenberg( $new_theme_json_content );
+				$result = new WP_Theme_JSON_Gutenberg();
+			} else {
+				$new_json = new WP_Theme_JSON( $new_theme_json_content );
+				$result = new WP_Theme_JSON();
+			}
+			$result->merge( $theme_data );
+			$result->merge( $new_json );
+			
+			$data = $result->get_data();
+			$theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			$theme_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
+
+			// Write the new theme.json to the theme folder
+			file_put_contents(
+				get_stylesheet_directory() . '/theme.json',
+				$theme_json_string
+			);
+
+			add_action( 'admin_notices', [ $this, 'admin_notice_add_google_fonts_success' ] );
+		}
+	}
+	
+	
+	function google_fonts_admin_page() {
+		wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( 'wp-element', 'wp-i18n' ), '1.0', false );
+		wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
+
+		if ( ! wp_is_block_theme() ) {
+			?>
+			<div class="wrap">
+				<h2><?php _ex('Create Block Theme', 'UI String', 'create-block-theme'); ?></h2>
+				<p><?php _e('Activate a block theme to use this tool.', 'create-block-theme'); ?></p>
+			</div>
+			<?php
+			return;
+		}
+
+?>
+		<div class="wrap google-fonts-page">
+			<h2><?php _ex('Add Google fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
+			<form method="get" action="?page=add-google-font-to-theme-json">
+				<input type="hidden" value="add-google-font-to-theme-json" name="page" />
+				<h3><?php printf( esc_html__('Add Google fonts assets and font face definitions to your current active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
+				<label for="google-font-id"><?php printf( esc_html__('Select Font', 'create-block-theme')); ?></label>
+				<select name="google-font" id="google-font-id">
+				</select>
+				<br /><br />
+				<p class="hint">Select the font variants you want to include:</p>
+				<table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
+					<thead>
+						<tr>
+							<td class=""></td>
+							<td class=""><?php printf( esc_html__('Variant', 'create-block-theme')); ?></td>
+							<td class=""><?php printf( esc_html__('Preview', 'create-block-theme')); ?></td>
+						</tr>
+					</thead>
+					<tbody id="font-options">
+					</tbody>
+				</table>
+				<br /><br />
+				<input type="hidden" name="google-font-name" id="google-font-name" value="" />
+				<input type="hidden" name="google-font-variants" id="google-font-variants" value="" />
+				<input type="submit" value="<?php _e('Add google fonts to your theme', 'create-block-theme'); ?>" class="button button-primary" id="google-fonts-submit" disabled=true />
+			</form>
+		</div>
+	<?php
+	}
+
 	function form_script() {
 		wp_enqueue_script('form-script', plugin_dir_url(__FILE__) . '/js/form-script.js');
 	}
@@ -950,6 +1100,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p><?php printf( esc_html__( 'Your variation of %1$s has been created successfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $variation_name )  ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_add_google_fonts_success () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php printf( esc_html__( 'Google fonts added to %1$s.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
