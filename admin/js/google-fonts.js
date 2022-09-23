@@ -9,14 +9,17 @@ async function get_google_fonts() {
     try { // Try to get the font list from the API
         const url = `${API_URL}${API_KEY}`;
         const response = await fetch(url);
-        const data = await response.json();
-        return data.items;
+        const { items } = await response.json();
+        if ( !items ) {
+            throw new Error('API Key error');
+        }
+        return items;
     } catch (error) { // If the API is not available, use the local list
         const currentUrl = new URL(document.getElementById('google-fonts-script-js').src);
         const fallbackURL = currentUrl.origin + currentUrl.pathname.replace('admin/js/google-fonts.js', 'assets/google-fonts/fallback-fonts-list.json');
         const response = await fetch(fallbackURL);
-        const data = await response.json();
-        return data.items;
+        const { items } = await response.json();
+        return items;
     }
 }
 
