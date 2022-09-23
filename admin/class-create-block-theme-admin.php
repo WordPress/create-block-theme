@@ -820,6 +820,8 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	<?php
 	}
 
+
+
 	function save_google_fonts_to_theme () {
 		if (
 			! empty( $_GET['page'] ) &&
@@ -837,6 +839,17 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			$theme_data = WP_Theme_JSON_Resolver::get_theme_data();
 			$theme_settings = $theme_data->get_settings();
 			$theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+			function exclude_existent_font_family ($font_family) {
+				return $font_family['slug']  !== $font_slug;
+			}
+
+			$existent_family =  array_values(
+				array_filter (
+					$theme_font_families ,
+					function ($font_family) use ($font_slug) { return $font_family['slug']  === $font_slug; }
+				)
+			);
 
 			// Create the font assets folder if it doesn't exist
 			$assets_path = get_stylesheet_directory() . '/assets';
@@ -878,12 +891,24 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			}
 
 			// Add the new font faces to the theme.json
-			$theme_font_families[] = array (
-				'fontFamily' => $google_font_name,
-				'name' => $google_font_name,
-				'slug' => $font_slug,
-				'fontFace' => $new_font_faces,
-			);
+			if ( empty( $existent_family ) ) { // If the new font family doesn't exist in the theme.json font families, add it to the exising font families
+				$theme_font_families[] = array(
+					'fontFamily' => $google_font_name,
+					'name' => $google_font_name,
+					'slug' => $font_slug,
+					'fontFace' => $new_font_faces,
+				);
+			} else { // If the new font family already exists in the theme.json font families, add the new font faces to the existing font family
+				$theme_font_families = array_values(
+					array_filter (
+						$theme_font_families,
+						function ($font_family)  use ($font_slug) { return $font_family['slug']  !== $font_slug; }
+					)
+				);
+				$existent_family[0]['fontFace'] = array_merge($existent_family[0]['fontFace'], $new_font_faces);
+				$theme_font_families = array_merge($theme_font_families, $existent_family);
+			}
+
 			$new_theme_json_content = array(
 				'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
 				'settings' => array(
