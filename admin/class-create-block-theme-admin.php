@@ -945,7 +945,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	
 	
 	function google_fonts_admin_page() {
-		wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( 'wp-element', 'wp-i18n' ), '1.0', false );
+		wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( ), '1.0', false );
 		wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
 
 		if ( ! wp_is_block_theme() ) {
