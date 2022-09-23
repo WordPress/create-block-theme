@@ -861,6 +861,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				mkdir( $font_assets_path, 0755 );
 			}
 
+			// If the font asset folder can't be written return an error
+			if ( ! is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) ) {
+				return add_action( 'admin_notices', [ $this, 'admin_notice_add_google_fonts_permission_error' ] );
+			}
+
 			$new_font_faces = array();
 			foreach ($variants as $variant) {
 				// variant name is $variant_and_url[0] and font asset url is $variant_and_url[1]
@@ -1134,6 +1139,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p><?php printf( esc_html__( 'Google fonts added to %1$s.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_add_google_fonts_permission_error () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error adding google fonts to %1$s. File permissions problem.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
