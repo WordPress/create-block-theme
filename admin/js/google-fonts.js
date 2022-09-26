@@ -113,7 +113,6 @@ function onFontVariantChange () {
     const submitElement = document.getElementById('google-fonts-submit');
     if (this.checked) {
         variantsSelected[this.id] = fontSelected['files'][this.id];
-        googleFontsSelectedElement.value += encodeURIComponent(JSON.stringify(fontSelected));
     } else {
         delete variantsSelected[this.id];
     }
