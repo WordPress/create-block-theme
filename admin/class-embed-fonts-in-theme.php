@@ -51,6 +51,8 @@ class Embed_Fonts_In_Theme_Admin {
                         <tr>
                             <th scope="row">
                                 <label for="font-file"><?php _e('Font file', 'create-block-theme'); ?></label>
+                                <br>
+                                <small style="font-weight:normal;">.ttf, .woff, .woff2 file extensions supported</small>
                             </th>
                             <td>
                                 <input type="file" accept=".ttf, .woff, .woff2"  name="font-file" required/>
