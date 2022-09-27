@@ -45,7 +45,7 @@ async function fillFontSelect() {
 }
 
 function onGoogleFontNameChange() {
-    const fontNameElement = document.getElementById("google-font-name");
+    const fontNameElement = document.getElementById("font-name");
     const fontsTableElement = document.getElementById("google-fonts-table");
     const hintElements = document.querySelector('.hint');
 
