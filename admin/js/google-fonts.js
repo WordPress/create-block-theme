@@ -1,4 +1,4 @@
-const API_URL = "https://google-fonts-service-proxy.vercel.app/api";
+const API_URL = "https://google-fonts-service-proxy.vercel.app/api"; // We are using this proxy to avoid sharing Google Fonst API key: https://github.com/matiasbenedetto/google-fonts-service-proxy
 const DEMO_TEXT = "The quick brown fox jumps over the lazy dog";
 let fonts = [];
 let fontSelected = null;
