@@ -1,4 +1,5 @@
-const API_URL = "https://google-webfonts-helper.herokuapp.com/api/fonts";
+const API_URL = "https://www.googleapis.com/webfonts/v1/webfonts?key=";
+const API_KEY = "AIzaSyC9-sErFQouy_mc0OqUmkNHEJZiZ-2_3iI"; // The API key is embed here because the API doesn't seem to have limits or costs.
 const DEMO_TEXT = "The quick brown fox jumps over the lazy dog";
 let fonts = [];
 let fontSelected = null;
@@ -6,10 +7,11 @@ let variantsSelected = {};
 
 async function get_google_fonts() {
     try { // Try to get the font list from the API
-        const response = await fetch(API_URL);
+        const url = `${API_URL}${API_KEY}`;
+        const response = await fetch(url);
         const { items } = await response.json();
         if ( !items ) {
-            throw new Error('Fonts API error');
+            throw new Error('API Key error');
         }
         return items;
     } catch (error) { // If the API is not available, use the local list
