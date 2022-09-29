@@ -40,7 +40,26 @@ class Embed_Fonts_In_Theme_Admin {
         return true;
 	}
 
+
+
     function local_fonts_admin_page () {
+        wp_enqueue_script('inflate', plugin_dir_url(__FILE__) . 'js/lib/inflate.js', array( ), '1.0', false );
+        wp_enqueue_script('unbrotli', plugin_dir_url(__FILE__) . 'js/lib/unbrotli.js', array( ), '1.0', false );
+        wp_enqueue_script('lib-font-browser', plugin_dir_url(__FILE__) . 'js/lib/lib-font.browser.js', array( ), '1.0', false );
+        wp_enqueue_script('embed-local-font', plugin_dir_url(__FILE__) . 'js/embed-local-font.js', array( ), '1.0', false );
+
+
+        function add_type_attribute($tag, $handle, $src) {
+            // if not your script, do nothing and return original $tag
+            if ( 'embed-local-font' !== $handle && 'lib-font-browser' !== $handle ) {
+                return $tag;
+            }
+            // change the script tag by adding type="module" and return it.
+            $tag = '<script type="module" src="' . esc_url( $src ) . '"></script>';
+            return $tag;
+        }
+
+        add_filter('script_loader_tag', 'add_type_attribute', 10, 3);
         ?>
         <div class="wrap local-fonts-page">
             <h2><?php _ex('Add local fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
@@ -55,7 +74,13 @@ class Embed_Fonts_In_Theme_Admin {
                                 <small style="font-weight:normal;">.ttf, .woff, .woff2 file extensions supported</small>
                             </th>
                             <td>
-                                <input type="file" accept=".ttf, .woff, .woff2"  name="font-file" required/>
+                                <input type="file" accept=".ttf, .woff, .woff2"  name="font-file" id="font-file" class="upload" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php _e('Font face defition for this font file:', 'create-block-theme'); ?></th>
+                            <td>
+                                <hr/>
                             </td>
                         </tr>
                         <tr>
@@ -71,7 +96,7 @@ class Embed_Fonts_In_Theme_Admin {
                                 <label for="font-style"><?php _e('Font style', 'create-block-theme'); ?></label>
                             </th>
                             <td>
-                                <select name="font-style" required>
+                                <select name="font-style" id="font-style" required>
                                     <option value="normal">Normal</option>
                                     <option value="italic">Italic</option>
                                 </select>
@@ -82,19 +107,7 @@ class Embed_Fonts_In_Theme_Admin {
                                 <label for="font-weight"><?php _e('Font weight', 'create-block-theme'); ?></label>
                             </th>
                             <td>
-                                <select name="font-weight" required>
-                                    <option value="normal">Normal</option>
-                                    <option value="bold">Bold</option>
-                                    <option value="100">100</option>
-                                    <option value="200">200</option>
-                                    <option value="300">300</option>
-                                    <option value="400">400</option>
-                                    <option value="500">500</option>
-                                    <option value="600">600</option>
-                                    <option value="700">700</option>
-                                    <option value="800">800</option>
-                                    <option value="900">900</option>
-                                </select>
+                                <input type="text" name="font-weight" id="font-weight" placeholder="Font Weight" required>
                             </td>
                         </tr>
                     </tbody>
