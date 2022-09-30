@@ -29,10 +29,6 @@ function prepareSelectElement () {
 async function fillFontSelect() {
     fonts = await get_google_fonts();
     const selectElement = document.getElementById('google-font-id');
-    const opt = document.createElement("option");
-    opt.value = "";
-    opt.innerHTML = "Select a font ...";
-    selectElement.appendChild(opt);
     for (const i in fonts) {
         const font = fonts[i];
         const opt = document.createElement("option");

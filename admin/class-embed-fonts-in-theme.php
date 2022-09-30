@@ -71,7 +71,7 @@ class Embed_Fonts_In_Theme_Admin {
                             <th scope="row">
                                 <label for="font-file"><?php _e('Font file', 'create-block-theme'); ?></label>
                                 <br>
-                                <small style="font-weight:normal;">.ttf, .woff, .woff2 file extensions supported</small>
+                                <small style="font-weight:normal;"><?php _e('.ttf, .woff, .woff2 file extensions supported', 'create-block-theme'); ?></small>
                             </th>
                             <td>
                                 <input type="file" accept=".ttf, .woff, .woff2"  name="font-file" id="font-file" class="upload" required/>
@@ -88,7 +88,7 @@ class Embed_Fonts_In_Theme_Admin {
                                 <label for="font-name"><?php _e('Font name', 'create-block-theme'); ?></label>
                             </th>
                             <td>
-                                <input type="text" name="font-name" id="font-name" placeholder="Font Name" required>
+                                <input type="text" name="font-name" id="font-name" placeholder="<?php _e('Font name', 'create-block-theme'); ?>" required>
                             </td>
                         </tr>
                         <tr>
@@ -107,7 +107,7 @@ class Embed_Fonts_In_Theme_Admin {
                                 <label for="font-weight"><?php _e('Font weight', 'create-block-theme'); ?></label>
                             </th>
                             <td>
-                                <input type="text" name="font-weight" id="font-weight" placeholder="Font Weight" required>
+                                <input type="text" name="font-weight" id="font-weight" placeholder="<?php _e('Font weight', 'create-block-theme'); ?>" required>
                             </td>
                         </tr>
                     </tbody>
@@ -129,9 +129,10 @@ class Embed_Fonts_In_Theme_Admin {
 				<h3><?php printf( esc_html__('Add Google fonts assets and font face definitions to your current active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
 				<label for="google-font-id"><?php printf( esc_html__('Select Font', 'create-block-theme')); ?></label>
 				<select name="google-font" id="google-font-id">
+                    <option value=""><?php _e('Select a font...', 'create-block-theme'); ?></option>
 				</select>
 				<br /><br />
-				<p class="hint">Select the font variants you want to include:</p>
+				<p class="hint"><?php _e('Select the font variants you want to include:', 'create-block-theme'); ?></p>
 				<table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
 					<thead>
 						<tr>
