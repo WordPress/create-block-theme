@@ -1,8 +1,14 @@
 # Create Block Theme
 A WordPress plugin to create block themes.
 
-This tool can be used in six ways:
+This plugin allows you to:
+- Create a new theme, blank theme, child theme or style variation.
+- Embed Google Fonts in your theme
+- Embed local font assets in your theme
 
+
+## Create Block Theme
+This feature can be used in six ways:
 ### 1.Export
 Export the activated theme including the user changes.
 
@@ -21,18 +27,30 @@ Generate a boilerplate "empty" theme inside of current site's themes directory.
 ### 6. Create a style variation
 Saves user's changes as a [style variation](https://developer.wordpress.org/themes/advanced-topics/theme-json/#global-styles-variations) of the current theme.
 
-## Get Started
+
+## Embed Google Fonts or local font files
+
+This feature allows you to embed fonts into your current theme. You can embed Google Fonts and local font assets.
+
+When you add a font the plugin will add to your theme:
+- The font files to your theme's file structure under this path `./assets/fonts`.
+- The font face definitions to the `theme.json` file.
+
+You can continue using your modified theme or you can export it as a new theme containing the new fonts.
+
+
+## How to use the plugin
 
 ### Step 1 – Setup
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
-### Step 2 – Style Customizations
-Make changes to your site design using the Site Editor.
+In the WordPress Admin Dashboard, under Appearance there will be three new pages called:
+- Create Block Theme
+- Embed Google font in your current theme
+- Embed local font file assets
 
-### Step 3 – Templates
-Edit your templates using the Site Editor. For some things you might need to edit the template files again later.
+### Step 2 – Fonts, styles and templates customizations
+Make changes to your site styles and templates using the Site Editor. You can also include new fonts using the plugin options.
 
-### Step 4 – Save
-In the WordPress Admin Dashboard, under Appearance there will be a new page called “Create Block Theme”.
-
-Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Create theme” button, to save the theme.
+### Step 3 – Save
+Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Create theme” button, to save the theme.
