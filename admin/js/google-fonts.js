@@ -1,24 +1,14 @@
-const API_URL = "https://google-fonts-service-proxy.vercel.app/api"; // We are using this proxy to avoid sharing Google Fonst API key: https://github.com/matiasbenedetto/google-fonts-service-proxy
 const DEMO_TEXT = "The quick brown fox jumps over the lazy dog";
 let fonts = [];
 let fontSelected = null;
 let variantsSelected = {};
 
 async function get_google_fonts() {
-    try { // Try to get the font list from the API
-        const response = await fetch(API_URL);
-        const { items } = await response.json();
-        if ( !items ) {
-            throw new Error('API response is invalid');
-        }
-        return items;
-    } catch (error) { // If the API is not available, use the local list
         const currentUrl = new URL(document.getElementById('google-fonts-script-js').src);
         const fallbackURL = currentUrl.origin + currentUrl.pathname.replace('admin/js/google-fonts.js', 'assets/google-fonts/fallback-fonts-list.json');
         const response = await fetch(fallbackURL);
         const { items } = await response.json();
         return items;
-    }
 }
 
 function prepareSelectElement () {
