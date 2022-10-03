@@ -31,7 +31,7 @@ In the WordPress Admin Dashboard, under Appearance there will be three new pages
 Make changes to your site styles and templates using the Site Editor. You can also include new fonts using the plugin options.
 
 = Step 3 – Export =
-Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Create theme” button, to save the theme.
+Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
 
