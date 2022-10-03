@@ -5,7 +5,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.0
-Stable tag: 1.2.3
+Stable tag: 1.2.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,7 +35,7 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 
 == Changelog ==
 
-= 1.2.3 = 
+= 1.2.0 = 
 Embed Google fonts and local font files in theme (#113)
 Change button text (#112)
 Add check and directory creation for template and parts folders. (#110)
