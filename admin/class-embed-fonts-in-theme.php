@@ -113,7 +113,7 @@ class Embed_Fonts_In_Theme_Admin {
                     </tbody>
                 </table>
                 <input type="submit" value="<?php _e('Upload local fonts to your theme', 'create-block-theme'); ?>" class="button button-primary" />
-                <input type="text" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
             </form>
         </div>
         
