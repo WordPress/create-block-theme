@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 class Embed_Fonts_In_Theme_Admin {
-    
+
 	public function __construct() {
         add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
         add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
@@ -64,7 +64,7 @@ class Embed_Fonts_In_Theme_Admin {
         <div class="wrap local-fonts-page">
             <h2><?php _ex('Add local fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
             <h3><?php printf( esc_html__('Add local fonts assets and font face definitions to your current active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
-            <form enctype="multipart/form-data" action="" method="POST">	
+            <form enctype="multipart/form-data" action="" method="POST">
                 <table class="form-table">
                     <tbody>
                         <tr>
@@ -116,7 +116,7 @@ class Embed_Fonts_In_Theme_Admin {
                 <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
             </form>
         </div>
-        
+
 <?php
     }
 
@@ -158,17 +158,18 @@ class Embed_Fonts_In_Theme_Admin {
     function save_local_fonts_to_theme () {
         if (
             current_user_can( 'edit_themes' ) &&
+            ! empty( $_POST['nonce'] ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_FILES['font-file'] ) &&
             ! empty( $_POST['font-name'] ) &&
-            ! empty( $_POST['font-style'] ) && 
+            ! empty( $_POST['font-style'] ) &&
             ! empty( $_POST['font-weight'] )
         ) {
             if (is_uploaded_file($_FILES['font-file']['tmp_name'])) {
                 $font_slug = sanitize_title( $_POST['font-name'] );
                 $file_extension = pathinfo( $_FILES['font-file']['name'], PATHINFO_EXTENSION );
                 $file_name = $font_slug . '_' . $_POST['font-style'] . '_' . $_POST['font-weight'] . '.' . $file_extension;
-                
+
                 if( ! $this->can_read_and_write_font_assets_directory() ) {
                     return add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_permission_error' ] );
                 }
@@ -195,6 +196,7 @@ class Embed_Fonts_In_Theme_Admin {
     function save_google_fonts_to_theme () {
         if (
             current_user_can( 'edit_themes' ) &&
+            ! empty( $_POST['nonce'] ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_POST['google-font-variants'] ) &&
             ! empty( $_POST['font-name'] )
@@ -217,7 +219,7 @@ class Embed_Fonts_In_Theme_Admin {
                 $file_name = $font_slug.'_'.$variant_and_url[0].'.'.$file_extension;
 
                 // Write file assets to the theme folder
-                $file = file_put_contents( 
+                $file = file_put_contents(
                     get_stylesheet_directory().'/assets/fonts/'.$file_name,
                     file_get_contents( $variant_and_url[1] )
                 );
@@ -239,7 +241,7 @@ class Embed_Fonts_In_Theme_Admin {
             }
 
             $this->add_or_update_theme_font_faces ( $google_font_name, $font_slug, $new_font_faces );
-            
+
             add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_success' ] );
         }
     }
@@ -294,7 +296,7 @@ class Embed_Fonts_In_Theme_Admin {
         }
         $result->merge( $theme_data );
         $result->merge( $new_json );
-        
+
         $data = $result->get_data();
         $theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
         $theme_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
