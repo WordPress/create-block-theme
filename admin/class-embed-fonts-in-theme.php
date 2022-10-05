@@ -157,7 +157,7 @@ class Embed_Fonts_In_Theme_Admin {
 
     function save_local_fonts_to_theme () {
         if (
-            current_user_can( 'upload_files' ) &&
+            current_user_can( 'edit_themes' ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_FILES['font-file'] ) &&
             ! empty( $_POST['font-name'] ) &&
@@ -194,7 +194,7 @@ class Embed_Fonts_In_Theme_Admin {
 
     function save_google_fonts_to_theme () {
         if (
-            current_user_can( 'upload_files' ) &&
+            current_user_can( 'edit_themes' ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_POST['google-font-variants'] ) &&
             ! empty( $_POST['font-name'] )
