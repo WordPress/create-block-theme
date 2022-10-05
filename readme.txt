@@ -5,7 +5,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.0
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -18,6 +18,8 @@ This plugin allows you to:
 - Create a new theme, blank theme, child theme or style variation.
 - Embed Google Fonts in your theme
 - Embed local font assets in your theme
+
+The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
 
 = Step 1 – Setup =
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.

@@ -6,6 +6,7 @@ This plugin allows you to:
 - Embed Google Fonts in your theme
 - Embed local font assets in your theme
 
+The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
 
 ## Create Block Theme
 This feature can be used in six ways:

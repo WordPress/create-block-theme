@@ -4,8 +4,8 @@ class Embed_Fonts_In_Theme_Admin {
     
 	public function __construct() {
         add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
-		add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
-		add_action( 'admin_init', [ $this, 'save_local_fonts_to_theme' ] );
+        add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
+        add_action( 'admin_init', [ $this, 'save_local_fonts_to_theme' ] );
 	}
 
     function create_admin_menu() {
@@ -113,6 +113,7 @@ class Embed_Fonts_In_Theme_Admin {
                     </tbody>
                 </table>
                 <input type="submit" value="<?php _e('Upload local fonts to your theme', 'create-block-theme'); ?>" class="button button-primary" />
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
             </form>
         </div>
         
@@ -148,6 +149,7 @@ class Embed_Fonts_In_Theme_Admin {
 				<input type="hidden" name="font-name" id="font-name" value="" />
 				<input type="hidden" name="google-font-variants" id="google-font-variants" value="" />
 				<input type="submit" value="<?php _e('Add google fonts to your theme', 'create-block-theme'); ?>" class="button button-primary" id="google-fonts-submit" disabled=true />
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
 			</form>
 		</div>
 	<?php
@@ -155,6 +157,8 @@ class Embed_Fonts_In_Theme_Admin {
 
     function save_local_fonts_to_theme () {
         if (
+            current_user_can( 'edit_themes' ) &&
+            wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_FILES['font-file'] ) &&
             ! empty( $_POST['font-name'] ) &&
             ! empty( $_POST['font-style'] ) && 
@@ -190,6 +194,8 @@ class Embed_Fonts_In_Theme_Admin {
 
     function save_google_fonts_to_theme () {
         if (
+            current_user_can( 'edit_themes' ) &&
+            wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_POST['google-font-variants'] ) &&
             ! empty( $_POST['font-name'] )
         ) {
