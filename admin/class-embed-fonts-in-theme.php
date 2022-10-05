@@ -8,6 +8,17 @@ class Embed_Fonts_In_Theme_Admin {
         add_action( 'admin_init', [ $this, 'save_local_fonts_to_theme' ] );
 	}
 
+    const ALLOWED_FONT_MIME_TYPES = array(
+        'ttf'   => 'font/ttf',
+        'woff'  => 'font/woff',
+        'woff2' => 'font/woff2',
+    );
+
+    function has_font_mime_type( $file ) {
+        $filetype = wp_check_filetype( $file );
+        return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES );
+    }
+
     function create_admin_menu() {
 		if ( ! wp_is_block_theme() ) {
 			return;
@@ -24,6 +35,7 @@ class Embed_Fonts_In_Theme_Admin {
 
     function can_read_and_write_font_assets_directory () {
 		// Create the font assets folder if it doesn't exist
+        $temp_dir = get_temp_dir();
 		$assets_path = get_stylesheet_directory() . '/assets';
 		$font_assets_path = $assets_path . '/fonts';
 		if ( ! is_dir( $assets_path ) ) {
@@ -34,7 +46,7 @@ class Embed_Fonts_In_Theme_Admin {
 		}
 
 		// If the font asset folder can't be written return an error
-		if ( ! is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) ) {
+		if ( ! is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || !is_writable  ( $temp_dir ) ) {
             return false;
 		}
         return true;
@@ -164,7 +176,10 @@ class Embed_Fonts_In_Theme_Admin {
             ! empty( $_POST['font-style'] ) && 
             ! empty( $_POST['font-weight'] )
         ) {
-            if (is_uploaded_file($_FILES['font-file']['tmp_name'])) {
+            if (
+                $this->has_font_mime_type( $_FILES['font-file']['name'] ) &&
+                is_uploaded_file($_FILES['font-file']['tmp_name'])
+            ) {
                 $font_slug = sanitize_title( $_POST['font-name'] );
                 $file_extension = pathinfo( $_FILES['font-file']['name'], PATHINFO_EXTENSION );
                 $file_name = $font_slug . '_' . $_POST['font-style'] . '_' . $_POST['font-weight'] . '.' . $file_extension;
@@ -186,9 +201,9 @@ class Embed_Fonts_In_Theme_Admin {
                 );
 
                 $this->add_or_update_theme_font_faces ( $_POST['font-name'], $font_slug, $new_font_faces );
-
-                add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_success' ] );
+                return add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_success' ] );
             }
+            return add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_file_error' ] );
         }
     }
 
@@ -216,26 +231,29 @@ class Embed_Fonts_In_Theme_Admin {
                 $file_extension = pathinfo($variant_and_url[1], PATHINFO_EXTENSION);
                 $file_name = $font_slug.'_'.$variant_and_url[0].'.'.$file_extension;
 
-                // Write file assets to the theme folder
-                $file = file_put_contents( 
-                    get_stylesheet_directory().'/assets/fonts/'.$file_name,
-                    file_get_contents( $variant_and_url[1] )
-                );
+                // Download font asset in temp folder
+                $temp_file = download_url( $variant_and_url[1] );
 
-                // Get the font style and weight
-                $variant_style  = str_contains($variant_and_url[0], 'italic') ? 'italic' : 'normal';
-                $variant_weight = ($variant_and_url[0] === 'regular' || $variant_and_url[0] === 'italic') ? '400' : $variant_and_url[0];
-                $variant_weight = str_replace('italic', '', $variant_weight);
+                if ( $this->has_font_mime_type( $variant_and_url[1] ) ) {
 
-                // Add each variant as one font face
-                $new_font_faces[] = array (
-                    'fontFamily' => $google_font_name,
-                    'fontStyle'  => $variant_style,
-                    'fontWeight' => $variant_weight,
-                    'src' => array (
-                        'file:./assets/fonts/'.$file_name
-                    ),
-                );
+                    // Move font asset to theme assets folder
+                    rename($temp_file, get_stylesheet_directory() . '/assets/fonts/' . $file_name);
+
+                    // Get the font style and weight
+                    $variant_style  = str_contains($variant_and_url[0], 'italic') ? 'italic' : 'normal';
+                    $variant_weight = ($variant_and_url[0] === 'regular' || $variant_and_url[0] === 'italic') ? '400' : $variant_and_url[0];
+                    $variant_weight = str_replace('italic', '', $variant_weight);
+
+                    // Add each variant as one font face
+                    $new_font_faces[] = array(
+                        'fontFamily' => $google_font_name,
+                        'fontStyle'  => $variant_style,
+                        'fontWeight' => $variant_weight,
+                        'src' => array(
+                            'file:./assets/fonts/'.$file_name
+                        ),
+                    );
+                }
             }
 
             $this->add_or_update_theme_font_faces ( $google_font_name, $font_slug, $new_font_faces );
@@ -321,6 +339,15 @@ class Embed_Fonts_In_Theme_Admin {
 		?>
 			<div class="notice notice-error is-dismissible">
 				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    function admin_notice_embed_font_file_error () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme.The font file submitted is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
