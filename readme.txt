@@ -19,6 +19,8 @@ This plugin allows you to:
 - Embed Google Fonts in your theme
 - Embed local font assets in your theme
 
+The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
+
 = Step 1 – Setup =
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
