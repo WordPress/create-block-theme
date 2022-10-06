@@ -24,12 +24,12 @@ class Embed_Fonts_In_Theme_Admin {
 			return;
 		}
 
-		$google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'add-google-font-to-theme-json');
-		$google_fonts_menu_title=_x('Embed Google font in current Theme', 'UI String', 'add-google-font-to-theme-json');
+		$google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
+		$google_fonts_menu_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
 		add_theme_page( $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
 
-		$local_fonts_page_title=_x('Embed local font in current Theme', 'UI String', 'add-local-font-to-theme-json');
-		$local_fonts_menu_title=_x('Embed local font in current Theme', 'UI String', 'add-local-font-to-theme-json');
+		$local_fonts_page_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
+		$local_fonts_menu_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
 		add_theme_page( $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
 	}
 
