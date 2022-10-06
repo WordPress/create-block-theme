@@ -347,7 +347,7 @@ class Embed_Fonts_In_Theme_Admin {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme.The font file submitted is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. The uploaded file is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
