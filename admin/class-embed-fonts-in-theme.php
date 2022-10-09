@@ -17,7 +17,7 @@ class Embed_Fonts_In_Theme_Admin {
     function has_font_mime_type( $file ) {
         $filetype = wp_check_filetype( $file );
         return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES );
-    }
+    }    
 
     function create_admin_menu() {
 		if ( ! wp_is_block_theme() ) {
@@ -31,6 +31,10 @@ class Embed_Fonts_In_Theme_Admin {
 		$local_fonts_page_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
 		$local_fonts_menu_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
 		add_theme_page( $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
+
+        $manage_fonts_page_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
+        $manage_fonts_menu_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
+        add_theme_page( $manage_fonts_page_title, $manage_fonts_menu_title, 'edit_theme_options', 'manage-fonts', [ $this, 'manage_fonts_admin_page' ] );
 	}
 
     function can_read_and_write_font_assets_directory () {
@@ -53,6 +57,36 @@ class Embed_Fonts_In_Theme_Admin {
 	}
 
 
+    function manage_fonts_admin_page () {
+        // Load the required WordPress packages.
+        // Automatically load imported dependencies and assets version.
+        $asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+     
+        // Enqueue CSS dependencies.
+        foreach ( $asset_file['dependencies'] as $style ) {
+            wp_enqueue_style( $style );
+        }
+     
+        // Load our app.js.
+        wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
+
+        wp_enqueue_style( 'manage-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/manage-fonts.css', array(), '1.0', false );
+
+        $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
+        $theme_settings = $theme_data->get_settings();
+        $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+        $fonts_json = wp_json_encode( $theme_font_families, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $fonts_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $fonts_json );
+    ?>
+    <div class="wrap">
+        <h2>Manage Theme Fonts</h2>
+        <p>These are the fonts currently available in your theme:</p>
+        <div id="manage-fonts"></div>
+        <input type="hidden" name="theme-fonts-json" id="theme-fonts-json" value='<?php echo $fonts_json;  ?>' />
+    </div>
+    <?php
+    }
 
     function local_fonts_admin_page () {
         wp_enqueue_script('inflate', plugin_dir_url(__FILE__) . 'js/lib/inflate.js', array( ), '1.0', false );
