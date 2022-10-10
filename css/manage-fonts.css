@@ -27,3 +27,9 @@
 .font-family-contents tbody td {
     vertical-align: middle;
 }
+
+.font-family-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
