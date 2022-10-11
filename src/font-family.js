@@ -7,7 +7,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
         <table className="wp-list-table widefat table-view-list">
             <thead>
                 <td class="font-family-head">
-                    <div>Font Family: <strong>{fontFamily.fontFamily}</strong> | Slug: <strong>{fontFamily.slug}</strong></div>
+                    <div>{fontFamily.fontFamily}:</div>
                     <div>
                         <Button
                             variant="tertiary"

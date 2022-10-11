@@ -4,6 +4,7 @@ import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/compone
 
 function ManageFonts () {
     const themeFontsJsonElement = document.querySelector("#theme-fonts-json");
+    const manageFontsFormElement = document.querySelector("#manage-fonts-form");
     const themeFontsJsonValue = themeFontsJsonElement.value;
     const themeFontsJson = JSON.parse(themeFontsJsonValue);
     const [newThemeFonts, setNewThemeFonts] =  useState( themeFontsJson );
@@ -15,12 +16,24 @@ function ManageFonts () {
     }
 
     function confirmDelete() {
-        console.log(fontToDelete);
-        if(fontToDelete.fontFamilyIndex && fontToDelete.fontFaceIndex) {
+        if(
+            fontToDelete.fontFamilyIndex !== undefined &&
+            fontToDelete.fontFaceIndex !== undefined
+        ) {
             deleteFontFace(fontToDelete.fontFamilyIndex, fontToDelete.fontFaceIndex);
         } else {
             deleteFontFamily(fontToDelete.fontFamilyIndex);
         }
+
+        if (
+            fontToDelete.fontFamilyIndex !== undefined ||
+            fontToDelete.fontFaceIndex !== undefined
+        ) {
+            setTimeout(() => {
+                manageFontsFormElement.submit();
+            }, 0);
+        }
+
         setFontToDelete({});
         setShowConfirmDialog(false);
     }
@@ -35,9 +48,9 @@ function ManageFonts () {
         setNewThemeFonts(updatedFonts);
     }
 
-    function deleteFontFace (fontFamilyIndex, fontFaceIndex) {
+    function deleteFontFace () {
+        const { fontFamilyIndex, fontFaceIndex } = fontToDelete;
         const updatedFonts = newThemeFonts.reduce((acc, fontFamily, index) => {
-
             if (index === fontFamilyIndex && fontFamily.fontFace.length > 1) {
                 const {fontFace, ...updatedFontFamily} = fontFamily;
                 updatedFontFamily.fontFace = fontFamily.fontFace.filter((_, index) => index !== fontFaceIndex);
@@ -53,6 +66,7 @@ function ManageFonts () {
 
             return [...acc, fontFamily];
         }, []);
+
         setNewThemeFonts(updatedFonts);
     }
 
@@ -61,6 +75,9 @@ function ManageFonts () {
 
     return (
         <>
+            <button onClick={ () => { console.log(newThemeFonts); manageFontsFormElement.submit(); } }>Update</button>
+
+            <input  type="input" name="new-theme-fonts-json" value={JSON.stringify(newThemeFonts)} />
             <ConfirmDialog
 				isOpen={ showConfirmDialog }
 				onConfirm={ confirmDelete }

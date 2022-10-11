@@ -72,7 +72,7 @@ function FontFamily(_ref) {
     className: "wp-list-table widefat table-view-list"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", {
     class: "font-family-head"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, "Font Family: ", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, fontFamily.fontFamily), " | Slug: ", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, fontFamily.slug)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, fontFamily.fontFamily, ":"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
     variant: "tertiary",
     isDestructive: true,
     onClick: () => deleteFontFamily(fontFamilyIndex)
@@ -120,6 +120,7 @@ function ManageFonts() {
   var _newThemeFonts$fontTo;
 
   const themeFontsJsonElement = document.querySelector("#theme-fonts-json");
+  const manageFontsFormElement = document.querySelector("#manage-fonts-form");
   const themeFontsJsonValue = themeFontsJsonElement.value;
   const themeFontsJson = JSON.parse(themeFontsJsonValue);
   const [newThemeFonts, setNewThemeFonts] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(themeFontsJson);
@@ -134,12 +135,16 @@ function ManageFonts() {
   }
 
   function confirmDelete() {
-    console.log(fontToDelete);
-
-    if (fontToDelete.fontFamilyIndex && fontToDelete.fontFaceIndex) {
+    if (fontToDelete.fontFamilyIndex !== undefined && fontToDelete.fontFaceIndex !== undefined) {
       deleteFontFace(fontToDelete.fontFamilyIndex, fontToDelete.fontFaceIndex);
     } else {
       deleteFontFamily(fontToDelete.fontFamilyIndex);
+    }
+
+    if (fontToDelete.fontFamilyIndex !== undefined || fontToDelete.fontFaceIndex !== undefined) {
+      setTimeout(() => {
+        manageFontsFormElement.submit();
+      }, 0);
     }
 
     setFontToDelete({});
@@ -156,7 +161,11 @@ function ManageFonts() {
     setNewThemeFonts(updatedFonts);
   }
 
-  function deleteFontFace(fontFamilyIndex, fontFaceIndex) {
+  function deleteFontFace() {
+    const {
+      fontFamilyIndex,
+      fontFaceIndex
+    } = fontToDelete;
     const updatedFonts = newThemeFonts.reduce((acc, fontFamily, index) => {
       if (index === fontFamilyIndex && fontFamily.fontFace.length > 1) {
         const {
@@ -178,7 +187,16 @@ function ManageFonts() {
 
   const fontFamilyToDelete = newThemeFonts[fontToDelete.fontFamilyIndex];
   const fontFaceToDelete = (_newThemeFonts$fontTo = newThemeFonts[fontToDelete.fontFamilyIndex]) === null || _newThemeFonts$fontTo === void 0 ? void 0 : _newThemeFonts$fontTo.fontFace[fontToDelete.fontFaceIndex];
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.__experimentalConfirmDialog, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    onClick: () => {
+      console.log(newThemeFonts);
+      manageFontsFormElement.submit();
+    }
+  }, "Update"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "input",
+    name: "new-theme-fonts-json",
+    value: JSON.stringify(newThemeFonts)
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.__experimentalConfirmDialog, {
     isOpen: showConfirmDialog,
     onConfirm: confirmDelete,
     onCancel: cancelDelete

@@ -6,6 +6,7 @@ class Embed_Fonts_In_Theme_Admin {
         add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
         add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
         add_action( 'admin_init', [ $this, 'save_local_fonts_to_theme' ] );
+        add_action( 'admin_init', [ $this, 'save_manage_fonts_changes' ] );
 	}
 
     const ALLOWED_FONT_MIME_TYPES = array(
@@ -82,8 +83,13 @@ class Embed_Fonts_In_Theme_Admin {
     <div class="wrap">
         <h2>Manage Theme Fonts</h2>
         <p>These are the fonts currently available in your theme:</p>
-        <div id="manage-fonts"></div>
         <input type="hidden" name="theme-fonts-json" id="theme-fonts-json" value='<?php echo $fonts_json;  ?>' />
+        
+        <form method="POST"  id="manage-fonts-form">
+            <div id="manage-fonts"></div>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+        </form>
+
     </div>
     <?php
     }
@@ -201,6 +207,16 @@ class Embed_Fonts_In_Theme_Admin {
 	<?php
 	}
 
+    function save_manage_fonts_changes () {
+        if ( ! empty( $_POST['new-theme-fonts-json'] ) ) {
+            // parse json from form 
+            $theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
+            echo "<pre>";
+            print_r($theme_fonts_json);
+            echo "</pre>";
+        }
+    }
+
     function save_local_fonts_to_theme () {
         if (
             current_user_can( 'edit_themes' ) &&
@@ -296,6 +312,45 @@ class Embed_Fonts_In_Theme_Admin {
 
             add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_success' ] );
         }
+    }
+
+    function replace_all_theme_font_families ( $font_families ) {
+        // Get the current Theme.json data
+        $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
+        $theme_settings = $theme_data->get_settings();
+        $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+        $new_theme_json_content = array(
+            'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
+            'settings' => array(
+                'typography' => array (
+                    'fontFamilies' => $theme_font_families
+                )
+            )
+        );
+
+
+
+        // Creates the new theme.json file
+        if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
+            $new_json = new WP_Theme_JSON_Gutenberg( $new_theme_json_content );
+            $result = new WP_Theme_JSON_Gutenberg();
+        } else {
+            $new_json = new WP_Theme_JSON( $new_theme_json_content );
+            $result = new WP_Theme_JSON();
+        }
+        $result->merge( $theme_data );
+        $result->merge( $new_json );
+
+        $data = $result->get_data();
+        $theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $theme_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
+
+        // Write the new theme.json to the theme folder
+        file_put_contents(
+            get_stylesheet_directory() . '/theme.json',
+            $theme_json_string
+        );
     }
 
     function add_or_update_theme_font_faces ( $font_name, $font_slug, $font_faces ) {
