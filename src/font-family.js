@@ -1,8 +1,15 @@
-import { Button, IconButton, Icon } from '@wordpress/components';
+import { useState } from 'react';
+import { Button, IconButton } from '@wordpress/components';
 import FontFace from "./font-face";
 
 const { __ } = wp.i18n;
 function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFontFace, demoText } ) {
+
+    const [isOpen, setIsOpen] = useState(true);
+
+    const toggleIsOpen = () => {
+        setIsOpen(!isOpen);
+    }
 
     return (
         <table className="wp-list-table widefat table-view-list">
@@ -17,35 +24,37 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         >
                             {__('Remove Font Family')}
                         </Button>
-                        <IconButton icon="arrow-down-alt2" />
+                        <IconButton icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} onClick={toggleIsOpen} />
                     </div>
                 </td>
             </thead>
-            <tbody>
-                <div className="font-family-contents">
-                    <table className="wp-list-table widefat striped table-view-list">
-                        <thead>
-                            <td>{__('Style')}</td>
-                            <td>{__('Weight')}</td>
-                            <td>{__('Preview')}</td>
-                            {/* <td>{__('Edit')}</td> */}
-                            <td></td>
-                        </thead>
-                        <tbody>
-                            {fontFamily.fontFace.map((fontFace, i) => (
-                                <FontFace
-                                    fontFace={fontFace}
-                                    fontFamilyIndex={fontFamilyIndex}
-                                    fontFaceIndex={i}
-                                    demoText={demoText}
-                                    key={`fontface${i}`}
-                                    deleteFontFace={
-                                        () => deleteFontFace(fontFamilyIndex, i)
-                                    }                                 
-                                />
-                            ))}  
-                        </tbody>  
-                    </table>
+            <tbody className="font-family-contents">
+                <div className="container">
+                    <div className={` slide ${isOpen ? "open" : "close"}`}>
+                        <table className="wp-list-table widefat striped table-view-list">
+                            <thead>
+                                <td>{__('Style')}</td>
+                                <td>{__('Weight')}</td>
+                                <td>{__('Preview')}</td>
+                                {/* <td>{__('Edit')}</td> */}
+                                <td></td>
+                            </thead>
+                            <tbody>
+                                {fontFamily.fontFace.map((fontFace, i) => (
+                                    <FontFace
+                                        fontFace={fontFace}
+                                        fontFamilyIndex={fontFamilyIndex}
+                                        fontFaceIndex={i}
+                                        demoText={demoText}
+                                        key={`fontface${i}`}
+                                        deleteFontFace={
+                                            () => deleteFontFace(fontFamilyIndex, i)
+                                        }                                 
+                                    />
+                                ))}  
+                            </tbody>  
+                        </table>
+                    </div>
                 </div>
             </tbody>
         </table>

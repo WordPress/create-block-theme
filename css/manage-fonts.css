@@ -6,12 +6,31 @@
     font-size: 1.1rem;
 }
 
-.font-family-contents {
+.font-family-contents .slide {
     border-bottom-left-radius: 15px;
     margin: 0 0 0 1.5rem;
 }
 
-.font-family-contents > table {
+.font-family-contents .container {
+    overflow: hidden;
+}
+
+.font-family-contents .slide {
+    transition: all 0.1s ease-in-out;
+}
+
+.font-family-contents .slide.open {
+    transform: translateY(0);
+    max-height: 999999px;
+}
+
+.font-family-contents .slide.close {
+    transform: translateY(-80%);
+    opacity: 0;
+    max-height: 0px;
+}
+
+.font-family-contents table {
     border-bottom: none;
     border-right: none;
     border-top: none;
@@ -32,4 +51,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.font-family-head div:last-of-type {
+    display: flex;
+    gap: 1rem;
 }
