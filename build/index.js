@@ -15,6 +15,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
 
 
+const {
+  __
+} = wp.i18n;
 
 function FontFace(_ref) {
   let {
@@ -37,7 +40,7 @@ function FontFace(_ref) {
     variant: "tertiary",
     isDestructive: true,
     onClick: deleteFontFace
-  }, "Remove")));
+  }, __('Remove'))));
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (FontFace);
@@ -59,6 +62,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const {
+  __
+} = wp.i18n;
 
 function FontFamily(_ref) {
   let {
@@ -72,15 +78,17 @@ function FontFamily(_ref) {
     className: "wp-list-table widefat table-view-list"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", {
     class: "font-family-head"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, fontFamily.fontFamily, ":"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, fontFamily.fontFamily)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
     variant: "tertiary",
     isDestructive: true,
     onClick: () => deleteFontFamily(fontFamilyIndex)
-  }, "Remove Font Family")))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  }, __('Remove Font Family')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.IconButton, {
+    icon: "arrow-down-alt2"
+  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "font-family-contents"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", {
     className: "wp-list-table widefat striped table-view-list"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, "Style"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, "Weight"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, "Preview"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, fontFamily.fontFace.map((fontFace, i) => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_font_face__WEBPACK_IMPORTED_MODULE_2__["default"], {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Style')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Weight')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Preview')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, fontFamily.fontFace.map((fontFace, i) => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_font_face__WEBPACK_IMPORTED_MODULE_2__["default"], {
     fontFace: fontFace,
     fontFamilyIndex: fontFamilyIndex,
     fontFaceIndex: i,
@@ -91,7 +99,7 @@ function FontFamily(_ref) {
 }
 
 FontFamily.defaultProps = {
-  demoText: "The quick brown fox jumps over the lazy dog."
+  demoText: __("The quick brown fox jumps over the lazy dog.")
 };
 /* harmony default export */ __webpack_exports__["default"] = (FontFamily);
 
