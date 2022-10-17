@@ -13,7 +13,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
 
     return (
         <table className="wp-list-table widefat table-view-list">
-            <thead>
+            <thead onClick={toggleIsOpen}>
                 <td class="font-family-head">
                     <div><strong>{fontFamily.fontFamily}</strong></div>
                     <div>
