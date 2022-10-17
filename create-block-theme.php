@@ -40,18 +40,30 @@ function run_create_block_theme() {
 }
 run_create_block_theme();
 
+function replace_between($str, $needle_start, $needle_end, $replacement) {
+    $pos = strpos($str, $needle_start);
+    $start = $pos === false ? 0 : $pos;
+
+    $pos = strpos($str, $needle_end, $start);
+    $end = $pos === false ? strlen($str) : $pos + strlen( $needle_end );
+
+    return substr_replace($str, $replacement, $start, $end - $start);
+}
+
 function get_custom_template() {
 	$plugin = 'plugin-name';
 	$slug = 'custom-template';
 	$template_id = $plugin . '//' . $slug;
 	$title = 'template-title';
 	$description = 'description';
-	$content = '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"layout":{"inherit":true}} --><div class="wp-block-group"><!-- wp:woocommerce/legacy-template {"template":"single-product"} /--></div><!-- /wp:group --><!-- wp:template-part {"slug":"footer","tagName":"footer","className":"site-footer-container"} /-->';
+	$custom_content = '<!-- wp:woocommerce/legacy-template {"template":"single-product"} /-->';
+	$index_template = wp_get_theme()->get_file_path( '/templates/index.html' );
+	$index_template_content = replace_between( file_get_contents( $index_template ), '<!-- wp:query', '<!-- /wp:query -->', $custom_content );
 
 	$template                 = new WP_Block_Template();
 	$template->id             = $template_id;
 	$template->theme          = $plugin;
-	$template->content        = $content;
+	$template->content        = $index_template_content;
 	$template->slug           = $slug;
 	$template->source         = 'plugin';
 	$template->type           = 'wp_template';
