@@ -25,17 +25,17 @@ class Embed_Fonts_In_Theme_Admin {
 			return;
 		}
 
-		$google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
+		$manage_fonts_page_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
+        $manage_fonts_menu_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
+        add_theme_page( $manage_fonts_page_title, $manage_fonts_menu_title, 'edit_theme_options', 'manage-fonts', [ $this, 'manage_fonts_admin_page' ] );
+
+        $google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
 		$google_fonts_menu_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
-		add_theme_page( $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
+        add_submenu_page(null, $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
 
 		$local_fonts_page_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
 		$local_fonts_menu_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
-		add_theme_page( $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
-
-        $manage_fonts_page_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
-        $manage_fonts_menu_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
-        add_theme_page( $manage_fonts_page_title, $manage_fonts_menu_title, 'edit_theme_options', 'manage-fonts', [ $this, 'manage_fonts_admin_page' ] );
+		add_submenu_page(null, $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
 	}
 
     function can_read_and_write_font_assets_directory () {
