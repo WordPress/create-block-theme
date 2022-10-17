@@ -224,6 +224,10 @@ class Embed_Fonts_In_Theme_Admin {
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_POST['new-theme-fonts-json'] )
         ) {
+            if( ! $this->can_read_and_write_font_assets_directory() ) {
+                return add_action( 'admin_notices', [ $this, 'admin_notice_manage_fonts_permission_error' ] );
+            }
+
             // parse json from form 
             $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
 
@@ -457,6 +461,15 @@ class Embed_Fonts_In_Theme_Admin {
 		?>
 			<div class="notice notice-error is-dismissible">
 				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. The uploaded file is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    function admin_notice_manage_fonts_permission_error () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error handling font changes. WordPress lack permissions to manage the theme font assets.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
