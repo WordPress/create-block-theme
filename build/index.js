@@ -115,6 +115,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const {
+  __
+} = wp.i18n;
 
 function ManageFonts() {
   var _newThemeFonts$fontTo;
@@ -204,7 +207,7 @@ function ManageFonts() {
     isOpen: showConfirmDialog,
     onConfirm: confirmDelete,
     onCancel: cancelDelete
-  }, (fontToDelete === null || fontToDelete === void 0 ? void 0 : fontToDelete.fontFamilyIndex) !== undefined && (fontToDelete === null || fontToDelete === void 0 ? void 0 : fontToDelete.fontFaceIndex) !== undefined ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Are you sure you want to delete \"", fontFaceToDelete === null || fontFaceToDelete === void 0 ? void 0 : fontFaceToDelete.fontStyle, " - ", fontFaceToDelete === null || fontFaceToDelete === void 0 ? void 0 : fontFaceToDelete.fontWeight, "\"  variant of \"", fontFamilyToDelete === null || fontFamilyToDelete === void 0 ? void 0 : fontFamilyToDelete.fontFamily, "\" from your theme?") : (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, "Are you sure you want to delete \"", fontFamilyToDelete === null || fontFamilyToDelete === void 0 ? void 0 : fontFamilyToDelete.fontFamily, "\" from your theme?"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "This action will delete the font definition and the font file assets from your theme.")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  }, (fontToDelete === null || fontToDelete === void 0 ? void 0 : fontToDelete.fontFamilyIndex) !== undefined && (fontToDelete === null || fontToDelete === void 0 ? void 0 : fontToDelete.fontFaceIndex) !== undefined ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, __(`Are you sure you want to delete "${fontFaceToDelete === null || fontFaceToDelete === void 0 ? void 0 : fontFaceToDelete.fontStyle} - ${fontFaceToDelete === null || fontFaceToDelete === void 0 ? void 0 : fontFaceToDelete.fontWeight}"  variant of "${fontFamilyToDelete === null || fontFamilyToDelete === void 0 ? void 0 : fontFamilyToDelete.fontFamily}" from your theme?`, 'create-block-theme')) : (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, __(`Are you sure you want to delete "${fontFamilyToDelete === null || fontFamilyToDelete === void 0 ? void 0 : fontFamilyToDelete.fontFamily}" from your theme?`, 'create-block-theme')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, __('This action will delete the font definition and the font file assets from your theme.', 'create-block-theme'))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "font-families"
   }, newThemeFonts.map((fontFamily, i) => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_font_family__WEBPACK_IMPORTED_MODULE_2__["default"], {
     fontFamily: fontFamily,

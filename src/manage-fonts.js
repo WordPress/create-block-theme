@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 
+const { __ } = wp.i18n;
+
 function ManageFonts () {
     // The element where the list of theme fonts is rendered coming from the server as JSON
     const themeFontsJsonElement = document.querySelector("#theme-fonts-json");
@@ -95,10 +97,10 @@ function ManageFonts () {
 				onCancel={ cancelDelete }
 			>
                 {(fontToDelete?.fontFamilyIndex !== undefined && fontToDelete?.fontFaceIndex !== undefined )
-                    ? <h3>Are you sure you want to delete "{fontFaceToDelete?.fontStyle} - {fontFaceToDelete?.fontWeight}"  variant of "{fontFamilyToDelete?.fontFamily}" from your theme?</h3>
-                    : <h3>Are you sure you want to delete "{fontFamilyToDelete?.fontFamily}" from your theme?</h3>
+                    ? <h3>{__(`Are you sure you want to delete "${fontFaceToDelete?.fontStyle} - ${fontFaceToDelete?.fontWeight}"  variant of "${fontFamilyToDelete?.fontFamily}" from your theme?`, 'create-block-theme')}</h3>
+                    : <h3>{__(`Are you sure you want to delete "${fontFamilyToDelete?.fontFamily}" from your theme?`, 'create-block-theme')}</h3>
                 }
-                <p>This action will delete the font definition and the font file assets from your theme.</p>
+                <p>{__('This action will delete the font definition and the font file assets from your theme.', 'create-block-theme')}</p>
 			</ConfirmDialog>
             <div className="font-families">
                 {newThemeFonts.map((fontFamily, i) => (
