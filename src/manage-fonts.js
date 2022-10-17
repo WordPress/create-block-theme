@@ -1,21 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 
 function ManageFonts () {
+    // The element where the list of theme fonts is rendered coming from the server as JSON
     const themeFontsJsonElement = document.querySelector("#theme-fonts-json");
+
+    // The form element that will be submitted to the server
     const manageFontsFormElement = document.querySelector("#manage-fonts-form");
+
+    // The theme font list coming from the server as JSON
     const themeFontsJsonValue = themeFontsJsonElement.value;
     const themeFontsJson = JSON.parse(themeFontsJsonValue);
+
+    // The client-side theme font list is initizaliased with the server-side theme font list
     const [newThemeFonts, setNewThemeFonts] =  useState( themeFontsJson );
+
+    // Object where we store the font family or font face index position in the newThemeFonts array that is about to be removed
+    const [ fontToDelete, setFontToDelete ] = useState( { fontFamilyIndex: undefined, fontFaceIndex : undefined } );
+
+    // Confirm dialog state
     const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-    const [ fontToDelete, setFontToDelete ] = useState( {} );
+
+
+    // When client side font list changes, we update the server side font list
+    useEffect( () => {
+        // Avoids running this effect on the first render
+        if ( 
+            fontToDelete.fontFamilyIndex !== undefined ||
+            fontToDelete.fontFaceIndex !== undefined
+        ) {
+            // Submit the form to the server
+            manageFontsFormElement.submit();
+        }
+    }, [newThemeFonts] );
 
     function requestDeleteConfirmation(fontFamilyIndex, fontFaceIndex)  {
         setFontToDelete( { fontFamilyIndex, fontFaceIndex },  setShowConfirmDialog(true));
     }
 
     function confirmDelete() {
+        // if fontFaceIndex is undefined, we are deleting a font family
         if(
             fontToDelete.fontFamilyIndex !== undefined &&
             fontToDelete.fontFaceIndex !== undefined
@@ -24,18 +49,6 @@ function ManageFonts () {
         } else {
             deleteFontFamily(fontToDelete.fontFamilyIndex);
         }
-
-        if (
-            fontToDelete.fontFamilyIndex !== undefined ||
-            fontToDelete.fontFaceIndex !== undefined
-        ) {
-            setTimeout(() => {
-                manageFontsFormElement.submit();
-            }, 0);
-        }
-
-        setFontToDelete({});
-        setShowConfirmDialog(false);
     }
 
     function cancelDelete () {
@@ -60,7 +73,7 @@ function ManageFonts () {
                 ];
             }
 
-            if (fontFamily.fontFace.length == 1) {
+            if (fontFamily.fontFace.length == 1 && index === fontFamilyIndex) {
                 return acc;
             }
 
@@ -75,9 +88,7 @@ function ManageFonts () {
 
     return (
         <>
-            <button onClick={ () => { console.log(newThemeFonts); manageFontsFormElement.submit(); } }>Update</button>
-
-            <input  type="input" name="new-theme-fonts-json" value={JSON.stringify(newThemeFonts)} />
+            <input type="hidden" name="new-theme-fonts-json" value={JSON.stringify(newThemeFonts)} />
             <ConfirmDialog
 				isOpen={ showConfirmDialog }
 				onConfirm={ confirmDelete }

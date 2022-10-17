@@ -73,17 +73,27 @@ class Embed_Fonts_In_Theme_Admin {
 
         wp_enqueue_style( 'manage-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/manage-fonts.css', array(), '1.0', false );
 
+        $theme_name = wp_get_theme()->get( 'Name' );
+
         $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
         $theme_settings = $theme_data->get_settings();
         $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
 
+        if ( ! empty( $_POST['new-theme-fonts-json'] ) ) {
+            $theme_font_families = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
+        }
+
         $fonts_json = wp_json_encode( $theme_font_families, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
         $fonts_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $fonts_json );
+        
     ?>
     <div class="wrap">
-        <h2>Manage Theme Fonts</h2>
-        <p>These are the fonts currently available in your theme:</p>
-        <input type="hidden" name="theme-fonts-json" id="theme-fonts-json" value='<?php echo $fonts_json;  ?>' />
+        <h1 class="wp-heading-inline"><?php _e('Manage Theme Fonts', 'create-block-theme'); ?></h1>
+        <a href="<?php echo admin_url( 'themes.php?page=add-google-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Google Font', 'create-block-theme'); ?></a>
+        <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
+        <hr class="wp-header-end" />
+        <p><?php printf( esc_html__( 'These are the fonts currently available in your theme (%1$s).', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+        <input type="hidden" name="theme-fonts-json" id="theme-fonts-json" value='<?php echo $fonts_json_string;  ?>' />
         
         <form method="POST"  id="manage-fonts-form">
             <div id="manage-fonts"></div>
@@ -208,12 +218,18 @@ class Embed_Fonts_In_Theme_Admin {
 	}
 
     function save_manage_fonts_changes () {
-        if ( ! empty( $_POST['new-theme-fonts-json'] ) ) {
+        if (
+            current_user_can( 'edit_themes' ) &&
+            ! empty( $_POST['nonce'] ) &&
+            wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
+            ! empty( $_POST['new-theme-fonts-json'] )
+        ) {
             // parse json from form 
-            $theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
-            echo "<pre>";
-            print_r($theme_fonts_json);
-            echo "</pre>";
+            $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
+
+            $this->replace_all_theme_font_families( $new_theme_fonts_json );
+
+            add_action( 'admin_notices', [ $this, 'admin_notice_delete_font_success' ] );
         }
     }
 
@@ -324,11 +340,10 @@ class Embed_Fonts_In_Theme_Admin {
             'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
             'settings' => array(
                 'typography' => array (
-                    'fontFamilies' => $theme_font_families
+                    'fontFamilies' => $font_families
                 )
             )
         );
-
 
 
         // Creates the new theme.json file
@@ -439,6 +454,15 @@ class Embed_Fonts_In_Theme_Admin {
 		?>
 			<div class="notice notice-error is-dismissible">
 				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. The uploaded file is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    function admin_notice_delete_font_success () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php printf( esc_html__( 'Font removed from your theme (%1$s).', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}

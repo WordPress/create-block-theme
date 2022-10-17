@@ -119,13 +119,30 @@ __webpack_require__.r(__webpack_exports__);
 function ManageFonts() {
   var _newThemeFonts$fontTo;
 
-  const themeFontsJsonElement = document.querySelector("#theme-fonts-json");
-  const manageFontsFormElement = document.querySelector("#manage-fonts-form");
+  // The element where the list of theme fonts is rendered coming from the server as JSON
+  const themeFontsJsonElement = document.querySelector("#theme-fonts-json"); // The form element that will be submitted to the server
+
+  const manageFontsFormElement = document.querySelector("#manage-fonts-form"); // The theme font list coming from the server as JSON
+
   const themeFontsJsonValue = themeFontsJsonElement.value;
-  const themeFontsJson = JSON.parse(themeFontsJsonValue);
-  const [newThemeFonts, setNewThemeFonts] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(themeFontsJson);
-  const [showConfirmDialog, setShowConfirmDialog] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-  const [fontToDelete, setFontToDelete] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const themeFontsJson = JSON.parse(themeFontsJsonValue); // The client-side theme font list is initizaliased with the server-side theme font list
+
+  const [newThemeFonts, setNewThemeFonts] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(themeFontsJson); // Object where we store the font family or font face index position in the newThemeFonts array that is about to be removed
+
+  const [fontToDelete, setFontToDelete] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
+    fontFamilyIndex: undefined,
+    fontFaceIndex: undefined
+  }); // Confirm dialog state
+
+  const [showConfirmDialog, setShowConfirmDialog] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false); // When client side font list changes, we update the server side font list
+
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    // Avoids running this effect on the first render
+    if (fontToDelete.fontFamilyIndex !== undefined || fontToDelete.fontFaceIndex !== undefined) {
+      // Submit the form to the server
+      manageFontsFormElement.submit();
+    }
+  }, [newThemeFonts]);
 
   function requestDeleteConfirmation(fontFamilyIndex, fontFaceIndex) {
     setFontToDelete({
@@ -135,20 +152,12 @@ function ManageFonts() {
   }
 
   function confirmDelete() {
+    // if fontFaceIndex is undefined, we are deleting a font family
     if (fontToDelete.fontFamilyIndex !== undefined && fontToDelete.fontFaceIndex !== undefined) {
       deleteFontFace(fontToDelete.fontFamilyIndex, fontToDelete.fontFaceIndex);
     } else {
       deleteFontFamily(fontToDelete.fontFamilyIndex);
     }
-
-    if (fontToDelete.fontFamilyIndex !== undefined || fontToDelete.fontFaceIndex !== undefined) {
-      setTimeout(() => {
-        manageFontsFormElement.submit();
-      }, 0);
-    }
-
-    setFontToDelete({});
-    setShowConfirmDialog(false);
   }
 
   function cancelDelete() {
@@ -176,7 +185,7 @@ function ManageFonts() {
         return [...acc, updatedFontFamily];
       }
 
-      if (fontFamily.fontFace.length == 1) {
+      if (fontFamily.fontFace.length == 1 && index === fontFamilyIndex) {
         return acc;
       }
 
@@ -187,13 +196,8 @@ function ManageFonts() {
 
   const fontFamilyToDelete = newThemeFonts[fontToDelete.fontFamilyIndex];
   const fontFaceToDelete = (_newThemeFonts$fontTo = newThemeFonts[fontToDelete.fontFamilyIndex]) === null || _newThemeFonts$fontTo === void 0 ? void 0 : _newThemeFonts$fontTo.fontFace[fontToDelete.fontFaceIndex];
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
-    onClick: () => {
-      console.log(newThemeFonts);
-      manageFontsFormElement.submit();
-    }
-  }, "Update"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
-    type: "input",
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
     name: "new-theme-fonts-json",
     value: JSON.stringify(newThemeFonts)
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.__experimentalConfirmDialog, {
