@@ -83,8 +83,11 @@ function FontFamily(_ref) {
 
   const toggleIsOpen = () => {
     setIsOpen(!isOpen);
-  };
+  }; // handle font famliy that has no font faces, for example a system font
+  // "-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu..."
 
+
+  const hasFontFaces = fontFamily.fontFace && fontFamily.fontFace.length;
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", {
     className: "wp-list-table widefat table-view-list"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", {
@@ -98,11 +101,11 @@ function FontFamily(_ref) {
       e.stopPropagation();
       deleteFontFamily(fontFamilyIndex);
     }
-  }, __('Remove Font Family')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+  }, __('Remove Font Family')), hasFontFaces && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
     onClick: toggleIsOpen
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Icon, {
     icon: isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'
-  }))))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", {
+  }))))), hasFontFaces && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", {
     className: "font-family-contents"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "container"
@@ -110,7 +113,7 @@ function FontFamily(_ref) {
     className: ` slide ${isOpen ? "open" : "close"}`
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", {
     className: "wp-list-table widefat striped table-view-list"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Style')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Weight')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Preview')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, fontFamily.fontFace.map((fontFace, i) => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_font_face__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("thead", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Style')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Weight')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, __('Preview')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, hasFontFaces && fontFamily.fontFace.map((fontFace, i) => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_font_face__WEBPACK_IMPORTED_MODULE_3__["default"], {
     fontFace: fontFace,
     fontFamilyIndex: fontFamilyIndex,
     fontFaceIndex: i,
@@ -185,9 +188,8 @@ function ManageFonts() {
   }
 
   function confirmDelete() {
-    setShowConfirmDialog(false);
-    
-    // if fontFaceIndex is undefined, we are deleting a font family
+    setShowConfirmDialog(false); // if fontFaceIndex is undefined, we are deleting a font family
+
     if (fontToDelete.fontFamilyIndex !== undefined && fontToDelete.fontFaceIndex !== undefined) {
       deleteFontFace(fontToDelete.fontFamilyIndex, fontToDelete.fontFaceIndex);
     } else {
