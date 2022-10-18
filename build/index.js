@@ -25,10 +25,12 @@ function FontFace(_ref) {
     demoText,
     deleteFontFace
   } = _ref;
+  // Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
+  const fontWeight = fontFace.fontWeight ? String(fontFace.fontWeight).split(' ')[0] : "normal";
   const demoStyles = {
     fontFamily: fontFace.fontFamily,
     fontStyle: fontFace.fontStyle,
-    fontWeight: fontFace.fontWeight
+    fontWeight: fontWeight
   };
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tr", {
     className: "font-face"

@@ -19,7 +19,7 @@ function render_font_styles ($font_families) {
             $styles .= "font-family: '". $font_face['fontFamily'] ."';";
             $styles .= "src: url(". $font_face_url .");";
             $styles .= "font-weight: ". $font_face_weight .";";
-            $styles .= "font-style: '". $font_face_style ."';";
+            $styles .= "font-style: ". $font_face_style .";";
             $styles .= "}";
         }
     }
