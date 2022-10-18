@@ -18,7 +18,7 @@ class Manage_Fonts_Admin {
     );
 
     function has_font_mime_type( $file ) {
-        $filetype = wp_check_filetype( $file );
+        $filetype = wp_check_filetype( $file, self::ALLOWED_FONT_MIME_TYPES );
         return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES );
     }    
 
