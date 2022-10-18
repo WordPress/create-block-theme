@@ -154,7 +154,7 @@ function ManageFonts() {
 
   const manageFontsFormElement = document.querySelector("#manage-fonts-form"); // The theme font list coming from the server as JSON
 
-  const themeFontsJsonValue = themeFontsJsonElement.value;
+  const themeFontsJsonValue = themeFontsJsonElement.innerHTML;
   const themeFontsJson = JSON.parse(themeFontsJsonValue); // The client-side theme font list is initizaliased with the server-side theme font list
 
   const [newThemeFonts, setNewThemeFonts] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(themeFontsJson); // Object where we store the font family or font face index position in the newThemeFonts array that is about to be removed

@@ -12,7 +12,8 @@ function ManageFonts () {
     const manageFontsFormElement = document.querySelector("#manage-fonts-form");
 
     // The theme font list coming from the server as JSON
-    const themeFontsJsonValue = themeFontsJsonElement.value;
+    const themeFontsJsonValue = themeFontsJsonElement.innerHTML;
+
     const themeFontsJson = JSON.parse(themeFontsJsonValue);
 
     // The client-side theme font list is initizaliased with the server-side theme font list

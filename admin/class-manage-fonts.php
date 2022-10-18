@@ -95,7 +95,7 @@ class Manage_Fonts_Admin {
             $theme_font_families = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
         }
 
-        $fonts_json = wp_json_encode( $theme_font_families, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $fonts_json = wp_json_encode( $theme_font_families );
         $fonts_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $fonts_json );
         
     ?>
@@ -105,7 +105,7 @@ class Manage_Fonts_Admin {
         <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
         <hr class="wp-header-end" />
         <p><?php printf( esc_html__( 'These are the fonts currently available in your theme (%1$s).', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
-        <input type="hidden" name="theme-fonts-json" id="theme-fonts-json" value='<?php echo $fonts_json_string;  ?>' />
+        <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
         
         <form method="POST"  id="manage-fonts-form">
             <div id="manage-fonts"></div>
