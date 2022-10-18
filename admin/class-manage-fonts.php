@@ -1,5 +1,7 @@
 <?php
 
+require_once (__DIR__ . '/font-helpers.php');
+
 class Manage_Fonts_Admin {
 
 	public function __construct() {
@@ -78,6 +80,16 @@ class Manage_Fonts_Admin {
         $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
         $theme_settings = $theme_data->get_settings();
         $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+        // This is only run when Gutenberg is not active because WordPress core does not include WP_Webfonts class yet. So we can't use it to load the font asset styles.
+        // See the comments here: https://github.com/WordPress/WordPress/blob/88cee0d359f743f94597c586febcc5e09830e780/wp-includes/script-loader.php#L3160-L3186
+        // TODO: remove this when WordPress core includes WP_Webfonts class.
+        if ( ! class_exists( 'WP_Webfonts' ) ) {
+            $font_assets_stylesheet = render_font_styles($theme_font_families);
+            wp_register_style( 'theme-font-families', false );
+            wp_add_inline_style( 'theme-font-families', $font_assets_stylesheet );
+            wp_enqueue_style( 'theme-font-families' );
+        }
 
         if ( ! empty( $_POST['new-theme-fonts-json'] ) ) {
             $theme_font_families = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
