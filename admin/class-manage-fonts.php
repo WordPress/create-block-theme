@@ -1,6 +1,6 @@
 <?php
 
-class Embed_Fonts_In_Theme_Admin {
+class Manage_Fonts_Admin {
 
 	public function __construct() {
         add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
