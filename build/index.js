@@ -96,10 +96,11 @@ function FontFamily(_ref) {
       e.stopPropagation();
       deleteFontFamily(fontFamilyIndex);
     }
-  }, __('Remove Font Family')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.IconButton, {
-    icon: isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2',
+  }, __('Remove Font Family')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
     onClick: toggleIsOpen
-  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Icon, {
+    icon: isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'
+  }))))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", {
     className: "font-family-contents"
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "container"

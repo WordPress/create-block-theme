@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, IconButton } from '@wordpress/components';
+import { Button, Icon } from '@wordpress/components';
 import FontFace from "./font-face";
 
 const { __ } = wp.i18n;
@@ -27,7 +27,9 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         >
                             {__('Remove Font Family')}
                         </Button>
-                        <IconButton icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} onClick={toggleIsOpen} />
+                        <Button onClick={toggleIsOpen}>
+                            <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
+                        </Button>
                     </div>
                 </td>
             </thead>
