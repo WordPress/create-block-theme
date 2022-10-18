@@ -43,6 +43,7 @@ function ManageFonts () {
     }
 
     function confirmDelete() {
+        setShowConfirmDialog(false);
         // if fontFaceIndex is undefined, we are deleting a font family
         if(
             fontToDelete.fontFamilyIndex !== undefined &&
