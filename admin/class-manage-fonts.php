@@ -104,7 +104,6 @@ class Manage_Fonts_Admin {
         <a href="<?php echo admin_url( 'themes.php?page=add-google-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Google Font', 'create-block-theme'); ?></a>
         <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
         <hr class="wp-header-end" />
-        <p><?php printf( esc_html__( 'These are the fonts currently available in your theme (%1$s).', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
         <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
         
         <form method="POST"  id="manage-fonts-form">

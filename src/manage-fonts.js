@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import { __experimentalConfirmDialog as ConfirmDialog, Modal, Icon, Button } from '@wordpress/components';
 
 const { __ } = wp.i18n;
 
@@ -22,9 +22,9 @@ function ManageFonts () {
     // Object where we store the font family or font face index position in the newThemeFonts array that is about to be removed
     const [ fontToDelete, setFontToDelete ] = useState( { fontFamilyIndex: undefined, fontFaceIndex : undefined } );
 
-    // Confirm dialog state
+    // dialogs states
     const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-
+    const [ isHelpOpen, setIsHelpOpen ] = useState( false );
 
     // When client side font list changes, we update the server side font list
     useEffect( () => {
@@ -37,6 +37,10 @@ function ManageFonts () {
             manageFontsFormElement.submit();
         }
     }, [newThemeFonts] );
+
+    const toggleIsHelpOpen = () => {
+        setIsHelpOpen( !isHelpOpen );
+    }
 
     function requestDeleteConfirmation(fontFamilyIndex, fontFaceIndex)  {
         setFontToDelete( { fontFamilyIndex, fontFaceIndex },  setShowConfirmDialog(true));
@@ -92,6 +96,25 @@ function ManageFonts () {
 
     return (
         <>
+            { isHelpOpen && (
+                <Modal 
+                    title={<><Icon icon={"info"}/> {__("Info", "create-block-theme")}</>}
+                    onRequestClose={toggleIsHelpOpen}
+                >
+                    <p>
+                        {__("This is a list of your font families listed in the theme.json file of your theme.", "create-block-theme")}
+                    </p>
+                    <p>
+                        {__("If your theme.json makes reference to fonts providers other than local they may not be displayed correctly.", "create-block-theme")}
+                    </p>
+                </Modal>
+            ) }
+            <p class="help">
+                {__("These are the fonts currently embedded in your theme ", "create-block-theme")}
+                <Button onClick={toggleIsHelpOpen} style={{padding:"0", height:"1rem"}}>
+                    <Icon icon={"info"}/>
+                </Button>
+            </p>
             <input type="hidden" name="new-theme-fonts-json" value={JSON.stringify(newThemeFonts)} />
             <ConfirmDialog
 				isOpen={ showConfirmDialog }
@@ -99,10 +122,10 @@ function ManageFonts () {
 				onCancel={ cancelDelete }
 			>
                 {(fontToDelete?.fontFamilyIndex !== undefined && fontToDelete?.fontFaceIndex !== undefined )
-                    ? <h3>{__(`Are you sure you want to delete "${fontFaceToDelete?.fontStyle} - ${fontFaceToDelete?.fontWeight}"  variant of "${fontFamilyToDelete?.fontFamily}" from your theme?`, 'create-block-theme')}</h3>
-                    : <h3>{__(`Are you sure you want to delete "${fontFamilyToDelete?.fontFamily}" from your theme?`, 'create-block-theme')}</h3>
+                    ? <h3>{__(`Are you sure you want to delete "${fontFaceToDelete?.fontStyle} - ${fontFaceToDelete?.fontWeight}"  variant of "${fontFamilyToDelete?.fontFamily}" from your theme?`, "create-block-theme")}</h3>
+                    : <h3>{__(`Are you sure you want to delete "${fontFamilyToDelete?.fontFamily}" from your theme?`, "create-block-theme")}</h3>
                 }
-                <p>{__('This action will delete the font definition and the font file assets from your theme.', 'create-block-theme')}</p>
+                <p>{__('This action will delete the font definition and the font file assets from your theme.', "create-block-theme")}</p>
 			</ConfirmDialog>
             <div className="font-families">
                 {newThemeFonts.map((fontFamily, i) => (

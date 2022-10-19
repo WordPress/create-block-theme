@@ -3,6 +3,12 @@
     visibility: hidden;
 }
 
+.help {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .font-families > table {
     margin-bottom: 2rem;
 }
