@@ -1,15 +1,15 @@
 {
-    "name": "05-recipe-card-esnext",
+    "name": "create-block-theme",
     "version": "1.1.0",
     "private": true,
-    "description": "Example: Recipe Card (ESNext).",
+    "description": "Create a block-based theme",
     "author": "The WordPress Contributors",
     "license": "GPL-2.0-or-later",
     "keywords": [ "WordPress", "block" ],
-    "homepage": "https://github.com/WordPress/gutenberg-examples/",
-    "repository": "git+https://github.com/WordPress/gutenberg-examples.git",
+    "homepage": "https://wordpress.org/plugins/create-block-theme/",
+    "repository": "git+https://github.com/WordPress/create-block-theme.git",
     "bugs": {
-        "url": "https://github.com/WordPress/gutenberg-examples/issues"
+        "url": "https://wordpress.org/support/plugin/create-block-theme/"
     },
     "main": "build/index.js",
     "devDependencies": {
