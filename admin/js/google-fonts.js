@@ -3,6 +3,18 @@ let fonts = [];
 let fontSelected = null;
 let variantsSelected = {};
 
+function prepareToggleSelectAllVariants () {
+    const element = document.getElementById('select-all-variants');
+    element.addEventListener('click', toggleSelectAllVariants);
+}
+
+function toggleSelectAllVariants () {
+    const checkboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+}
+
 async function get_google_fonts() {
         const currentUrl = new URL(document.getElementById('google-fonts-script-js').src);
         const fallbackURL = currentUrl.origin + currentUrl.pathname.replace('admin/js/google-fonts.js', 'assets/google-fonts/fallback-fonts-list.json');
@@ -117,6 +129,7 @@ function emptyFontOptions () {
 function init () {
     fillFontSelect();
     prepareSelectElement();
+    prepareToggleSelectAllVariants();
 }
 
 init();
