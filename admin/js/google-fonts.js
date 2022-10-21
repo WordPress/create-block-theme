@@ -9,10 +9,11 @@ function prepareToggleSelectAllVariants () {
 }
 
 function toggleSelectAllVariants () {
-    const checkboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
+    const variantCheckboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+    variantCheckboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
     });
+    checkIfFormIsAbleToSubmit();
 }
 
 async function get_google_fonts() {
@@ -106,14 +107,19 @@ function displayFontOptions () {
 
 function onFontVariantChange () {
     const googleFontsSelectedElement = document.getElementById('google-font-variants');
-    const submitElement = document.getElementById('google-fonts-submit');
     if (this.checked) {
         variantsSelected[this.id] = fontSelected['files'][this.id];
     } else {
         delete variantsSelected[this.id];
     }
     googleFontsSelectedElement.value = Object.keys(variantsSelected).map(key => `${key}::${variantsSelected[key]}`).join(',');
-    submitElement.disabled = !googleFontsSelectedElement.value;
+    checkIfFormIsAbleToSubmit();
+}
+
+function checkIfFormIsAbleToSubmit () {
+    const variantCheckboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+    const submitElement = document.getElementById('google-fonts-submit');
+    submitElement.disabled = ! Array.from(variantCheckboxes).find(checkbox => checkbox.checked);
 }
 
 function emptyFontOptions () {
