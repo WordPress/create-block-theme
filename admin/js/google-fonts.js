@@ -4,8 +4,8 @@ let fontSelected = null;
 let variantsSelected = {};
 
 function prepareToggleSelectAllVariants () {
-    const element = document.getElementById('select-all-variants');
-    element.addEventListener('click', toggleSelectAllVariants);
+    const selectAllVariantsElement = document.getElementById('select-all-variants');
+    selectAllVariantsElement.addEventListener('click', toggleSelectAllVariants);
 }
 
 function toggleSelectAllVariants () {
@@ -124,6 +124,8 @@ function emptyFontOptions () {
     const submitElement = document.getElementById('google-fonts-submit');
     submitElement.disabled = true;
     variantsSelected = {};
+    const selectAllVariantsElement = document.getElementById('select-all-variants');
+    selectAllVariantsElement.checked = false;
 }
 
 function init () {
