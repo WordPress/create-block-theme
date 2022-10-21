@@ -45,20 +45,20 @@ function onGoogleFontNameChange() {
     const fontsTableElement = document.getElementById("google-fonts-table");
     const hintElements = document.querySelector('.hint');
 
+    emptyFontOptions();
+
     if(this.value) {
         fontNameElement.value = fonts[this.value]['family'];
         fontSelected = fonts[this.value];
         fontsTableElement.style.display = "block";
         hintElements.style.display = "block";
+        displayFontOptions();
     } else {
         fontNameElement.value = "";
         fontSelected = null;
         fontsTableElement.style.display = "none";
         hintElements.style.display = "none";
     }
-
-    emptyFontOptions();
-    displayFontOptions();
 }
 
 function displayFontOptions () {
