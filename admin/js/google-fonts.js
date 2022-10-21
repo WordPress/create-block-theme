@@ -13,6 +13,7 @@ function toggleSelectAllVariants () {
     variantCheckboxes.forEach(checkbox => {
         checkbox.checked = this.checked;
     });
+    onFontVariantChange();
     checkIfFormIsAbleToSubmit();
 }
 
@@ -106,13 +107,22 @@ function displayFontOptions () {
 }
 
 function onFontVariantChange () {
-    const googleFontsSelectedElement = document.getElementById('google-font-variants');
-    if (this.checked) {
-        variantsSelected[this.id] = fontSelected['files'][this.id];
-    } else {
-        delete variantsSelected[this.id];
+    const variantCheckboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+
+    // updates the variantsSelected object with the selected variants
+    for (const checkbox of variantCheckboxes) {
+        if (checkbox.checked) {
+            variantsSelected[checkbox.id] = fontSelected['files'][checkbox.id];
+        } else {
+            delete variantsSelected[checkbox.id];
+        }
     }
+
+    // write the input that will be submitted to the server
+    const googleFontsSelectedElement = document.getElementById('google-font-variants');
     googleFontsSelectedElement.value = Object.keys(variantsSelected).map(key => `${key}::${variantsSelected[key]}`).join(',');
+    
+    // enable/disable the form submit button
     checkIfFormIsAbleToSubmit();
 }
 
