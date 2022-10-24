@@ -6,7 +6,7 @@ name: Update Google Fonts JSON
 # or API.
 on:
   schedule:
-    - cron: '0 0 1,7,14,21,28 * *' # Runs weekly, more precisely at 00:00 on day-of-month 1, 7, 14, 21, and 28.
+    - cron: '0 0 * * TUE' # Runs weekly, every Tuesday.
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
