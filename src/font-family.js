@@ -74,7 +74,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
 }
 
 FontFamily.defaultProps = {
-    demoText: __("The quick brown fox jumps over the lazy dog."),
+    demoText: __("The quick brown fox jumps over the lazy dog.", "create-block-theme"),
 };
 
 export default FontFamily;
