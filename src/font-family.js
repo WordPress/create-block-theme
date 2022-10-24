@@ -48,7 +48,6 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                     <td>{__('Style')}</td>
                                     <td>{__('Weight')}</td>
                                     <td>{__('Preview')}</td>
-                                    {/* <td>{__('Edit')}</td> */}
                                     <td></td>
                                 </thead>
                                 <tbody>
