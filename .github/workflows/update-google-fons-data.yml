@@ -36,8 +36,8 @@ jobs:
       run: |
         echo "Updating Google fonts JSON"
         node ./update-google-fonts-json-file.js
-        git config user.name 'Matias Benedetto'
-        git config user.email 'matias.benedetto@gmail.com'
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
         git config --global --add --bool push.autoSetupRemote true
         
         git diff-index --quiet HEAD -- || ( git add assets/google-fonts/fallback-fonts-list.json && git checkout -b ${{ env.BRANCH_NAME }} && git commit -m "Updating file" && git push && gh pr create -B trunk -H ${{ env.BRANCH_NAME }} --title "Update Google Fonts JSON data from API" --body "Created by Update Google Fonts JSON Github action" )
