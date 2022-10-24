@@ -18,7 +18,6 @@ function FontFace ( { fontFace, demoText, deleteFontFace } ) {
             <td>{fontFace.fontStyle}</td>
             <td>{fontFace.fontWeight}</td>
             <td className="demo-cell"><p style={ demoStyles }>{demoText}</p></td>
-            {/* <td><Button variant="secondary">Edit</Button></td> */}
             <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove')}</Button></td>
         </tr>
     );
