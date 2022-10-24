@@ -17,7 +17,7 @@ async function updateFiles () {
         newData = await newApiData.json();
     } catch (error) {
         console.error("❎  Error fetching the Google Fonts API:", error);
-        return;
+        process.exit(1);
     }
 
     if ( newData.items ) {
@@ -36,6 +36,7 @@ async function updateFiles () {
 
     } else {
         console.error("❎  No new data to check. Check the Google Fonts API key.");
+        process.exit(1);
     }
 }
 
