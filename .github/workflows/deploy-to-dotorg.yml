@@ -1,15 +1,53 @@
 name: Deploy to WordPress.org
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
 on:
-  push:
-    tags:
-    - "*"
   workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+        - major
+        - minor
+        - patch
 jobs:
   tag:
-    name: New tag
+    name: Checkout repo
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+      
+    - name: Install node dependencies
+      run: npm install
+
+    - name: Compile Javascript App
+      run: npm run build
+
+    - name: Update version and changelog
+      id: update-version
+      env:
+        RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+      run: npm run update-version
+
+    - name: Create Relase
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git config --global --add --bool push.autoSetupRemote true
+        git diff-index --quiet HEAD -- || ( git add package.json readme.txt && git commit -m "Version bump & changelog update" && git push )
+        gh release create ${{steps.update-version.outputs.NEW_TAG }} --notes "${{steps.update-version.outputs.CHANGELOG }}"
+
     - name: Create Block Theme Plugin Deploy to WordPress.org
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:
