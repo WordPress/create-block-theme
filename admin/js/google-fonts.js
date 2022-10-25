@@ -3,6 +3,20 @@ let fonts = [];
 let fontSelected = null;
 let variantsSelected = {};
 
+function prepareToggleSelectAllVariants () {
+    const selectAllVariantsElement = document.getElementById('select-all-variants');
+    selectAllVariantsElement.addEventListener('click', toggleSelectAllVariants);
+}
+
+function toggleSelectAllVariants () {
+    const variantCheckboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+    variantCheckboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    onFontVariantChange();
+    checkIfFormIsAbleToSubmit();
+}
+
 async function get_google_fonts() {
         const currentUrl = new URL(document.getElementById('google-fonts-script-js').src);
         const fallbackURL = currentUrl.origin + currentUrl.pathname.replace('admin/js/google-fonts.js', 'assets/google-fonts/fallback-fonts-list.json');
@@ -33,20 +47,20 @@ function onGoogleFontNameChange() {
     const fontsTableElement = document.getElementById("google-fonts-table");
     const hintElements = document.querySelector('.hint');
 
+    emptyFontOptions();
+
     if(this.value) {
         fontNameElement.value = fonts[this.value]['family'];
         fontSelected = fonts[this.value];
         fontsTableElement.style.display = "block";
         hintElements.style.display = "block";
+        displayFontOptions();
     } else {
         fontNameElement.value = "";
         fontSelected = null;
         fontsTableElement.style.display = "none";
         hintElements.style.display = "none";
     }
-
-    emptyFontOptions();
-    displayFontOptions();
 }
 
 function displayFontOptions () {
@@ -93,15 +107,29 @@ function displayFontOptions () {
 }
 
 function onFontVariantChange () {
-    const googleFontsSelectedElement = document.getElementById('google-font-variants');
-    const submitElement = document.getElementById('google-fonts-submit');
-    if (this.checked) {
-        variantsSelected[this.id] = fontSelected['files'][this.id];
-    } else {
-        delete variantsSelected[this.id];
+    const variantCheckboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+
+    // updates the variantsSelected object with the selected variants
+    for (const checkbox of variantCheckboxes) {
+        if (checkbox.checked) {
+            variantsSelected[checkbox.id] = fontSelected['files'][checkbox.id];
+        } else {
+            delete variantsSelected[checkbox.id];
+        }
     }
+
+    // write the input that will be submitted to the server
+    const googleFontsSelectedElement = document.getElementById('google-font-variants');
     googleFontsSelectedElement.value = Object.keys(variantsSelected).map(key => `${key}::${variantsSelected[key]}`).join(',');
-    submitElement.disabled = !googleFontsSelectedElement.value;
+    
+    // enable/disable the form submit button
+    checkIfFormIsAbleToSubmit();
+}
+
+function checkIfFormIsAbleToSubmit () {
+    const variantCheckboxes = document.querySelectorAll('#font-options input[type="checkbox"]');
+    const submitElement = document.getElementById('google-fonts-submit');
+    submitElement.disabled = ! Array.from(variantCheckboxes).find(checkbox => checkbox.checked);
 }
 
 function emptyFontOptions () {
@@ -112,11 +140,14 @@ function emptyFontOptions () {
     const submitElement = document.getElementById('google-fonts-submit');
     submitElement.disabled = true;
     variantsSelected = {};
+    const selectAllVariantsElement = document.getElementById('select-all-variants');
+    selectAllVariantsElement.checked = false;
 }
 
 function init () {
     fillFontSelect();
     prepareSelectElement();
+    prepareToggleSelectAllVariants();
 }
 
 init();

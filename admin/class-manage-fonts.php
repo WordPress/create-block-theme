@@ -210,7 +210,7 @@ class Manage_Fonts_Admin {
 				<table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
 					<thead>
 						<tr>
-							<td class=""></td>
+							<td class=""><input type="checkbox" id="select-all-variants" /></td>
 							<td class=""><?php printf( esc_html__('Variant', 'create-block-theme')); ?></td>
 							<td class=""><?php printf( esc_html__('Preview', 'create-block-theme')); ?></td>
 						</tr>
