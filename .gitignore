@@ -25,4 +25,5 @@ node_modules/
 # ignore system files
 .DS_Store
 
-
+# plugin build folder
+build/
