@@ -70,7 +70,9 @@ function displayFontOptions () {
         // Loads the selected font to create the previews
         const style = variant.includes('italic') ? 'italic' : 'normal';
         const weight = variant === 'regular' || variant === 'italic' ? '400' : variant.replace('italic', '');
-        const newFont = new FontFace(fontSelected['family'], `url(${fontSelected['files'][variant]})`, { style: style, weight: weight });
+        // Force https because sometimes Google Fonts API returns http instead of https
+        const variantUrl = fontSelected['files'][variant].replace("http://", "https://");
+        const newFont = new FontFace(fontSelected['family'], `url(${variantUrl})`, { style: style, weight: weight });
         newFont.load().then(function(loaded_face) {
             document.fonts.add(loaded_face);
         }).catch(function(error) {
