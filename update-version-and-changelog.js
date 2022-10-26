@@ -38,6 +38,11 @@ async function updateVersion () {
         process.exit(1);
     }
 
+    if (!fs.existsSync('./create-block-theme.php')) {
+        console.error("❎  Error: create-block-theme.php file not found.");
+        process.exit(1);
+    }
+
     const package = require('./package.json');
     const currentVersion = package.version;
     const newVersion = semver.inc(currentVersion, releaseType);
@@ -73,6 +78,12 @@ async function updateVersion () {
     newReadme = newReadme.replace(/Stable tag: (.*)/, `Stable tag: ${ newVersion }`);
     fs.writeFileSync('./readme.txt', newReadme);
     console.info('✅  Readme version updated', currentTag, '=>', newTag);
+
+    // update create-block-theme.php version
+    const pluginPhpFile = fs.readFileSync('./create-block-theme.php', 'utf8');
+    const newPluginPhpFile = pluginPhpFile.replace(/Version: (.*)/, `Version: ${ newVersion }`);
+    fs.writeFileSync('./create-block-theme.php', newPluginPhpFile);
+    console.info('✅  create-block-theme.php file version updated', currentTag, '=>', newTag);
 
     // output data to be used by the next steps of the github action
     core.setOutput('NEW_VERSION', newVersion);
