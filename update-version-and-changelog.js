@@ -31,7 +31,7 @@ async function updateVersion () {
 
     const package = require('./package.json');
     const currentVersion = package.version;
-    const newVersion = semver.inc(currentTag, releaseType);
+    const newVersion = semver.inc(currentVersion, releaseType);
     const currentTag = `v${currentVersion}`;
     const newTag = `v${newVersion}`;
 
