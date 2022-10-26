@@ -8,3 +8,4 @@ package.json
 src/
 .git
 .github
+.wordpress-org
