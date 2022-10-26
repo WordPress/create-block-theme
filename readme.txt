@@ -38,37 +38,37 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 == Changelog ==
 
 = 1.2.3 = 
-Add translation domain (#121)
-Check for nonce index (#120)
-Validating mime type of font file on server side (#119)
+* Add translation domain (#121)
+* Check for nonce index (#120)
+* Validating mime type of font file on server side (#119)
 
 = 1.2.2 = 
-Add capabilities and nonce checks (#118)
+* Add capabilities and nonce checks (#118)
 
 = 1.2.1 = 
-Correcting version number
+* Correcting version number
 
 = 1.2.0 = 
-Embed Google fonts and local font files in theme (#113)
-Change button text (#112)
-Add check and directory creation for template and parts folders. (#110)
-Change theme.json schema of blank theme if Gutenberg isn't installed. (#107)
+* Embed Google fonts and local font files in theme (#113)
+* Change button text (#112)
+* Add check and directory creation for template and parts folders. (#110)
+* Change theme.json schema of blank theme if Gutenberg isn't installed. (#107)
 
 = 1.1.3 = 
-update links, screenshots of the new changes (#97)
-Add $schema and use Gutenberg classes (#99)
-Update readme to include latest features (#100)
-Generate $schema URL in the same way as core. (#105)
+* update links, screenshots of the new changes (#97)
+* Add $schema and use Gutenberg classes (#99)
+* Update readme to include latest features (#100)
+* Generate $schema URL in the same way as core. (#105)
 
 = 1.1.2 =
-Save a theme variation (#90)
-Make UI string 'Create Block Theme' can be translatable (#92)
+* Save a theme variation (#90)
+* Make UI string 'Create Block Theme' can be translatable (#92)
 
 = 1.0.1 = 
-Add option to create blank theme. (#70)
-Improve form instructions (#76)
-Form cleanup and Theme name check (#77) 
-Get the correct merged theme.json data (#88)
+* Add option to create blank theme. (#70)
+* Improve form instructions (#76)
+* Form cleanup and Theme name check (#77) 
+* Get the correct merged theme.json data (#88)
 
 = 1.0 =
 * Initial version.
