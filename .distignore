@@ -6,4 +6,3 @@ update-google-fonts-json-file.js
 update-version-and-changelog.js
 package.json
 src/
-.github/
