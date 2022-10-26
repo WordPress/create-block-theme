@@ -8,9 +8,18 @@ const git = simpleGit.default();
 const releaseType = process.env.RELEASE_TYPE;
 const VALID_RELEASE_TYPES = ['major', 'minor', 'patch'];
 
+// To get the merges since the last tag
 async function getChangesSinceGitTag (tag) {
     const changes = await git.log(["--reverse", "--merges", `HEAD...${tag}`]);
     return changes;
+}
+
+// To know if there are changes since the last tag.
+// we are not using getChangesSinceGitTag because it returns the just the merges and not the commits.
+// So for example if a hotfix was committed directly to trunk this function will detect it but getChangesSinceGitTag will not.
+async function getHasChangesSinceGitTag (tag) {
+    const changes = await git.log([`HEAD...${tag}`]);
+    return changes?.all?.length > 0;
 }
 
 async function updateVersion () {
@@ -42,9 +51,10 @@ async function updateVersion () {
 
     // get changes since last tag
     const changes = await getChangesSinceGitTag(currentTag);
+    const hasChangesSinceGitTag = await getHasChangesSinceGitTag(currentTag);
 
     // check if there are any changes
-    if (!changes || changes.total === 0) {
+    if (!hasChangesSinceGitTag) {
         console.error("❎  No changes since last tag. There is nothing to release.");
         process.exit(1);
     }
