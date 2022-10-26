@@ -75,6 +75,7 @@ async function updateVersion () {
     console.info('✅  Readme version updated', currentTag, '=>', newTag);
 
     // output data to be used by the next steps of the github action
+    core.setOutput('NEW_VERSION', newVersion);
     core.setOutput('NEW_TAG', newTag);
     core.setOutput('CHANGELOG', changelogChanges);
 }
