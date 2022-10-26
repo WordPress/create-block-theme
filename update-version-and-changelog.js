@@ -67,7 +67,7 @@ async function updateVersion () {
     // update readme.txt version with the new changelog
     const readme = fs.readFileSync('./readme.txt', 'utf8');
     const changelogChanges = changes.all.map(change => `* ${ change.body || change.message }`).join('\n');
-    const newChangelog = `== Changelog ==\n\n= ${ newVersion } =\n\n${ changelogChanges }`;
+    const newChangelog = `== Changelog ==\n\n= ${ newVersion } =\n${ changelogChanges }`;
     let newReadme = readme.replace("== Changelog ==", newChangelog);
     // update version in readme.txt
     newReadme = newReadme.replace(/Stable tag: (.*)/, `Stable tag: ${ newVersion }`);
