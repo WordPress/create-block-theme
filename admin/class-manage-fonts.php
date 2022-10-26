@@ -1,11 +1,14 @@
 <?php
 
-class Embed_Fonts_In_Theme_Admin {
+require_once (__DIR__ . '/font-helpers.php');
+
+class Manage_Fonts_Admin {
 
 	public function __construct() {
         add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
         add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
         add_action( 'admin_init', [ $this, 'save_local_fonts_to_theme' ] );
+        add_action( 'admin_init', [ $this, 'save_manage_fonts_changes' ] );
 	}
 
     const ALLOWED_FONT_MIME_TYPES = array(
@@ -15,22 +18,26 @@ class Embed_Fonts_In_Theme_Admin {
     );
 
     function has_font_mime_type( $file ) {
-        $filetype = wp_check_filetype( $file );
+        $filetype = wp_check_filetype( $file, self::ALLOWED_FONT_MIME_TYPES );
         return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES );
-    }
+    }    
 
     function create_admin_menu() {
 		if ( ! wp_is_block_theme() ) {
 			return;
 		}
 
-		$google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
+		$manage_fonts_page_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
+        $manage_fonts_menu_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
+        add_theme_page( $manage_fonts_page_title, $manage_fonts_menu_title, 'edit_theme_options', 'manage-fonts', [ $this, 'manage_fonts_admin_page' ] );
+
+        $google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
 		$google_fonts_menu_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
-		add_theme_page( $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
+        add_submenu_page(null, $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
 
 		$local_fonts_page_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
 		$local_fonts_menu_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
-		add_theme_page( $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
+		add_submenu_page(null, $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
 	}
 
     function can_read_and_write_font_assets_directory () {
@@ -53,6 +60,60 @@ class Embed_Fonts_In_Theme_Admin {
 	}
 
 
+    function manage_fonts_admin_page () {
+        // Load the required WordPress packages.
+        // Automatically load imported dependencies and assets version.
+        $asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+     
+        // Enqueue CSS dependencies.
+        foreach ( $asset_file['dependencies'] as $style ) {
+            wp_enqueue_style( $style );
+        }
+     
+        // Load our app.js.
+        wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
+
+        wp_enqueue_style( 'manage-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/manage-fonts.css', array(), '1.0', false );
+
+        $theme_name = wp_get_theme()->get( 'Name' );
+
+        $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
+        $theme_settings = $theme_data->get_settings();
+        $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+        // This is only run when Gutenberg is not active because WordPress core does not include WP_Webfonts class yet. So we can't use it to load the font asset styles.
+        // See the comments here: https://github.com/WordPress/WordPress/blob/88cee0d359f743f94597c586febcc5e09830e780/wp-includes/script-loader.php#L3160-L3186
+        // TODO: remove this when WordPress core includes WP_Webfonts class.
+        if ( ! class_exists( 'WP_Webfonts' ) ) {
+            $font_assets_stylesheet = render_font_styles($theme_font_families);
+            wp_register_style( 'theme-font-families', false );
+            wp_add_inline_style( 'theme-font-families', $font_assets_stylesheet );
+            wp_enqueue_style( 'theme-font-families' );
+        }
+
+        if ( ! empty( $_POST['new-theme-fonts-json'] ) ) {
+            $theme_font_families = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
+        }
+
+        $fonts_json = wp_json_encode( $theme_font_families );
+        $fonts_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $fonts_json );
+        
+    ?>
+    <div class="wrap">
+        <h1 class="wp-heading-inline"><?php _e('Manage Theme Fonts', 'create-block-theme'); ?></h1>
+        <a href="<?php echo admin_url( 'themes.php?page=add-google-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Google Font', 'create-block-theme'); ?></a>
+        <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
+        <hr class="wp-header-end" />
+        <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
+        
+        <form method="POST"  id="manage-fonts-form">
+            <div id="manage-fonts"></div>
+            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+        </form>
+
+    </div>
+    <?php
+    }
 
     function local_fonts_admin_page () {
         wp_enqueue_script('inflate', plugin_dir_url(__FILE__) . 'js/lib/inflate.js', array( ), '1.0', false );
@@ -149,7 +210,7 @@ class Embed_Fonts_In_Theme_Admin {
 				<table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
 					<thead>
 						<tr>
-							<td class=""></td>
+							<td class=""><input type="checkbox" id="select-all-variants" /></td>
 							<td class=""><?php printf( esc_html__('Variant', 'create-block-theme')); ?></td>
 							<td class=""><?php printf( esc_html__('Preview', 'create-block-theme')); ?></td>
 						</tr>
@@ -166,6 +227,26 @@ class Embed_Fonts_In_Theme_Admin {
 		</div>
 	<?php
 	}
+
+    function save_manage_fonts_changes () {
+        if (
+            current_user_can( 'edit_themes' ) &&
+            ! empty( $_POST['nonce'] ) &&
+            wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
+            ! empty( $_POST['new-theme-fonts-json'] )
+        ) {
+            if( ! $this->can_read_and_write_font_assets_directory() ) {
+                return add_action( 'admin_notices', [ $this, 'admin_notice_manage_fonts_permission_error' ] );
+            }
+
+            // parse json from form 
+            $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
+
+            $this->replace_all_theme_font_families( $new_theme_fonts_json );
+
+            add_action( 'admin_notices', [ $this, 'admin_notice_delete_font_success' ] );
+        }
+    }
 
     function save_local_fonts_to_theme () {
         if (
@@ -264,6 +345,44 @@ class Embed_Fonts_In_Theme_Admin {
         }
     }
 
+    function replace_all_theme_font_families ( $font_families ) {
+        // Get the current Theme.json data
+        $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
+        $theme_settings = $theme_data->get_settings();
+        $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+
+        $new_theme_json_content = array(
+            'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
+            'settings' => array(
+                'typography' => array (
+                    'fontFamilies' => $font_families
+                )
+            )
+        );
+
+
+        // Creates the new theme.json file
+        if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
+            $new_json = new WP_Theme_JSON_Gutenberg( $new_theme_json_content );
+            $result = new WP_Theme_JSON_Gutenberg();
+        } else {
+            $new_json = new WP_Theme_JSON( $new_theme_json_content );
+            $result = new WP_Theme_JSON();
+        }
+        $result->merge( $theme_data );
+        $result->merge( $new_json );
+
+        $data = $result->get_data();
+        $theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $theme_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
+
+        // Write the new theme.json to the theme folder
+        file_put_contents(
+            get_stylesheet_directory() . '/theme.json',
+            $theme_json_string
+        );
+    }
+
     function add_or_update_theme_font_faces ( $font_name, $font_slug, $font_faces ) {
         // Get the current Theme.json data
         $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
@@ -331,7 +450,10 @@ class Embed_Fonts_In_Theme_Admin {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+				<p>
+                    <?php printf( esc_html__( '%1$s font added to %2$s theme. ', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?>
+                    <a href="themes.php?page=manage-fonts"><?php printf( esc_html__( "Manage Fonts", "create-block-theme" ) ); ?></a>
+                </p>
 			</div>
 		<?php
 	}
@@ -350,6 +472,24 @@ class Embed_Fonts_In_Theme_Admin {
 		?>
 			<div class="notice notice-error is-dismissible">
 				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. The uploaded file is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    function admin_notice_manage_fonts_permission_error () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error handling font changes. WordPress lack permissions to manage the theme font assets.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    function admin_notice_delete_font_success () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php printf( esc_html__( 'Font removed from your theme (%1$s).', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}

@@ -1,0 +1,25 @@
+{
+    "name": "create-block-theme",
+    "version": "1.2.3",
+    "private": true,
+    "description": "Create a block-based theme",
+    "author": "The WordPress Contributors",
+    "license": "GPL-2.0-or-later",
+    "keywords": [ "WordPress", "block" ],
+    "homepage": "https://wordpress.org/plugins/create-block-theme/",
+    "repository": "git+https://github.com/WordPress/create-block-theme.git",
+    "bugs": {
+        "url": "https://wordpress.org/support/plugin/create-block-theme/"
+    },
+    "main": "build/index.js",
+    "devDependencies": {
+        "@wordpress/scripts": "^18.0.1"
+    },
+    "scripts": {
+        "build": "wp-scripts build",
+        "format": "wp-scripts format",
+        "lint:js": "wp-scripts lint-js",
+        "packages-update": "wp-scripts packages-update",
+        "start": "wp-scripts start"
+    }
+}

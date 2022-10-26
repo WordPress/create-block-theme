@@ -40,7 +40,7 @@ class Create_Block_Theme {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-create-block-theme-admin.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-embed-fonts-in-theme.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-manage-fonts.php';
 
 		$this->loader = new Create_Block_Theme_Loader();
 
@@ -56,7 +56,7 @@ class Create_Block_Theme {
 	private function define_admin_hooks() {
 
 		$plugin_admin = new Create_Block_Theme_Admin();
-		$embed_fonts_admin = new Embed_Fonts_In_Theme_Admin();
+		$manage_fonts_admin = new Manage_Fonts_Admin();
 	}
 
 	/**
