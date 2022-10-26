@@ -44,10 +44,10 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 * auto update version of php file
 
 = 1.3.3 =
-
+* Automatic release improvements
 
 = 1.3.2 =
-
+* Automatic release improvements
 
 = 1.3.1 =
 * Update .distignore
