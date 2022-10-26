@@ -9,7 +9,7 @@ const releaseType = process.env.RELEASE_TYPE;
 const VALID_RELEASE_TYPES = ['major', 'minor', 'patch'];
 
 async function getChangesSinceGitTag (tag) {
-    const changes = await git.log(["--reverse", `HEAD...${tag}`]);
+    const changes = await git.log(["--reverse", "--merges", `HEAD...${tag}`]);
     return changes;
 }
 
@@ -56,7 +56,7 @@ async function updateVersion () {
     
     // update readme.txt version with the new changelog
     const readme = fs.readFileSync('./readme.txt', 'utf8');
-    const changelogChanges = changes.all.map(change => `* ${ change.message }`).join('\n');
+    const changelogChanges = changes.all.map(change => `* ${ change.body || change.message }`).join('\n');
     const newChangelog = `== Changelog ==\n\n= ${ newVersion } =\n\n${ changelogChanges }`;
     let newReadme = readme.replace("== Changelog ==", newChangelog);
     // update version in readme.txt
