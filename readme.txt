@@ -5,7 +5,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.0
-Stable tag: 1.2.3
+Stable tag: 1.3.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -36,6 +36,19 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.3.0 =
+* Updating google fonts data
+* Force https to load Google fonts preview
+* Add the ability to select/unselect all google font variants
+* Merge branch 'trunk' into try/manage-fonts
+* Update google fonts JSON data automatically using a repo action
+* Merge branch 'trunk' into release-action
+* Merge branch 'trunk' into try/manage-fonts
+* Merge branch 'try/manage-fonts' into release-action
+* Manage theme fonts
+* Automate release: build, version bump, changelog, deploy to wp.org
+* Automate release
 
 = 1.2.3 = 
 * Add translation domain (#121)
