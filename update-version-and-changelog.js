@@ -30,8 +30,10 @@ async function updateVersion () {
     }
 
     const package = require('./package.json');
-    const currentTag = package.version;
-    const newTag = semver.inc(currentTag, releaseType);
+    const currentVersion = package.version;
+    const newVersion = semver.inc(currentTag, releaseType);
+    const currentTag = `v${currentVersion}`;
+    const newTag = `v${newVersion}`;
 
     if (!semver.valid(currentTag)) {
         console.error(`❎  Error: current tag ( ${ currentTag } ) is not a valid semver version."`);
@@ -48,17 +50,17 @@ async function updateVersion () {
     }
 
     // update package.json version
-    package.version = newTag;
+    package.version = newVersion;
     fs.writeFileSync('./package.json', JSON.stringify(package, null, 2));
     console.info('✅ Version updated', currentTag, '=>', newTag);
     
     // update readme.txt version with the new changelog
     const readme = fs.readFileSync('./readme.txt', 'utf8');
     const changelogChanges = changes.all.map(change => `* ${ change.message }`).join('\n');
-    const newChangelog = `== Changelog ==\n\n= ${ newTag } =\n\n${ changelogChanges }`;
+    const newChangelog = `== Changelog ==\n\n= ${ newVersion } =\n\n${ changelogChanges }`;
     let newReadme = readme.replace("== Changelog ==", newChangelog);
     // update version in readme.txt
-    newReadme = newReadme.replace(/Stable tag: (.*)/, `Stable tag: ${ newTag }`);
+    newReadme = newReadme.replace(/Stable tag: (.*)/, `Stable tag: ${ newVersion }`);
     fs.writeFileSync('./readme.txt', newReadme);
     console.info('✅  Readme version updated', currentTag, '=>', newTag);
 
