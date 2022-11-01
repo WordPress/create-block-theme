@@ -1,5 +1,5 @@
 === Create Block Theme ===
-Contributors: @wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu
+Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu
 Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
