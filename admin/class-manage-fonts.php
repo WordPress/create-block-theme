@@ -151,7 +151,7 @@ class Manage_Fonts_Admin {
                             </td>
                         </tr>
                         <tr>
-                            <th><?php _e('Font face defition for this font file:', 'create-block-theme'); ?></th>
+                            <th><?php _e('Font face definition for this font file:', 'create-block-theme'); ?></th>
                             <td>
                                 <hr/>
                             </td>
