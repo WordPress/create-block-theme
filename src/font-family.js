@@ -29,7 +29,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                 deleteFontFamily(fontFamilyIndex)
                             }}
                         >
-                            {__('Remove Font Family')}
+                            {__('Remove Font Family', 'create-block-theme')}
                         </Button>
                         {hasFontFaces && (
                             <Button onClick={toggleIsOpen}>
@@ -45,9 +45,9 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         <div className={` slide ${isOpen ? "open" : "close"}`}>
                             <table className="wp-list-table widefat striped table-view-list">
                                 <thead>
-                                    <td>{__('Style')}</td>
-                                    <td>{__('Weight')}</td>
-                                    <td>{__('Preview')}</td>
+                                    <td>{__('Style', 'create-block-theme')}</td>
+                                    <td>{__('Weight', 'create-block-theme')}</td>
+                                    <td>{__('Preview', 'create-block-theme')}</td>
                                     <td></td>
                                 </thead>
                                 <tbody>
