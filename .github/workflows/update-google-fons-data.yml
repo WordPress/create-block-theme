@@ -25,7 +25,7 @@ jobs:
 
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      run: echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_OUTPUT
 
     # Runs a single command using the runners shell
     # This script fetchs the Goolgle Fonts API data and creates a PR if new data is available
