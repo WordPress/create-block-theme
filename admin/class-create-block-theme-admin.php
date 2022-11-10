@@ -834,6 +834,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			}
 
 			if ( $_GET['theme']['type'] === 'save' ) {
+				// Avoid running if WordPress dosn't have permission to overwrite the theme folder
+				if ( ! is_writable( get_stylesheet_directory() ) ) {
+					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
+				}
+
 				if ( is_child_theme() ) {
 					$this->save_theme_locally( 'current' );
 				}
@@ -851,6 +856,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_variation_name' ] );
 				}
 
+				// Avoid running if WordPress dosn't have permission to write the theme folder
+				if ( ! is_writable ( get_stylesheet_directory() ) ) {
+					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
+				}
+
 				if ( is_child_theme() ) {
 					$this->save_variation( 'current', $_GET['theme'] );
 				}
@@ -863,6 +873,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			}
 
 			else if ( $_GET['theme']['type'] === 'blank' ) {
+				// Avoid running if WordPress dosn't have permission to write the themes folder
+				if ( ! is_writable ( get_theme_root() ) ) {
+					return add_action( 'admin_notices', [ $this, 'admin_notice_error_themes_file_permissions' ] );
+				}
+
 				if ( $_GET['theme']['name'] === '' ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 				}
@@ -951,6 +966,25 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p><?php printf( esc_html__( 'Your variation of %1$s has been created successfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $variation_name )  ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_error_theme_file_permissions () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		$theme_dir = get_stylesheet_directory();
+		?>
+			<div class="notice notice-error">
+				<p><?php printf( esc_html__( 'Your theme ( %1$s ) directory ( %2$s ) is not writable. Please check your file permissions.', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $theme_dir )  ); ?></p>
+			</div>
+		<?php
+	}
+
+	function admin_notice_error_themes_file_permissions () {
+		$themes_dir = get_theme_root();
+		?>
+			<div class="notice notice-error">
+				<p><?php printf( esc_html__( 'Your themes directory ( %1$s ) is not writable. Please check your file permissions.', 'create-block-theme' ), esc_html( $themes_dir )  ); ?></p>
 			</div>
 		<?php
 	}
