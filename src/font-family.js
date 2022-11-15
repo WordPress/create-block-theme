@@ -46,10 +46,10 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                 <td>{__('Style')}</td>
                                 <td>{__('Weight')}</td>
                                 <td>{__('Preview')}</td>
-                                { fontFamily.fontFace && <td></td> }
+                                { hasFontFaces && <td></td> }
                             </thead>
                             <tbody>
-                                { fontFamily.fontFace && fontFamily.fontFace.length && fontFamily.fontFace.map((fontFace, i) => (
+                                { hasFontFaces && fontFamily.fontFace.map((fontFace, i) => (
                                     <FontFace
                                         { ...fontFace }
                                         fontFamilyIndex={fontFamilyIndex}
@@ -62,7 +62,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                     />
                                 )) }
                                 {
-                                    ! fontFamily.fontFace && fontFamily.fontFamily &&
+                                    ! hasFontFaces && fontFamily.fontFamily &&
                                     <FontFace
                                         { ...fontFamily }
                                         demoText={ demoText }
