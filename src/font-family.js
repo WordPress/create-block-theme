@@ -19,7 +19,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                 <td class="font-family-head">
                     <div><strong>{fontFamily.name || fontFamily.fontFamily}</strong></div>
                     <div>
-                        { hasFontFaces && ( <Button
+                        <Button
                             variant="tertiary"
                             isDestructive={true}
                             onClick={(e) => {
@@ -29,12 +29,9 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         >
                             {__('Remove Font Family')}
                         </Button>
-                        )}
-                        { hasFontFaces && (
-                            <Button onClick={toggleIsOpen}>
-                                <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
-                            </Button>
-                        )}
+                        <Button onClick={toggleIsOpen}>
+                            <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
+                        </Button>
                     </div>
                 </td>
             </thead>
