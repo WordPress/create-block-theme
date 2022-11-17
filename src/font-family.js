@@ -11,13 +11,11 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
         setIsOpen(!isOpen);
     }
 
-    // handle font famliy that has no font faces, for example a system font
-    // "-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu..."
     const hasFontFaces = fontFamily.fontFace && fontFamily.fontFace.length;
 
     return (
         <table className="wp-list-table widefat table-view-list">
-            <thead onClick={toggleIsOpen}>
+            <thead>
                 <td class="font-family-head">
                     <div><strong>{fontFamily.name || fontFamily.fontFamily}</strong></div>
                     <div>
@@ -31,44 +29,47 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         >
                             {__('Remove Font Family')}
                         </Button>
-                        {hasFontFaces && (
-                            <Button onClick={toggleIsOpen}>
-                                <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
-                            </Button>
-                        )}
+                        <Button onClick={toggleIsOpen}>
+                            <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
+                        </Button>
                     </div>
                 </td>
             </thead>
-            {hasFontFaces && (
-                <tbody className="font-family-contents">
-                    <div className="container">
-                        <div className={` slide ${isOpen ? "open" : "close"}`}>
-                            <table className="wp-list-table widefat striped table-view-list">
-                                <thead>
-                                    <td>{__('Style')}</td>
-                                    <td>{__('Weight')}</td>
-                                    <td>{__('Preview')}</td>
-                                    <td></td>
-                                </thead>
-                                <tbody>
-                                    {hasFontFaces && fontFamily.fontFace.map((fontFace, i) => (
-                                        <FontFace
-                                            fontFace={fontFace}
-                                            fontFamilyIndex={fontFamilyIndex}
-                                            fontFaceIndex={i}
-                                            demoText={demoText}
-                                            key={`fontface${i}`}
-                                            deleteFontFace={
-                                                () => deleteFontFace(fontFamilyIndex, i)
-                                            }                                 
-                                        />
-                                    ))}  
-                                </tbody>  
-                            </table>
-                        </div>
+            <tbody className="font-family-contents">
+                <div className="container">
+                    <div className={` slide ${isOpen ? "open" : "close"}`}>
+                        <table className="wp-list-table widefat striped table-view-list">
+                            <thead>
+                                <td>{__('Style')}</td>
+                                <td>{__('Weight')}</td>
+                                <td>{__('Preview')}</td>
+                                { hasFontFaces && <td></td> }
+                            </thead>
+                            <tbody>
+                                { hasFontFaces && fontFamily.fontFace.map((fontFace, i) => (
+                                    <FontFace
+                                        { ...fontFace }
+                                        fontFamilyIndex={fontFamilyIndex}
+                                        fontFaceIndex={i}
+                                        demoText={demoText}
+                                        key={`fontface${i}`}
+                                        deleteFontFace={
+                                            () => deleteFontFace(fontFamilyIndex, i)
+                                        }
+                                    />
+                                )) }
+                                {
+                                    ! hasFontFaces && fontFamily.fontFamily &&
+                                    <FontFace
+                                        { ...fontFamily }
+                                        demoText={ demoText }
+                                    />
+                                }
+                            </tbody>
+                        </table>
                     </div>
-                </tbody>
-            )}
+                </div>
+            </tbody>
         </table>
     )
 }

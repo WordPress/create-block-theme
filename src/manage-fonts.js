@@ -80,8 +80,8 @@ function ManageFonts () {
                     updatedFontFamily
                 ];
             }
-
-            if (fontFamily.fontFace.length == 1 && index === fontFamilyIndex) {
+            
+            if (fontFamily?.fontFace?.length == 1 && index === fontFamilyIndex) {
                 return acc;
             }
 
@@ -92,7 +92,7 @@ function ManageFonts () {
     }
 
     const fontFamilyToDelete = newThemeFonts[fontToDelete.fontFamilyIndex];
-    const fontFaceToDelete = newThemeFonts[fontToDelete.fontFamilyIndex]?.fontFace[fontToDelete.fontFaceIndex];
+    const fontFaceToDelete = newThemeFonts[fontToDelete.fontFamilyIndex]?.fontFace?.[fontToDelete.fontFaceIndex];
 
     return (
         <>

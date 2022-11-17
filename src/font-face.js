@@ -2,25 +2,35 @@ import { Button } from '@wordpress/components';
 
 const { __ } = wp.i18n;
 
-function FontFace ( { fontFace, demoText, deleteFontFace } ) {
-
-    // Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
-    const fontWeight = fontFace.fontWeight ? String(fontFace.fontWeight).split(' ')[0] : "normal";
-
+function FontFace ( {
+    fontFamily,
+    fontWeight,
+    fontStyle,
+    demoText,
+    deleteFontFace
+} ) {
+    
     const demoStyles = {
-        fontFamily: fontFace.fontFamily,
-        fontStyle: fontFace.fontStyle,
-        fontWeight: fontWeight,
+        fontFamily,
+        fontStyle,
+        // Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
+        fontWeight: fontWeight ? String(fontWeight).split(' ')[0] : "normal",
     };
 
     return (
         <tr className="font-face">
-            <td>{fontFace.fontStyle}</td>
-            <td>{fontFace.fontWeight}</td>
+            <td>{fontStyle}</td>
+            <td>{fontWeight}</td>
             <td className="demo-cell"><p style={ demoStyles }>{demoText}</p></td>
-            <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove')}</Button></td>
+            { deleteFontFace && <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove')}</Button></td> }
         </tr>
     );
 }
+
+FontFace.defaultProps = {
+    demoText: __("The quick brown fox jumps over the lazy dog.", "create-block-theme"),
+    fontWeight: "normal",
+    fontStyle: "normal",
+};
 
 export default FontFace;
