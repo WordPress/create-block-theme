@@ -2,12 +2,18 @@ import { Button } from '@wordpress/components';
 
 const { __ } = wp.i18n;
 
-function FontFace ( { fontFamily, fontWeight, fontStyle, demoText, deleteFontFace } ) {
-
-    // Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
+function FontFace ( {
+    fontFamily,
+    fontWeight,
+    fontStyle,
+    demoText,
+    deleteFontFace
+} ) {
+    
     const demoStyles = {
         fontFamily,
         fontStyle,
+        // Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
         fontWeight: fontWeight ? String(fontWeight).split(' ')[0] : "normal",
     };
 
@@ -20,5 +26,11 @@ function FontFace ( { fontFamily, fontWeight, fontStyle, demoText, deleteFontFac
         </tr>
     );
 }
+
+FontFace.defaultProps = {
+    demoText: __("The quick brown fox jumps over the lazy dog.", "create-block-theme"),
+    fontWeight: "normal",
+    fontStyle: "normal",
+};
 
 export default FontFace;
