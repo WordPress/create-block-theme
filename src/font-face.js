@@ -22,7 +22,7 @@ function FontFace ( {
             <td>{fontStyle}</td>
             <td>{fontWeight}</td>
             <td className="demo-cell"><p style={ demoStyles }>{demoText}</p></td>
-            { deleteFontFace && <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove')}</Button></td> }
+            { deleteFontFace && <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove', 'create-block-theme')}</Button></td> }
         </tr>
     );
 }
