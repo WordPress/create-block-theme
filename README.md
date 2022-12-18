@@ -14,9 +14,9 @@ This feature can be used in six ways:
 Export the activated theme including the user changes.
 
 ### 2. Create a child theme
-Creates a new child theme with the currently activated theme as a parent.
+Creates a new child theme with the currently active theme as a parent.
 
-### 3. Clone the current theme
+### 3. Clone the active theme
 Creates a new theme by cloning the activated theme. The resulting theme will have all of the assets of the activated theme combined with the user's changes.
 
 ### 4. Overwrite theme files
@@ -26,12 +26,12 @@ Saves user's changes to the theme files and deletes the user's changes.
 Generate a boilerplate "empty" theme inside of current site's themes directory.
 
 ### 6. Create a style variation
-Saves user's changes as a [style variation](https://developer.wordpress.org/themes/advanced-topics/theme-json/#global-styles-variations) of the current theme.
+Saves user's changes as a [style variation](https://developer.wordpress.org/themes/advanced-topics/theme-json/#global-styles-variations) of the currently active theme.
 
 
 ## Embed Google Fonts or local font files
 
-This feature allows you to embed fonts into your current theme. You can embed Google Fonts and local font assets.
+This feature allows you to embed fonts into your active theme. You can embed Google Fonts and local font assets.
 
 When you add a font the plugin will add to your theme:
 - The font files to your theme's file structure under this path `./assets/fonts`.
@@ -47,7 +47,7 @@ Install and activate the [Create Block Theme](https://wordpress.org/plugins/crea
 
 In the WordPress Admin Dashboard, under Appearance there will be three new pages called:
 - Create Block Theme
-- Embed Google font in your current theme
+- Embed Google font in your active theme
 - Embed local font file assets
 
 ### Step 2 – Fonts, styles and templates customizations

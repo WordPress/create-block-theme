@@ -31,12 +31,12 @@ class Manage_Fonts_Admin {
         $manage_fonts_menu_title=_x('Manage theme fonts', 'UI String', 'create-block-theme');
         add_theme_page( $manage_fonts_page_title, $manage_fonts_menu_title, 'edit_theme_options', 'manage-fonts', [ $this, 'manage_fonts_admin_page' ] );
 
-        $google_fonts_page_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
-		$google_fonts_menu_title=_x('Embed Google font in current Theme', 'UI String', 'create-block-theme');
+        $google_fonts_page_title=_x('Embed Google font in the active theme', 'UI String', 'create-block-theme');
+		$google_fonts_menu_title=_x('Embed Google font in the active theme', 'UI String', 'create-block-theme');
         add_submenu_page(null, $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', [ $this, 'google_fonts_admin_page' ] );
 
-		$local_fonts_page_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
-		$local_fonts_menu_title=_x('Embed local font in current Theme', 'UI String', 'create-block-theme');
+		$local_fonts_page_title=_x('Embed local font in the active theme', 'UI String', 'create-block-theme');
+		$local_fonts_menu_title=_x('Embed local font in the active theme', 'UI String', 'create-block-theme');
 		add_submenu_page(null, $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
 	}
 
@@ -137,7 +137,7 @@ class Manage_Fonts_Admin {
         ?>
         <div class="wrap local-fonts-page">
             <h2><?php _ex('Add local fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
-            <h3><?php printf( esc_html__('Add local fonts assets and font face definitions to your current active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
+            <h3><?php printf( esc_html__('Add local fonts assets and font face definitions to your currently active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
             <form enctype="multipart/form-data" action="" method="POST">
                 <table class="form-table">
                     <tbody>
@@ -201,7 +201,7 @@ class Manage_Fonts_Admin {
 		<div class="wrap google-fonts-page">
 			<h2><?php _ex('Add Google fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
 			<form enctype="multipart/form-data" action="" method="POST">
-				<h3><?php printf( esc_html__('Add Google fonts assets and font face definitions to your current active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
+				<h3><?php printf( esc_html__('Add Google fonts assets and font face definitions to your currently active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
 				<label for="google-font-id"><?php printf( esc_html__('Select Font', 'create-block-theme')); ?></label>
 				<select name="google-font" id="google-font-id">
                     <option value=""><?php _e('Select a font...', 'create-block-theme'); ?></option>
