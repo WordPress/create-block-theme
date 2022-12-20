@@ -452,7 +452,7 @@ class Manage_Fonts_Admin {
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p>
-                    <?php printf( esc_html__( '%1$s font added to %2$s theme. ', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?>
+                    <?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?>
                     <a href="themes.php?page=manage-fonts"><?php printf( esc_html__( "Manage Fonts", "create-block-theme" ) ); ?></a>
                 </p>
 			</div>

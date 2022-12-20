@@ -716,14 +716,20 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 							<label>
 								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
-								<?php _e('Export ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
+								<?php _e('Export', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<?php if ( is_child_theme() ): ?>
 								<label>
 									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
-									<?php _e('Create sibling of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
+									<?php
+									printf(
+										/* translators: Theme Name. */
+										__('Create sibling of %s', 'create-block-theme'),
+										wp_get_theme()->get('Name')
+									);
+									?>
 								</label>
 								<br />
 								<?php _e('[Create a new theme cloning the activated child theme.  The parent theme will be the same as the parent of the currently activated theme. The resulting theme will have all of the assets of the activated theme, none of the assets provided by the parent theme, as well as user changes.]', 'create-block-theme'); ?>
@@ -732,33 +738,39 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<?php else: ?>
 								<label>
 									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
-									<?php _e('Create child of ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?>
+									<?php
+									printf(
+										/* translators: Theme Name. */
+										__('Create child of %s', 'create-block-theme'),
+										wp_get_theme()->get('Name')
+									);
+									?>
 								</label>
 								<br />
 								<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?>
 								<br /><br />
 								<label>
 									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
-									<?php _e('Clone ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
+									<?php _e('Clone', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 									<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
 								</label>
 								<br /><br />
 							<?php endif; ?>
 							<label>
 								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
-								<?php _e('Overwrite ', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
+								<?php _e('Overwrite', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
 								<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
 								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );" />
-								<?php _e('Create blank theme ', 'create-block-theme'); ?><br />
+								<?php _e('Create blank theme', 'create-block-theme'); ?><br />
 								<?php _e('[Generate a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
 								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_variation_metadata_form', false );" />
-								<?php _e('Create a style variation ', 'create-block-theme'); ?><br />
+								<?php _e('Create a style variation', 'create-block-theme'); ?><br />
 								<?php printf( esc_html__('[Save user changes as a style variation of %1$s.]', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?>
 							</label>
 							<br /><br />
