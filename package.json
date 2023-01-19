@@ -21,6 +21,10 @@
     "semver": "^7.3.8",
     "simple-git": "^3.14.1"
   },
+  "engines": {
+    "node": ">=16.9.1",
+    "npm": ">=7 <8"
+  },
   "scripts": {
     "build": "wp-scripts build",
     "format": "wp-scripts format",
