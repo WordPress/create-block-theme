@@ -256,7 +256,7 @@ class Manage_Fonts_Admin {
 				$new_font_faces = array();
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					$updated_font_face = $font_face;
-					if ( !isset ( $font_face['shouldBeRemoved'] ) ) {
+					if ( !isset ( $font_face['shouldBeRemoved'] ) && ! isset ( $font_family[ 'shouldBeRemoved' ] ) ) {
 						$new_font_faces[] = $updated_font_face;
 					} else {
 						$this->delete_font_asset( $font_face );
