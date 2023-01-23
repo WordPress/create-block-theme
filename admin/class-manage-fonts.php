@@ -239,10 +239,10 @@ class Manage_Fonts_Admin {
 
         if ( ! is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
             return add_action( 'admin_notices', [ $this, 'admin_notice_font_asset_removal_error' ] );
+        }
 
-            if ( file_exists( $font_asset_path ) ) {
-                return unlink( $font_asset_path );
-            }
+        if ( file_exists( $font_asset_path ) ) {
+            return unlink( $font_asset_path );
         }
         
         return false;
