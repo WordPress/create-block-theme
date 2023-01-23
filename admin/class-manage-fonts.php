@@ -394,7 +394,7 @@ class Manage_Fonts_Admin {
 
     function replace_all_theme_font_families ( $font_families ) {
         // Construct updated theme.json.
-        $theme_json_raw = json_decode( file_get_contents( get_template_directory() . '/theme.json' ), true );
+        $theme_json_raw = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
         // Overwrite the previous fontFamilies with the new ones.
         $theme_json_raw['settings']['typography']['fontFamilies'] = $font_families;
 
@@ -410,7 +410,7 @@ class Manage_Fonts_Admin {
 
     function add_or_update_theme_font_faces ( $font_name, $font_slug, $font_faces ) {
         // Get the current theme.json and fontFamilies defined (if any).
-        $theme_json_raw = json_decode( file_get_contents( get_template_directory() . '/theme.json' ), true );
+        $theme_json_raw = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
         $theme_font_families = $theme_json_raw['settings']['typography']['fontFamilies'];
 
         $existent_family = $theme_font_families ? array_values(
