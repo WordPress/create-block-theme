@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
 import { __experimentalConfirmDialog as ConfirmDialog, Modal, Icon, Button } from '@wordpress/components';
+import { ManageFontsProvider } from "./fonts-context";
 
 const { __ } = wp.i18n;
 
@@ -158,4 +159,8 @@ function ManageFonts () {
     );
 }
 
-export default ManageFonts;
+export default () =>  (
+    <ManageFontsProvider>
+        <ManageFonts />
+    </ManageFontsProvider>
+);
