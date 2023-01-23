@@ -229,6 +229,51 @@ class Manage_Fonts_Admin {
 	<?php
 	}
 
+    function delete_font_asset ( $font_face ) {
+        // if the font asset is a theme asset, delete it
+        $theme_folder = get_stylesheet_directory();
+        $font_path = pathinfo( $font_face['src'][0] );
+        $font_dir = str_replace("file:./", "", $font_path['dirname']);
+
+        $font_asset_path = $theme_folder . DIRECTORY_SEPARATOR . $font_dir . DIRECTORY_SEPARATOR . $font_path['basename'];
+
+        if ( ! is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
+            return add_action( 'admin_notices', [ $this, 'admin_notice_font_asset_removal_error' ] );
+
+            if ( file_exists( $font_asset_path ) ) {
+                return unlink( $font_asset_path );
+            }
+        }
+        
+        return false;
+	}
+
+    protected function prepare_font_families_for_database( $font_families ) {
+		$prepared_font_families = array();
+
+		foreach ( $font_families as $font_family ) {
+			if ( isset ( $font_family['fontFace'] ) ) {
+				$new_font_faces = array();
+				foreach ( $font_family['fontFace'] as $font_face ) {
+					$updated_font_face = $font_face;
+					if ( !isset ( $font_face['shouldBeRemoved'] ) ) {
+						$new_font_faces[] = $updated_font_face;
+					} else {
+						$this->delete_font_asset( $font_face );
+					}
+				}
+
+				$font_family['fontFace'] = $new_font_faces;
+			}
+			if ( ! isset ( $font_family[ 'shouldBeRemoved' ] ) ) {
+				$prepared_font_families[] = $font_family;
+			}
+			
+		}
+
+		return $prepared_font_families;
+	}
+
     function save_manage_fonts_changes () {
         if (
             current_user_can( 'edit_themes' ) &&
@@ -242,8 +287,9 @@ class Manage_Fonts_Admin {
 
             // parse json from form 
             $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
+            $new_font_families = $this->prepare_font_families_for_database( $new_theme_fonts_json );
 
-            $this->replace_all_theme_font_families( $new_theme_fonts_json );
+            $this->replace_all_theme_font_families( $new_font_families );
 
             add_action( 'admin_notices', [ $this, 'admin_notice_delete_font_success' ] );
         }
@@ -477,6 +523,15 @@ class Manage_Fonts_Admin {
 		<?php
 	}
 
+    function admin_notice_font_asset_removal_error () {
+		$theme_name = wp_get_theme()->get( 'Name' );
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error removing font asset. WordPress lack permissions to remove these font assets.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+			</div>
+		<?php
+	}
+
     function admin_notice_manage_fonts_permission_error () {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
@@ -490,7 +545,7 @@ class Manage_Fonts_Admin {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Font removed from your theme (%1$s).', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+				<p><?php printf( esc_html__( 'Font definition removed from your theme (%1$s) theme.json file.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}

@@ -11,7 +11,11 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
         setIsOpen(!isOpen);
     }
 
-    const hasFontFaces = fontFamily.fontFace && fontFamily.fontFace.length;
+    const hasFontFaces = !!fontFamily.fontFace && !!fontFamily.fontFace.length;
+
+    if ( fontFamily.shouldBeRemoved ) {
+        return null;
+    }
 
     return (
         <table className="wp-list-table widefat table-view-list">
