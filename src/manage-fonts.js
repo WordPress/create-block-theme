@@ -65,29 +65,45 @@ function ManageFonts () {
     }
 
     function deleteFontFamily (fontFamilyIndex) {
-        const updatedFonts = newThemeFonts.filter((_, index) => index !== fontFamilyIndex);
+        const updatedFonts = newThemeFonts.map((family, index) => {
+            if ( index === fontFamilyIndex ) {
+                return {
+                    ...family,
+                    shouldBeRemoved: true
+                }
+            }
+            return family;
+        });
+        console.log(updatedFonts);
         setNewThemeFonts(updatedFonts);
     }
 
     function deleteFontFace () {
         const { fontFamilyIndex, fontFaceIndex } = fontToDelete;
         const updatedFonts = newThemeFonts.reduce((acc, fontFamily, index) => {
-            if (index === fontFamilyIndex && fontFamily.fontFace.length > 1) {
-                const {fontFace, ...updatedFontFamily} = fontFamily;
-                updatedFontFamily.fontFace = fontFamily.fontFace.filter((_, index) => index !== fontFaceIndex);
+                const {fontFace=[], ...updatedFontFamily} = fontFamily;
+
+                if ( fontFace.filter( face => !face.shouldBeRemoved ).length === 1 ) {
+                    updatedFontFamily.shouldBeRemoved = true;
+                }
+
+                updatedFontFamily.fontFace = fontFace.map(
+                    (face, i) => {
+                        if ( fontFamilyIndex == index && fontFaceIndex === i ) {
+                            return {
+                                ...face,
+                                shouldBeRemoved: true
+                            }
+                        }
+                        return face;
+                    }
+                );
                 return [
                     ...acc,
                     updatedFontFamily
                 ];
-            }
-            
-            if (fontFamily?.fontFace?.length == 1 && index === fontFamilyIndex) {
-                return acc;
-            }
 
-            return [...acc, fontFamily];
         }, []);
-
         setNewThemeFonts(updatedFonts);
     }
 

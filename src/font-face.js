@@ -7,7 +7,8 @@ function FontFace ( {
     fontWeight,
     fontStyle,
     demoText,
-    deleteFontFace
+    deleteFontFace,
+    shouldBeRemoved,
 } ) {
     
     const demoStyles = {
@@ -16,6 +17,10 @@ function FontFace ( {
         // Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
         fontWeight: fontWeight ? String(fontWeight).split(' ')[0] : "normal",
     };
+
+    if ( shouldBeRemoved ) {
+        return null;
+    }
 
     return (
         <tr className="font-face">
