@@ -59,8 +59,7 @@ class Manage_Fonts_Admin {
         return true;
 	}
 
-
-    function manage_fonts_admin_page () {
+    function load_fonts_react_app () {
         // Load the required WordPress packages.
         // Automatically load imported dependencies and assets version.
         $asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
@@ -73,7 +72,10 @@ class Manage_Fonts_Admin {
         // Load our app.js.
         array_push( $asset_file['dependencies'], 'wp-i18n' );
         wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
+    }
 
+    function manage_fonts_admin_page () {
+        $this->load_fonts_react_app();
         wp_enqueue_style( 'manage-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/manage-fonts.css', array(), '1.0', false );
 
         $theme_name = wp_get_theme()->get( 'Name' );
@@ -108,7 +110,7 @@ class Manage_Fonts_Admin {
         <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
         
         <form method="POST"  id="manage-fonts-form">
-            <div id="manage-fonts"></div>
+            <div id="fonts-app"></div>
             <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
         </form>
 
@@ -197,7 +199,9 @@ class Manage_Fonts_Admin {
     function google_fonts_admin_page() {
 		wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( ), '1.0', false );
 		wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
+        $this->load_fonts_react_app();
 ?>
+        <div id="fonts-app"></div>
 		<div class="wrap google-fonts-page">
 			<h2><?php _ex('Add Google fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
 			<form enctype="multipart/form-data" action="" method="POST">

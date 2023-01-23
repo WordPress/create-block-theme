@@ -8,6 +8,8 @@ function App() {
     switch (page) {
         case "manage-fonts":
             return <ManageFonts />;
+        case "add-google-font-to-theme-json":
+            return <p>Google Fonts!!!!!!!!!!!!!!!</p>;
         default:
             return <p>Default</p>;
     }
@@ -18,7 +20,7 @@ window.addEventListener(
     function () {
         render(
             <App />,
-            document.querySelector( '#manage-fonts' )
+            document.querySelector( '#fonts-app' )
         );
     },
     false
