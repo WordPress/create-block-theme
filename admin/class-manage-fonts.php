@@ -527,7 +527,7 @@ class Manage_Fonts_Admin {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error removing font asset. WordPress lack permissions to remove these font assets.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+				<p><?php printf( esc_html__( 'Error removing font asset. WordPress lacks permissions to remove these font assets.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
