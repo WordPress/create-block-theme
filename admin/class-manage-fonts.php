@@ -393,34 +393,12 @@ class Manage_Fonts_Admin {
     }
 
     function replace_all_theme_font_families ( $font_families ) {
-        // Get the current Theme.json data
-        $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
-        $theme_settings = $theme_data->get_settings();
-        $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+        // Construct updated theme.json.
+        $theme_json_raw = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
+        // Overwrite the previous fontFamilies with the new ones.
+        $theme_json_raw['settings']['typography']['fontFamilies'] = $font_families;
 
-        $new_theme_json_content = array(
-            'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
-            'settings' => array(
-                'typography' => array (
-                    'fontFamilies' => $font_families
-                )
-            )
-        );
-
-
-        // Creates the new theme.json file
-        if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-            $new_json = new WP_Theme_JSON_Gutenberg( $new_theme_json_content );
-            $result = new WP_Theme_JSON_Gutenberg();
-        } else {
-            $new_json = new WP_Theme_JSON( $new_theme_json_content );
-            $result = new WP_Theme_JSON();
-        }
-        $result->merge( $theme_data );
-        $result->merge( $new_json );
-
-        $data = $result->get_data();
-        $theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $theme_json = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
         $theme_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
 
         // Write the new theme.json to the theme folder
@@ -431,19 +409,18 @@ class Manage_Fonts_Admin {
     }
 
     function add_or_update_theme_font_faces ( $font_name, $font_slug, $font_faces ) {
-        // Get the current Theme.json data
-        $theme_data = WP_Theme_JSON_Resolver::get_theme_data();
-        $theme_settings = $theme_data->get_settings();
-        $theme_font_families = $theme_settings['typography']['fontFamilies']['theme'];
+        // Get the current theme.json and fontFamilies defined (if any).
+        $theme_json_raw = json_decode( file_get_contents( get_stylesheet_directory() . '/theme.json' ), true );
+        $theme_font_families = $theme_json_raw['settings']['typography']['fontFamilies'];
 
-        $existent_family =  array_values(
+        $existent_family = $theme_font_families ? array_values(
             array_filter (
-                $theme_font_families ,
-                function ($font_family) use ($font_slug) { return $font_family['slug']  === $font_slug; }
+                $theme_font_families,
+                function ($font_family) use ($font_slug) { return $font_family['slug'] === $font_slug; }
             )
-        );
+        ) : null;
 
-        // Add the new font faces to the theme.json
+        // Add the new font faces.
         if ( empty( $existent_family ) ) { // If the new font family doesn't exist in the theme.json font families, add it to the exising font families
             $theme_font_families[] = array(
                 'fontFamily' => $font_name,
@@ -454,35 +431,17 @@ class Manage_Fonts_Admin {
             $theme_font_families = array_values(
                 array_filter (
                     $theme_font_families,
-                    function ($font_family)  use ($font_slug) { return $font_family['slug']  !== $font_slug; }
+                    function ($font_family)  use ($font_slug) { return $font_family['slug'] !== $font_slug; }
                 )
             );
             $existent_family[0]['fontFace'] = array_merge($existent_family[0]['fontFace'], $font_faces);
             $theme_font_families = array_merge($theme_font_families, $existent_family);
         }
 
-        $new_theme_json_content = array(
-            'version'  => class_exists( 'WP_Theme_JSON_Gutenberg' ) ? WP_Theme_JSON_Gutenberg::LATEST_SCHEMA : WP_Theme_JSON::LATEST_SCHEMA,
-            'settings' => array(
-                'typography' => array (
-                    'fontFamilies' => $theme_font_families
-                )
-            )
-        );
+        // Overwrite the previous fontFamilies with the new ones.
+        $theme_json_raw['settings']['typography']['fontFamilies'] = $theme_font_families;
 
-        // Creates the new theme.json file
-        if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-            $new_json = new WP_Theme_JSON_Gutenberg( $new_theme_json_content );
-            $result = new WP_Theme_JSON_Gutenberg();
-        } else {
-            $new_json = new WP_Theme_JSON( $new_theme_json_content );
-            $result = new WP_Theme_JSON();
-        }
-        $result->merge( $theme_data );
-        $result->merge( $new_json );
-
-        $data = $result->get_data();
-        $theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        $theme_json = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
         $theme_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
 
         // Write the new theme.json to the theme folder
