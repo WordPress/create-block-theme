@@ -189,8 +189,9 @@ class Create_Block_Theme_Admin {
 			'style.css',
 			$css_contents
 		);
+		die(var_dump($screenshot));
 
-		if ( is_uploaded_file( $screenshot['tmp_name'] ) ){
+		if ( is_uploaded_file( $screenshot['tmp_name'] && $screenshot['type'] === 'image/png' ) ){
 			// Add user uploaded screenshot.png.
 			$zip->addFile(
 				$screenshot['tmp_name'],
@@ -827,7 +828,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 									<?php _e('Screenshot:', 'create-block-theme'); ?><br />
 									<small><?php _e('Upload a new theme screenshot (2mb max | .png,.jpg,.jpeg allowed | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
 									<input type="hidden" name="MAX_FILE_SIZE" value="20000000" />
-									<input type="file" accept=".png, .jpg, .jpeg"  name="screenshot" id="screenshot" class="upload"/>
+									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
 								</label><br/>
 								<p><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></p><br />
 							</div>
