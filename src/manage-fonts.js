@@ -74,7 +74,6 @@ function ManageFonts () {
             }
             return family;
         });
-        console.log(updatedFonts);
         setNewThemeFonts(updatedFonts);
     }
 
@@ -83,7 +82,7 @@ function ManageFonts () {
         const updatedFonts = newThemeFonts.reduce((acc, fontFamily, index) => {
                 const {fontFace=[], ...updatedFontFamily} = fontFamily;
 
-                if ( fontFace.filter( face => !face.shouldBeRemoved ).length === 1 ) {
+                if ( fontFamilyIndex === index && fontFace.filter( face => !face.shouldBeRemoved ).length === 1 ) {
                     updatedFontFamily.shouldBeRemoved = true;
                 }
 
