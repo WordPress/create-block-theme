@@ -100,7 +100,7 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Create a sibling theme of the activated theme
 	 */
-	function create_sibling_theme( $theme ) {
+	function create_sibling_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -135,9 +135,14 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
-		// Add screenshot.png.
+		// Add screenshot.
+		$screenshot_path = __DIR__ . '/../screenshot.png';
+		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
+			// Replace with user uploaded screenshot.png.
+			$screenshot_path = $screenshot['tmp_name'];
+		} 
 		$zip->addFile(
-			__DIR__ . '/../screenshot.png',
+			$screenshot_path,
 			'screenshot.png'
 		);
 
@@ -190,19 +195,16 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
+		// Add screenshot.
+		$screenshot_path = __DIR__ . '/../screenshot.png';
 		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
-			// Add user uploaded screenshot.png.
-			$zip->addFile(
-				$screenshot['tmp_name'],
-				'screenshot.png'
-			);
-		} else {
-			// Add existing screenshot.png.
-			$zip->addFile(
-				__DIR__ . '/../screenshot.png',
-				'screenshot.png'
-			);
-		}
+			// Replace with user uploaded screenshot.png.
+			$screenshot_path = $screenshot['tmp_name'];
+		} 
+		$zip->addFile(
+			$screenshot_path,
+			'screenshot.png'
+		);
 
 		$zip->close();
 
@@ -245,19 +247,17 @@ class Create_Block_Theme_Admin {
 			$this->build_child_style_css( $theme )
 		);
 
+		
+		// Add screenshot.
+		$screenshot_path = __DIR__ . '/../screenshot.png';
 		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
-			// Add user uploaded screenshot.png.
-			$zip->addFile(
-				$screenshot['tmp_name'],
-				'screenshot.png'
-			);
-		} else {
-			// Add existing screenshot.png.
-			$zip->addFile(
-				__DIR__ . '/../screenshot.png',
-				'screenshot.png'
-			);
-		}
+			// Replace with user uploaded screenshot.png.
+			$screenshot_path = $screenshot['tmp_name'];
+		} 
+		$zip->addFile(
+			$screenshot_path,
+			'screenshot.png'
+		);
 
 		$zip->close();
 
@@ -929,7 +929,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 					if ( $_POST['theme']['name'] === '' ) {
 						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
-					$this->create_sibling_theme( $_POST['theme'] );
+					$this->create_sibling_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else {
 					$this->export_child_theme( $_POST['theme'] );
