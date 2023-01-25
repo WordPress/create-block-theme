@@ -1,5 +1,6 @@
 import { render } from '@wordpress/element';
 import ManageFonts from './manage-fonts';
+import GoogleFonts from './google-fonts';
  
 function App() {
     const params = new URLSearchParams(document.location.search);
@@ -9,7 +10,7 @@ function App() {
         case "manage-fonts":
             return <ManageFonts />;
         case "add-google-font-to-theme-json":
-            return <p>Google Fonts!!!!!!!!!!!!!!!</p>;
+            return <GoogleFonts />;
         default:
             return <p>Default</p>;
     }

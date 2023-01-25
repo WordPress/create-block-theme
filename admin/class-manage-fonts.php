@@ -197,39 +197,12 @@ class Manage_Fonts_Admin {
     }
 
     function google_fonts_admin_page() {
-		wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( ), '1.0', false );
-		wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
+		// wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( ), '1.0', false );
+		// wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
         $this->load_fonts_react_app();
 ?>
         <div id="fonts-app"></div>
-		<div class="wrap google-fonts-page">
-			<h2><?php _ex('Add Google fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
-			<form enctype="multipart/form-data" action="" method="POST">
-				<h3><?php printf( esc_html__('Add Google fonts assets and font face definitions to your currently active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
-				<label for="google-font-id"><?php printf( esc_html__('Select Font', 'create-block-theme')); ?></label>
-				<select name="google-font" id="google-font-id">
-                    <option value=""><?php _e('Select a font...', 'create-block-theme'); ?></option>
-				</select>
-				<br /><br />
-				<p class="hint"><?php _e('Select the font variants you want to include:', 'create-block-theme'); ?></p>
-				<table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
-					<thead>
-						<tr>
-							<td class=""><input type="checkbox" id="select-all-variants" /></td>
-							<td class=""><?php printf( esc_html__('Variant', 'create-block-theme')); ?></td>
-							<td class=""><?php printf( esc_html__('Preview', 'create-block-theme')); ?></td>
-						</tr>
-					</thead>
-					<tbody id="font-options">
-					</tbody>
-				</table>
-				<br /><br />
-				<input type="hidden" name="font-name" id="font-name" value="" />
-				<input type="hidden" name="google-font-variants" id="google-font-variants" value="" />
-				<input type="submit" value="<?php _e('Add google fonts to your theme', 'create-block-theme'); ?>" class="button button-primary" id="google-fonts-submit" disabled=true />
-                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-			</form>
-		</div>
+
 	<?php
 	}
 
