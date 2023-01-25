@@ -189,7 +189,6 @@ class Create_Block_Theme_Admin {
 			'style.css',
 			$css_contents
 		);
-		die(var_dump($screenshot));
 
 		if ( is_uploaded_file( $screenshot['tmp_name'] && $screenshot['type'] === 'image/png' ) ){
 			// Add user uploaded screenshot.png.
