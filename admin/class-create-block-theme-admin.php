@@ -190,7 +190,7 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
-		if ( is_uploaded_file( $screenshot['tmp_name'] && $screenshot['type'] === 'image/png' ) ){
+		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
 			// Add user uploaded screenshot.png.
 			$zip->addFile(
 				$screenshot['tmp_name'],
