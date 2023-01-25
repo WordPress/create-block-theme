@@ -216,7 +216,7 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Create a child theme of the activated theme
 	 */
-	function create_child_theme( $theme ) {
+	function create_child_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -245,11 +245,19 @@ class Create_Block_Theme_Admin {
 			$this->build_child_style_css( $theme )
 		);
 
-		// Add screenshot.png.
-		$zip->addFile(
-			__DIR__ . '/../screenshot.png',
-			'screenshot.png'
-		);
+		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
+			// Add user uploaded screenshot.png.
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		} else {
+			// Add existing screenshot.png.
+			$zip->addFile(
+				__DIR__ . '/../screenshot.png',
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -285,7 +293,7 @@ class Create_Block_Theme_Admin {
 		die();
 	}
 
-	function create_blank_theme( $theme ) {
+	function create_blank_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -308,6 +316,10 @@ class Create_Block_Theme_Admin {
 
 			// Add new metadata.
 			$css_contents = $this->build_child_style_css( $theme );
+			if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
+				// Add user uploaded screenshot.png.
+				rename( $screenshot['tmp_name'], $blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png');
+			}
 
 			// Add style.css.
 			file_put_contents( 
@@ -907,7 +919,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				if ( $_POST['theme']['name'] === '' ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 				}
-				$this->create_blank_theme( $_POST['theme'] );
+				$this->create_blank_theme( $_POST['theme'], $_FILES['screenshot'] );
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_blank_success' ] );
 			}
@@ -928,7 +940,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 					if ( $_POST['theme']['name'] === '' ) {
 						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
-					$this->create_child_theme( $_POST['theme'] );
+					$this->create_child_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else if( $_POST['theme']['type'] === 'clone' ) {
 					if ( $_POST['theme']['name'] === '' ) {
