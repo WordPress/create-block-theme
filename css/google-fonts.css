@@ -1,0 +1,24 @@
+#google-fonts-table {
+    display: none;
+}
+
+#google-fonts-table.widefat thead td input {
+    margin: 0;
+}
+
+#google-fonts-table tbody tr td:nth-of-type(3) {
+    width: 100%;
+}
+
+#google-fonts-table tbody td {
+    vertical-align: middle;
+}
+
+#google-fonts-table tbody p {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.google-fonts-page .hint {
+    display: none;
+}

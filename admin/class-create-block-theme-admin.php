@@ -556,6 +556,69 @@ class Create_Block_Theme_Admin {
 
 	}
 
+	function is_absolute_url( $url ) {
+		return isset( parse_url( $url )[ 'host' ] );
+	}
+
+	// find all the media files used in the templates and add them to the zip
+	function make_template_images_local ( $template_content ) {
+		$media = [];
+		$has_updated_content = false;
+		$new_content         = '';
+		$template_blocks     = parse_blocks( $template_content );
+		
+		$blocks = _flatten_blocks( $template_blocks );
+		$new_blocks = [];
+		foreach ( $blocks as $block ) {
+			if ( 'core/image' === $block[ 'blockName' ] ) {
+				$doc = new DOMDocument();
+				@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+				$tags = $doc->getElementsByTagName( 'img' );
+				$block_has_external_images = false;
+				foreach ( $tags as $tag ) {
+					$image_url = $tag->getAttribute( 'src' );
+					if ( $this->is_absolute_url( $image_url ) ) {
+						$block_has_external_images = true;
+						$media[] = $tag->getAttribute( 'src' );
+						$tag->setAttribute(
+							'src',
+							'<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/'. basename( $tag->getAttribute( 'src' ) )
+						);
+					}
+				}
+				if ( $block_has_external_images ) {
+					$block['innerHTML'] = $doc->saveHTML();
+					$block['innerContent'] = array ( $doc->saveHTML() );
+					$has_updated_content = true;
+				}
+			}
+			$new_blocks[] = $block;
+		}
+		
+		if ( ! $has_updated_content ) {
+			return array (
+				'content' => $template_content,
+				'media' => $media
+			);
+		}
+		
+		foreach ( $new_blocks as $block ) {
+			$new_content .= serialize_block( $block );
+		}
+		
+		return array (
+			'content' => $this->clean_serialized_markup ( $new_content ),
+			'media' => $media
+		);
+	}
+
+	function clean_serialized_markup ( $markup ) {
+		$markup = str_replace( '%20', ' ', $markup );
+		$markup = str_replace( '&lt;', '<', $markup );
+		$markup = str_replace( '&gt;', '>', $markup );
+		return $markup;
+	}
+
 	/**
 	 * Add block templates and parts to the zip.
 	 *
@@ -567,7 +630,6 @@ class Create_Block_Theme_Admin {
 	 * 						all = all templates no matter what
 	 */
 	function add_templates_to_zip( $zip, $export_type, $new_slug ) {
-
 		$theme_templates = $this->get_theme_templates( $export_type, $new_slug );
 
 		if ( $theme_templates->templates ) {
@@ -579,17 +641,31 @@ class Create_Block_Theme_Admin {
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
+			$template_data = $this->make_template_images_local( $template->content );
+
 			$zip->addFromString(
 				'templates/' . $template->slug . '.html',
-				$template->content
+				$template_data['content']
 			);
+
+			foreach ( $template_data['media'] as $media ) {
+				$download_file = file_get_contents( $media );
+				$zip->addFromString( 'assets/images/' . basename( $media ) , $download_file );
+			}
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
+			$template_data = $this->make_template_images_local( $template_part->content );
+
 			$zip->addFromString(
 				'parts/' . $template_part->slug . '.html',
-				$template_part->content
+				$template_data['content']
 			);
+
+			foreach ( $template_data['media'] as $media ) {
+				$download_file = file_get_contents( $media );
+				$zip->addFromString( 'assets/images/' . basename( $media ) , $download_file );
+			}
 		}
 
 		return $zip;
@@ -605,11 +681,23 @@ class Create_Block_Theme_Admin {
 			wp_mkdir_p( get_stylesheet_directory() . '/' . $template_folders['wp_template'] );
 		}
 
+		if ( ! is_dir( get_stylesheet_directory() . '/assets/images' ) ) {
+			wp_mkdir_p( get_stylesheet_directory() . '/assets/images' );
+		}
+
 		foreach ( $theme_templates->templates as $template ) {
+			$template_data = $this->make_template_images_local( $template->content );
 			file_put_contents(
 				get_stylesheet_directory() . '/' . $template_folders['wp_template'] . '/' . $template->slug . '.html',
-				$template->content
+				$template_data[ 'content' ]
 			);
+			foreach ( $template_data[ 'media' ] as $media ) {
+				$download_file = file_get_contents( $media );
+				file_put_contents(
+					get_stylesheet_directory() . DIRECTORY_SEPARATOR .'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . basename( $media ),
+					$download_file
+				);
+			}
 		}
 
 		// If there is no parts folder, create it.
@@ -618,10 +706,18 @@ class Create_Block_Theme_Admin {
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
+			$template_data = $this->make_template_images_local( $template_part->content );
 			file_put_contents(
 				get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] . '/' . $template_part->slug . '.html',
-				$template_part->content
+				$template_data[ 'content' ]
 			);
+			foreach ( $template_data[ 'media' ] as $media ) {
+				$download_file = file_get_contents( $media );
+				file_put_contents(
+					get_stylesheet_directory() . DIRECTORY_SEPARATOR .'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . basename( $media ),
+					$download_file
+				);
+			}
 		}
 	}
 
