@@ -135,16 +135,13 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
-		// Add screenshot.
-		$screenshot_path = __DIR__ . '/../screenshot.png';
-		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
-			// Replace with user uploaded screenshot.png.
-			$screenshot_path = $screenshot['tmp_name'];
-		} 
-		$zip->addFile(
-			$screenshot_path,
-			'screenshot.png'
-		);
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ){
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -195,16 +192,13 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
-		// Add screenshot.
-		$screenshot_path = __DIR__ . '/../screenshot.png';
-		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
-			// Replace with user uploaded screenshot.png.
-			$screenshot_path = $screenshot['tmp_name'];
-		} 
-		$zip->addFile(
-			$screenshot_path,
-			'screenshot.png'
-		);
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ){
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -246,18 +240,14 @@ class Create_Block_Theme_Admin {
 			'style.css',
 			$this->build_child_style_css( $theme )
 		);
-
 		
-		// Add screenshot.
-		$screenshot_path = __DIR__ . '/../screenshot.png';
-		if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
-			// Replace with user uploaded screenshot.png.
-			$screenshot_path = $screenshot['tmp_name'];
-		} 
-		$zip->addFile(
-			$screenshot_path,
-			'screenshot.png'
-		);
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ){
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -316,9 +306,13 @@ class Create_Block_Theme_Admin {
 
 			// Add new metadata.
 			$css_contents = $this->build_child_style_css( $theme );
-			if ( is_uploaded_file( $screenshot['tmp_name'] ) && $screenshot['type'] === 'image/png' ) {
-				// Add user uploaded screenshot.png.
-				rename( $screenshot['tmp_name'], $blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png');
+
+			// Add screenshot.
+			if ( $this->is_valid_screenshot( $screenshot ) ){
+				$zip->addFile(
+					$screenshot['tmp_name'],
+					'screenshot.png'
+				);
 			}
 
 			// Add style.css.
@@ -837,8 +831,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								</label><br /><br />
 								<label for="screenshot">
 									<?php _e('Screenshot:', 'create-block-theme'); ?><br />
-									<small><?php _e('Upload a new theme screenshot (2mb max | .png,.jpg,.jpeg allowed | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
-									<input type="hidden" name="MAX_FILE_SIZE" value="20000000" />
+									<small><?php _e('Upload a new theme screenshot (2mb max | .png only | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
 									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
 								</label><br/>
 								<p><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></p><br />
@@ -1027,4 +1020,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		<?php
 	}
 
+    const ALLOWED_SCREENSHOT_TYPES = array(
+        'png'   => 'image/png'
+    );
+
+    function is_valid_screenshot( $file ) {
+		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
+		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES ) && $file['size'] < 2097152 ) {
+			return 1;
+		}
+        return 0;
+    }
 }
