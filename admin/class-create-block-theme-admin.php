@@ -716,7 +716,14 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 							<label>
 								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
-								<?php _e('Export', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
+								<?php
+									printf(
+										/* translators: Theme Name. */
+										__('Export %s', 'create-block-theme'),
+										wp_get_theme()->get('Name')
+									);
+								?>
+								<br />
 								<?php _e('[Export the activated theme with user changes]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
@@ -751,14 +758,28 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<br /><br />
 								<label>
 									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
-									<?php _e('Clone', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
+									<?php
+										printf(
+											/* translators: Theme Name. */
+											__('Clone %s', 'create-block-theme'),
+											wp_get_theme()->get('Name')
+										);
+									?>
+									<br />
 									<?php _e('[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme'); ?>
 								</label>
 								<br /><br />
 							<?php endif; ?>
 							<label>
 								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
-								<?php _e('Overwrite', 'create-block-theme'); echo wp_get_theme()->get('Name'); ?><br />
+								<?php
+									printf(
+										/* translators: Theme Name. */
+										__('Overwrite %s', 'create-block-theme'),
+										wp_get_theme()->get('Name')
+									);
+								?>
+								<br />
 								<?php _e('[Save USER changes as THEME changes and delete the USER changes.  Your changes will be saved in the theme on the folder.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
