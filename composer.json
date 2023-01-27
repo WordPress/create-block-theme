@@ -1,0 +1,29 @@
+{
+	"name": "wordpress/create-block-theme",
+	"type": "package",
+	"description": "Create a block-based theme",
+	"keywords": [
+		"WordPress",
+		"block"
+	],
+	"homepage": "https://github.com/WordPress/create-block-theme",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "Contributors",
+			"homepage": "https://github.com/WordPress/create-block-theme/contributors.md"
+		}
+	],
+	"require": {
+		"php": ">=5.6"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+		"wptrt/wpthemereview": "^0.2.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}
