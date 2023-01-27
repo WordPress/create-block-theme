@@ -1,12 +1,35 @@
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+
+import FontVariant from './font-variant';
 import googleFontsData from "../../assets/google-fonts/fallback-fonts-list.json";
 
 
 function GoogleFonts () {
     const [ selectedFont, setSelectedFont ] = useState( null );
+    const [ selectedVariants, setSelectedVariants ] = useState( [] );
+
+    const handleToggleAllVariants = () => {
+        if ( !selectedVariants.length ) {
+            setSelectedVariants( selectedFont.variants );
+        } else {
+            setSelectedVariants( [] );
+        }
+    }
+
+    const handleToggleVariant = ( variant ) => {
+        if ( selectedVariants.includes( variant ) ) {
+            setSelectedVariants( selectedVariants.filter( ( v ) => v !== variant ) );
+        } else {
+            setSelectedVariants( [ ...selectedVariants, variant ] );
+        }
+    }
+
+    useEffect( () => {
+        setSelectedVariants( [] );
+    }, [ selectedFont ] );
 
     const theme = useSelect( ( select ) => {
         return select( coreDataStore ).getCurrentTheme();
@@ -14,8 +37,9 @@ function GoogleFonts () {
 
     const handleSelectChange = ( event ) => {
         setSelectedFont( googleFontsData.items[ event.target.value ] ) ;
-        console.log(googleFontsData.items[ event.target.value ]);
     }
+
+    console.log( selectedVariants );
 
     return (
         <div className="wrap google-fonts-page">
@@ -34,29 +58,42 @@ function GoogleFonts () {
                 </select>
 
                 <br /><br />
-                <p class="hint">{ __('Select the font variants you want to include:', 'create-block-theme') }</p>
-                <table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
-                    <thead>
-                        <tr>
-                            <td class=""><input type="checkbox" id="select-all-variants" /></td>
-                            <td class="">{ __('Variant', 'create-block-theme') }</td>
-                            <td class="">{ __('Preview', 'create-block-theme') }</td>
-                        </tr>
-                    </thead>
-                    <tbody id="font-options">
-                        {selectedFont && selectedFont.variants.map( ( variant, i ) => (
-                            <tr key={`variant-${i}`}>
-                                <td class=""><input type="checkbox" name="google-font-variant" value={ variant } /></td>
-                                <td class="">{ variant }</td>
-                                <td class=""><span class="font-preview" style={ { fontFamily: selectedFont.family } }>{ selectedFont.family }</span></td>
+                <p className="hint">{ __('Select the font variants you want to include:', 'create-block-theme') }</p>
+
+                { selectedFont && (
+                    <table className="wp-list-table widefat striped table-view-list" id="google-fonts-table">
+                        <thead>
+                            <tr>
+                                <td className="">
+                                    <input
+                                        type="checkbox"
+                                        onClick={ handleToggleAllVariants }
+                                        checked={ selectedVariants.length === selectedFont?.variants.length }
+                                    />
+                                </td>
+                                <td className="">{ __('Weight', 'create-block-theme') }</td>
+                                <td className="">{ __('Style', 'create-block-theme') }</td>
+                                <td className="">{ __('Preview', 'create-block-theme') }</td>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="font-options">
+                            {selectedFont.variants.map( ( variant, i ) => (
+                                <FontVariant
+                                    font={ selectedFont }
+                                    variant={ variant }
+                                    key={`font-variant-${i}`}
+                                    isSelected={ selectedVariants.includes( variant ) }
+                                    handleToggle={ () => handleToggleVariant( variant ) }
+                                />
+                            ))}
+                        </tbody>
+                    </table>
+                ) }
+
                 <br /><br />
                 <input type="hidden" name="font-name" id="font-name" value="" />
                 <input type="hidden" name="google-font-variants" id="google-font-variants" value="" />
-                <input type="submit" value={ __('Add google fonts to your theme', 'create-block-theme') } class="button button-primary" id="google-fonts-submit" disabled={true} />
+                <input type="submit" value={ __('Add google fonts to your theme', 'create-block-theme') } className="button button-primary" id="google-fonts-submit" disabled={true} />
                 <input type="hidden" name="nonce"/>
             </form>
 		</div>
