@@ -36,7 +36,7 @@
     "lint:js": "wp-scripts lint-js",
     "lint:js:fix": "npm run lint:js -- --fix",
     "lint:php": "./vendor/bin/phpcs",
-    "lint:php:fix": "./bin/phpcbf.sh",
+    "lint:php:fix": "./vendor/bin/phpcbf",
     "packages-update": "wp-scripts packages-update",
     "start": "wp-scripts start",
     "update-version": "node update-version-and-changelog.js"
