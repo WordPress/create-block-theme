@@ -100,7 +100,7 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Create a sibling theme of the activated theme
 	 */
-	function create_sibling_theme( $theme ) {
+	function create_sibling_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -135,11 +135,13 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
-		// Add screenshot.png.
-		$zip->addFile(
-			__DIR__ . '/../screenshot.png',
-			'screenshot.png'
-		);
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ){
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -154,7 +156,7 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Clone the activated theme to create a new theme
 	 */
-	function clone_theme( $theme ) {
+	function clone_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -190,11 +192,13 @@ class Create_Block_Theme_Admin {
 			$css_contents
 		);
 
-		// Add screenshot.png.
-		$zip->addFile(
-			__DIR__ . '/../screenshot.png',
-			'screenshot.png'
-		);
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ){
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -208,7 +212,7 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Create a child theme of the activated theme
 	 */
-	function create_child_theme( $theme ) {
+	function create_child_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -236,12 +240,14 @@ class Create_Block_Theme_Admin {
 			'style.css',
 			$this->build_child_style_css( $theme )
 		);
-
-		// Add screenshot.png.
-		$zip->addFile(
-			__DIR__ . '/../screenshot.png',
-			'screenshot.png'
-		);
+		
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ){
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -277,7 +283,7 @@ class Create_Block_Theme_Admin {
 		die();
 	}
 
-	function create_blank_theme( $theme ) {
+	function create_blank_theme( $theme, $screenshot ) {
 		// Sanitize inputs.
 		$theme['name'] = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -300,6 +306,14 @@ class Create_Block_Theme_Admin {
 
 			// Add new metadata.
 			$css_contents = $this->build_child_style_css( $theme );
+
+			// Add screenshot.
+			if ( $this->is_valid_screenshot( $screenshot ) ){
+				$zip->addFile(
+					$screenshot['tmp_name'],
+					'screenshot.png'
+				);
+			}
 
 			// Add style.css.
 			file_put_contents( 
@@ -364,7 +378,7 @@ class Create_Block_Theme_Admin {
 			$variation_slug = $variation_slug . '_' . $file_counter;
 		}
 
-		$_GET['theme']['variation_slug'] = $variation_slug;
+		$_POST['theme']['variation_slug'] = $variation_slug;
 		
 		file_put_contents(
 			$variation_path . $variation_slug . '.json',
@@ -708,7 +722,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		?>
 		<div class="wrap">
 			<h2><?php _ex('Create Block Theme', 'UI String', 'create-block-theme'); ?></h2>
-			<form method="get">
+			<form enctype="multipart/form-data" method="POST">
 				<div id="col-container">
 					<div id="col-left">
 						<div class="col-wrap">
@@ -835,7 +849,12 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 									<?php _e('Author URI:', 'create-block-theme'); ?><br />
 									<small><?php _e('The URL of the authoring individual or organization.', 'create-block-theme'); ?></small><br />
 									<input placeholder="<?php _e('https://wordpress.org/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="large-text code" />
-								</label><br />
+								</label><br /><br />
+								<label for="screenshot">
+									<?php _e('Screenshot:', 'create-block-theme'); ?><br />
+									<small><?php _e('Upload a new theme screenshot (2mb max | .png only | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
+									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
+								</label><br/>
 								<p><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></p><br />
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
@@ -854,7 +873,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function blockbase_save_theme() {
 
-		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_GET['theme'] ) ) {
+		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_POST['theme'] ) ) {
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -862,11 +881,11 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 			}
 
 			// Check nonce
-			if ( ! wp_verify_nonce( $_GET['nonce'], 'create_block_theme' ) ) {
+			if ( ! wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) ) {
 				return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 			}
 
-			if ( $_GET['theme']['type'] === 'save' ) {
+			if ( $_POST['theme']['type'] === 'save' ) {
 				// Avoid running if WordPress dosn't have permission to overwrite the theme folder
 				if ( ! is_writable( get_stylesheet_directory() ) ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
@@ -883,9 +902,9 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
 			}
 
-			else if ( $_GET['theme']['type'] === 'variation' ) {
+			else if ( $_POST['theme']['type'] === 'variation' ) {
 
-				if ( $_GET['theme']['variation'] === '' ) {
+				if ( $_POST['theme']['variation'] === '' ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_variation_name' ] );
 				}
 
@@ -895,56 +914,56 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				}
 
 				if ( is_child_theme() ) {
-					$this->save_variation( 'current', $_GET['theme'] );
+					$this->save_variation( 'current', $_POST['theme'] );
 				}
 				else {
-					$this->save_variation( 'all', $_GET['theme'] );
+					$this->save_variation( 'all', $_POST['theme'] );
 				}
 				$this->clear_user_customizations();
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_variation_success' ] );
 			}
 
-			else if ( $_GET['theme']['type'] === 'blank' ) {
+			else if ( $_POST['theme']['type'] === 'blank' ) {
 				// Avoid running if WordPress dosn't have permission to write the themes folder
 				if ( ! is_writable ( get_theme_root() ) ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_themes_file_permissions' ] );
 				}
 
-				if ( $_GET['theme']['name'] === '' ) {
+				if ( $_POST['theme']['name'] === '' ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 				}
-				$this->create_blank_theme( $_GET['theme'] );
+				$this->create_blank_theme( $_POST['theme'], $_FILES['screenshot'] );
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_blank_success' ] );
 			}
 
 			else if ( is_child_theme() ) {
-				if ( $_GET['theme']['type'] === 'sibling' ) {
-					if ( $_GET['theme']['name'] === '' ) {
+				if ( $_POST['theme']['type'] === 'sibling' ) {
+					if ( $_POST['theme']['name'] === '' ) {
 						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
-					$this->create_sibling_theme( $_GET['theme'] );
+					$this->create_sibling_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else {
-					$this->export_child_theme( $_GET['theme'] );
+					$this->export_child_theme( $_POST['theme'] );
 				}
 				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			} else {
-				if( $_GET['theme']['type'] === 'child' ) {
-					if ( $_GET['theme']['name'] === '' ) {
+				if( $_POST['theme']['type'] === 'child' ) {
+					if ( $_POST['theme']['name'] === '' ) {
 						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
-					$this->create_child_theme( $_GET['theme'] );
+					$this->create_child_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
-				else if( $_GET['theme']['type'] === 'clone' ) {
-					if ( $_GET['theme']['name'] === '' ) {
+				else if( $_POST['theme']['type'] === 'clone' ) {
+					if ( $_POST['theme']['name'] === '' ) {
 						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
 					}
-					$this->clone_theme( $_GET['theme'] );
+					$this->clone_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else {
-					$this->export_theme( $_GET['theme'] );
+					$this->export_theme( $_POST['theme'] );
 				}
 				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
 			}
@@ -983,7 +1002,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 	}
 
 	function admin_notice_blank_success() {
-		$theme_name = $_GET['theme']['name'];
+		$theme_name = $_POST['theme']['name'];
 
 		?>
 			<div class="notice notice-success is-dismissible">
@@ -994,7 +1013,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function admin_notice_variation_success() {
 		$theme_name = wp_get_theme()->get( 'Name' );
-		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . $_GET['theme']['variation_slug'] .'.json';
+		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . $_POST['theme']['variation_slug'] .'.json';
 
 		?>
 			<div class="notice notice-success is-dismissible">
@@ -1022,4 +1041,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		<?php
 	}
 
+    const ALLOWED_SCREENSHOT_TYPES = array(
+        'png'   => 'image/png'
+    );
+
+    function is_valid_screenshot( $file ) {
+		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
+		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES ) && $file['size'] < 2097152 ) {
+			return 1;
+		}
+        return 0;
+    }
 }
