@@ -1,6 +1,6 @@
 <?php
 
-require_once (__DIR__ . '/resolver_additions.php');
+require_once( __DIR__ . '/resolver_additions.php' );
 
 /**
  * The admin-specific functionality of the plugin.
@@ -336,7 +336,7 @@ class Create_Block_Theme_Admin {
 			if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) ) {
 				global $wp_version;
 				$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
-    				$schema = '"$schema": "https://schemas.wp.org/' . $theme_json_version . '/theme.json"';
+				$schema = '"$schema": "https://schemas.wp.org/' . $theme_json_version . '/theme.json"';
 				$theme_json_path = $blank_theme_path . DIRECTORY_SEPARATOR . 'theme.json';
 				$theme_json_string = file_get_contents( $theme_json_path );
 				$theme_json_string = str_replace('"$schema": "https://schemas.wp.org/trunk/theme.json"', $schema, $theme_json_string );
@@ -374,7 +374,7 @@ class Create_Block_Theme_Admin {
 			$file_counter++;
 			while ( file_exists( $variation_path . $variation_slug . '_' . $file_counter . '.json' ) ) {
 				$file_counter++;
-		   	}
+			}
 			$variation_slug = $variation_slug . '_' . $file_counter;
 		}
 
@@ -467,7 +467,7 @@ class Create_Block_Theme_Admin {
 		// this will enforce the usage of a singleword slug for those themes.
 
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
- 		$new_slug = sanitize_title( $new_theme_name );
+		$new_slug = sanitize_title( $new_theme_name );
 
 		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
 			return str_replace( '-', '', $new_slug );
@@ -562,9 +562,9 @@ class Create_Block_Theme_Admin {
 	 * @since    0.0.2
 	 * @param    object               $zip          The zip archive to add the templates to.
 	 * @param    string               $export_type  Determine the templates that should be exported.
-	 * 						current = templates from currently activated theme (but not a parent theme if there is one) as well as user edited templates
-	 * 						user = only user edited templates
-	 * 						all = all templates no matter what
+	 * current = templates from currently activated theme (but not a parent theme if there is one) as well as user edited templates
+	 * user = only user edited templates
+	 * all = all templates no matter what
 	 */
 	function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 
@@ -864,7 +864,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				</div>
 			</form>
 		</div>
-	<?php
+		<?php
 	}
 
 	function form_script() {
@@ -1041,15 +1041,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 		<?php
 	}
 
-    const ALLOWED_SCREENSHOT_TYPES = array(
-        'png'   => 'image/png'
-    );
+	const ALLOWED_SCREENSHOT_TYPES = array(
+		'png'   => 'image/png'
+	);
 
-    function is_valid_screenshot( $file ) {
+	function is_valid_screenshot( $file ) {
 		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
 		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES ) && $file['size'] < 2097152 ) {
 			return 1;
 		}
-        return 0;
-    }
+		return 0;
+	}
 }
