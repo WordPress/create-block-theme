@@ -55,7 +55,7 @@ class Create_Block_Theme {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Create_Block_Theme_Admin();
+		$plugin_admin       = new Create_Block_Theme_Admin();
 		$manage_fonts_admin = new Manage_Fonts_Admin();
 	}
 
