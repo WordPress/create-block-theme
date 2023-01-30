@@ -18,6 +18,7 @@
   "devDependencies": {
     "@actions/core": "^1.10.0",
     "@wordpress/block-library": "^8.2.0",
+    "@wordpress/element": "^5.2.0",
     "@wordpress/prettier-config": "^2.8.0",
     "@wordpress/scripts": "^18.0.1",
     "babel-plugin-inline-json-import": "^0.3.2",
