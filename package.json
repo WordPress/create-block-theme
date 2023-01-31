@@ -20,7 +20,7 @@
     "@wordpress/block-library": "^8.2.0",
     "@wordpress/element": "^5.2.0",
     "@wordpress/prettier-config": "^2.8.0",
-    "@wordpress/scripts": "^18.0.1",
+    "@wordpress/scripts": "^25.2.0",
     "babel-plugin-inline-json-import": "^0.3.2",
     "semver": "^7.3.8",
     "simple-git": "^3.14.1"
