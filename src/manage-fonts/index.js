@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
 import { __experimentalConfirmDialog as ConfirmDialog, Modal, Icon, Button } from '@wordpress/components';
+import { ManageFontsProvider } from "./fonts-context";
 
 const { __ } = wp.i18n;
 
@@ -74,7 +75,6 @@ function ManageFonts () {
             }
             return family;
         });
-        console.log(updatedFonts);
         setNewThemeFonts(updatedFonts);
     }
 
@@ -83,7 +83,7 @@ function ManageFonts () {
         const updatedFonts = newThemeFonts.reduce((acc, fontFamily, index) => {
                 const {fontFace=[], ...updatedFontFamily} = fontFamily;
 
-                if ( fontFace.filter( face => !face.shouldBeRemoved ).length === 1 ) {
+                if ( fontFamilyIndex === index && fontFace.filter( face => !face.shouldBeRemoved ).length === 1 ) {
                     updatedFontFamily.shouldBeRemoved = true;
                 }
 
@@ -158,4 +158,8 @@ function ManageFonts () {
     );
 }
 
-export default ManageFonts;
+export default () =>  (
+    <ManageFontsProvider>
+        <ManageFonts />
+    </ManageFontsProvider>
+);
