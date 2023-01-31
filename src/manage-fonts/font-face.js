@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components'; 
 import { useContext } from '@wordpress/element';
-import { ManageFontsContext } from './fonts-context';
+import { ManageFontsContext } from '../fonts-context';
 const { __ } = wp.i18n;
 
 function FontFace ( {
