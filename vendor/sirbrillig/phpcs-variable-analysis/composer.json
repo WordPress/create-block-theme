@@ -1,0 +1,61 @@
+{
+    "name": "sirbrillig/phpcs-variable-analysis",
+    "description": "A PHPCS sniff to detect problems with variables.",
+    "type": "phpcodesniffer-standard",
+    "keywords" : [ "phpcs", "static analysis" ],
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Sam Graham",
+            "email": "php-codesniffer-variableanalysis@illusori.co.uk"
+        },
+        {
+            "name": "Payton Swick",
+            "email": "payton@foolord.com"
+        }
+    ],
+    "support"    : {
+        "issues": "https://github.com/sirbrillig/phpcs-variable-analysis/issues",
+        "wiki"  : "https://github.com/sirbrillig/phpcs-variable-analysis/wiki",
+        "source": "https://github.com/sirbrillig/phpcs-variable-analysis"
+    },
+    "config": {
+        "sort-order": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "VariableAnalysis\\": "VariableAnalysis/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "VariableAnalysis\\Tests\\": "Tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "./vendor/bin/phpunit --no-coverage",
+        "coverage": "./vendor/bin/phpunit",
+        "lint": "./vendor/bin/phpcs",
+        "fix": "./vendor/bin/phpcbf",
+        "phpstan": "./vendor/bin/phpstan analyse",
+        "psalm": "./vendor/bin/psalm --no-cache",
+        "static-analysis": "composer phpstan && composer psalm"
+    },
+    "require" : {
+        "php" : ">=5.4.0",
+        "squizlabs/php_codesniffer": "^3.5.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6.5 || ^7.0 || ^8.0 || ^9.0",
+        "sirbrillig/phpcs-import-detection": "^1.1",
+        "phpcsstandards/phpcsdevcs": "^1.1",
+        "phpstan/phpstan": "^1.7",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7 || ^1.0",
+        "vimeo/psalm": "^0.2 || ^0.3 || ^1.1 || ^4.24 || ^5.0@beta"
+    }
+}

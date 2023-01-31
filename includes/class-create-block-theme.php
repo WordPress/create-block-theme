@@ -41,6 +41,7 @@ class Create_Block_Theme {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-create-block-theme-admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-manage-fonts.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-version-control.php';
 
 		$this->loader = new Create_Block_Theme_Loader();
 
@@ -57,6 +58,7 @@ class Create_Block_Theme {
 
 		$plugin_admin = new Create_Block_Theme_Admin();
 		$manage_fonts_admin = new Manage_Fonts_Admin();
+		$version_control_admin = new Version_Control_Admin();
 	}
 
 	/**

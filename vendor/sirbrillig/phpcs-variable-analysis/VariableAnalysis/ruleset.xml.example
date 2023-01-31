@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset name="VariableAnalysis">
+  <description>Plugin for PHP_CodeSniffer static analysis tool that adds analysis of problematic variable use.</description>
+
+   <!-- If you want everything, with the defaults, just include this line -->
+   <rule ref="VariableAnalysis"/>
+   <!--
+     You can also refer to specific sniff codes to customize or disable them. See the README for a list of the available codes.
+     There are also many options that can be set to change the behavior of this sniff. See the "Customization" section of the README.
+   -->
+</ruleset>
