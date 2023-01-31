@@ -10,7 +10,7 @@ function FontFace ( {
     deleteFontFace,
     shouldBeRemoved
 } ) {
-    const { demoText, handleDemoTextChange, resetDemoText } = useContext(ManageFontsContext);
+    const { demoText, handleDemoTextChange, resetDemoText } = useContext( ManageFontsContext );
 
     const demoStyles = {
         fontFamily,

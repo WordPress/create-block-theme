@@ -1,9 +1,9 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-
-const DEMO_TEXT = __( 'The quick brown fox jumps over the lazy dog' );
+import { useEffect, useContext } from '@wordpress/element';
+import { ManageFontsContext } from '../fonts-context';
 
 function FontVariant ( { font, variant, isSelected, handleToggle } ) {
+    const { demoText, handleDemoTextChange, resetDemoText } = useContext( ManageFontsContext );
 
     const style = variant.includes('italic') ? 'italic' : 'normal';
     const weight = variant === 'regular' || variant === 'italic' ? '400' : variant.replace('italic', '');
@@ -40,7 +40,7 @@ function FontVariant ( { font, variant, isSelected, handleToggle } ) {
             <td className="">{ style }</td>
             <td className="demo-cell">
                 <span className="font-preview" style={ previewStyles }>
-                    { DEMO_TEXT }
+                    { demoText }
                 </span>
             </td>
         </tr>
