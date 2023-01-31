@@ -3,7 +3,7 @@ import { Button, Icon } from '@wordpress/components';
 import FontFace from "./font-face";
 
 const { __ } = wp.i18n;
-function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFontFace, demoText } ) {
+function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFontFace } ) {
 
     const [isOpen, setIsOpen] = useState(true);
 
@@ -46,7 +46,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                             <thead>
                                 <td>{__('Style', 'create-block-theme')}</td>
                                 <td>{__('Weight', 'create-block-theme')}</td>
-                                <td>{__('Preview', 'create-block-theme')}</td>
+                                <td class="preview-head">{__('Preview', 'create-block-theme')}</td>
                                 { hasFontFaces && <td></td> }
                             </thead>
                             <tbody>
@@ -55,7 +55,6 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                         { ...fontFace }
                                         fontFamilyIndex={fontFamilyIndex}
                                         fontFaceIndex={i}
-                                        demoText={demoText}
                                         key={`fontface${i}`}
                                         deleteFontFace={
                                             () => deleteFontFace(fontFamilyIndex, i)
@@ -66,7 +65,6 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                     ! hasFontFaces && fontFamily.fontFamily &&
                                     <FontFace
                                         { ...fontFamily }
-                                        demoText={ demoText }
                                     />
                                 }
                             </tbody>
@@ -77,9 +75,5 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
         </table>
     )
 }
-
-FontFamily.defaultProps = {
-    demoText: __("The quick brown fox jumps over the lazy dog.", "create-block-theme"),
-};
 
 export default FontFamily;
