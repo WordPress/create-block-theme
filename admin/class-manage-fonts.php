@@ -20,7 +20,7 @@ class Manage_Fonts_Admin {
     function has_font_mime_type( $file ) {
         $filetype = wp_check_filetype( $file, self::ALLOWED_FONT_MIME_TYPES );
         return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES );
-    }    
+    }
 
     function create_admin_menu() {
 		if ( ! wp_is_block_theme() ) {
@@ -53,7 +53,7 @@ class Manage_Fonts_Admin {
 		}
 
 		// If the font asset folder can't be written return an error
-		if ( ! is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || !is_writable  ( $temp_dir ) ) {
+		if ( ! wp_is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || ! wp_is_writable( $temp_dir ) ) {
             return false;
 		}
         return true;
@@ -64,12 +64,12 @@ class Manage_Fonts_Admin {
         // Load the required WordPress packages.
         // Automatically load imported dependencies and assets version.
         $asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
-     
+
         // Enqueue CSS dependencies.
         foreach ( $asset_file['dependencies'] as $style ) {
             wp_enqueue_style( $style );
         }
-     
+
         // Load our app.js.
         array_push( $asset_file['dependencies'], 'wp-i18n' );
         wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
@@ -98,7 +98,7 @@ class Manage_Fonts_Admin {
 
         $fonts_json = wp_json_encode( $theme_font_families );
         $fonts_json_string = preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $fonts_json );
-        
+
     ?>
     <div class="wrap">
         <h1 class="wp-heading-inline"><?php _e('Manage Theme Fonts', 'create-block-theme'); ?></h1>
@@ -106,7 +106,7 @@ class Manage_Fonts_Admin {
         <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
         <hr class="wp-header-end" />
         <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
-        
+
         <form method="POST"  id="manage-fonts-form">
             <div id="manage-fonts"></div>
             <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
@@ -237,14 +237,14 @@ class Manage_Fonts_Admin {
 
         $font_asset_path = $theme_folder . DIRECTORY_SEPARATOR . $font_dir . DIRECTORY_SEPARATOR . $font_path['basename'];
 
-        if ( ! is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
+        if ( ! wp_is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
             return add_action( 'admin_notices', [ $this, 'admin_notice_font_asset_removal_error' ] );
         }
 
         if ( file_exists( $font_asset_path ) ) {
             return unlink( $font_asset_path );
         }
-        
+
         return false;
 	}
 
@@ -268,7 +268,7 @@ class Manage_Fonts_Admin {
 			if ( ! isset ( $font_family[ 'shouldBeRemoved' ] ) ) {
 				$prepared_font_families[] = $font_family;
 			}
-			
+
 		}
 
 		return $prepared_font_families;
@@ -285,7 +285,7 @@ class Manage_Fonts_Admin {
                 return add_action( 'admin_notices', [ $this, 'admin_notice_manage_fonts_permission_error' ] );
             }
 
-            // parse json from form 
+            // parse json from form
             $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
             $new_font_families = $this->prepare_font_families_for_database( $new_theme_fonts_json );
 
