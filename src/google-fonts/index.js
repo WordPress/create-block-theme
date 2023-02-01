@@ -5,11 +5,17 @@ import { store as coreDataStore } from '@wordpress/core-data';
 
 import FontVariant from './font-variant';
 import googleFontsData from "../../assets/google-fonts/fallback-fonts-list.json";
+import { getWeightFromGoogleVariant, getStyleFromGoogleVariant, forceHttps } from './utils';
 
+const EMPTY_SELECTION_DATA = JSON.stringify( {} );
 
 function GoogleFonts () {
     const [ selectedFont, setSelectedFont ] = useState( null );
     const [ selectedVariants, setSelectedVariants ] = useState( [] );
+    const [ selectionData, setSelectionData ] = useState( EMPTY_SELECTION_DATA );
+
+    // pickup the nonce from the input printed in the server
+    const nonce = document.querySelector( "#nonce" ).value;
 
     const handleToggleAllVariants = () => {
         if ( !selectedVariants.length ) {
@@ -27,9 +33,32 @@ function GoogleFonts () {
         }
     }
 
+    // Reset selected variants when the selected font changes
     useEffect( () => {
         setSelectedVariants( [] );
+        setSelectionData( EMPTY_SELECTION_DATA );
     }, [ selectedFont ] );
+
+    // Update selection data when selected variants change
+    useEffect( () => {
+        if ( selectedFont && selectedVariants.length ) {
+            const faces = selectedVariants.map( ( variant ) => {
+                return {
+                    style: getStyleFromGoogleVariant( variant ),
+                    weight: getWeightFromGoogleVariant( variant ),
+                    src: forceHttps( selectedFont.files[ variant ] ),
+                }
+            });
+            const newSelectionData = {
+                family: selectedFont.family,
+                faces: faces,
+            };
+            setSelectionData( JSON.stringify( newSelectionData ) );
+        } else {
+            setSelectionData( EMPTY_SELECTION_DATA );
+        }
+    }, [ selectedVariants ] );
+
 
     const theme = useSelect( ( select ) => {
         return select( coreDataStore ).getCurrentTheme();
@@ -38,8 +67,6 @@ function GoogleFonts () {
     const handleSelectChange = ( event ) => {
         setSelectedFont( googleFontsData.items[ event.target.value ] ) ;
     }
-
-    console.log( selectedVariants );
 
     return (
         <div className="wrap google-fonts-page">
@@ -50,7 +77,7 @@ function GoogleFonts () {
             <form enctype="multipart/form-data" action="" method="POST">
                 <label for="google-font-id">{ __('Select Font', 'create-block-theme') }</label>
 
-                <select name="google-font" id="google-font-id" onChange={ handleSelectChange }>
+                <select name="google-font" onChange={ handleSelectChange }>
                     <option value={null}>{ __('Select a font...', 'create-block-theme') }</option>
                     { googleFontsData.items.map( ( font, index ) => (
                             <option value={ index }>{ font.family }</option>
@@ -76,7 +103,7 @@ function GoogleFonts () {
                                 <td className="">{ __('Preview', 'create-block-theme') }</td>
                             </tr>
                         </thead>
-                        <tbody id="font-options">
+                        <tbody>
                             {selectedFont.variants.map( ( variant, i ) => (
                                 <FontVariant
                                     font={ selectedFont }
@@ -91,10 +118,17 @@ function GoogleFonts () {
                 ) }
 
                 <br /><br />
-                <input type="hidden" name="font-name" id="font-name" value="" />
-                <input type="hidden" name="google-font-variants" id="google-font-variants" value="" />
-                <input type="submit" value={ __('Add google fonts to your theme', 'create-block-theme') } className="button button-primary" id="google-fonts-submit" disabled={true} />
-                <input type="hidden" name="nonce"/>
+
+                <input type="hidden" name="selection-data" value={ selectionData } />
+
+                <input
+                    type="submit"
+                    value={ __('Add google fonts to your theme', 'create-block-theme') }
+                    className="button button-primary"
+                    disabled={ selectedVariants.length === 0 }
+                />
+
+                <input type="hidden" name="nonce" value={ nonce } />
             </form>
 		</div>
     )
