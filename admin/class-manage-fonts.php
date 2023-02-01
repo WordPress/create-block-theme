@@ -424,11 +424,18 @@ class Manage_Fonts_Admin {
 
     function admin_notice_embed_font_success () {
 		$theme_name = wp_get_theme()->get( 'Name' );
-        $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+        $font_family = "";
+        if ( isset( $_POST[ 'selection-data' ] ) ) {
+            $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+            $font_family = $data[ 'family' ];
+        } 
+        if ( isset( $_POST[ 'font-name' ] ) ) {
+            $font_family = $_POST[ 'font-name' ];
+        }
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p>
-                    <?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $data[ 'family' ] ), esc_html( $theme_name ) ); ?>
+                    <?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) ); ?>
                     <a href="themes.php?page=manage-fonts"><?php printf( esc_html__( "Manage Fonts", "create-block-theme" ) ); ?></a>
                 </p>
 			</div>
@@ -437,10 +444,17 @@ class Manage_Fonts_Admin {
 
 	function admin_notice_embed_font_permission_error () {
 		$theme_name = wp_get_theme()->get( 'Name' );
-        $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+        $font_family = "";
+        if ( isset( $_POST[ 'selection-data' ] ) ) {
+            $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+            $font_family = $data[ 'family' ];
+        } 
+        if ( isset( $_POST[ 'font-name' ] ) ) {
+            $font_family = $_POST[ 'font-name' ];
+        }
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $data[ 'family' ] ), esc_html( $theme_name ) ); ?></p>
+				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
