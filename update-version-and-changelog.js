@@ -92,4 +92,3 @@ async function updateVersion () {
 }
 
 updateVersion();
-
