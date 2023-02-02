@@ -20,34 +20,38 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
     return (
         <table className="wp-list-table widefat table-view-list">
             <thead>
-                <td class="font-family-head">
-                    <div><strong>{fontFamily.name || fontFamily.fontFamily}</strong></div>
-                    <div>
-                        <Button
-                            variant="tertiary"
-                            isDestructive={true}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                deleteFontFamily(fontFamilyIndex)
-                            }}
-                        >
-                            {__('Remove Font Family', 'create-block-theme')}
-                        </Button>
-                        <Button onClick={toggleIsOpen}>
-                            <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
-                        </Button>
-                    </div>
-                </td>
+                <tr>
+                    <td className="font-family-head">
+                        <div><strong>{fontFamily.name || fontFamily.fontFamily}</strong></div>
+                        <div>
+                            <Button
+                                variant="tertiary"
+                                isDestructive={true}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteFontFamily(fontFamilyIndex)
+                                }}
+                            >
+                                {__('Remove Font Family', 'create-block-theme')}
+                            </Button>
+                            <Button onClick={toggleIsOpen}>
+                                <Icon icon={isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2'} />
+                            </Button>
+                        </div>
+                    </td>
+                </tr>
             </thead>
             <tbody className="font-family-contents">
-                <div className="container">
-                    <div className={` slide ${isOpen ? "open" : "close"}`}>
+                <tr className="container">
+                    <td className={` slide ${isOpen ? "open" : "close"}`}>
                         <table className="wp-list-table widefat striped table-view-list">
                             <thead>
-                                <td>{__('Style', 'create-block-theme')}</td>
-                                <td>{__('Weight', 'create-block-theme')}</td>
-                                <td class="preview-head">{__('Preview', 'create-block-theme')}</td>
-                                { hasFontFaces && <td></td> }
+                                <tr>
+                                    <td>{__('Style', 'create-block-theme')}</td>
+                                    <td>{__('Weight', 'create-block-theme')}</td>
+                                    <td className="preview-head">{__('Preview', 'create-block-theme')}</td>
+                                    { hasFontFaces && <td></td> }
+                                </tr>
                             </thead>
                             <tbody>
                                 { hasFontFaces && fontFamily.fontFace.map((fontFace, i) => (
@@ -69,8 +73,8 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                 }
                             </tbody>
                         </table>
-                    </div>
-                </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     )
