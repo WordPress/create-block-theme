@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
 import { __experimentalConfirmDialog as ConfirmDialog, Modal, Icon, Button } from '@wordpress/components';
-import { ManageFontsProvider } from "./fonts-context";
 
 const { __ } = wp.i18n;
 
@@ -125,7 +124,7 @@ function ManageFonts () {
                     </p>
                 </Modal>
             ) }
-            <p class="help">
+            <p className="help">
                 {__("These are the fonts currently embedded in your theme ", "create-block-theme")}
                 <Button onClick={toggleIsHelpOpen} style={{padding:"0", height:"1rem"}}>
                     <Icon icon={"info"}/>
@@ -158,8 +157,4 @@ function ManageFonts () {
     );
 }
 
-export default () =>  (
-    <ManageFontsProvider>
-        <ManageFonts />
-    </ManageFontsProvider>
-);
+export default ManageFonts;

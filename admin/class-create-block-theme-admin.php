@@ -887,7 +887,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			if ( $_POST['theme']['type'] === 'save' ) {
 				// Avoid running if WordPress dosn't have permission to overwrite the theme folder
-				if ( ! is_writable( get_stylesheet_directory() ) ) {
+				if ( ! wp_is_writable( get_stylesheet_directory() ) ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
 				}
 
@@ -909,7 +909,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				}
 
 				// Avoid running if WordPress dosn't have permission to write the theme folder
-				if ( ! is_writable ( get_stylesheet_directory() ) ) {
+				if ( ! wp_is_writable ( get_stylesheet_directory() ) ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
 				}
 
@@ -926,7 +926,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 			else if ( $_POST['theme']['type'] === 'blank' ) {
 				// Avoid running if WordPress dosn't have permission to write the themes folder
-				if ( ! is_writable ( get_theme_root() ) ) {
+				if ( ! wp_is_writable ( get_theme_root() ) ) {
 					return add_action( 'admin_notices', [ $this, 'admin_notice_error_themes_file_permissions' ] );
 				}
 

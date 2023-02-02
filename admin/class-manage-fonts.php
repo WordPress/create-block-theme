@@ -53,14 +53,13 @@ class Manage_Fonts_Admin {
 		}
 
 		// If the font asset folder can't be written return an error
-		if ( ! is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || !is_writable  ( $temp_dir ) ) {
+		if ( ! wp_is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || ! wp_is_writable( $temp_dir ) ) {
             return false;
 		}
         return true;
 	}
 
-
-    function manage_fonts_admin_page () {
+    function load_fonts_react_app () {
         // Load the required WordPress packages.
         // Automatically load imported dependencies and assets version.
         $asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
@@ -73,7 +72,10 @@ class Manage_Fonts_Admin {
         // Load our app.js.
         array_push( $asset_file['dependencies'], 'wp-i18n' );
         wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
+    }
 
+    function manage_fonts_admin_page () {
+        $this->load_fonts_react_app();
         wp_enqueue_style( 'manage-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/manage-fonts.css', array(), '1.0', false );
 
         $theme_name = wp_get_theme()->get( 'Name' );
@@ -108,7 +110,7 @@ class Manage_Fonts_Admin {
         <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
         
         <form method="POST"  id="manage-fonts-form">
-            <div id="manage-fonts"></div>
+            <div id="fonts-app"></div>
             <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
         </form>
 
@@ -195,37 +197,12 @@ class Manage_Fonts_Admin {
     }
 
     function google_fonts_admin_page() {
-		wp_enqueue_script('google-fonts-script', plugin_dir_url(__FILE__) . 'js/google-fonts.js', array( ), '1.0', false );
 		wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
+        $this->load_fonts_react_app();
 ?>
-		<div class="wrap google-fonts-page">
-			<h2><?php _ex('Add Google fonts to your theme', 'UI String', 'create-block-theme'); ?></h2>
-			<form enctype="multipart/form-data" action="" method="POST">
-				<h3><?php printf( esc_html__('Add Google fonts assets and font face definitions to your currently active theme (%1$s)', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></h3>
-				<label for="google-font-id"><?php printf( esc_html__('Select Font', 'create-block-theme')); ?></label>
-				<select name="google-font" id="google-font-id">
-                    <option value=""><?php _e('Select a font...', 'create-block-theme'); ?></option>
-				</select>
-				<br /><br />
-				<p class="hint"><?php _e('Select the font variants you want to include:', 'create-block-theme'); ?></p>
-				<table class="wp-list-table widefat fixed striped table-view-list" id="google-fonts-table">
-					<thead>
-						<tr>
-							<td class=""><input type="checkbox" id="select-all-variants" /></td>
-							<td class=""><?php printf( esc_html__('Variant', 'create-block-theme')); ?></td>
-							<td class=""><?php printf( esc_html__('Preview', 'create-block-theme')); ?></td>
-						</tr>
-					</thead>
-					<tbody id="font-options">
-					</tbody>
-				</table>
-				<br /><br />
-				<input type="hidden" name="font-name" id="font-name" value="" />
-				<input type="hidden" name="google-font-variants" id="google-font-variants" value="" />
-				<input type="submit" value="<?php _e('Add google fonts to your theme', 'create-block-theme'); ?>" class="button button-primary" id="google-fonts-submit" disabled=true />
-                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-			</form>
-		</div>
+        <input id="nonce" type="hidden" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+        <div id="fonts-app"></div>
+
 	<?php
 	}
 
@@ -237,7 +214,7 @@ class Manage_Fonts_Admin {
 
         $font_asset_path = $theme_folder . DIRECTORY_SEPARATOR . $font_dir . DIRECTORY_SEPARATOR . $font_path['basename'];
 
-        if ( ! is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
+        if ( ! wp_is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
             return add_action( 'admin_notices', [ $this, 'admin_notice_font_asset_removal_error' ] );
         }
 
@@ -339,46 +316,39 @@ class Manage_Fonts_Admin {
     function save_google_fonts_to_theme () {
         if (
             current_user_can( 'edit_themes' ) &&
-            ! empty( $_POST['nonce'] ) &&
-            wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
-            ! empty( $_POST['google-font-variants'] ) &&
-            ! empty( $_POST['font-name'] )
+            ! empty( $_POST[ 'nonce' ] ) &&
+            wp_verify_nonce( $_POST[ 'nonce' ], 'create_block_theme' ) &&
+            ! empty( $_POST[ 'selection-data' ] )
         ) {
             if( ! $this->can_read_and_write_font_assets_directory() ) {
                 return add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_permission_error' ] );
             }
 
             // Gets data from the form
-            $google_font_name = $_POST['font-name'];
+            $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+            $google_font_name = $data[ 'family' ];
             $font_slug = sanitize_title( $google_font_name );
-            $google_font_variants = $_POST['google-font-variants'];
-            $variants = explode(',', $google_font_variants);
+            $variants = $data[ 'faces' ];
 
             $new_font_faces = array();
             foreach ($variants as $variant) {
                 // variant name is $variant_and_url[0] and font asset url is $variant_and_url[1]
-                $variant_and_url = explode ('::', $variant);
-                $file_extension = pathinfo($variant_and_url[1], PATHINFO_EXTENSION);
-                $file_name = $font_slug.'_'.$variant_and_url[0].'.'.$file_extension;
+                $file_extension = pathinfo($variant[ 'src' ], PATHINFO_EXTENSION);
+                $file_name = $font_slug.'_'.$variant[ 'style' ].'_'.$variant[ 'weight' ].'.'.$file_extension;
 
                 // Download font asset in temp folder
-                $temp_file = download_url( $variant_and_url[1] );
+                $temp_file = download_url( $variant[ 'src' ] );
 
-                if ( $this->has_font_mime_type( $variant_and_url[1] ) ) {
+                if ( $this->has_font_mime_type( $variant[ 'src' ] ) ) {
 
                     // Move font asset to theme assets folder
-                    rename($temp_file, get_stylesheet_directory() . '/assets/fonts/' . $file_name);
-
-                    // Get the font style and weight
-                    $variant_style  = str_contains($variant_and_url[0], 'italic') ? 'italic' : 'normal';
-                    $variant_weight = ($variant_and_url[0] === 'regular' || $variant_and_url[0] === 'italic') ? '400' : $variant_and_url[0];
-                    $variant_weight = str_replace('italic', '', $variant_weight);
+                    rename( $temp_file, get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 
                     // Add each variant as one font face
                     $new_font_faces[] = array(
                         'fontFamily' => $google_font_name,
-                        'fontStyle'  => $variant_style,
-                        'fontWeight' => $variant_weight,
+                        'fontStyle'  => $variant[ 'style' ],
+                        'fontWeight' => $variant[ 'weight' ],
                         'src' => array(
                             'file:./assets/fonts/'.$file_name
                         ),
@@ -454,10 +424,18 @@ class Manage_Fonts_Admin {
 
     function admin_notice_embed_font_success () {
 		$theme_name = wp_get_theme()->get( 'Name' );
+        $font_family = "";
+        if ( isset( $_POST[ 'selection-data' ] ) ) {
+            $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+            $font_family = $data[ 'family' ];
+        } 
+        if ( isset( $_POST[ 'font-name' ] ) ) {
+            $font_family = $_POST[ 'font-name' ];
+        }
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p>
-                    <?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?>
+                    <?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) ); ?>
                     <a href="themes.php?page=manage-fonts"><?php printf( esc_html__( "Manage Fonts", "create-block-theme" ) ); ?></a>
                 </p>
 			</div>
@@ -466,9 +444,17 @@ class Manage_Fonts_Admin {
 
 	function admin_notice_embed_font_permission_error () {
 		$theme_name = wp_get_theme()->get( 'Name' );
+        $font_family = "";
+        if ( isset( $_POST[ 'selection-data' ] ) ) {
+            $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
+            $font_family = $data[ 'family' ];
+        } 
+        if ( isset( $_POST[ 'font-name' ] ) ) {
+            $font_family = $_POST[ 'font-name' ];
+        }
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) ); ?></p>
 			</div>
 		<?php
 	}
