@@ -124,7 +124,7 @@ function ManageFonts () {
                     </p>
                 </Modal>
             ) }
-            <p class="help">
+            <p className="help">
                 {__("These are the fonts currently embedded in your theme ", "create-block-theme")}
                 <Button onClick={toggleIsHelpOpen} style={{padding:"0", height:"1rem"}}>
                     <Icon icon={"info"}/>
