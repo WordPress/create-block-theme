@@ -64,10 +64,13 @@ class Manage_Fonts_Admin {
         // Automatically load imported dependencies and assets version.
         $asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
      
-        // Enqueue CSS dependencies.
+        // Enqueue CSS dependencies of the scripts included in the build.
         foreach ( $asset_file['dependencies'] as $style ) {
             wp_enqueue_style( $style );
         }
+
+        // Enqueue CSS of the app
+        wp_enqueue_style( 'fonts-app', plugins_url( 'build/index.css', __DIR__ ), array(), $asset_file['version'] );
      
         // Load our app.js.
         array_push( $asset_file['dependencies'], 'wp-i18n' );
@@ -76,7 +79,6 @@ class Manage_Fonts_Admin {
 
     function manage_fonts_admin_page () {
         $this->load_fonts_react_app();
-        wp_enqueue_style( 'manage-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/manage-fonts.css', array(), '1.0', false );
 
         $theme_name = wp_get_theme()->get( 'Name' );
 
@@ -197,7 +199,6 @@ class Manage_Fonts_Admin {
     }
 
     function google_fonts_admin_page() {
-		wp_enqueue_style('google-fonts-styles',  plugin_dir_url( __DIR__ ) . '/css/google-fonts.css', array(), '1.0', false );
         $this->load_fonts_react_app();
 ?>
         <input id="nonce" type="hidden" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
