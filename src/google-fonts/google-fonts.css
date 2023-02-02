@@ -1,3 +1,7 @@
+#google-fonts-table {
+    margin-bottom: 2rem;
+}
+
 #google-fonts-table.widefat thead td input {
     margin: 0;
 }
@@ -16,6 +20,6 @@
     font-size: 1.7rem;
 }
 
-.google-fonts-page .hint {
-    display: none;
+.select-font {
+    display: flex;
 }

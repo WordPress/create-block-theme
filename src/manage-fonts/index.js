@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import FontFamily from "./font-family";
 import { __experimentalConfirmDialog as ConfirmDialog, Modal, Icon, Button } from '@wordpress/components';
+import DemoTextInput from "../demo-text-input";
+import "./manage-fonts.css";
 
 const { __ } = wp.i18n;
 
@@ -142,6 +144,9 @@ function ManageFonts () {
                 }
                 <p>{__('This action will delete the font definition and the font file assets from your theme.', "create-block-theme")}</p>
 			</ConfirmDialog>
+
+            <DemoTextInput />
+
             <div className="font-families">
                 {newThemeFonts.map((fontFamily, i) => (
                     <FontFamily
