@@ -53,7 +53,7 @@ class Manage_Fonts_Admin {
 		}
 
 		// If the font asset folder can't be written return an error
-		if ( ! is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || !is_writable  ( $temp_dir ) ) {
+		if ( ! wp_is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || ! wp_is_writable( $temp_dir ) ) {
             return false;
 		}
         return true;
@@ -237,7 +237,7 @@ class Manage_Fonts_Admin {
 
         $font_asset_path = $theme_folder . DIRECTORY_SEPARATOR . $font_dir . DIRECTORY_SEPARATOR . $font_path['basename'];
 
-        if ( ! is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
+        if ( ! wp_is_writable( $theme_folder . DIRECTORY_SEPARATOR . $font_dir ) ) {
             return add_action( 'admin_notices', [ $this, 'admin_notice_font_asset_removal_error' ] );
         }
 
