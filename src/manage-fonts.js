@@ -30,7 +30,7 @@ function ManageFonts () {
     // When client side font list changes, we update the server side font list
     useEffect( () => {
         // Avoids running this effect on the first render
-        if (
+        if ( 
             fontToDelete.fontFamilyIndex !== undefined ||
             fontToDelete.fontFaceIndex !== undefined
         ) {
@@ -113,7 +113,7 @@ function ManageFonts () {
     return (
         <>
             { isHelpOpen && (
-                <Modal
+                <Modal 
                     title={<><Icon icon={"info"}/> {__("Info", "create-block-theme")}</>}
                     onRequestClose={toggleIsHelpOpen}
                 >
