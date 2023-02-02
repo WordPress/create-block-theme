@@ -44,7 +44,7 @@ export function ManageFontsProvider( { children } ) {
     );
 
     const [ demoFontSize, setDemoFontSize ] = useState(
-        localStorage.getItem( "cbt_default-demo-font-size" ) || DEMO_DEFAULTS[ demoType ][ "size" ]
+        parseInt( localStorage.getItem( "cbt_default-demo-font-size" )) || DEMO_DEFAULTS[ demoType ][ "size" ]
     );
 
     const handleDemoTextChange = ( newDemoText ) => {

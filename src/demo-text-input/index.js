@@ -36,13 +36,12 @@ function DemoTextInput () {
 
                 <div>
                     <RangeControl
-                        label={ __( "Font size", "create-block-theme" ) }
-                        initialPosition={ demoFontSize }
+                        label={ __( "Font size (px)", "create-block-theme" ) }
                         value={ demoFontSize }
                         onChange={ handleDemoFontSizeChange }
                         min={ 8 }
-                        max={ 100 }
-                        withInputField={ false }
+                        max={ 140 }
+                        withInputField={ true }
                     />
                 </div>
 

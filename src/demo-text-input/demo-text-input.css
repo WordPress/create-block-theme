@@ -1,7 +1,7 @@
 .demo-text-input {
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    padding: 1rem;
+    padding: 1rem 0;
     margin: 1rem 0;
 }
 
@@ -15,4 +15,13 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.demo-text-input .components-range-control__root {
+    flex-direction: row-reverse;
+}
+
+.demo-text-input .components-range-control__number {
+    margin-left: unset !important;
+    margin-right: 1rem;
 }
