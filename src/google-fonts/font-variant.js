@@ -1,10 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useContext } from '@wordpress/element';
 import { ManageFontsContext } from '../fonts-context';
+import Demo from "../demo-text-input/demo";
 
 function FontVariant ( { font, variant, isSelected, handleToggle } ) {
-    const { demoText, handleDemoTextChange, resetDemoText } = useContext( ManageFontsContext );
-
     const style = variant.includes('italic') ? 'italic' : 'normal';
     const weight = variant === 'regular' || variant === 'italic' ? '400' : variant.replace('italic', '');
     // Force https because sometimes Google Fonts API returns http instead of https
@@ -39,9 +38,7 @@ function FontVariant ( { font, variant, isSelected, handleToggle } ) {
             <td className="">{ weight }</td>
             <td className="">{ style }</td>
             <td className="demo-cell">
-                <span className="font-preview" style={ previewStyles }>
-                    { demoText }
-                </span>
+                <Demo style={ previewStyles } />
             </td>
         </tr>
     )

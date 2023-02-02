@@ -53,11 +53,6 @@
     width: 100%;
 }
 
-.font-face td {
-    white-space: nowrap;
-    text-align: center;
-}
-
 .font-face .demo-cell input {
     font-size: 1.7rem;
     line-height: 1.5;
