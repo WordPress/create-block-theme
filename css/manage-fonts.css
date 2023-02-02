@@ -13,13 +13,15 @@
     margin-bottom: 2rem;
 }
 
-.font-families > table > thead > td {
+.font-families > table > thead td {
     font-size: 1.1rem;
 }
 
 .font-family-contents .slide {
     border-bottom-left-radius: 15px;
     margin: 0 0 0 1.5rem;
+    display: block;
+    padding: 0;
 }
 
 .font-family-contents .container {
