@@ -16,8 +16,8 @@
   },
   "main": "build/index.js",
   "devDependencies": {
-    "@wordpress/scripts": "^18.0.1",
     "@actions/core": "^1.10.0",
+    "@wordpress/scripts": "^18.0.1",
     "semver": "^7.3.8",
     "simple-git": "^3.14.1"
   },
@@ -32,5 +32,8 @@
     "packages-update": "wp-scripts packages-update",
     "start": "wp-scripts start",
     "update-version": "node update-version-and-changelog.js"
+  },
+  "dependencies": {
+    "@wordpress/icons": "^9.17.0"
   }
 }
