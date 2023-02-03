@@ -37,13 +37,11 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 == Changelog ==
 
 = 1.5.0 =
-* Merge branch 'trunk' into refactor/google-fonts-to-react-app
 * Fix: browser console errors
 * Fix: Adding or removing fonts fails in some Windows environments
-* Merge branch 'trunk' into refactor/google-fonts-to-react-app
 * Add placeholder screenshot to boilerplate theme
 * Refactor: Add Google Fonts section from vanilla JS to React app
-* Clean version of Adding demo text settings
+* Adding demo text settings
 
 = 1.4.0 =
 * Specify node and npm versions, add nvmrc file
