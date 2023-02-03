@@ -40,13 +40,10 @@ class Manage_Fonts_Admin {
 		add_submenu_page(null, $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
 	}
 
-    function has_permissions () {
+    function has_file_and_user_permissions () {
         $has_user_permissions = $this->user_can_edit_themes();
         $has_file_permissions = $this->can_read_and_write_font_assets_directory();
-        if ( $has_user_permissions && $has_file_permissions ) {
-            return true;
-        }
-        return false;
+        return $has_user_permissions && $has_file_permissions;
     }
 
     function user_can_edit_themes () {
@@ -279,7 +276,7 @@ class Manage_Fonts_Admin {
             ! empty( $_POST['nonce'] ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_POST['new-theme-fonts-json'] ) &&
-            $this->has_permissions()
+            $this->has_file_and_user_permissions()
         ) {
             // parse json from form 
             $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
@@ -299,7 +296,7 @@ class Manage_Fonts_Admin {
             ! empty( $_POST['font-name'] ) &&
             ! empty( $_POST['font-style'] ) &&
             ! empty( $_POST['font-weight'] ) &&
-            $this->has_permissions()
+            $this->has_file_and_user_permissions()
         ) {
             if (
                 $this->has_font_mime_type( $_FILES['font-file']['name'] ) &&
@@ -333,7 +330,7 @@ class Manage_Fonts_Admin {
             ! empty( $_POST[ 'nonce' ] ) &&
             wp_verify_nonce( $_POST[ 'nonce' ], 'create_block_theme' ) &&
             ! empty( $_POST[ 'selection-data' ] ) &&
-            $this->has_permissions()
+            $this->has_file_and_user_permissions()
         ) {
             // Gets data from the form
             $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
