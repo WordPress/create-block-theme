@@ -1,0 +1,12 @@
+{
+	"globals": {
+		"window": true
+	},
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true
+		}
+	}
+}
