@@ -1,6 +1,6 @@
 {
 	"name": "create-block-theme",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"private": true,
 	"description": "Create a block-based theme",
 	"author": "The WordPress Contributors",
@@ -19,6 +19,9 @@
 		"npm": ">=7 <8"
 	},
 	"main": "build/index.js",
+	"dependencies": {
+		"@wordpress/icons": "^9.17.0"
+	},
 	"devDependencies": {
 		"@actions/core": "^1.10.0",
 		"@emotion/babel-plugin": "^11.10.5",

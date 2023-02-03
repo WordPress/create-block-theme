@@ -1,6 +1,7 @@
 import { Button } from '@wordpress/components'; 
 import { useContext } from '@wordpress/element';
 import { ManageFontsContext } from '../fonts-context';
+import Demo from "../demo-text-input/demo";
 const { __ } = wp.i18n;
 
 function FontFace ( {
@@ -10,7 +11,7 @@ function FontFace ( {
     deleteFontFace,
     shouldBeRemoved
 } ) {
-    const { demoText, handleDemoTextChange, resetDemoText } = useContext( ManageFontsContext );
+    const { demoText, handleDemoTextChange, resetDefaults } = useContext( ManageFontsContext );
 
     const demoStyles = {
         fontFamily,
@@ -24,12 +25,6 @@ function FontFace ( {
         handleDemoTextChange( newDemoText );
     }
 
-    const onBlur = ( event ) => {
-        if ( ! event.target.value ) {
-            resetDemoText();
-        }
-    }
-
     if ( shouldBeRemoved ) {
         return null;
     }
@@ -39,7 +34,8 @@ function FontFace ( {
             <td>{fontStyle}</td>
             <td>{fontWeight}</td>
             <td className="demo-cell">
-                <input style={ demoStyles } onChange={ handleChange } value={ demoText } onBlur={ onBlur }/>
+                {/* <input style={ demoStyles } onChange={ handleChange } value={ demoText }/> */}
+                <Demo style={ demoStyles } />
             </td>
             { deleteFontFace && <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove', 'create-block-theme')}</Button></td> }
         </tr>
