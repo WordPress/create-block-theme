@@ -4,7 +4,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.1
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,6 +35,15 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.5.0 =
+* Merge branch 'trunk' into refactor/google-fonts-to-react-app
+* Fix: browser console errors
+* Fix: Adding or removing fonts fails in some Windows environments
+* Merge branch 'trunk' into refactor/google-fonts-to-react-app
+* Add placeholder screenshot to boilerplate theme
+* Refactor: Add Google Fonts section from vanilla JS to React app
+* Clean version of Adding demo text settings
 
 = 1.4.0 =
 * Specify node and npm versions, add nvmrc file
