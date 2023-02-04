@@ -75,6 +75,11 @@ class Manage_Fonts_Admin {
         // Load our app.js.
         array_push( $asset_file['dependencies'], 'wp-i18n' );
         wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
+
+        // Set google fonts json file url.
+        wp_localize_script('create-block-theme-app', 'createBlockTheme', array(
+            'googleFontsDataUrl' => plugins_url( 'assets/google-fonts/fallback-fonts-list.json', __DIR__ ),
+        ));
     }
 
     function manage_fonts_admin_page () {

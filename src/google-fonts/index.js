@@ -5,7 +5,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { SelectControl } from '@wordpress/components';
 
 import FontVariant from './font-variant';
-import googleFontsData from "../../assets/google-fonts/fallback-fonts-list.json";
 import { getWeightFromGoogleVariant, getStyleFromGoogleVariant, forceHttps } from './utils';
 import DemoTextInput from "../demo-text-input";
 import "./google-fonts.css";
@@ -13,6 +12,7 @@ import "./google-fonts.css";
 const EMPTY_SELECTION_DATA = JSON.stringify( {} );
 
 function GoogleFonts () {
+    const [ googleFontsData, setGoogleFontsData ] = useState( {} );
     const [ selectedFont, setSelectedFont ] = useState( null );
     const [ selectedVariants, setSelectedVariants ] = useState( [] );
     const [ selectionData, setSelectionData ] = useState( EMPTY_SELECTION_DATA );
@@ -35,6 +35,15 @@ function GoogleFonts () {
             setSelectedVariants( [ ...selectedVariants, variant ] );
         }
     }
+
+    // Load google fonts data
+    useEffect(() => {
+        (async () => {
+            const responseData = await fetch( createBlockTheme.googleFontsDataUrl );
+            const parsedData = await responseData.json();
+            setGoogleFontsData( parsedData );
+        })();
+    }, []);
 
     // Reset selected variants when the selected font changes
     useEffect( () => {
@@ -69,6 +78,10 @@ function GoogleFonts () {
 
     const handleSelectChange = ( value ) => {
         setSelectedFont( googleFontsData.items[ value ] ) ;
+    }
+
+    if ( ! googleFontsData?.items ) {
+        return null;
     }
 
     return (
