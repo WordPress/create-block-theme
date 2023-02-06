@@ -506,7 +506,7 @@ class Manage_Fonts_Admin {
     function admin_notice_file_edit_error () {
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error: You need to disable the DISALLOW_FILE_EDIT config your wp-config.php file to be able to modify your theme', 'create-block-theme' ) ); ?></p>
+				<p><?php printf( esc_html__( 'Error: `DISALLOW_FILE_EDIT` cannot be enabled in wp-config.php to make modifications to the theme using this plugin.', 'create-block-theme' ) ); ?></p>
 			</div>
 		<?php
 	}
