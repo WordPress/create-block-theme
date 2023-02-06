@@ -40,6 +40,25 @@ class Manage_Fonts_Admin {
 		add_submenu_page(null, $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', [ $this, 'local_fonts_admin_page' ] );
 	}
 
+    function has_file_and_user_permissions () {
+        $has_user_permissions = $this->user_can_edit_themes();
+        $has_file_permissions = $this->can_read_and_write_font_assets_directory();
+        return $has_user_permissions && $has_file_permissions;
+    }
+
+    function user_can_edit_themes () {
+        if ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT === true ) {
+            add_action( 'admin_notices', [ $this, 'admin_notice_file_edit_error' ] );
+            return false;
+        }
+
+        if ( ! current_user_can( 'edit_themes' ) ) {
+            add_action( 'admin_notices', [ $this, 'admin_notice_user_cant_edit_theme' ] );
+            return false;
+        }
+        return true;
+    }
+
     function can_read_and_write_font_assets_directory () {
 		// Create the font assets folder if it doesn't exist
         $temp_dir = get_temp_dir();
@@ -54,6 +73,7 @@ class Manage_Fonts_Admin {
 
 		// If the font asset folder can't be written return an error
 		if ( ! wp_is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || ! wp_is_writable( $temp_dir ) ) {
+            add_action( 'admin_notices', [ $this, 'admin_notice_manage_fonts_permission_error' ] );
             return false;
 		}
         return true;
@@ -254,15 +274,11 @@ class Manage_Fonts_Admin {
 
     function save_manage_fonts_changes () {
         if (
-            current_user_can( 'edit_themes' ) &&
             ! empty( $_POST['nonce'] ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
-            ! empty( $_POST['new-theme-fonts-json'] )
+            ! empty( $_POST['new-theme-fonts-json'] ) &&
+            $this->has_file_and_user_permissions()
         ) {
-            if( ! $this->can_read_and_write_font_assets_directory() ) {
-                return add_action( 'admin_notices', [ $this, 'admin_notice_manage_fonts_permission_error' ] );
-            }
-
             // parse json from form 
             $new_theme_fonts_json = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
             $new_font_families = $this->prepare_font_families_for_database( $new_theme_fonts_json );
@@ -275,13 +291,13 @@ class Manage_Fonts_Admin {
 
     function save_local_fonts_to_theme () {
         if (
-            current_user_can( 'edit_themes' ) &&
             ! empty( $_POST['nonce'] ) &&
             wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
             ! empty( $_FILES['font-file'] ) &&
             ! empty( $_POST['font-name'] ) &&
             ! empty( $_POST['font-style'] ) &&
-            ! empty( $_POST['font-weight'] )
+            ! empty( $_POST['font-weight'] ) &&
+            $this->has_file_and_user_permissions()
         ) {
             if (
                 $this->has_font_mime_type( $_FILES['font-file']['name'] ) &&
@@ -290,10 +306,6 @@ class Manage_Fonts_Admin {
                 $font_slug = sanitize_title( $_POST['font-name'] );
                 $file_extension = pathinfo( $_FILES['font-file']['name'], PATHINFO_EXTENSION );
                 $file_name = $font_slug . '_' . $_POST['font-style'] . '_' . $_POST['font-weight'] . '.' . $file_extension;
-
-                if( ! $this->can_read_and_write_font_assets_directory() ) {
-                    return add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_permission_error' ] );
-                }
 
                 move_uploaded_file( $_FILES['font-file']['tmp_name'], get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 
@@ -316,15 +328,11 @@ class Manage_Fonts_Admin {
 
     function save_google_fonts_to_theme () {
         if (
-            current_user_can( 'edit_themes' ) &&
             ! empty( $_POST[ 'nonce' ] ) &&
             wp_verify_nonce( $_POST[ 'nonce' ], 'create_block_theme' ) &&
-            ! empty( $_POST[ 'selection-data' ] )
+            ! empty( $_POST[ 'selection-data' ] ) &&
+            $this->has_file_and_user_permissions()
         ) {
-            if( ! $this->can_read_and_write_font_assets_directory() ) {
-                return add_action( 'admin_notices', [ $this, 'admin_notice_embed_font_permission_error' ] );
-            }
-
             // Gets data from the form
             $data = json_decode( stripslashes( $_POST[ 'selection-data' ] ), true );
             $google_font_name = $data[ 'family' ];
@@ -495,6 +503,24 @@ class Manage_Fonts_Admin {
 			</div>
 		<?php
 	}
+
+    function admin_notice_file_edit_error () {
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error: `DISALLOW_FILE_EDIT` cannot be enabled in wp-config.php to make modifications to the theme using this plugin.', 'create-block-theme' ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    function admin_notice_user_cant_edit_theme () {
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php printf( esc_html__( 'Error: You do not have sufficient permission to edit the theme.', 'create-block-theme' ) ); ?></p>
+			</div>
+		<?php
+	}
+
+    
 }
 
 ?>
