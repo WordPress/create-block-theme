@@ -514,7 +514,7 @@ class Manage_Fonts_Admin {
     function admin_notice_user_cant_edit_theme () {
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error: Your user account do not have the enough permissions to edit the theme.', 'create-block-theme' ) ); ?></p>
+				<p><?php printf( esc_html__( 'Error: You do not have sufficient permission to edit the theme.', 'create-block-theme' ) ); ?></p>
 			</div>
 		<?php
 	}
