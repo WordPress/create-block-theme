@@ -560,19 +560,16 @@ class Create_Block_Theme_Admin {
 		return isset( parse_url( $url )[ 'host' ] );
 	}
 
-	// find all the media files used in the templates and add them to the zip
-	function make_template_images_local ( $template_content ) {
-		$media = [];
-		$has_updated_content = false;
-		$new_content         = '';
-		$template_blocks     = parse_blocks( $template_content );
-		
-		$blocks = _flatten_blocks( $template_blocks );
+	function make_image_blocks_local ( $nested_blocks ) {
 		$new_blocks = [];
-		foreach ( $blocks as $block ) {
+		foreach ( $nested_blocks as $block ) {
+			// recursive call for inner blocks
+			if ( !empty ( $block['innerBlocks'] ) ) {
+				$block['innerBlocks'] = $this->make_image_blocks_local( $block[ 'innerBlocks' ] );
+			}
 			if ( 'core/image' === $block[ 'blockName' ] ) {
 				$doc = new DOMDocument();
-				@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+				@$doc->loadHTML( $block[ 'innerHTML' ], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 				$tags = $doc->getElementsByTagName( 'img' );
 				$block_has_external_images = false;
 				foreach ( $tags as $tag ) {
@@ -589,27 +586,44 @@ class Create_Block_Theme_Admin {
 				if ( $block_has_external_images ) {
 					$block['innerHTML'] = $doc->saveHTML();
 					$block['innerContent'] = array ( $doc->saveHTML() );
-					$has_updated_content = true;
 				}
 			}
 			$new_blocks[] = $block;
 		}
-		
-		if ( ! $has_updated_content ) {
-			return array (
-				'content' => $template_content,
-				'media' => $media
-			);
+		return $new_blocks;
+	}
+
+	function get_media_absolute_urls_from_blocks ( $flatten_blocks ) {
+		$media = [];
+		foreach ( $flatten_blocks as $block ) {
+			if ('core/image' === $block[ 'blockName' ]) {
+				$doc = new DOMDocument();
+				@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+				$tags = $doc->getElementsByTagName( 'img' );
+				$block_has_external_images = false;
+				foreach ($tags as $tag) {
+					$image_url = $tag->getAttribute( 'src' );
+					if ($this->is_absolute_url( $image_url )) {
+						$media[] = $tag->getAttribute( 'src' );
+					}
+				}
+			}
 		}
+		return $media;
+	}
+
+	// find all the media files used in the templates and add them to the zip
+	function make_template_images_local ( $template ) {
+		$new_content         = $template->content;
+		$template_blocks     = parse_blocks( $template->content );
+		$flatten_blocks	     = _flatten_blocks( $template_blocks );
 		
-		foreach ( $new_blocks as $block ) {
-			$new_content .= serialize_block( $block );
-		}
-		
-		return array (
-			'content' => $this->clean_serialized_markup ( $new_content ),
-			'media' => $media
-		);
+		$blocks = $this->make_image_blocks_local( $template_blocks );
+		$blocks = serialize_blocks ( $blocks );
+
+		$template->content = $this->clean_serialized_markup ( $blocks );
+		$template->media = $this->get_media_absolute_urls_from_blocks ( $flatten_blocks );
+		return $template;
 	}
 
 	function clean_serialized_markup ( $markup ) {
@@ -617,6 +631,26 @@ class Create_Block_Theme_Admin {
 		$markup = str_replace( '&lt;', '<', $markup );
 		$markup = str_replace( '&gt;', '>', $markup );
 		return $markup;
+	}
+
+	function pattern_from_template ( $template ) {
+		$theme_slug = wp_get_theme()->get( 'TextDomain' );
+		$pattern_slug = $theme_slug . '/' . $template->slug;
+		$pattern_content = (
+'<?php
+/**
+ * Title: '. $template->slug .'
+ * Slug: ' . $pattern_slug. '
+ * Categories: hidden
+ * Inserter: no
+ */
+?>
+'. $template->content
+		);
+		return array (
+			'slug' => $pattern_slug,
+			'content' => $pattern_content
+		);
 	}
 
 	/**
@@ -641,31 +675,60 @@ class Create_Block_Theme_Admin {
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
-			$template_data = $this->make_template_images_local( $template->content );
+			$template_data = $this->make_template_images_local( $template );
 
+			// If there are images in the template, add it as a pattern
+			if ( count( $template_data->media ) > 0 ) {
+				$pattern = $this->pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+
+				// Add pattern to zip
+				$zip->addFromString(
+					'patterns/' . $template_data->slug . '.php',
+					$pattern[ 'content' ]
+				);
+
+				// Add image assets to zip
+				foreach ( $template_data->media as $media ) {
+					$download_file = file_get_contents( $media );
+					$zip->addFromString( 'assets/images/' . basename( $media ), $download_file );
+				}
+			}
+
+			// Add template to zip
 			$zip->addFromString(
-				'templates/' . $template->slug . '.html',
-				$template_data['content']
+				'templates/' . $template_data->slug . '.html',
+				$template_data->content
 			);
 
-			foreach ( $template_data['media'] as $media ) {
-				$download_file = file_get_contents( $media );
-				$zip->addFromString( 'assets/images/' . basename( $media ) , $download_file );
-			}
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
-			$template_data = $this->make_template_images_local( $template_part->content );
+			$template_data = $this->make_template_images_local( $template_part );
 
-			$zip->addFromString(
-				'parts/' . $template_part->slug . '.html',
-				$template_data['content']
-			);
+			// If there are images in the template, add it as a pattern
+			if ( count( $template_data->media ) > 0 ) {
+				$pattern = $this->pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
 
-			foreach ( $template_data['media'] as $media ) {
-				$download_file = file_get_contents( $media );
-				$zip->addFromString( 'assets/images/' . basename( $media ) , $download_file );
+				// Add pattern to zip
+				$zip->addFromString(
+					'patterns/' . $template_data->slug . '.php',
+					$pattern[ 'content' ]
+				);
+
+				// Add image assets to zip
+				foreach ( $template_data->media as $media ) {
+					$download_file = file_get_contents( $media );
+					$zip->addFromString( 'assets/images/' . basename( $media ), $download_file );
+				}
 			}
+
+			// Add template to zip
+			$zip->addFromString(
+				'parts/' . $template_data->slug . '.html',
+				$template_data->content
+			);
 		}
 
 		return $zip;
