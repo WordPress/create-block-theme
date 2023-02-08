@@ -39,8 +39,7 @@ class Create_Block_Theme_Admin {
 		$this->add_theme_json_variation_to_local( $export_type, $theme );
 	}
 
-	function clear_user_customizations() {
-
+	function clear_user_styles_customizations(){
 		// Clear all values in the user theme.json
 		$user_custom_post_type_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
 		$global_styles_controller = new WP_REST_Global_Styles_Controller();
@@ -53,7 +52,9 @@ class Create_Block_Theme_Admin {
 		delete_transient( 'global_styles_' . get_stylesheet() );
 		delete_transient( 'gutenberg_global_styles' );
 		delete_transient( 'gutenberg_global_styles_' . get_stylesheet() );
+	}
 
+	function clear_user_templates_customizations() {
 		//remove all user templates (they have been saved in the theme)
 		$templates = get_block_templates();
 		$template_parts = get_block_templates( array(), 'wp_template_part' );
@@ -70,7 +71,6 @@ class Create_Block_Theme_Admin {
 			}
 			wp_delete_post($template->wp_id, true);
 		}
-
 	}
 
 	/**
@@ -897,7 +897,8 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				else {
 					$this->save_theme_locally( 'all' );
 				}
-				$this->clear_user_customizations();
+				$this->clear_user_styles_customizations();
+				$this->clear_user_templates_customizations();
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
 			}
@@ -919,7 +920,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 				else {
 					$this->save_variation( 'all', $_POST['theme'] );
 				}
-				$this->clear_user_customizations();
+				$this->clear_user_styles_customizations();
 
 				add_action( 'admin_notices', [ $this, 'admin_notice_variation_success' ] );
 			}
