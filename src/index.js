@@ -36,11 +36,7 @@ window.addEventListener(
     function () {
         render(
             <App />,
-<<<<<<< HEAD
-            document.querySelector( '#fonts-app' )
-=======
             document.querySelector( '#app-container' )
->>>>>>> a22f375 (Get themes and display them in a submit theme panel.)
         );
     },
     false
