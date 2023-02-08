@@ -740,8 +740,8 @@ class Create_Block_Theme_Admin {
 		$template_folders = get_block_theme_folders();
 
 		// If there is no templates folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . '/' . $template_folders['wp_template']  ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . '/' . $template_folders['wp_template'] );
+		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template']  ) ) {
+			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] );
 		}
 
 		if ( ! is_dir( get_stylesheet_directory() . '/assets/images' ) ) {
@@ -749,32 +749,77 @@ class Create_Block_Theme_Admin {
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
-			$template_data = $this->make_template_images_local( $template->content );
+			$template_data = $this->make_template_images_local( $template );
+
+			// If there are images in the template, add it as a pattern
+			if ( ! empty ( $template_data->media ) ) {
+				// If there is no templates folder, create it.
+				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns'  ) ) {
+					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
+				}
+
+				// If there are external images, add it as a pattern
+				$pattern = $this->pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+
+				// Write the pattern
+				file_put_contents(
+					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
+					$pattern[ 'content' ]
+				);
+			}
+
+			// Write the template content
 			file_put_contents(
-				get_stylesheet_directory() . '/' . $template_folders['wp_template'] . '/' . $template->slug . '.html',
-				$template_data[ 'content' ]
+				get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				$template_data->content
 			);
-			foreach ( $template_data[ 'media' ] as $media ) {
+
+			// Write the image assets
+			foreach ( $template_data->media as $media ) {
 				$download_file = file_get_contents( $media );
 				file_put_contents(
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR .'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . basename( $media ),
 					$download_file
 				);
 			}
+
 		}
 
 		// If there is no parts folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] );
+		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] ) ) {
+			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] );
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
-			$template_data = $this->make_template_images_local( $template_part->content );
+			$template_data = $this->make_template_images_local( $template_part );
+
+			// If there are images in the template, add it as a pattern
+			if ( ! empty ( $template_data->media ) ) {
+				// If there is no templates folder, create it.
+				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns'  ) ) {
+					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
+				}
+
+				// If there are external images, add it as a pattern
+				$pattern = $this->pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+
+				// Write the pattern
+				file_put_contents(
+					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
+					$pattern[ 'content' ]
+				);
+			}
+
+			// Write the template content
 			file_put_contents(
-				get_stylesheet_directory() . '/' . $template_folders['wp_template_part'] . '/' . $template_part->slug . '.html',
-				$template_data[ 'content' ]
+				get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . $template_data->slug . '.html',
+				$template_data->content
 			);
-			foreach ( $template_data[ 'media' ] as $media ) {
+
+			// Write the image assets
+			foreach ( $template_data->media as $media ) {
 				$download_file = file_get_contents( $media );
 				file_put_contents(
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR .'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . basename( $media ),
