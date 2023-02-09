@@ -5,41 +5,40 @@ name: Update Google Fonts JSON
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  schedule:
-    - cron: '0 0 * * TUE' # Runs weekly, every Tuesday.
-  workflow_dispatch:
+    schedule:
+        - cron: '0 0 * * TUE' # Runs weekly, every Tuesday.
+    workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "update-google-fonts-json"
-  update-google-fonts-json:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    # This workflow contains a single job called "update-google-fonts-json"
+    update-google-fonts-json:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
+        # Steps represent a sequence of tasks that will be executed as part of the job
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
 
-    - name: Get current date
-      id: date
-      run: echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_OUTPUT
+            - name: Get current date
+              id: date
+              run: echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_OUTPUT
 
-    # Runs a single command using the runners shell
-    # This script fetchs the Goolgle Fonts API data and creates a PR if new data is available
-    - name: Update Google Fonts JSON
-      env:
-        GOOGLE_FONTS_API_KEY: ${{ secrets.GOOGLE_FONTS_API_KEY }}
-        BRANCH_NAME: update/google-fonts-json-${{ steps.date.outputs.date }}_${{ github.run_id }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        echo "Updating Google fonts JSON"
-        node ./update-google-fonts-json-file.js
-        git config user.name 'github-actions[bot]'
-        git config user.email 'github-actions[bot]@users.noreply.github.com'
-        git config --global --add --bool push.autoSetupRemote true
-        
-        git diff-index --quiet HEAD -- || ( git add assets/google-fonts/fallback-fonts-list.json && git checkout -b ${{ env.BRANCH_NAME }} && git commit -m "Updating file" && git push && gh pr create -B trunk -H ${{ env.BRANCH_NAME }} --title "Update Google Fonts JSON data from API" --body "Created by Update Google Fonts JSON Github action" )
-        
+            # Runs a single command using the runners shell
+            # This script fetchs the Goolgle Fonts API data and creates a PR if new data is available
+            - name: Update Google Fonts JSON
+              env:
+                  GOOGLE_FONTS_API_KEY: ${{ secrets.GOOGLE_FONTS_API_KEY }}
+                  BRANCH_NAME: update/google-fonts-json-${{ steps.date.outputs.date }}_${{ github.run_id }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Updating Google fonts JSON"
+                  node ./update-google-fonts-json-file.js
+                  git config user.name 'github-actions[bot]'
+                  git config user.email 'github-actions[bot]@users.noreply.github.com'
+                  git config --global --add --bool push.autoSetupRemote true
+
+                  git diff-index --quiet HEAD -- || ( git add assets/google-fonts/fallback-fonts-list.json && git checkout -b ${{ env.BRANCH_NAME }} && git commit -m "Updating file" --no-verify && git push && gh pr create -B trunk -H ${{ env.BRANCH_NAME }} --title "Update Google Fonts JSON data from API" --body "Created by Update Google Fonts JSON Github action" )
