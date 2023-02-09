@@ -37,17 +37,6 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 == Changelog ==
 
 = 1.5.1 =
-* # Conflicts:
-#	css/manage-fonts.css
-#	src/font-face.js
-#	src/font-family.js
-#	src/manage-fonts.js
-
-* Merge branch 'trunk' into add/code-linting
-* # Conflicts:
-#	package-lock.json
-#	package.json
-
 * check for DISALLOW_FILE_EDIT and simplify permission check logic
 * Load google fonts data from url
 * Separate styles and templates reset
