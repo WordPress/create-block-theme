@@ -107,6 +107,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags'] = sanitize_text_field( $theme['tags'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -163,6 +164,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags'] = sanitize_text_field( $theme['tags'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -219,6 +221,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags'] = sanitize_text_field( $theme['tags'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
@@ -290,6 +293,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags'] = sanitize_text_field( $theme['tags'] );
 		$theme['template'] = '';
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 
@@ -690,6 +694,7 @@ GNU General Public License for more details.
 		$uri = $theme['uri'];
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
+		$tags = $theme['tags'] ? ", " . $theme['tags'] : '';
 		$template = $theme['template'];
 		return "/*
 Theme Name: {$name}
@@ -705,7 +710,7 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
 Text Domain: {$slug}
-Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
+Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks{$tags}
 */";
 	}
 
@@ -849,7 +854,14 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 									<?php _e('Author URI:', 'create-block-theme'); ?><br />
 									<small><?php _e('The URL of the authoring individual or organization.', 'create-block-theme'); ?></small><br />
 									<input placeholder="<?php _e('https://wordpress.org/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="large-text code" />
-								</label><br /><br />
+								</label>
+								<br /><br />
+								<label>
+									<?php _e('Theme Tags:', 'create-block-theme'); ?><br />
+									<small><?php _e('Add theme tags to help categorize the theme.', 'create-block-theme'); ?></small><br />
+									<input placeholder="<?php _e('blog, one-column', 'create-block-theme'); ?>" type="text" name="theme[tags]" class="large-text code" />
+								</label>
+								<br /><br />
 								<label for="screenshot">
 									<?php _e('Screenshot:', 'create-block-theme'); ?><br />
 									<small><?php _e('Upload a new theme screenshot (2mb max | .png only | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
