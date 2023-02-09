@@ -4,7 +4,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.1
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,6 +35,26 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.5.1 =
+* # Conflicts:
+#	css/manage-fonts.css
+#	src/font-face.js
+#	src/font-family.js
+#	src/manage-fonts.js
+
+* Merge branch 'trunk' into add/code-linting
+* # Conflicts:
+#	package-lock.json
+#	package.json
+
+* check for DISALLOW_FILE_EDIT and simplify permission check logic
+* Load google fonts data from url
+* Separate styles and templates reset
+* Add spinner while google fonts load instead of showing a blank page
+* Add: code linting scripts
+* Update Google Fonts JSON data from API
+* Avoid pre commit verifications on Github actions to prevent action errors caused by linting problems
 
 = 1.5.0 =
 * Fix: browser console errors
