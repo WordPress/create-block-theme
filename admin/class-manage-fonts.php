@@ -137,7 +137,7 @@ class Manage_Fonts_Admin {
         <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
         
         <form method="POST"  id="manage-fonts-form">
-            <div id="fonts-app"></div>
+            <div id="app-container"></div>
             <input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
         </form>
 
@@ -227,7 +227,7 @@ class Manage_Fonts_Admin {
         $this->load_fonts_react_app();
 ?>
         <input id="nonce" type="hidden" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-        <div id="fonts-app"></div>
+        <div id="app-container"></div>
 
 	<?php
 	}
