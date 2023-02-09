@@ -1,0 +1,6 @@
+{
+	"extends": "plugin:@wordpress/eslint-plugin/recommended",
+	"rules": {
+		"no-undef": "off"
+	}
+}
