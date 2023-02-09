@@ -694,7 +694,7 @@ GNU General Public License for more details.
 		$uri = $theme['uri'];
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
-		$tags = $theme['tags'] ? ", " . $theme['tags'] : '';
+		$tags = $theme['tags'] ? ", " . $theme['tags'] : ", one-column";
 		$template = $theme['template'];
 		return "/*
 Theme Name: {$name}
@@ -710,7 +710,7 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
 Text Domain: {$slug}
-Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks{$tags}
+Tags: editor-style, full-site-editing, rtl-language-support, threaded-comments, translation-ready{$tags}
 */";
 	}
 
