@@ -579,7 +579,7 @@ class Create_Block_Theme_Admin {
 						$media[] = $tag->getAttribute( 'src' );
 						$tag->setAttribute(
 							'src',
-							'<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/'. basename( $tag->getAttribute( 'src' ) )
+							'<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/'. basename( $tag->getAttribute( 'src' ) )
 						);
 					}
 				}
