@@ -560,33 +560,70 @@ class Create_Block_Theme_Admin {
 		return isset( parse_url( $url )[ 'host' ] );
 	}
 
-	function make_image_blocks_local ( $nested_blocks ) {
+	function make_relative_image_url ( $absolute_url ) {
+		return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/'. basename( $absolute_url );
+	}
+
+	function make_img_tags_local ( $html ) {
+		if ( empty( $html ) ) {
+			return $html;
+		}
+		$doc = new DOMDocument();
+		@$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		$img_tags = $doc->getElementsByTagName( 'img' );
+		$html_has_external_images = false;
+		foreach ( $img_tags as $tag ) {
+			$image_url = $tag->getAttribute( 'src' );
+			if ( $this->is_absolute_url( $image_url ) ) {
+				$html_has_external_images = true;
+				$img_src = $tag->getAttribute( 'src' );
+				$media[] = $img_src;
+				$html = str_replace( $img_src, $this->make_relative_image_url( $img_src ), $html );
+			}
+		}
+		return $html;
+	}
+
+	function make_image_block_local ( $block ) {
+		if ( 'core/image' === $block[ 'blockName' ] ) {
+			$inner_html =  $this->make_img_tags_local( $block[ 'innerHTML' ] );
+			$block['innerHTML'] = $inner_html;
+			$block['innerContent'] = array ( $inner_html );
+		}
+		return $block;
+	}
+
+	function make_cover_block_local ( $block ) {
+		if ( 'core/cover' === $block[ 'blockName' ] ) {
+			$inner_html = $this->make_img_tags_local( $block[ 'innerHTML' ] );
+			
+			if ( isset ( $block['attrs']['url'] ) && $this->is_absolute_url( $block['attrs']['url'] ) ) {
+				$block_has_external_images = true;
+				$block['attrs']['url'] = $this->make_relative_image_url( $block['attrs']['url'] );
+			}
+
+			$inner_content = [];
+			foreach ( $block['innerContent'] as $content ) {
+				$content_html = $this->make_img_tags_local( $content );
+				$inner_content[] = $content_html;
+			}
+			
+			$block['innerHTML'] = $inner_html;
+			$block['innerContent'] = $inner_content;
+		}
+		return $block;
+	}
+
+	function make_media_blocks_local ( $nested_blocks ) {
 		$new_blocks = [];
 		foreach ( $nested_blocks as $block ) {
+			$inner_blocks = $block['innerBlocks'];
+			$block = $this->make_image_block_local( $block );
+			$block = $this->make_cover_block_local( $block );
+
 			// recursive call for inner blocks
 			if ( !empty ( $block['innerBlocks'] ) ) {
-				$block['innerBlocks'] = $this->make_image_blocks_local( $block[ 'innerBlocks' ] );
-			}
-			if ( 'core/image' === $block[ 'blockName' ] ) {
-				$doc = new DOMDocument();
-				@$doc->loadHTML( $block[ 'innerHTML' ], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-				$tags = $doc->getElementsByTagName( 'img' );
-				$block_has_external_images = false;
-				foreach ( $tags as $tag ) {
-					$image_url = $tag->getAttribute( 'src' );
-					if ( $this->is_absolute_url( $image_url ) ) {
-						$block_has_external_images = true;
-						$media[] = $tag->getAttribute( 'src' );
-						$tag->setAttribute(
-							'src',
-							'<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/'. basename( $tag->getAttribute( 'src' ) )
-						);
-					}
-				}
-				if ( $block_has_external_images ) {
-					$block['innerHTML'] = $doc->saveHTML();
-					$block['innerContent'] = array ( $doc->saveHTML() );
-				}
+				$block['innerBlocks'] = $this->make_media_blocks_local( $inner_blocks );
 			}
 			$new_blocks[] = $block;
 		}
@@ -596,7 +633,7 @@ class Create_Block_Theme_Admin {
 	function get_media_absolute_urls_from_blocks ( $flatten_blocks ) {
 		$media = [];
 		foreach ( $flatten_blocks as $block ) {
-			if ('core/image' === $block[ 'blockName' ]) {
+			if ( 'core/image' === $block[ 'blockName' ] || 'core/cover' === $block[ 'blockName' ] ) {
 				$doc = new DOMDocument();
 				@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 				$tags = $doc->getElementsByTagName( 'img' );
@@ -618,7 +655,7 @@ class Create_Block_Theme_Admin {
 		$template_blocks     = parse_blocks( $template->content );
 		$flatten_blocks	     = _flatten_blocks( $template_blocks );
 		
-		$blocks = $this->make_image_blocks_local( $template_blocks );
+		$blocks = $this->make_media_blocks_local( $template_blocks );
 		$blocks = serialize_blocks ( $blocks );
 
 		$template->content = $this->clean_serialized_markup ( $blocks );
@@ -630,6 +667,8 @@ class Create_Block_Theme_Admin {
 		$markup = str_replace( '%20', ' ', $markup );
 		$markup = str_replace( '&lt;', '<', $markup );
 		$markup = str_replace( '&gt;', '>', $markup );
+		$markup = str_replace( '\u003c', '<', $markup );
+		$markup = str_replace( '\u003e', '>', $markup );
 		return $markup;
 	}
 
