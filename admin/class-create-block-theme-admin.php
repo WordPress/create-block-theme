@@ -564,21 +564,33 @@ class Create_Block_Theme_Admin {
 		return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/'. basename( $absolute_url );
 	}
 
-	function make_img_tags_local ( $html ) {
+	function make_html_images_local ( $html ) {
 		if ( empty( $html ) ) {
 			return $html;
 		}
 		$doc = new DOMDocument();
 		@$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 		$img_tags = $doc->getElementsByTagName( 'img' );
-		$html_has_external_images = false;
+		// replace all images that have absolute urls
 		foreach ( $img_tags as $tag ) {
 			$image_url = $tag->getAttribute( 'src' );
 			if ( $this->is_absolute_url( $image_url ) ) {
-				$html_has_external_images = true;
 				$img_src = $tag->getAttribute( 'src' );
-				$media[] = $img_src;
 				$html = str_replace( $img_src, $this->make_relative_image_url( $img_src ), $html );
+			}
+		}
+		// also replace background images with absolute urls (used in cover blocks)
+		$div_tags = $doc->getElementsByTagName( 'div' );
+		foreach ( $div_tags as $tag ) {
+			$style = $tag->getAttribute( 'style' );
+			if ( $style ) {
+				preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match);
+				$urls = $match[0];
+				foreach ( $urls as $url ) {
+					if ( $this->is_absolute_url( $url ) ) {
+						$html = str_replace( $url, $this->make_relative_image_url( $url ), $html );
+					}
+				}
 			}
 		}
 		return $html;
@@ -586,7 +598,7 @@ class Create_Block_Theme_Admin {
 
 	function make_image_block_local ( $block ) {
 		if ( 'core/image' === $block[ 'blockName' ] ) {
-			$inner_html =  $this->make_img_tags_local( $block[ 'innerHTML' ] );
+			$inner_html =  $this->make_html_images_local( $block[ 'innerHTML' ] );
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = array ( $inner_html );
 		}
@@ -595,7 +607,7 @@ class Create_Block_Theme_Admin {
 
 	function make_cover_block_local ( $block ) {
 		if ( 'core/cover' === $block[ 'blockName' ] ) {
-			$inner_html = $this->make_img_tags_local( $block[ 'innerHTML' ] );
+			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
 			
 			if ( isset ( $block['attrs']['url'] ) && $this->is_absolute_url( $block['attrs']['url'] ) ) {
 				$block_has_external_images = true;
@@ -604,7 +616,7 @@ class Create_Block_Theme_Admin {
 
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
-				$content_html = $this->make_img_tags_local( $content );
+				$content_html = $this->make_html_images_local( $content );
 				$inner_content[] = $content_html;
 			}
 			
@@ -636,12 +648,28 @@ class Create_Block_Theme_Admin {
 			if ( 'core/image' === $block[ 'blockName' ] || 'core/cover' === $block[ 'blockName' ] ) {
 				$doc = new DOMDocument();
 				@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+
+				// Get the media urls from img tags
 				$tags = $doc->getElementsByTagName( 'img' );
 				$block_has_external_images = false;
 				foreach ($tags as $tag) {
 					$image_url = $tag->getAttribute( 'src' );
 					if ($this->is_absolute_url( $image_url )) {
 						$media[] = $tag->getAttribute( 'src' );
+					}
+				}
+				// Get the media urls from div style tags (used in cover blocks)
+				$div_tags = $doc->getElementsByTagName( 'div' );
+				foreach ( $div_tags as $tag ) {
+					$style = $tag->getAttribute( 'style' );
+					if ( $style ) {
+						preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match);
+						$urls = $match[0];
+						foreach ( $urls as $url ) {
+							if ( $this->is_absolute_url( $url ) ) {
+								$media[] = $url;
+							}
+						}
 					}
 				}
 			}
