@@ -2,10 +2,9 @@ import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl, Spinner } from '@wordpress/components';
 
 import FontVariant from './font-variant';
-import googleFontsData from "../../assets/google-fonts/fallback-fonts-list.json";
 import { getWeightFromGoogleVariant, getStyleFromGoogleVariant, forceHttps } from './utils';
 import DemoTextInput from "../demo-text-input";
 import "./google-fonts.css";
@@ -13,6 +12,7 @@ import "./google-fonts.css";
 const EMPTY_SELECTION_DATA = JSON.stringify( {} );
 
 function GoogleFonts () {
+    const [ googleFontsData, setGoogleFontsData ] = useState( {} );
     const [ selectedFont, setSelectedFont ] = useState( null );
     const [ selectedVariants, setSelectedVariants ] = useState( [] );
     const [ selectionData, setSelectionData ] = useState( EMPTY_SELECTION_DATA );
@@ -35,6 +35,15 @@ function GoogleFonts () {
             setSelectedVariants( [ ...selectedVariants, variant ] );
         }
     }
+
+    // Load google fonts data
+    useEffect(() => {
+        (async () => {
+            const responseData = await fetch( createBlockTheme.googleFontsDataUrl );
+            const parsedData = await responseData.json();
+            setGoogleFontsData( parsedData );
+        })();
+    }, []);
 
     // Reset selected variants when the selected font changes
     useEffect( () => {
@@ -76,63 +85,74 @@ function GoogleFonts () {
 			<h1 className="wp-heading-inline">{ __('Add Google fonts to your theme', 'create-block-theme') }</h1>
             <h3>{ __('Add Google fonts assets and font face definitions to your currently active theme', 'create-block-theme')} ({ theme?.name.rendered })</h3>
 
-            <div className="select-font">
-                <SelectControl
-                        label={ __('Select Font', 'create-block-theme') }
-                        name="google-font"
-                        onChange={ handleSelectChange }
-                    >
-                        <option value={null}>{ __('Select a font...', 'create-block-theme') }</option>
-                        { googleFontsData.items.map( ( font, index ) => (
-                                <option value={ index }>{ font.family }</option>
-                        ))}
-                </SelectControl>
-            </div>
-
-            <DemoTextInput />
-
-            { selectedFont && <p>{ __('Select the font variants you want to include:', 'create-block-theme') }</p> }
-
-            { selectedFont && (
-                <table className="wp-list-table widefat striped table-view-list" id="google-fonts-table">
-                    <thead>
-                        <tr>
-                            <td className="">
-                                <input
-                                    type="checkbox"
-                                    onClick={ handleToggleAllVariants }
-                                    checked={ selectedVariants.length === selectedFont?.variants.length }
-                                />
-                            </td>
-                            <td className="">{ __('Weight', 'create-block-theme') }</td>
-                            <td className="">{ __('Style', 'create-block-theme') }</td>
-                            <td className="">{ __('Preview', 'create-block-theme') }</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {selectedFont.variants.map( ( variant, i ) => (
-                            <FontVariant
-                                font={ selectedFont }
-                                variant={ variant }
-                                key={`font-variant-${i}`}
-                                isSelected={ selectedVariants.includes( variant ) }
-                                handleToggle={ () => handleToggleVariant( variant ) }
-                            />
-                        ))}
-                    </tbody>
-                </table>
+            { ! googleFontsData?.items && (
+                <p>
+                    <Spinner />
+                    <span>{ __('Loading Google fonts data...', 'create-block-theme') }</span>
+                </p>
             ) }
-            
-            <form enctype="multipart/form-data" action="" method="POST">
-                <input type="hidden" name="selection-data" value={ selectionData } />
-                <input
-                    type="submit"
-                    value={ __('Add google fonts to your theme', 'create-block-theme') }
-                    className="button button-primary"
-                    disabled={ selectedVariants.length === 0 }
-                />
-                <input type="hidden" name="nonce" value={ nonce } />
-            </form>
+
+            { googleFontsData?.items && (
+                <>
+                    <div className="select-font">
+                        <SelectControl
+                                label={ __('Select Font', 'create-block-theme') }
+                                name="google-font"
+                                onChange={ handleSelectChange }
+                            >
+                                <option value={null}>{ __('Select a font...', 'create-block-theme') }</option>
+                                { googleFontsData.items.map( ( font, index ) => (
+                                        <option value={ index }>{ font.family }</option>
+                                ))}
+                        </SelectControl>
+                    </div>
+
+                    <DemoTextInput />
+
+                    { selectedFont && <p>{ __('Select the font variants you want to include:', 'create-block-theme') }</p> }
+
+                    { selectedFont && (
+                        <table className="wp-list-table widefat striped table-view-list" id="google-fonts-table">
+                            <thead>
+                                <tr>
+                                    <td className="">
+                                        <input
+                                            type="checkbox"
+                                            onClick={ handleToggleAllVariants }
+                                            checked={ selectedVariants.length === selectedFont?.variants.length }
+                                        />
+                                    </td>
+                                    <td className="">{ __('Weight', 'create-block-theme') }</td>
+                                    <td className="">{ __('Style', 'create-block-theme') }</td>
+                                    <td className="">{ __('Preview', 'create-block-theme') }</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {selectedFont.variants.map( ( variant, i ) => (
+                                    <FontVariant
+                                        font={ selectedFont }
+                                        variant={ variant }
+                                        key={`font-variant-${i}`}
+                                        isSelected={ selectedVariants.includes( variant ) }
+                                        handleToggle={ () => handleToggleVariant( variant ) }
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    ) }
+                    
+                    <form enctype="multipart/form-data" action="" method="POST">
+                        <input type="hidden" name="selection-data" value={ selectionData } />
+                        <input
+                            type="submit"
+                            value={ __('Add google fonts to your theme', 'create-block-theme') }
+                            className="button button-primary"
+                            disabled={ selectedVariants.length === 0 }
+                        />
+                        <input type="hidden" name="nonce" value={ nonce } />
+                    </form>
+                </>
+            ) }
 		</div>
     )
 }

@@ -45,7 +45,7 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git config --global --add --bool push.autoSetupRemote true
-        git diff-index --quiet HEAD -- || ( git add package.json readme.txt create-block-theme.php && git commit -m "Version bump & changelog update" && git push )
+        git diff-index --quiet HEAD -- || ( git add package.json readme.txt create-block-theme.php && git commit -m "Version bump & changelog update" --no-verify && git push )
         gh release create ${{steps.update-version.outputs.NEW_TAG }} --generate-notes
 
     - name: Create Block Theme Plugin Deploy to WordPress.org
