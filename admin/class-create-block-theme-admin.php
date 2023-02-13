@@ -608,20 +608,33 @@ class Create_Block_Theme_Admin {
 	function make_cover_block_local ( $block ) {
 		if ( 'core/cover' === $block[ 'blockName' ] ) {
 			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
-			
-			if ( isset ( $block['attrs']['url'] ) && $this->is_absolute_url( $block['attrs']['url'] ) ) {
-				$block_has_external_images = true;
-				$block['attrs']['url'] = $this->make_relative_image_url( $block['attrs']['url'] );
-			}
-
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
 				$content_html = $this->make_html_images_local( $content );
 				$inner_content[] = $content_html;
 			}
-			
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = $inner_content;
+			if ( isset ( $block['attrs']['url'] ) && $this->is_absolute_url( $block['attrs']['url'] ) ) {
+				$block['attrs']['url'] = $this->make_relative_image_url( $block['attrs']['url'] );
+			}
+		}
+		return $block;
+	}
+
+	function make_mediatext_block_local ( $block ) {
+		if ( 'core/media-text' === $block[ 'blockName' ] ) {
+			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
+			$inner_content = [];
+			foreach ( $block['innerContent'] as $content ) {
+				$content_html = $this->make_html_images_local( $content );
+				$inner_content[] = $content_html;
+			}
+			$block['innerHTML'] = $inner_html;
+			$block['innerContent'] = $inner_content;
+			if ( isset ( $block['attrs']['mediaLink'] ) && $this->is_absolute_url( $block['attrs']['mediaLink'] ) ) {
+				$block['attrs']['mediaLink'] = $this->make_relative_image_url( $block['attrs']['mediaLink'] );
+			}
 		}
 		return $block;
 	}
@@ -632,6 +645,7 @@ class Create_Block_Theme_Admin {
 			$inner_blocks = $block['innerBlocks'];
 			$block = $this->make_image_block_local( $block );
 			$block = $this->make_cover_block_local( $block );
+			$block = $this->make_mediatext_block_local( $block );
 
 			// recursive call for inner blocks
 			if ( !empty ( $block['innerBlocks'] ) ) {
