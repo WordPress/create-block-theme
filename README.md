@@ -6,7 +6,8 @@ It works alongside features that are already available in the Site Editor to enh
 
 This plugin allows you to:
 
--   Create a new theme, blank theme, child theme, or style variation from within the Site Editor
+- Export your existing theme with all customizations made in the Site Editor
+- Create a new theme, blank theme, child theme, or style variation from the Site Editor
 -   Embed Google Fonts locally in your theme
 -   Embed local font assets in your theme
 
