@@ -8,6 +8,7 @@
  * @subpackage Create_Block_Theme/includes
  * @author     WordPress.org
  */
+#[AllowDynamicProperties]
 class Create_Block_Theme {
 
 	/**
