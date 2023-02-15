@@ -832,9 +832,10 @@ Tags: {$tags}
 					<div id="col-right">
 						<div class="col-wrap">
 							<div hidden id="new_variation_metadata_form" class="theme-form">
+								<p><em><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></em></p>
 								<label>
 									<?php _e('Variation Name (*):', 'create-block-theme'); ?><br />
-									<input placeholder="<?php _e('Variation Name', 'create-block-theme'); ?>" type="text" name="theme[variation]" class="large-text" />
+									<input placeholder="<?php _e('Variation Name', 'create-block-theme'); ?>" type="text" name="theme[variation]" class="large-text" required />
 								</label>
 							</div>
 							<div hidden id="new_theme_metadata_form" class="theme-form">
