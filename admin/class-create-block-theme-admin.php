@@ -879,8 +879,7 @@ Tags: {$tags}
 
 									<div class="theme-tags">
 									<?php
-										$json = file_get_contents("http://api.wordpress.org/themes/info/1.1/?action=feature_list");
-										$theme_tags = json_decode($json, true);
+										$theme_tags = get_theme_feature_list();
 
 										if ( ! is_array( $theme_tags ) ) {
 											return null;
