@@ -881,6 +881,13 @@ Tags: {$tags}
 									<?php
 										$theme_tags = get_theme_feature_list();
 
+										function isDefaultTag( $tag ) {
+											$default_tags = array( 'editor-style', 'full-site-editing', 'rtl-language-support', 'translation-ready', 'one-column' );
+											// check active theme tags
+											$tag = strtolower( $tag );
+											return in_array( $tag, $default_tags );
+										}
+
 										if ( ! is_array( $theme_tags ) ) {
 											return null;
 										}
@@ -895,10 +902,10 @@ Tags: {$tags}
 													<fieldset id="<?php echo strtolower($key); ?>_tags">
 														<legend class="large-text"><?php if ('Subject' === $key) { echo $key . " " . __('(max 3 tags)', 'create-block-theme') . ":"; } else { echo $key . ":"; }?></legend>
 												<?php
-													foreach($value as $tag) {
+													foreach($value as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo strtolower($tag); ?>">
-															<label for="<?php echo $tag; ?>"><?php echo $tag; ?></label>
+															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isDefaultTag( $tag ) ) { echo ' checked'; }	?>>
+															<label for="<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
 													}
@@ -915,10 +922,10 @@ Tags: {$tags}
 													<fieldset id="features_tags_1">
 														<legend class="large-text"><?php echo $key . ":"; ?></legend>
 												<?php
-													foreach($features_one as $tag) {
+													foreach($features_one as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo strtolower($tag); ?>">
-															<label for="<?php echo $tag; ?>"><?php echo $tag; ?></label>
+															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isDefaultTag( $tag ) ) { echo ' checked'; }	?>>
+															<label for="<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
 													}
@@ -926,10 +933,10 @@ Tags: {$tags}
 													</fieldset>
 													<fieldset id="features_tags_2">
 												<?php
-													foreach($features_two as $tag) {
+													foreach($features_two as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo strtolower($tag); ?>">
-															<label for="<?php echo $tag; ?>"><?php echo $tag; ?></label>
+															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isDefaultTag( $tag ) ) { echo ' checked'; }	?>>
+															<label for="<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
 													}
