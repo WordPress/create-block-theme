@@ -875,7 +875,15 @@ Tags: {$tags}
 								<br /><br />
 								<div>
 									<?php _e('Theme Tags:', 'create-block-theme'); ?><br />
-									<small><?php _e('Add theme tags to help categorize the theme (<a href="https://make.wordpress.org/themes/handbook/review/required/theme-tags/">read more</a>).', 'create-block-theme'); ?></small><br />
+									<small>
+									<?php
+									printf(
+										/* Translators: Theme Tags link. */
+										esc_html__( 'Add theme tags to help categorize the theme (%s).', 'create-block-theme' ),
+										'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/theme-tags/', 'create-block-theme' ) ) . '">read more</a>'
+									)
+									?>
+									</small><br />
 
 									<div class="theme-tags">
 									<?php
