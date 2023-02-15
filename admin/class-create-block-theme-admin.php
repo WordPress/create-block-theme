@@ -107,7 +107,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags'] = sanitize_text_field( $theme['tags'] );
+		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -164,7 +164,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags'] = sanitize_text_field( $theme['tags'] );
+		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -221,7 +221,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags'] = sanitize_text_field( $theme['tags'] );
+		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
@@ -293,7 +293,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags'] = sanitize_text_field( $theme['tags'] );
+		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
 		$theme['template'] = '';
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 
@@ -694,8 +694,18 @@ GNU General Public License for more details.
 		$uri = $theme['uri'];
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
-		$tags = $theme['tags'] ? ", " . $theme['tags'] : ", one-column";
 		$template = $theme['template'];
+
+		// build tags list
+		$tags_merged = array_merge($theme['tags-subject'] ?? [], $theme['tags-layout'] ?? [], $theme['tags-features'] ?? []);
+		$checkbox_tags = $tags_merged ? ", " . implode(", ", $tags_merged) : '';
+		$custom_tags = $theme['tags-custom'] ? ", " . $theme['tags-custom'] : '';
+		$tags = $checkbox_tags . $custom_tags;
+
+		if ( ! $tags ) {
+			$tags = ", one-column";
+		}
+
 		return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -828,6 +838,7 @@ Tags: editor-style, full-site-editing, rtl-language-support, threaded-comments, 
 								</label>
 							</div>
 							<div hidden id="new_theme_metadata_form">
+								<p><em><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></em></p>
 								<label>
 									<?php _e('Theme Name (*):', 'create-block-theme'); ?><br />
 									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" required />
@@ -856,18 +867,85 @@ Tags: editor-style, full-site-editing, rtl-language-support, threaded-comments, 
 									<input placeholder="<?php _e('https://wordpress.org/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="large-text code" />
 								</label>
 								<br /><br />
-								<label>
-									<?php _e('Theme Tags:', 'create-block-theme'); ?><br />
-									<small><?php _e('Add theme tags to help categorize the theme.', 'create-block-theme'); ?></small><br />
-									<input placeholder="<?php _e('blog, one-column', 'create-block-theme'); ?>" type="text" name="theme[tags]" class="large-text code" />
-								</label>
-								<br /><br />
 								<label for="screenshot">
 									<?php _e('Screenshot:', 'create-block-theme'); ?><br />
 									<small><?php _e('Upload a new theme screenshot (2mb max | .png only | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
 									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
-								</label><br/>
-								<p><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></p><br />
+								</label>
+								<br /><br />
+								<div>
+									<?php _e('Theme Tags:', 'create-block-theme'); ?><br />
+									<small><?php _e('Add theme tags to help categorize the theme.', 'create-block-theme'); ?></small><br />
+
+									<div class="theme-tags">
+									<?php
+										$json = file_get_contents("http://api.wordpress.org/themes/info/1.1/?action=feature_list");
+										$theme_tags = json_decode($json, true);
+
+										if ( ! is_array( $theme_tags ) ) {
+											return null;
+										}
+
+										if ( is_array( $theme_tags ) ) {
+											// sort tags by relevance
+											krsort( $theme_tags );
+
+											foreach($theme_tags as $key => $value) {
+												if ('Features' !== $key) {
+													?>
+													<fieldset id="<?php echo strtolower($key); ?>_tags">
+														<legend class="large-text"><?php if ('Subject' === $key) { echo $key . " " . __('(max 3 tags)', 'create-block-theme') . ":"; } else { echo $key . ":"; }?></legend>
+												<?php
+													foreach($value as $tag) {
+														?>
+															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo strtolower($tag); ?>">
+															<label for="<?php echo $tag; ?>"><?php echo $tag; ?></label>
+															<br />
+														<?php
+													}
+														?>
+													</fieldset>
+													<?php
+												}
+												if ('Features' === $key) {
+													// split array in half to display in two columns
+													$half = ceil(count($value) / 2);
+													$features_one = array_slice($value, 0, $half);
+													$features_two = array_slice($value, $half);
+												?>
+													<fieldset id="features_tags_1">
+														<legend class="large-text"><?php echo $key . ":"; ?></legend>
+												<?php
+													foreach($features_one as $tag) {
+														?>
+															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo strtolower($tag); ?>">
+															<label for="<?php echo $tag; ?>"><?php echo $tag; ?></label>
+															<br />
+														<?php
+													}
+														?>
+													</fieldset>
+													<fieldset id="features_tags_2">
+												<?php
+													foreach($features_two as $tag) {
+														?>
+															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo strtolower($tag); ?>">
+															<label for="<?php echo $tag; ?>"><?php echo $tag; ?></label>
+															<br />
+														<?php
+													}
+														?>
+													</fieldset>
+												<?php
+												}
+											}
+										}
+									?>
+									</div>
+									<br />
+									<small><?php _e('Add custom tags (comma-separated single or hypenated words):', 'create-block-theme'); ?></small><br />
+									<input placeholder="<?php _e('custom, tags, custom-tags', 'create-block-theme'); ?>" type="text" name="theme[tags-custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z]+)*$" />
+								</div>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
 							<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
