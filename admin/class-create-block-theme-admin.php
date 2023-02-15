@@ -892,7 +892,7 @@ Tags: {$tags}
 
 										// Lists default tags
 										function listDefaultTags() {
-											$default_tags = array( 'editor-style', 'full-site-editing', 'rtl-language-support', 'translation-ready' );
+											$default_tags = array( 'full-site-editing' );
 											return $default_tags;
 										}
 
