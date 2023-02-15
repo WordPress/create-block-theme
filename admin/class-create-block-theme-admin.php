@@ -876,18 +876,7 @@ Tags: {$tags}
 								</label>
 								<br /><br />
 								<div>
-									<?php _e('Theme Tags:', 'create-block-theme'); ?><br />
-									<small>
-									<?php
-									printf(
-										/* Translators: Theme Tags link. */
-										esc_html__( 'Add theme tags to help categorize the theme (%s).', 'create-block-theme' ),
-										'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/theme-tags/', 'create-block-theme' ) ) . '">read more</a>'
-									)
-									?>
-									</small><br />
-
-									<?php handle_theme_tags(); ?>
+									<?php theme_tags_section(); ?>
 								</div>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />

@@ -5,7 +5,19 @@
  * @package Create Block Theme
  */
 
-function handle_theme_tags() {
+function theme_tags_section() {
+	_e( 'Theme Tags:', 'create-block-theme' );
+
+	echo '<br /><small>';
+
+	printf(
+		/* Translators: Theme Tags link. */
+		esc_html__( 'Add theme tags to help categorize the theme (%s).', 'create-block-theme' ),
+		'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/theme-tags/', 'create-block-theme' ) ) . '">read more</a>'
+	);
+
+	echo '</small><br />';
+
 	echo '<div class="theme-tags">';
 
 	// Generate list of theme tags
