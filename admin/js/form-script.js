@@ -35,7 +35,6 @@ function toggleForm( element ) {
 // hide all theme forms
 function hideAllForms() {
 	const allForms = document.querySelectorAll( '.theme-form' );
-
 	allForms.forEach( ( form ) => {
 		form.toggleAttribute( 'hidden', true );
 	} );
@@ -72,25 +71,25 @@ function validateSubjectThemeTags() {
 	}
 }
 
-// store checked theme tag checkboxes when page is loaded
-let checkedThemeTags = [];
+// store active theme tags when page is loaded
+let activeThemeTags = [];
 window.onload = () => {
-	checkedThemeTags = document.querySelectorAll(
+	activeThemeTags = document.querySelectorAll(
 		'.theme-tags input[type="checkbox"]:checked'
 	);
 };
 
 // clear all theme tags for blank theme
 function clearThemeTags( themeType ) {
-	if ( ! checkedThemeTags ) return;
+	if ( ! activeThemeTags ) return;
+
+	activeThemeTags.forEach( ( checkbox ) => {
+		checkbox.checked = true;
+	} );
 
 	if ( 'blank' === themeType ) {
-		checkedThemeTags.forEach( ( checkbox ) => {
+		activeThemeTags.forEach( ( checkbox ) => {
 			checkbox.checked = false;
-		} );
-	} else {
-		checkedThemeTags.forEach( ( checkbox ) => {
-			checkbox.checked = true;
 		} );
 	}
 }
