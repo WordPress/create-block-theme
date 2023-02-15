@@ -599,6 +599,7 @@ class Create_Block_Theme_Admin {
 	function make_image_block_local ( $block ) {
 		if ( 'core/image' === $block[ 'blockName' ] ) {
 			$inner_html =  $this->make_html_images_local( $block[ 'innerHTML' ] );
+			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = array ( $inner_html );
 		}
@@ -608,9 +609,11 @@ class Create_Block_Theme_Admin {
 	function make_cover_block_local ( $block ) {
 		if ( 'core/cover' === $block[ 'blockName' ] ) {
 			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
+			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
 				$content_html = $this->make_html_images_local( $content );
+				$content_html = $this->escape_alt_for_pattern ( $content_html );
 				$inner_content[] = $content_html;
 			}
 			$block['innerHTML'] = $inner_html;
@@ -625,9 +628,11 @@ class Create_Block_Theme_Admin {
 	function make_mediatext_block_local ( $block ) {
 		if ( 'core/media-text' === $block[ 'blockName' ] ) {
 			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
+			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
 				$content_html = $this->make_html_images_local( $content );
+				$content_html = $this->escape_alt_for_pattern ( $content_html );
 				$inner_content[] = $content_html;
 			}
 			$block['innerHTML'] = $inner_html;
@@ -732,6 +737,26 @@ class Create_Block_Theme_Admin {
 			'slug' => $pattern_slug,
 			'content' => $pattern_content
 		);
+	}
+
+	function escape_text_for_pattern( $text ) {
+		if ( $text && trim ( $text ) !== "" ) {
+			return '<?php echo esc_attr( __( "' . $text . '" ) ); ?>';
+		}
+	}
+
+	function escape_alt_for_pattern ( $html ) {
+		preg_match( '@alt="([^"]+)"@' , $html, $match );
+		if ( isset( $match[0] ) ) {
+			$alt_attribute = $match[0];
+			$alt_value= $match[1];
+			$html = str_replace(
+				$alt_attribute,
+				'alt="'.$this->escape_text_for_pattern( $alt_value ).'"',
+				$html
+			);
+		}
+		return $html;
 	}
 
 	/**
