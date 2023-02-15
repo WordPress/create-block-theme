@@ -26,7 +26,6 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         <div>
                             <Button
                                 variant="tertiary"
-                                isDestructive={true}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     deleteFontFamily(fontFamilyIndex)

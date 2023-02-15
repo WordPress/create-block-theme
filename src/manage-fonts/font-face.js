@@ -37,7 +37,7 @@ function FontFace ( {
                 {/* <input style={ demoStyles } onChange={ handleChange } value={ demoText }/> */}
                 <Demo style={ demoStyles } />
             </td>
-            { deleteFontFace && <td><Button variant="tertiary" isDestructive={true} onClick={deleteFontFace}>{__('Remove', 'create-block-theme')}</Button></td> }
+            { deleteFontFace && <td><Button variant="tertiary" onClick={deleteFontFace}>{__('Remove', 'create-block-theme')}</Button></td> }
         </tr>
     );
 }

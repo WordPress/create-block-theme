@@ -67,13 +67,46 @@
     vertical-align: middle;
 }
 
-.font-family-head {
+.widefat td {
+    padding: .5rem 2rem;
+}
+
+td.font-family-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem;
+    background-color: #f6f7f7;
 }
 
 .font-family-head div:last-of-type {
     display: flex;
     gap: 1rem;
+}
+
+.slide.open {
+    margin: 0;
+    border: none;
+}
+
+table.widefat.wp-list-table {
+    border-radius: 2px;
+}
+
+table.widefat table {
+    border: none;
+}
+
+.manage-fonts-header-flex {
+    display: flex;
+    align-items: flex-end;
+}
+
+.manage-fonts-header-flex .wp-heading-inline+.page-title-action {
+    margin-left: auto;
+}
+
+.components-button.page-title-action {
+    font-weight: normal;
+    margin-left: .75rem;
 }
