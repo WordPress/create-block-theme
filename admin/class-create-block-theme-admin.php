@@ -890,17 +890,33 @@ Tags: {$tags}
 									<?php
 										$theme_tags = get_theme_feature_list();
 
-										function isExistingTag( $tag ) {
-											// Checks if active theme has tags
-											// and adds a list of default tags
+										// Lists default tags
+										function listDefaultTags() {
+											$default_tags = array( 'editor-style', 'full-site-editing', 'rtl-language-support', 'translation-ready' );
+											return $default_tags;
+										}
 
+										// Checks if a tag is a default tag
+										function isDefaultTag( $tag ) {
 											if ( ! is_string( $tag ) ) {
 												return null;
 											}
 
 											$tag = strtolower( $tag );
-											$default_tags = array( 'editor-style', 'full-site-editing', 'rtl-language-support', 'translation-ready', 'one-column' );
+											$default_tags = listDefaultTags();
+
+											return in_array( $tag, $default_tags );
+										}
+
+										// Checks if a tag is included in the active theme or the default tags
+										function isExistingTag( $tag ) {
+											if ( ! is_string( $tag ) ) {
+												return null;
+											}
+
+											$tag = strtolower( $tag );
 											$active_theme_tags = wp_get_theme()->get('Tags');
+											$default_tags = listDefaultTags();
 											$merged_tags = array_unique(array_merge( $default_tags, $active_theme_tags ));
 
 											return in_array( $tag, $merged_tags );
@@ -922,7 +938,7 @@ Tags: {$tags}
 												<?php
 													foreach($value as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
+															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" class="<?php if ( isDefaultTag( $tag ) ) { echo 'default-tag'; } ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
 															<label for="theme-tag-<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
@@ -942,7 +958,7 @@ Tags: {$tags}
 												<?php
 													foreach($features_one as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
+															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>"  class="<?php if ( isDefaultTag( $tag ) ) { echo 'default-tag'; } ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
 															<label for="theme-tag-<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
@@ -953,7 +969,7 @@ Tags: {$tags}
 												<?php
 													foreach($features_two as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
+															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" class="<?php if ( isDefaultTag( $tag ) ) { echo 'default-tag'; } ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
 															<label for="theme-tag-<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php

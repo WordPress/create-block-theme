@@ -1,7 +1,6 @@
+// Toggles the visibility of the forms based on the selected theme type
 // eslint-disable-next-line no-unused-vars
 function toggleForm( element ) {
-	// Toggles the visibility of the forms based on the selected theme type
-
 	if ( ! element?.value ) return;
 	const themeType = element.value;
 	hideAllForms();
@@ -19,7 +18,7 @@ function toggleForm( element ) {
 				.getElementById( 'new_theme_metadata_form' )
 				.toggleAttribute( 'hidden', false );
 
-			clearThemeTags( element.value );
+			resetThemeTags( element.value );
 			validateSubjectThemeTags( element.value );
 			break;
 
@@ -41,9 +40,8 @@ function hideAllForms() {
 	} );
 }
 
+// Validates theme subject tags, allows only 3 to be selected
 function validateSubjectThemeTags( themeType ) {
-	// Validates theme subject tags, allows only 3 to be selected
-
 	const subjectCheckboxes = document.querySelectorAll(
 		'input[name="theme[tags-subject][]"]'
 	);
@@ -91,11 +89,8 @@ window.onload = () => {
 	);
 };
 
-function clearThemeTags( themeType ) {
-	// Clears all theme tag states (checked, disabled)
-
-	if ( ! activeThemeTags ) return;
-
+// Resets all theme tag states (checked, disabled) to default values
+function resetThemeTags( themeType ) {
 	// Clear all checkboxes
 	const allCheckboxes = document.querySelectorAll(
 		'.theme-tags input[type="checkbox"]'
@@ -105,8 +100,18 @@ function clearThemeTags( themeType ) {
 		checkbox.removeAttribute( 'disabled' );
 	} );
 
+	// Recheck default tags
+	const defaultTags = document.querySelectorAll(
+		'.theme-tags input[type="checkbox"].default-tag'
+	);
+	defaultTags.forEach( ( checkbox ) => {
+		checkbox.checked = true;
+	} );
+
 	if ( 'blank' !== themeType ) {
 		// Recheck active theme tags
+		if ( ! activeThemeTags ) return;
+
 		activeThemeTags.forEach( ( checkbox ) => {
 			checkbox.checked = true;
 		} );
