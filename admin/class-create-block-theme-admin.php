@@ -744,7 +744,7 @@ Tags: {$tags}
 							<p><?php printf( esc_html__('Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></p>
 
 							<label>
-								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
+								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true, this );toggleForm( 'new_variation_metadata_form', true, this );" />
 								<?php
 									printf(
 										/* translators: Theme Name. */
@@ -758,7 +758,7 @@ Tags: {$tags}
 							<br /><br />
 							<?php if ( is_child_theme() ): ?>
 								<label>
-									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
+									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false, this );"/>
 									<?php
 									printf(
 										/* translators: Theme Name. */
@@ -773,7 +773,7 @@ Tags: {$tags}
 								<br />
 							<?php else: ?>
 								<label>
-									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
+									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false, this );"/>
 									<?php
 									printf(
 										/* translators: Theme Name. */
@@ -786,7 +786,7 @@ Tags: {$tags}
 								<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?>
 								<br /><br />
 								<label>
-									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
+									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false, this );"/>
 									<?php
 										printf(
 											/* translators: Theme Name. */
@@ -800,7 +800,7 @@ Tags: {$tags}
 								<br /><br />
 							<?php endif; ?>
 							<label>
-								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
+								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true, this );toggleForm( 'new_variation_metadata_form', true, this );" />
 								<?php
 									printf(
 										/* translators: Theme Name. */
@@ -813,13 +813,13 @@ Tags: {$tags}
 							</label>
 							<br /><br />
 							<label>
-								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );" />
+								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false, this );" />
 								<?php _e('Create blank theme', 'create-block-theme'); ?><br />
 								<?php _e('[Generate a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
-								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_variation_metadata_form', false );" />
+								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_variation_metadata_form', false, this );" />
 								<?php _e('Create a style variation', 'create-block-theme'); ?><br />
 								<?php printf( esc_html__('[Save user changes as a style variation of %1$s.]', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?>
 							</label>
