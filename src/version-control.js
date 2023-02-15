@@ -1,69 +1,69 @@
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from "react";
+import './version-control.css';
 
 const VersionControl = () => {
-	const [ theme, setTheme ] = useState({});
-	const [ themes, setThemes ] = useState([]);
+	const [ theme, setTheme ] = useState('');
+	const [ status, setStatus ] = useState( false );
+	const [ commitMessage, setCommitMessage ] = useState('');
 	
 	useEffect(() =>{
-		fetch('/wp-json/create-block-theme/v1/themes')
+		// fetch('/wp-json/create-block-theme/v1/themes')
+		// 	.then( response => response.json() )
+		// 	.then( json => {
+		// 		setThemes( json );
+		// 	})
+		// 	.catch( err => console.log(err));
+		fetch('/wp-json/create-block-theme/v1/theme-status')
 			.then( response => response.json() )
 			.then( json => {
-				setThemes( json );
+				setTheme( json['current_theme'] );
+				if ( json['status'].includes('nothing to commit, working tree clean')) {
+					setStatus( false );
+				} else {
+					setStatus( true );
+				}
 			})
 			.catch( err => console.log(err));
 	}, []);
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		console.log(theme);
 
-		const data = await fetch(`/wp-json/create-block-theme/v1/themes-pr?theme_slug=${theme.slug}&isChild=${theme.isChild}`)
-			.then( response => response.json() )
+		const data = {
+			'theme_slug': theme,
+			'commit_message': commitMessage
+		};
+		const res = await fetch(`/wp-json/create-block-theme/v1/pullrequest`, {
+				method: 'POST',
+				body: JSON.stringify(data)
+			})
+			.then( response => {
+				return response.json()
+			})
 			.catch( err => console.log(err));
 
-			console.log(data);
-		
-		// const response = await fetch(
-		//   `https://api.github.com/repos/${repoName}/pulls`,
-		//   {
-		// 	method: "POST",
-		// 	headers: {
-		// 	  "Content-Type": "application/json",
-		// 	  Authorization: `Token YOUR_ACCESS_TOKEN`,
-		// 	},
-		// 	body: JSON.stringify({
-		// 	  title: "my theme",
-		// 	  body: pullRequestBody,
-		// 	  head: "branch-name",
-		// 	  base: "trunk",
-		// 	}),
-		//   }
-		// );
-		// const data = await response.json();
-		// console.log(data);
+			console.log(res);
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			{ themes && (
-				<select value={theme?.slug} onChange={(e) => {
-					setTheme( themes.find( t => t.slug === e.target.value ));
-				}}>
-					{themes?.map((t, index) => (
-						<option key={index} value={t.slug}>
-						{ t.name }
-						</option>
-					))}
-				</select>
-			)}
-			<input
-				type="submit"
-				value={ __('Submit', 'create-block-theme') }
-				className="button button-primary"
-				// disabled={ selectedVariants.length === 0 }
-			/>
-	  </form>
+		<>
+			<h2>Active Theme: { theme }</h2>
+			<p>{ status ? 'Found changes to submit.' : 'No changes found.' }</p>
+			<form onSubmit={handleSubmit}>
+				{ status ? ( <input 
+					type="text" 
+					value={commitMessage} 
+					onChange={e => setCommitMessage(e.target.value)}
+					placeholder='Briefly describe the changes'/> ) : null }
+				<input
+					type="submit"
+					value={ __('Open Pull Request', 'create-block-theme') }
+					className="button button-primary"
+					disabled={ ! status }
+				/>
+			</form>
+		</>
 	)
 }
 

@@ -27,9 +27,14 @@ class Version_Control_Admin extends Create_Block_Theme_Admin {
 			'callback' => array($this, 'get_all_themes'),
 		));
 
-		register_rest_route( $namespace, '/themes-pr', array(
+		register_rest_route( $namespace, '/theme-status', array(
 			'methods' => 'GET',
-			'callback' => array($this, 'create_theme_pr'),
+			'callback' => array($this, 'get_changes'),
+		));
+
+		register_rest_route( $namespace, '/pullrequest', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'create_pull_request'),
 		));
 	}
 
@@ -51,25 +56,38 @@ class Version_Control_Admin extends Create_Block_Theme_Admin {
 		return rest_ensure_response($theme_names);
 	}
 
-    function create_theme_pr( $request ) {
-        $theme_slug = $request->get_param( 'theme_slug' );
-        $template = $request->get_param( 'template' );
-        $repo_path = get_stylesheet_directory_uri();
-        $commit_message = 'My test commit';
-        $commit_hash = 'a3892as3';
-        $branch = 'update/' . $theme_slug . '-' . $commit_hash;
+    function get_changes() {
+        $this->save_theme_locally( 'all' );
+
+        $current_theme = get_current_theme();
+        $cmd = sprintf(
+            'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s && 
+            git status', $current_theme );
+        exec( $cmd, $output );
+
+        $cmd = sprintf(
+            'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s && 
+            git stash', $current_theme );
+        exec( $cmd );
+
+        return rest_ensure_response( array(
+            'status' => $output,
+            'current_theme' => $current_theme
+        ));
+    }
+
+    function create_pull_request( $request ) {
+        $parameters = $request->get_json_params();
+        // $commit_message = 'My test commit';
+        // $random_id = wp_rand();
+        // $branch = 'update/' . $parameters->theme_slug . '-' . $random_id;
 
         // $cmd = sprintf( 
         //     'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s &&
-        //     git checkout -b try/\'%2$s\'', $theme_slug, $branch );
+        //     git checkout -b \'%2$s\' &&
+        //     git stash apply &&
+        //     git commit -m ', $theme_slug, $branch );
         // exec( $cmd, $output, $ret_val );
-
-        // if ( $theme_slug ) {
-        //     $this->save_theme_locally( 'current' );
-        // }
-        // else {
-        //     $this->save_theme_locally( 'all' );
-        // }
 
         // $cmd = sprintf( 
         //     'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s &&
@@ -79,15 +97,21 @@ class Version_Control_Admin extends Create_Block_Theme_Admin {
         //     git push origin try/\'%2$s\' > /dev/null &&
         //     gh pr create --repo=automattic/themes --web > /dev/null &', $theme_slug, $branch, $commit_message );
         // exec( $cmd, $output, $ret_val );
+        return rest_ensure_response(
+            array(
+                'theme' => $parameters->theme_slug,
+                'commit_message' => $parameters->commit_message
+            )
+        );
 
-        return rest_ensure_response(array(
-            'slug' => $theme_slug,
-            'template' => $template,
-            // 'output' => $output,
-            // 'return' => $ret_val,
-            // 'cmd' => $cmd,
-            'pr' => sprintf( 'https://github.com/automattic/themes/compare/trunk...%s?body=&expand=1', urlencode( $branch ) )
-        ));
+        // return rest_ensure_response(array(
+        //     'slug' => $theme_slug,
+        //     'template' => $template,
+        //     // 'output' => $output,
+        //     // 'return' => $ret_val,
+        //     // 'cmd' => $cmd,
+        //     'pr' => sprintf( 'https://github.com/automattic/themes/compare/trunk...%s?body=&expand=1', urlencode( $branch ) )
+        // ));
     }
 
     function version_control_admin_page () {
