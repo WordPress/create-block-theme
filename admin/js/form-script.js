@@ -46,28 +46,33 @@ function validateSubjectThemeTags() {
 		'input[name="theme[tags-subject][]"]'
 	);
 	const maxTags = 3;
+	handleCheckboxes();
 
 	for ( let i = 0; i < subjectCheckboxes.length; i++ ) {
 		subjectCheckboxes[ i ].addEventListener( 'change', function () {
-			const checked = document.querySelectorAll(
-				'input[name="theme[tags-subject][]"]:checked'
-			);
-			const unchecked = document.querySelectorAll(
-				'input[name="theme[tags-subject][]"]:not(:checked)'
-			);
-
-			if ( checked.length >= maxTags ) {
-				for ( let j = 0; j < unchecked.length; j++ ) {
-					unchecked[ j ].setAttribute( 'disabled', true );
-				}
-			}
-
-			if ( checked.length < maxTags ) {
-				for ( let j = 0; j < unchecked.length; j++ ) {
-					unchecked[ j ].removeAttribute( 'disabled' );
-				}
-			}
+			handleCheckboxes();
 		} );
+	}
+
+	function handleCheckboxes() {
+		const checked = document.querySelectorAll(
+			'input[name="theme[tags-subject][]"]:checked'
+		);
+		const unchecked = document.querySelectorAll(
+			'input[name="theme[tags-subject][]"]:not(:checked)'
+		);
+
+		if ( checked.length >= maxTags ) {
+			for ( let j = 0; j < unchecked.length; j++ ) {
+				unchecked[ j ].setAttribute( 'disabled', true );
+			}
+		}
+
+		if ( checked.length < maxTags ) {
+			for ( let j = 0; j < unchecked.length; j++ ) {
+				unchecked[ j ].removeAttribute( 'disabled' );
+			}
+		}
 	}
 }
 
