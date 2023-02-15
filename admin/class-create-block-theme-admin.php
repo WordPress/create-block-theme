@@ -702,8 +702,8 @@ GNU General Public License for more details.
 		$custom_tags   = $theme['tags-custom'] ? ', ' . $theme['tags-custom'] : '';
 		$tags          = $checkbox_tags . $custom_tags;
 
-		if ( ! $tags ) {
-			$tags = '';
+		if ( substr( $tags, 0, 2 ) === ", " ) {
+			$tags = substr($tags, 2);
 		}
 
 		return "/*
