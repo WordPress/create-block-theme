@@ -830,7 +830,7 @@ Tags: editor-style, full-site-editing, rtl-language-support, threaded-comments, 
 							<div hidden id="new_theme_metadata_form">
 								<label>
 									<?php _e('Theme Name (*):', 'create-block-theme'); ?><br />
-									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" />
+									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" required />
 								</label>
 								<br /><br />
 								<label>
