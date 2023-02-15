@@ -910,8 +910,8 @@ Tags: {$tags}
 												<?php
 													foreach($value as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
-															<label for="<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
+															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
+															<label for="theme-tag-<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
 													}
@@ -930,8 +930,8 @@ Tags: {$tags}
 												<?php
 													foreach($features_one as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
-															<label for="<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
+															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
+															<label for="theme-tag-<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
 													}
@@ -941,8 +941,8 @@ Tags: {$tags}
 												<?php
 													foreach($features_two as $tag => $pretty_tag) {
 														?>
-															<input type="checkbox" id="<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
-															<label for="<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
+															<input type="checkbox" id="theme-tag-<?php echo $tag; ?>" name="theme[tags-<?php echo strtolower($key); ?>][]" value="<?php echo $tag; ?>" <?php if ( isExistingTag( $tag ) ) { echo ' checked'; }	?>>
+															<label for="theme-tag-<?php echo $tag; ?>"><?php echo $pretty_tag; ?></label>
 															<br />
 														<?php
 													}
