@@ -1,5 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 function toggleForm( element ) {
+	// Toggles the visibility of the forms based on the selected theme type
+
 	if ( ! element?.value ) return;
 	const themeType = element.value;
 	hideAllForms();
@@ -32,7 +34,6 @@ function toggleForm( element ) {
 	}
 }
 
-// hide all theme forms
 function hideAllForms() {
 	const allForms = document.querySelectorAll( '.theme-form' );
 	allForms.forEach( ( form ) => {
@@ -40,8 +41,9 @@ function hideAllForms() {
 	} );
 }
 
-// validate theme subject tags, only allow 3 to be selected
 function validateSubjectThemeTags( themeType ) {
+	// Validates theme subject tags, allows only 3 to be selected
+
 	const subjectCheckboxes = document.querySelectorAll(
 		'input[name="theme[tags-subject][]"]'
 	);
@@ -81,7 +83,7 @@ function validateSubjectThemeTags( themeType ) {
 	}
 }
 
-// store active theme tags when page is loaded
+// Store active theme tags when page is loaded
 let activeThemeTags = [];
 window.onload = () => {
 	activeThemeTags = document.querySelectorAll(
@@ -89,11 +91,12 @@ window.onload = () => {
 	);
 };
 
-// clear all theme tags for blank theme
 function clearThemeTags( themeType ) {
+	// Clears all theme tag states (checked, disabled)
+
 	if ( ! activeThemeTags ) return;
 
-	// clear all checkboxes
+	// Clear all checkboxes
 	const allCheckboxes = document.querySelectorAll(
 		'.theme-tags input[type="checkbox"]'
 	);
@@ -103,7 +106,7 @@ function clearThemeTags( themeType ) {
 	} );
 
 	if ( 'blank' !== themeType ) {
-		// recheck active theme tags
+		// Recheck active theme tags
 		activeThemeTags.forEach( ( checkbox ) => {
 			checkbox.checked = true;
 		} );

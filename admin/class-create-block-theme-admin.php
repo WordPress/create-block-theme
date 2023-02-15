@@ -891,6 +891,9 @@ Tags: {$tags}
 										$theme_tags = get_theme_feature_list();
 
 										function isExistingTag( $tag ) {
+											// Checks if active theme has tags
+											// and adds a list of default tags
+
 											if ( ! is_string( $tag ) ) {
 												return null;
 											}
@@ -908,7 +911,7 @@ Tags: {$tags}
 										}
 
 										if ( is_array( $theme_tags ) ) {
-											// sort tags by relevance
+											// Sort tags by relevance
 											krsort( $theme_tags );
 
 											foreach($theme_tags as $key => $value) {
@@ -929,7 +932,7 @@ Tags: {$tags}
 													<?php
 												}
 												if ('Features' === $key) {
-													// split array in half to display in two columns
+													// Split array in half to display in two columns
 													$half = ceil(count($value) / 2);
 													$features_one = array_slice($value, 0, $half);
 													$features_two = array_slice($value, $half);
