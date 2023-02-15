@@ -697,13 +697,13 @@ GNU General Public License for more details.
 		$template = $theme['template'];
 
 		// build tags list
-		$tags_merged   = array_merge( $theme['tags-subject'] ?? array(), $theme['tags-layout'] ?? array(), $theme['tags-features'] ?? array() );
-		$checkbox_tags = $tags_merged ? ', ' . implode( ', ', $tags_merged ) : '';
-		$custom_tags   = $theme['tags-custom'] ? ', ' . $theme['tags-custom'] : '';
-		$tags          = $checkbox_tags . $custom_tags;
+		$checkbox_tags_merged = array_merge( $theme['tags-subject'] ?? array(), $theme['tags-layout'] ?? array(), $theme['tags-features'] ?? array() );
+		$checkbox_tags        = $checkbox_tags_merged ? ', ' . implode( ', ', $checkbox_tags_merged ) : '';
+		$custom_tags          = $theme['tags-custom'] ? ', ' . $theme['tags-custom'] : '';
+		$tags                 = $checkbox_tags . $custom_tags;
 
 		if ( substr( $tags, 0, 2 ) === ", " ) {
-			$tags = substr($tags, 2);
+			$tags = substr( $tags, 2 );
 		}
 
 		return "/*
