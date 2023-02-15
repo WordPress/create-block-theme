@@ -959,6 +959,7 @@ Tags: editor-style, full-site-editing, rtl-language-support, threaded-comments, 
 
 	function form_script() {
 		wp_enqueue_script('form-script', plugin_dir_url(__FILE__) . '/js/form-script.js');
+		wp_enqueue_style('form-style', plugin_dir_url(__FILE__) . '/css/form.css');
 	}
 
 	function blockbase_save_theme() {
