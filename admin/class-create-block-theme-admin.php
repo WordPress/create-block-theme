@@ -835,14 +835,14 @@ Tags: {$tags}
 								<p><em><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></em></p>
 								<label>
 									<?php _e('Variation Name (*):', 'create-block-theme'); ?><br />
-									<input placeholder="<?php _e('Variation Name', 'create-block-theme'); ?>" type="text" name="theme[variation]" class="large-text" required />
+									<input placeholder="<?php _e('Variation Name', 'create-block-theme'); ?>" type="text" name="theme[variation]" class="large-text" />
 								</label>
 							</div>
 							<div hidden id="new_theme_metadata_form" class="theme-form">
 								<p><em><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></em></p>
 								<label>
 									<?php _e('Theme Name (*):', 'create-block-theme'); ?><br />
-									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" required />
+									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" />
 								</label>
 								<br /><br />
 								<label>
