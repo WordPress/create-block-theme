@@ -648,10 +648,17 @@ class Create_Block_Theme_Admin {
 		$new_blocks = [];
 		foreach ( $nested_blocks as $block ) {
 			$inner_blocks = $block['innerBlocks'];
-			$block = $this->make_image_block_local( $block );
-			$block = $this->make_cover_block_local( $block );
-			$block = $this->make_mediatext_block_local( $block );
-
+			switch ( $block[ 'blockName' ] ) {
+				case 'core/image':
+					$block = $this->make_image_block_local($block);
+					break;
+				case 'core/cover':
+					$block = $this->make_cover_block_local($block);
+					break;
+				case 'core/media-text':
+					$block = $this->make_mediatext_block_local($block);
+					break;
+			}
 			// recursive call for inner blocks
 			if ( !empty ( $block['innerBlocks'] ) ) {
 				$block['innerBlocks'] = $this->make_media_blocks_local( $inner_blocks );
