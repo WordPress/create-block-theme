@@ -17,8 +17,8 @@ function toggleForm( element ) {
 				.getElementById( 'new_theme_metadata_form' )
 				.toggleAttribute( 'hidden', false );
 
-			validateSubjectThemeTags();
 			clearThemeTags( element.value );
+			validateSubjectThemeTags( element.value );
 			break;
 
 		case 'variation':
@@ -41,7 +41,7 @@ function hideAllForms() {
 }
 
 // validate theme subject tags, only allow 3 to be selected
-function validateSubjectThemeTags() {
+function validateSubjectThemeTags( themeType ) {
 	const subjectCheckboxes = document.querySelectorAll(
 		'input[name="theme[tags-subject][]"]'
 	);
@@ -49,6 +49,11 @@ function validateSubjectThemeTags() {
 	handleCheckboxes();
 
 	for ( let i = 0; i < subjectCheckboxes.length; i++ ) {
+		if ( 'blank' === themeType ) {
+			subjectCheckboxes[ i ].checked = false;
+			subjectCheckboxes[ i ].removeAttribute( 'disabled' );
+		}
+
 		subjectCheckboxes[ i ].addEventListener( 'change', function () {
 			handleCheckboxes();
 		} );
@@ -88,13 +93,19 @@ window.onload = () => {
 function clearThemeTags( themeType ) {
 	if ( ! activeThemeTags ) return;
 
-	activeThemeTags.forEach( ( checkbox ) => {
-		checkbox.checked = true;
+	// clear all checkboxes
+	const allCheckboxes = document.querySelectorAll(
+		'.theme-tags input[type="checkbox"]'
+	);
+	allCheckboxes.forEach( ( checkbox ) => {
+		checkbox.checked = false;
+		checkbox.removeAttribute( 'disabled' );
 	} );
 
-	if ( 'blank' === themeType ) {
+	if ( 'blank' !== themeType ) {
+		// recheck active theme tags
 		activeThemeTags.forEach( ( checkbox ) => {
-			checkbox.checked = false;
+			checkbox.checked = true;
 		} );
 	}
 }
