@@ -1,10 +1,35 @@
 <?php
 /**
- * Inserts the theme tags section of the theme form.
+ * Handles the theme tags functionality.
  *
  * @package Create Block Theme
  */
 
+/**
+ * Build theme tags list for readme.txt
+ *
+ * @param array $theme Theme data.
+ * @return string
+ * @since 1.5.2
+ */
+function theme_tags_list( $theme ) {
+	$checkbox_tags_merged = array_merge( $theme['tags-subject'] ?? array(), $theme['tags-layout'] ?? array(), $theme['tags-features'] ?? array() );
+	$checkbox_tags        = $checkbox_tags_merged ? ', ' . implode( ', ', $checkbox_tags_merged ) : '';
+	$custom_tags          = $theme['tags-custom'] ? ', ' . $theme['tags-custom'] : '';
+	$tags                 = $checkbox_tags . $custom_tags;
+
+	if ( substr( $tags, 0, 2 ) === ', ' ) {
+		$tags = substr( $tags, 2 );
+	}
+
+	return $tags;
+}
+
+/**
+ * Render theme tags form section
+ *
+ * @since 1.5.2
+ */
 function theme_tags_section() {
 	_e( 'Theme Tags:', 'create-block-theme' );
 
