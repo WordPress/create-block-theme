@@ -831,7 +831,7 @@ class Create_Block_Theme_Admin {
 
 	function escape_text_for_pattern( $text ) {
 		if ( $text && trim ( $text ) !== "" ) {
-			return '<?php echo esc_attr( __( "' . $text . '" ) ); ?>';
+			return '<?php echo esc_attr( __( "' . $text . '", '. wp_get_theme()->get( 'Name' ) .' ) ); ?>';
 		}
 	}
 
