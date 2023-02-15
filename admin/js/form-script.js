@@ -1,14 +1,44 @@
 // eslint-disable-next-line no-unused-vars
-function toggleForm( formID, hide, element ) {
-	if ( formID === 'new_theme_metadata_form' && ! hide ) {
-		toggleForm( 'new_variation_metadata_form', true );
-		validateSubjectThemeTags();
-		clearThemeTags( element.value );
+function toggleForm( element ) {
+	if ( ! element?.value ) return;
+	const themeType = element.value;
+	hideAllForms();
+
+	switch ( themeType ) {
+		case 'export':
+		case 'save':
+			hideAllForms();
+			break;
+
+		case 'child':
+		case 'clone':
+		case 'blank':
+			document
+				.getElementById( 'new_theme_metadata_form' )
+				.toggleAttribute( 'hidden', false );
+
+			validateSubjectThemeTags();
+			clearThemeTags( element.value );
+			break;
+
+		case 'variation':
+			document
+				.getElementById( 'new_variation_metadata_form' )
+				.toggleAttribute( 'hidden', false );
+			break;
+
+		default:
+			break;
 	}
-	if ( formID === 'new_variation_metadata_form' && ! hide ) {
-		toggleForm( 'new_theme_metadata_form', true );
-	}
-	document.getElementById( formID ).toggleAttribute( 'hidden', hide );
+}
+
+// hide all theme forms
+function hideAllForms() {
+	const allForms = document.querySelectorAll( '.theme-form' );
+
+	allForms.forEach( ( form ) => {
+		form.toggleAttribute( 'hidden', true );
+	} );
 }
 
 // validate theme subject tags, only allow 3 to be selected
