@@ -963,7 +963,7 @@ Tags: {$tags}
 									?>
 									</div>
 									<br />
-									<small><?php _e('Add custom tags (single or hypenated words, separated by commas):', 'create-block-theme'); ?></small><br />
+									<small><?php _e('Add custom tags (single or hyphenated words, separated by commas):', 'create-block-theme'); ?></small><br />
 									<input placeholder="<?php _e('custom, tags, custom-tags', 'create-block-theme'); ?>" type="text" name="theme[tags-custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z]+)*$" />
 								</div>
 							</div>
