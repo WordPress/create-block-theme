@@ -697,13 +697,13 @@ GNU General Public License for more details.
 		$template = $theme['template'];
 
 		// build tags list
-		$tags_merged = array_merge($theme['tags-subject'] ?? [], $theme['tags-layout'] ?? [], $theme['tags-features'] ?? []);
-		$checkbox_tags = $tags_merged ? ", " . implode(", ", $tags_merged) : '';
-		$custom_tags = $theme['tags-custom'] ? ", " . $theme['tags-custom'] : '';
-		$tags = $checkbox_tags . $custom_tags;
+		$tags_merged   = array_merge( $theme['tags-subject'] ?? array(), $theme['tags-layout'] ?? array(), $theme['tags-features'] ?? array() );
+		$checkbox_tags = $tags_merged ? ', ' . implode( ', ', $tags_merged ) : '';
+		$custom_tags   = $theme['tags-custom'] ? ', ' . $theme['tags-custom'] : '';
+		$tags          = $checkbox_tags . $custom_tags;
 
 		if ( ! $tags ) {
-			$tags = ", one-column";
+			$tags = '';
 		}
 
 		return "/*
@@ -720,7 +720,7 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
 Text Domain: {$slug}
-Tags: editor-style, full-site-editing, rtl-language-support, threaded-comments, translation-ready{$tags}
+Tags: {$tags}
 */";
 	}
 
