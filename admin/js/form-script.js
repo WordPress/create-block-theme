@@ -9,6 +9,8 @@ function toggleForm( element ) {
 		case 'export':
 		case 'save':
 			// Forms should stay hidden
+			// Default submit button should be shown
+			hideDefaultSubmitButton();
 			break;
 
 		case 'child':
@@ -19,6 +21,7 @@ function toggleForm( element ) {
 				.getElementById( 'new_theme_metadata_form' )
 				.toggleAttribute( 'hidden', false );
 
+			hideDefaultSubmitButton( true );
 			resetThemeTags( element.value );
 			validateThemeTags( 'subject' );
 			break;
@@ -28,6 +31,8 @@ function toggleForm( element ) {
 			document
 				.getElementById( 'new_variation_metadata_form' )
 				.toggleAttribute( 'hidden', false );
+
+			hideDefaultSubmitButton();
 			break;
 
 		default:
@@ -40,6 +45,20 @@ function hideAllForms() {
 	allForms.forEach( ( form ) => {
 		form.toggleAttribute( 'hidden', true );
 	} );
+}
+
+// Hide the default submit button if a long form is being displayed
+function hideDefaultSubmitButton( shouldHide ) {
+	const defaultSubmitButton = document.querySelector(
+		'#col-left input[type="submit"]'
+	);
+
+	if ( ! shouldHide ) {
+		defaultSubmitButton.style.display = 'block';
+	}
+	if ( shouldHide ) {
+		defaultSubmitButton.style.display = 'none';
+	}
 }
 
 // Handle theme tag validation
