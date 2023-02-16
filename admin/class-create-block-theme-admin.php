@@ -557,14 +557,18 @@ class Create_Block_Theme_Admin {
 	}
 
 	function is_absolute_url( $url ) {
-		return isset( parse_url( $url )[ 'host' ] );
+		return ! empty( $url ) &&  isset( parse_url( $url )[ 'host' ] );
 	}
 
-	function make_relative_image_url ( $absolute_url ) {
-		return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/'. basename( $absolute_url );
+	function make_relative_media_url ( $absolute_url ) {
+		if ( ! empty ( $absolute_url ) && $this->is_absolute_url( $absolute_url ) ) {
+			$folder_path = $this->get_media_folder_path_from_url( $absolute_url );
+			return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $folder_path . basename( $absolute_url );
+		}
+		return $absolute_url;
 	}
 
-	function make_html_images_local ( $html ) {
+	function make_html_media_local ( $html ) {
 		if ( empty( $html ) ) {
 			return $html;
 		}
@@ -577,9 +581,19 @@ class Create_Block_Theme_Admin {
 			$html = new WP_HTML_Tag_Processor( $html );
 			while ( $html->next_tag( 'img' ) ) {
 				if ( $this->is_absolute_url( $html->get_attribute( 'src' ) ) ) {
-					$html->set_attribute( 'src', $this->make_relative_image_url( $html->get_attribute( 'src' ) ) );
+					$html->set_attribute( 'src', $this->make_relative_media_url( $html->get_attribute( 'src' ) ) );
 				}
 			}
+			$html = new WP_HTML_Tag_Processor( $html->__toString() );
+			while ( $html->next_tag( 'video' ) ) {
+				if ( $this->is_absolute_url( $html->get_attribute( 'src' ) ) ) {
+					$html->set_attribute( 'src', $this->make_relative_media_url( $html->get_attribute( 'src' ) ) );
+				}
+				if ( $this->is_absolute_url( $html->get_attribute( 'poster' ) ) ) {
+					$html->set_attribute( 'poster', $this->make_relative_media_url( $html->get_attribute( 'poster' ) ) );
+				}
+			}
+			$html = new WP_HTML_Tag_Processor( $html->__toString() );
 			while ( $html->next_tag( 'div' ) ) {
 				$style = $html->get_attribute( 'style' );
 				if ( $style ) {
@@ -587,7 +601,7 @@ class Create_Block_Theme_Admin {
 					$urls = $match[0];
 					foreach ( $urls as $url ) {
 						if ( $this->is_absolute_url( $url ) ) {
-							$html->set_attribute( 'style', str_replace( $url, $this->make_relative_image_url( $url ), $style ) );
+							$html->set_attribute( 'style', str_replace( $url, $this->make_relative_media_url( $url ), $style ) );
 						}
 					}
 				}
@@ -600,13 +614,26 @@ class Create_Block_Theme_Admin {
 		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) { 
 			$doc = new DOMDocument();
 			@$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-			$img_tags = $doc->getElementsByTagName( 'img' );
 			// replace all images that have absolute urls
+			$img_tags = $doc->getElementsByTagName( 'img' );
 			foreach ( $img_tags as $tag ) {
 				$image_url = $tag->getAttribute( 'src' );
 				if ( $this->is_absolute_url( $image_url ) ) {
 					$img_src = $tag->getAttribute( 'src' );
-					$html = str_replace( $img_src, $this->make_relative_image_url( $img_src ), $html );
+					$html = str_replace( $img_src, $this->make_relative_media_url( $img_src ), $html );
+				}
+			}
+			// replace all video that have absolute urls
+			$video_tags = $doc->getElementsByTagName( 'video' );
+			foreach ( $video_tags as $tag ) {
+				$video_url = $tag->getAttribute( 'src' );
+				if ( !empty( $video_url ) && $this->is_absolute_url( $video_url ) ) {
+					$video_src = $tag->getAttribute( 'src' );
+					$html = str_replace( $video_src, $this->make_relative_media_url( $video_src ), $html );
+				}
+				$poster_url = $tag->getAttribute( 'poster' );
+				if ( !empty ( $poster_url ) && $this->is_absolute_url( $poster_url ) ) {
+					$html = str_replace( $poster_url, $this->make_relative_media_url( $poster_url ), $html );
 				}
 			}
 			// also replace background images with absolute urls (used in cover blocks)
@@ -618,7 +645,7 @@ class Create_Block_Theme_Admin {
 					$urls = $match[0];
 					foreach ( $urls as $url ) {
 						if ( $this->is_absolute_url( $url ) ) {
-							$html = str_replace( $url, $this->make_relative_image_url( $url ), $html );
+							$html = str_replace( $url, $this->make_relative_media_url( $url ), $html );
 						}
 					}
 				}
@@ -628,9 +655,9 @@ class Create_Block_Theme_Admin {
 
 	}
 
-	function make_image_block_local ( $block ) {
-		if ( 'core/image' === $block[ 'blockName' ] ) {
-			$inner_html =  $this->make_html_images_local( $block[ 'innerHTML' ] );
+	function make_image_video_block_local ( $block ) {
+		if ( 'core/image' === $block[ 'blockName' ] || 'core/video' === $block[ 'blockName' ] ) {
+			$inner_html =  $this->make_html_media_local( $block[ 'innerHTML' ] );
 			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = array ( $inner_html );
@@ -640,18 +667,18 @@ class Create_Block_Theme_Admin {
 
 	function make_cover_block_local ( $block ) {
 		if ( 'core/cover' === $block[ 'blockName' ] ) {
-			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
+			$inner_html = $this->make_html_media_local( $block[ 'innerHTML' ] );
 			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
-				$content_html = $this->make_html_images_local( $content );
+				$content_html = $this->make_html_media_local( $content );
 				$content_html = $this->escape_alt_for_pattern ( $content_html );
 				$inner_content[] = $content_html;
 			}
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = $inner_content;
 			if ( isset ( $block['attrs']['url'] ) && $this->is_absolute_url( $block['attrs']['url'] ) ) {
-				$block['attrs']['url'] = $this->make_relative_image_url( $block['attrs']['url'] );
+				$block['attrs']['url'] = $this->make_relative_media_url( $block['attrs']['url'] );
 			}
 		}
 		return $block;
@@ -659,18 +686,18 @@ class Create_Block_Theme_Admin {
 
 	function make_mediatext_block_local ( $block ) {
 		if ( 'core/media-text' === $block[ 'blockName' ] ) {
-			$inner_html = $this->make_html_images_local( $block[ 'innerHTML' ] );
+			$inner_html = $this->make_html_media_local( $block[ 'innerHTML' ] );
 			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
-				$content_html = $this->make_html_images_local( $content );
+				$content_html = $this->make_html_media_local( $content );
 				$content_html = $this->escape_alt_for_pattern ( $content_html );
 				$inner_content[] = $content_html;
 			}
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = $inner_content;
 			if ( isset ( $block['attrs']['mediaLink'] ) && $this->is_absolute_url( $block['attrs']['mediaLink'] ) ) {
-				$block['attrs']['mediaLink'] = $this->make_relative_image_url( $block['attrs']['mediaLink'] );
+				$block['attrs']['mediaLink'] = $this->make_relative_media_url( $block['attrs']['mediaLink'] );
 			}
 		}
 		return $block;
@@ -682,7 +709,8 @@ class Create_Block_Theme_Admin {
 			$inner_blocks = $block['innerBlocks'];
 			switch ( $block[ 'blockName' ] ) {
 				case 'core/image':
-					$block = $this->make_image_block_local( $block );
+				case 'core/video':
+					$block = $this->make_image_video_block_local( $block );
 					break;
 				case 'core/cover':
 					$block = $this->make_cover_block_local( $block );
@@ -711,6 +739,7 @@ class Create_Block_Theme_Admin {
 				// Gets the absolute URLs of img in these blocks
 				if ( 
 					'core/image' === $block[ 'blockName' ] ||
+					'core/video' === $block[ 'blockName' ] ||
 					'core/cover' === $block[ 'blockName' ] ||
 					'core/media-text' === $block[ 'blockName' ]
 				) {
@@ -719,6 +748,17 @@ class Create_Block_Theme_Admin {
 						$url = $html->get_attribute( 'src' );
 						if ( $this->is_absolute_url( $url ) ) {
 							$media[] = $url;
+						}
+					}
+					$html = new WP_HTML_Tag_Processor( $html->__toString() );
+					while ( $html->next_tag( 'video' ) ) {
+						$url = $html->get_attribute( 'src' );
+						if ( $this->is_absolute_url( $url ) ) {
+							$media[] = $url;
+						}
+						$poster_url = $html->get_attribute( 'poster' );
+						if ( $this->is_absolute_url( $poster_url ) ) {
+							$media[] = $poster_url;
 						}
 					}
 				}
@@ -750,6 +790,7 @@ class Create_Block_Theme_Admin {
 			foreach ( $flatten_blocks as $block ) {
 				if ( 
 						'core/image' === $block[ 'blockName' ] ||
+						'core/video' === $block[ 'blockName' ] ||
 						'core/cover' === $block[ 'blockName' ] ||
 						'core/media-text' === $block[ 'blockName' ]
 					) {
@@ -758,11 +799,22 @@ class Create_Block_Theme_Admin {
 
 					// Get the media urls from img tags
 					$tags = $doc->getElementsByTagName( 'img' );
-					$block_has_external_images = false;
-					foreach ($tags as $tag) {
+					foreach ( $tags as $tag ) {
 						$image_url = $tag->getAttribute( 'src' );
 						if ($this->is_absolute_url( $image_url )) {
 							$media[] = $tag->getAttribute( 'src' );
+						}
+					}
+					// Get the media urls from video tags
+					$tags = $doc->getElementsByTagName( 'video' );
+					foreach ( $tags as $tag ) {
+						$video_url = $tag->getAttribute( 'src' );
+						if ($this->is_absolute_url( $video_url )) {
+							$media[] = $tag->getAttribute( 'src' );
+						}
+						$poster_url = $tag->getAttribute( 'poster' );
+						if ($this->is_absolute_url( $poster_url )) {
+							$media[] = $tag->getAttribute( 'poster' );
 						}
 					}
 					// Get the media urls from div style tags (used in cover blocks)
@@ -802,10 +854,9 @@ class Create_Block_Theme_Admin {
 
 	function clean_serialized_markup ( $markup ) {
 		$markup = str_replace( '%20', ' ', $markup );
-		$markup = str_replace( '&lt;', '<', $markup );
-		$markup = str_replace( '&gt;', '>', $markup );
 		$markup = str_replace( '\u003c', '<', $markup );
 		$markup = str_replace( '\u003e', '>', $markup );
+		$markup = html_entity_decode( $markup, ENT_QUOTES | ENT_XML1, 'UTF-8' );
 		return $markup;
 	}
 
@@ -831,7 +882,8 @@ class Create_Block_Theme_Admin {
 
 	function escape_text_for_pattern( $text ) {
 		if ( $text && trim ( $text ) !== "" ) {
-			return '<?php echo esc_attr( __( "' . $text . '", '. wp_get_theme()->get( 'Name' ) .' ) ); ?>';
+			return "<?php echo esc_attr_e( '" . $text . "', '". wp_get_theme()->get( "Name" ) ."' ); ?>";
+
 		}
 	}
 
@@ -845,10 +897,10 @@ class Create_Block_Theme_Admin {
 		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
 			$html = new WP_HTML_Tag_Processor( $html );
 			while ( $html->next_tag( 'img' ) ) {
-				// $alt_attribute = $html->get_attribute( 'alt' );
-				// if ( !empty ( $alt_attribute ) ) {
-					$html->set_attribute( 'alt', 'hola' );
-				// }
+				$alt_attribute = $html->get_attribute( 'alt' );
+				if ( !empty ( $alt_attribute ) ) {
+					$html->set_attribute( 'alt', $this->escape_text_for_pattern( $alt_attribute ) );
+				}
 			}
 			return $html->__toString();
 		}
@@ -867,6 +919,49 @@ class Create_Block_Theme_Admin {
 				);
 			}
 			return $html;
+		}
+	}
+
+	function get_media_folder_path_from_url ( $url ) {
+		$extension = strtolower( pathinfo( $url, PATHINFO_EXTENSION ) );
+		$folder_path = "";
+		$image_extensions = [ 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' ];
+		$video_extensions = [ 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'ogv', '3gp', '3g2' ];
+		if ( in_array( $extension, $image_extensions ) ) {
+			$folder_path = "/assets/images/";
+		} else if ( in_array( $extension, $video_extensions ) ) {
+			$folder_path = "/assets/videos/";
+		} else {
+			$folder_path = "/assets/";
+		}
+		return $folder_path;
+	}
+
+	function get_file_extension_from_url ( $url ) {
+		$extension = pathinfo( $url, PATHINFO_EXTENSION );
+		return $extension;
+	} 
+
+	function add_media_to_zip ( $zip, $media ) {
+		$media = array_unique( $media );
+		foreach ( $media as $url ) {
+			$folder_path = $this->get_media_folder_path_from_url( $url );
+			$download_file = file_get_contents( $url );
+			$zip->addFromString( $folder_path . basename( $url ), $download_file );
+		}
+	}
+
+	function add_media_to_local ( $media ) {
+		foreach ( $media as $url ) {
+			$download_file = file_get_contents( $url );
+			$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . $this->get_media_folder_path_from_url ( $url );
+			if ( ! is_dir( $media_path ) ) {
+				wp_mkdir_p( $media_path );
+			}
+			file_put_contents(
+				$media_path . basename( $url ),
+				$download_file
+			);
 		}
 	}
 
@@ -905,11 +1000,8 @@ class Create_Block_Theme_Admin {
 					$pattern[ 'content' ]
 				);
 
-				// Add image assets to zip
-				foreach ( $template_data->media as $media ) {
-					$download_file = file_get_contents( $media );
-					$zip->addFromString( 'assets/images/' . basename( $media ), $download_file );
-				}
+				// Add media assets to zip
+				$this->add_media_to_zip( $zip, $template_data->media );
 			}
 
 			// Add template to zip
@@ -934,11 +1026,8 @@ class Create_Block_Theme_Admin {
 					$pattern[ 'content' ]
 				);
 
-				// Add image assets to zip
-				foreach ( $template_data->media as $media ) {
-					$download_file = file_get_contents( $media );
-					$zip->addFromString( 'assets/images/' . basename( $media ), $download_file );
-				}
+				// Add media assets to zip
+				$this->add_media_to_zip( $zip, $template_data->media );
 			}
 
 			// Add template to zip
@@ -959,10 +1048,6 @@ class Create_Block_Theme_Admin {
 		// If there is no templates folder, create it.
 		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template']  ) ) {
 			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] );
-		}
-
-		if ( ! is_dir( get_stylesheet_directory() . '/assets/images' ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . '/assets/images' );
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
@@ -992,15 +1077,9 @@ class Create_Block_Theme_Admin {
 				$template_data->content
 			);
 
-			// Write the image assets
-			foreach ( $template_data->media as $media ) {
-				$download_file = file_get_contents( $media );
-				file_put_contents(
-					get_stylesheet_directory() . DIRECTORY_SEPARATOR .'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . basename( $media ),
-					$download_file
-				);
-			}
-
+			// Write the media assets
+			$this->add_media_to_local( $template_data->media );
+			
 		}
 
 		// If there is no parts folder, create it.
@@ -1035,14 +1114,8 @@ class Create_Block_Theme_Admin {
 				$template_data->content
 			);
 
-			// Write the image assets
-			foreach ( $template_data->media as $media ) {
-				$download_file = file_get_contents( $media );
-				file_put_contents(
-					get_stylesheet_directory() . DIRECTORY_SEPARATOR .'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . basename( $media ),
-					$download_file
-				);
-			}
+			// Write the media assets
+			$this->add_media_to_local( $template_data->media );
 		}
 	}
 
