@@ -67,21 +67,23 @@ function limitCheckboxSelection( checkboxesSelector, max = 0 ) {
 	);
 
 	if ( checked.length >= max ) {
-		for ( let j = 0; j < unchecked.length; j++ ) {
-			unchecked[ j ].setAttribute( 'disabled', true );
+		for ( let i = 0; i < unchecked.length; i++ ) {
+			unchecked[ i ].setAttribute( 'disabled', true );
 		}
 	}
 
 	if ( checked.length < max ) {
-		for ( let j = 0; j < unchecked.length; j++ ) {
-			unchecked[ j ].removeAttribute( 'disabled' );
+		for ( let i = 0; i < unchecked.length; i++ ) {
+			unchecked[ i ].removeAttribute( 'disabled' );
 		}
 	}
 
-	for ( let i = 0; i < allCheckboxes.length; i++ ) {
-		allCheckboxes[ i ].addEventListener( 'change', function () {
-			limitCheckboxSelection( checkboxesSelector, max );
-		} );
+	if ( allCheckboxes.length > max ) {
+		for ( let i = 0; i < allCheckboxes.length; i++ ) {
+			allCheckboxes[ i ].addEventListener( 'change', function () {
+				limitCheckboxSelection( checkboxesSelector, max );
+			} );
+		}
 	}
 }
 
