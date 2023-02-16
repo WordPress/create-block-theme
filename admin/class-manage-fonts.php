@@ -91,7 +91,7 @@ class Manage_Fonts_Admin {
 
         // Enqueue CSS of the app
         wp_enqueue_style( 'fonts-app', plugins_url( 'build/index.css', __DIR__ ), array(), $asset_file['version'] );
-     
+
         // Load our app.js.
         array_push( $asset_file['dependencies'], 'wp-i18n' );
         wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
@@ -130,9 +130,11 @@ class Manage_Fonts_Admin {
         
     ?>
     <div class="wrap">
-        <h1 class="wp-heading-inline"><?php _e('Manage Theme Fonts', 'create-block-theme'); ?></h1>
-        <a href="<?php echo admin_url( 'themes.php?page=add-google-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Google Font', 'create-block-theme'); ?></a>
-        <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
+        <div class="manage-fonts-header-flex">
+            <h1 class="wp-heading-inline"><?php _e('Manage Theme Fonts', 'create-block-theme'); ?></h1>
+            <a href="<?php echo admin_url( 'themes.php?page=add-google-font-to-theme-json' ); ?>" class="components-button page-title-action"><?php _e('Add Google Font', 'create-block-theme'); ?></a>
+            <a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="components-button page-title-action"><?php _e('Add Local Font', 'create-block-theme'); ?></a>
+        </div>
         <hr class="wp-header-end" />
         <p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string;  ?></p>
         
