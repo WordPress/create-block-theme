@@ -151,5 +151,5 @@ function theme_tags_section() {
 	echo '</small><br />';
 
 	// Regex for pattern attribute ensures only single words or words with hyphens are used, separated by commas
-	echo '<input placeholder="' . __( 'custom, tags, custom-tags', 'create-block-theme' ) . '" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z]+)*$" />';
+	echo '<input placeholder="' . __( 'custom, tags, custom-tags', 'create-block-theme' ) . '" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z\-]+)*$" />';
 }
