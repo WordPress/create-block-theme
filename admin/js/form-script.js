@@ -8,21 +8,23 @@ function toggleForm( element ) {
 	switch ( themeType ) {
 		case 'export':
 		case 'save':
-			hideAllForms();
+			// Forms should stay hidden
 			break;
 
 		case 'child':
 		case 'clone':
 		case 'blank':
+			// Show New Theme form
 			document
 				.getElementById( 'new_theme_metadata_form' )
 				.toggleAttribute( 'hidden', false );
 
 			resetThemeTags( element.value );
-			validateSubjectThemeTags( element.value );
+			validateThemeTags( 'subject' );
 			break;
 
 		case 'variation':
+			// Show Variation form
 			document
 				.getElementById( 'new_variation_metadata_form' )
 				.toggleAttribute( 'hidden', false );
@@ -40,44 +42,46 @@ function hideAllForms() {
 	} );
 }
 
-// Validates theme subject tags, allows only 3 to be selected
-function validateSubjectThemeTags( themeType ) {
-	const subjectCheckboxes = document.querySelectorAll(
-		'input[name="theme[tags-subject][]"]'
-	);
-	const maxTags = 3;
-	handleCheckboxes();
+// Handle theme tag validation
+function validateThemeTags( tagCategory ) {
+	if ( ! tagCategory ) return;
+	let checkboxes;
 
-	for ( let i = 0; i < subjectCheckboxes.length; i++ ) {
-		if ( 'blank' === themeType ) {
-			subjectCheckboxes[ i ].checked = false;
-			subjectCheckboxes[ i ].removeAttribute( 'disabled' );
-		}
-
-		subjectCheckboxes[ i ].addEventListener( 'change', function () {
-			handleCheckboxes();
-		} );
+	if ( 'subject' === tagCategory ) {
+		checkboxes = 'input[name="theme[tags-subject][]"]';
 	}
 
-	function handleCheckboxes() {
-		const checked = document.querySelectorAll(
-			'input[name="theme[tags-subject][]"]:checked'
-		);
-		const unchecked = document.querySelectorAll(
-			'input[name="theme[tags-subject][]"]:not(:checked)'
-		);
+	limitCheckboxSelection( checkboxes, 3 );
+}
 
-		if ( checked.length >= maxTags ) {
-			for ( let j = 0; j < unchecked.length; j++ ) {
-				unchecked[ j ].setAttribute( 'disabled', true );
-			}
-		}
+// Takes a checkbox selector and limits the number of checkboxes that can be selected
+function limitCheckboxSelection( checkboxesSelector, max = 0 ) {
+	if ( ! checkboxesSelector ) return;
 
-		if ( checked.length < maxTags ) {
-			for ( let j = 0; j < unchecked.length; j++ ) {
-				unchecked[ j ].removeAttribute( 'disabled' );
-			}
+	const allCheckboxes = document.querySelectorAll( checkboxesSelector );
+	const checked = document.querySelectorAll(
+		`${ checkboxesSelector }:checked`
+	);
+	const unchecked = document.querySelectorAll(
+		`${ checkboxesSelector }:not(:checked)`
+	);
+
+	if ( checked.length >= max ) {
+		for ( let j = 0; j < unchecked.length; j++ ) {
+			unchecked[ j ].setAttribute( 'disabled', true );
 		}
+	}
+
+	if ( checked.length < max ) {
+		for ( let j = 0; j < unchecked.length; j++ ) {
+			unchecked[ j ].removeAttribute( 'disabled' );
+		}
+	}
+
+	for ( let i = 0; i < allCheckboxes.length; i++ ) {
+		allCheckboxes[ i ].addEventListener( 'change', function () {
+			limitCheckboxSelection( checkboxesSelector, max );
+		} );
 	}
 }
 
