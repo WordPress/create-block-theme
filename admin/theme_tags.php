@@ -15,7 +15,7 @@
 function theme_tags_list( $theme ) {
 	$checkbox_tags_merged = array_merge( $theme['tags-subject'] ?? array(), $theme['tags-layout'] ?? array(), $theme['tags-features'] ?? array() );
 	$checkbox_tags        = $checkbox_tags_merged ? ', ' . implode( ', ', $checkbox_tags_merged ) : '';
-	$custom_tags          = $theme['tags-custom'] ? ', ' . $theme['tags-custom'] : '';
+	$custom_tags          = $theme['tags_custom'] ? ', ' . $theme['tags_custom'] : '';
 	$tags                 = $checkbox_tags . $custom_tags;
 
 	// Remove comma and space from start of tags list
@@ -151,5 +151,5 @@ function theme_tags_section() {
 	echo '</small><br />';
 
 	// Regex for pattern attribute ensures only single words or words with hyphens are used, separated by commas
-	echo '<input placeholder="' . __( 'custom, tags, custom-tags', 'create-block-theme' ) . '" type="text" name="theme[tags-custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z]+)*$" />';
+	echo '<input placeholder="' . __( 'custom, tags, custom-tags', 'create-block-theme' ) . '" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z]+)*$" />';
 }

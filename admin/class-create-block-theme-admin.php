@@ -108,7 +108,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -165,7 +165,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -222,7 +222,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
@@ -294,7 +294,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags-custom'] = sanitize_text_field( $theme['tags-custom'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['template'] = '';
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 
