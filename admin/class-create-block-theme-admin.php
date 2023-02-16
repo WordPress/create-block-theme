@@ -707,7 +707,7 @@ class Create_Block_Theme_Admin {
 		// The template parts included in the patterns need to indicate the theme they belong to
 		if ( 'core/template-part' === $block[ 'blockName' ] ) {
 			$block['attrs']['theme'] = ( $_POST['theme']['type'] === "export" || $_POST['theme']['type'] === "save" )
-			? get_stylesheet()
+			? strtolower( wp_get_theme()->get( 'Name' ) )
 			: $_POST['theme']['name'];
 		}
 		return $block;
