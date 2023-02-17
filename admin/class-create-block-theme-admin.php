@@ -1143,6 +1143,27 @@ class Create_Block_Theme_Admin {
 	}
 
 	/**
+	 * Build string for original theme credits.
+	 * Used in style.css and readme.txt of cloned themes.
+	 *
+	 * @param string $original_theme Original theme name.
+	 * @return string
+	 */
+	function original_theme_credits( $original_theme ) {
+		if ( ! $original_theme ) {
+			return;
+		}
+
+		$theme_credit_content = sprintf(
+			/* translators: Original Theme Name. */
+			__('Based on %s theme.', 'create-block-theme'),
+			$original_theme
+		);
+
+		return $theme_credit_content;
+	}
+
+	/**
 	 * Build a readme.txt file for CHILD/GRANDCHILD themes.
 	 */
 	function build_readme_txt( $theme ) {
@@ -1153,18 +1174,14 @@ class Create_Block_Theme_Admin {
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
 		$copyYear = date('Y');
-		$theme_credit = $theme['original_theme'] ?? '';
+		$original_theme = $theme['original_theme'] ?? '';
 
-		if ( $theme_credit ) {
-			$theme_credit_content = sprintf(
-				/* translators: Original Theme Name. */
-				__('Based on %s theme.', 'create-block-theme'),
-				$theme['original_theme']
-			);
+		if ( $original_theme ) {
+			$theme_credit_content = $this->original_theme_credits( $original_theme );
+			$whitespace = $description ? '
 
-			$description .= "
-
-{$theme_credit_content}";
+' : '';
+			$description .= $whitespace . $theme_credit_content;
 		}
 
 		return "=== {$name} ===
@@ -1212,6 +1229,14 @@ GNU General Public License for more details.
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
 		$template = $theme['template'];
+		$original_theme = $theme['original_theme'] ?? '';
+
+		if ( $original_theme ) {
+			$theme_credit_content = $this->original_theme_credits( $original_theme );
+			$whitespace = $description ? ' ' : '';
+			$description .= $whitespace . $theme_credit_content;
+		}
+
 		return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
