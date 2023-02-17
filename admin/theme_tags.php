@@ -32,6 +32,8 @@ function theme_tags_list( $theme ) {
  * @since 1.5.2
  */
 function theme_tags_section() {
+	echo '<div role="group" aria-labelledby="theme_tags_label">';
+	echo '<div id="theme_tags_label">';
 	_e( 'Theme Tags:', 'create-block-theme' );
 	echo '<br /><small>';
 	printf(
@@ -40,6 +42,7 @@ function theme_tags_section() {
 		'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/theme-tags/', 'create-block-theme' ) ) . '">read more</a>'
 	);
 	echo '</small><br />';
+	echo '</div>';
 	echo '<div class="theme-tags">';
 
 	// Generate list of theme tags
@@ -146,10 +149,15 @@ function theme_tags_section() {
 	echo '</div>';
 
 	// Custom tags input
+	echo '<label>';
 	echo '<br /><small>';
 	_e( 'Add custom tags (single or hyphenated words, separated by commas):', 'create-block-theme' );
 	echo '</small><br />';
 
 	// Regex for pattern attribute ensures only single words or words with hyphens are used, separated by commas
 	echo '<input placeholder="' . __( 'custom, tags, custom-tags', 'create-block-theme' ) . '" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z\-]+)*$" />';
+
+	echo '</label>';
+
+	echo '</div>';
 }
