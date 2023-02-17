@@ -165,6 +165,7 @@ class Create_Block_Theme_Admin {
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
+		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
@@ -1152,6 +1153,19 @@ class Create_Block_Theme_Admin {
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
 		$copyYear = date('Y');
+		$theme_credit = $theme['original_theme'] ?? '';
+
+		if ( $theme_credit ) {
+			$theme_credit_content = sprintf(
+				/* translators: Original Theme Name. */
+				__('Based on %s theme.', 'create-block-theme'),
+				$theme['original_theme']
+			);
+
+			$description .= "
+
+{$theme_credit_content}";
+		}
 
 		return "=== {$name} ===
 Contributors: {$author}
