@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Button, Icon } from '@wordpress/components';
 import FontFace from "./font-face";
 
-const { __ } = wp.i18n;
+const { __, _n } = wp.i18n;
 function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFontFace } ) {
 
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     const toggleIsOpen = () => {
         setIsOpen(!isOpen);
@@ -19,10 +19,15 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
 
     return (
         <table className="wp-list-table widefat table-view-list">
-            <thead>
+            <thead onClick={toggleIsOpen}>
                 <tr>
                     <td className="font-family-head">
-                        <div><strong>{fontFamily.name || fontFamily.fontFamily}</strong></div>
+                        <div>
+                            <strong>{fontFamily.name || fontFamily.fontFamily}</strong>
+                            { hasFontFaces &&
+                                <span className="variants-count"> ( { fontFamily.fontFace.length } { _n( "Variant", "Variants",  fontFamily.fontFace.length, "create-block-theme" ) } )</span>
+                            }
+                        </div>
                         <div>
                             <Button
                                 variant="tertiary"
