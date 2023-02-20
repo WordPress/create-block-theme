@@ -5,10 +5,10 @@ require_once (__DIR__ . '/font-helpers.php');
 class Manage_Fonts_Admin {
 
 	public function __construct() {
-        add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
+        add_action( 'init', [ $this, 'save_manage_fonts_changes' ], 1 ); // <- High priority to run before the theme.json data is loaded
         add_action( 'admin_init', [ $this, 'save_google_fonts_to_theme' ] );
         add_action( 'admin_init', [ $this, 'save_local_fonts_to_theme' ] );
-        add_action( 'admin_init', [ $this, 'save_manage_fonts_changes' ] );
+        add_action( 'admin_menu', [ $this, 'create_admin_menu' ] );
 	}
 
     const ALLOWED_FONT_MIME_TYPES = array(
@@ -119,10 +119,6 @@ class Manage_Fonts_Admin {
             wp_register_style( 'theme-font-families', false );
             wp_add_inline_style( 'theme-font-families', $font_assets_stylesheet );
             wp_enqueue_style( 'theme-font-families' );
-        }
-
-        if ( ! empty( $_POST['new-theme-fonts-json'] ) ) {
-            $theme_font_families = json_decode( stripslashes( $_POST['new-theme-fonts-json'] ), true );
         }
 
         $fonts_json = wp_json_encode( $theme_font_families );
