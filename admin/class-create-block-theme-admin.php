@@ -1160,7 +1160,7 @@ class Create_Block_Theme_Admin {
 		$original_readme      = get_stylesheet_directory() . '/readme.txt' ?? '';
 		$original_license     = '';
 		$original_license_uri = '';
-		$readme_content       = file_get_contents( $original_readme ) ?? '';
+		$readme_content       = file_exists( $original_readme ) ? file_get_contents( $original_readme ) : '';
 
 		if ( ! $readme_content ) {
 			return;
@@ -1210,10 +1210,11 @@ class Create_Block_Theme_Admin {
 		$author_uri = $theme['author_uri'];
 		$copyYear = date('Y');
 		$original_theme = $theme['original_theme'] ?? '';
-		$original_theme_credits = '';
+		$original_theme_credits = $original_theme ? $this->original_theme_credits( $name ) : '';
 
-		if ( $original_theme ) {
-			$original_theme_credits = "{$this->original_theme_credits( $name )}
+		if ( $original_theme_credits ) {
+			// Add a new line to the original theme credits
+			$original_theme_credits = "{$original_theme_credits}
 ";
 		}
 
