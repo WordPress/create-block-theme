@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useContext } from '@wordpress/element';
 import { Button, Icon } from '@wordpress/components';
 import FontFace from "./font-face";
+import { ManageFontsContext } from '../fonts-context';
 
 const { __, _n } = wp.i18n;
 function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFontFace } ) {
 
-    const [isOpen, setIsOpen] = useState(false);
+    const { familiesOpen, handleToggleFamily } = useContext(ManageFontsContext);
+    const isOpen = familiesOpen.includes( fontFamily.name || fontFamily.fontFamily );
 
     const toggleIsOpen = () => {
-        setIsOpen(!isOpen);
+        handleToggleFamily( fontFamily.name || fontFamily.fontFamily );
     }
 
-    const hasFontFaces = !!fontFamily.fontFace && !!fontFamily.fontFace.length;
+    const fontFaces = fontFamily.fontFace.filter( face => !face.shouldBeRemoved );
+    const hasFontFaces = !!fontFaces.length;
 
     if ( fontFamily.shouldBeRemoved ) {
         return null;
@@ -25,7 +28,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         <div>
                             <strong>{fontFamily.name || fontFamily.fontFamily}</strong>
                             { hasFontFaces &&
-                                <span className="variants-count"> ( { fontFamily.fontFace.length } { _n( "Variant", "Variants",  fontFamily.fontFace.length, "create-block-theme" ) } )</span>
+                                <span className="variants-count"> ( { fontFaces.length } { _n( "Variant", "Variants",  fontFamily.fontFace.length, "create-block-theme" ) } )</span>
                             }
                         </div>
                         <div>
@@ -58,7 +61,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                 </tr>
                             </thead>
                             <tbody>
-                                { hasFontFaces && fontFamily.fontFace.map((fontFace, i) => (
+                                { hasFontFaces && fontFaces.map((fontFace, i) => (
                                     <FontFace
                                         { ...fontFace }
                                         fontFamilyIndex={fontFamilyIndex}
