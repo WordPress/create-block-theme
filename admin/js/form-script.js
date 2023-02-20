@@ -70,14 +70,28 @@ function validateThemeTags( tagCategory ) {
 		checkboxes = 'input[name="theme[tags-subject][]"]';
 	}
 
-	limitCheckboxSelection( checkboxes, 3 );
+	// Maximum number of checkboxes that can be selected
+	const max = 3;
+
+	// Run validation on form load
+	limitCheckboxSelection( checkboxes, max );
+
+	const allCheckboxes = document.querySelectorAll( checkboxes );
+
+	// Run validation on each checkbox change
+	if ( allCheckboxes.length > max ) {
+		for ( let i = 0; i < allCheckboxes.length; i++ ) {
+			allCheckboxes[ i ].addEventListener( 'change', function () {
+				limitCheckboxSelection( checkboxes, max );
+			} );
+		}
+	}
 }
 
 // Takes a checkbox selector and limits the number of checkboxes that can be selected
 function limitCheckboxSelection( checkboxesSelector, max = 0 ) {
 	if ( ! checkboxesSelector ) return;
 
-	const allCheckboxes = document.querySelectorAll( checkboxesSelector );
 	const checked = document.querySelectorAll(
 		`${ checkboxesSelector }:checked`
 	);
@@ -92,14 +106,6 @@ function limitCheckboxSelection( checkboxesSelector, max = 0 ) {
 	} else {
 		for ( let i = 0; i < unchecked.length; i++ ) {
 			unchecked[ i ].removeAttribute( 'disabled' );
-		}
-	}
-
-	if ( allCheckboxes.length > max ) {
-		for ( let i = 0; i < allCheckboxes.length; i++ ) {
-			allCheckboxes[ i ].addEventListener( 'change', function () {
-				limitCheckboxSelection( checkboxesSelector, max );
-			} );
 		}
 	}
 }
