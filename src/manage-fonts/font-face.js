@@ -1,6 +1,4 @@
 import { Button } from '@wordpress/components'; 
-import { useContext } from '@wordpress/element';
-import { ManageFontsContext } from '../fonts-context';
 import Demo from "../demo-text-input/demo";
 const { __ } = wp.i18n;
 
@@ -12,8 +10,6 @@ function FontFace ( {
     shouldBeRemoved,
     isFamilyOpen
 } ) {
-    const { demoText, handleDemoTextChange, resetDefaults } = useContext( ManageFontsContext );
-
     const demoStyles = {
         fontFamily,
         fontStyle,
@@ -21,11 +17,6 @@ function FontFace ( {
         fontWeight: fontWeight ? String(fontWeight).split(' ')[0] : "normal",
     };
     
-    const handleChange = ( event ) => {
-        const newDemoText = event.target.value;
-        handleDemoTextChange( newDemoText );
-    }
-
     if ( shouldBeRemoved ) {
         return null;
     }
@@ -35,7 +26,6 @@ function FontFace ( {
             <td>{fontStyle}</td>
             <td>{fontWeight}</td>
             <td className="demo-cell">
-                {/* <input style={ demoStyles } onChange={ handleChange } value={ demoText }/> */}
                 <Demo style={ demoStyles } />
             </td>
             { deleteFontFace && (
