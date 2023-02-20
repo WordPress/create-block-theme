@@ -67,12 +67,14 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                         deleteFontFace={
                                             () => deleteFontFace(fontFamilyIndex, i)
                                         }
+                                        isFamilyOpen={isOpen}
                                     />
                                 )) }
                                 {
                                     ! hasFontFaces && fontFamily.fontFamily &&
                                     <FontFace
                                         { ...fontFamily }
+                                        isFamilyOpen={isOpen}
                                     />
                                 }
                             </tbody>

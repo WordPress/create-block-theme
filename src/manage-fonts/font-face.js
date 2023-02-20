@@ -9,7 +9,8 @@ function FontFace ( {
     fontWeight,
     fontStyle,
     deleteFontFace,
-    shouldBeRemoved
+    shouldBeRemoved,
+    isFamilyOpen
 } ) {
     const { demoText, handleDemoTextChange, resetDefaults } = useContext( ManageFontsContext );
 
@@ -37,7 +38,17 @@ function FontFace ( {
                 {/* <input style={ demoStyles } onChange={ handleChange } value={ demoText }/> */}
                 <Demo style={ demoStyles } />
             </td>
-            { deleteFontFace && <td><Button variant="tertiary" onClick={deleteFontFace}>{__('Remove', 'create-block-theme')}</Button></td> }
+            { deleteFontFace && (
+                <td>
+                    <Button
+                        variant="tertiary"
+                        onClick={deleteFontFace}
+                        tabindex={isFamilyOpen ? 0 : -1}
+                    >
+                        {__('Remove', 'create-block-theme')}
+                    </Button>
+                </td>
+            )}
         </tr>
     );
 }
