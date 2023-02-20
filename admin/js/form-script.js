@@ -89,9 +89,7 @@ function limitCheckboxSelection( checkboxesSelector, max = 0 ) {
 		for ( let i = 0; i < unchecked.length; i++ ) {
 			unchecked[ i ].setAttribute( 'disabled', true );
 		}
-	}
-
-	if ( checked.length < max ) {
+	} else {
 		for ( let i = 0; i < unchecked.length; i++ ) {
 			unchecked[ i ].removeAttribute( 'disabled' );
 		}
