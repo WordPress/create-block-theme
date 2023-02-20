@@ -1,112 +1,109 @@
-.hidden  {
-    display: none;
-    visibility: hidden;
+.hidden {
+	display: none;
+	visibility: hidden;
 }
 
 .help {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .font-families > table {
-    margin-bottom: 2rem;
+	margin-bottom: 2rem;
 }
 
 .font-families > table > thead td {
-    font-size: 1.1rem;
+	font-size: 1.1rem;
 }
 
 .font-family-contents .slide {
-    border-bottom-left-radius: 15px;
-    margin: 0 0 0 1.5rem;
-    display: block;
-    padding: 0;
-}
-
-.font-family-contents .container {
-    overflow: hidden;
-}
-
-.font-family-contents .slide {
-    transition: all 0.1s ease-in-out;
+	border-bottom-left-radius: 15px;
+	margin: 0 0 0 1.5rem;
+	display: block;
+	padding: 0;
+	transition: all 0.1s ease-in-out;
 }
 
 .font-family-contents .slide.open {
-    transform: translateY(0);
-    max-height: 999999px;
+	transform: translateY(0);
+	max-height: 999999px;
 }
 
 .font-family-contents .slide.close {
-    transform: translateY(-80%);
-    opacity: 0;
-    max-height: 0px;
+	transform: translateY(-80%);
+	opacity: 0;
+	max-height: 0;
+}
+
+.font-family-contents .container {
+	overflow: hidden;
 }
 
 .font-family-contents table {
-    border-bottom: none;
-    border-right: none;
-    border-top: none;
+	border-bottom: none;
+	border-right: none;
+	border-top: none;
 }
 
 .font-family-contents .preview-head {
-    width: 100%;
+	width: 100%;
 }
 
 .font-face .demo-cell input {
-    font-size: 1.7rem;
-    line-height: 1.5;
-    margin: 0;
-    padding: 0.1em;
-    border: none;
-    background: none;
-    width: 100%;
+	font-size: 1.7rem;
+	line-height: 1.5;
+	margin: 0;
+	padding: 0.1em;
+	border: none;
+	background: none;
+	width: 100%;
 }
 
 .font-family-contents tbody td {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 .widefat td {
-    padding: .5rem 2rem;
+	padding: 0.5rem 2rem;
 }
 
 td.font-family-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background-color: #f6f7f7;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem;
+	background-color: #f6f7f7;
 }
 
 .font-family-head div:last-of-type {
-    display: flex;
-    gap: 1rem;
+	display: flex;
+	gap: 1rem;
 }
 
 .slide.open {
-    margin: 0;
-    border: none;
+	margin: 0;
+	border: none;
 }
 
 table.widefat.wp-list-table {
-    border-radius: 2px;
+	border-radius: 2px;
 }
 
 table.widefat table {
-    border: none;
+	border: none;
 }
 
 .manage-fonts-header-flex {
-    display: flex;
-    align-items: flex-end;
+	display: flex;
+	align-items: flex-end;
 }
 
-.manage-fonts-header-flex .wp-heading-inline+.page-title-action {
-    margin-left: auto;
+.manage-fonts-header-flex .wp-heading-inline + .page-title-action {
+	margin-left: auto;
 }
 
 .components-button.page-title-action {
-    font-weight: normal;
-    margin-left: .75rem;
+	font-weight: normal;
+	margin-left: 0.75rem;
 }

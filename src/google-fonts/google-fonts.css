@@ -1,25 +1,25 @@
 #google-fonts-table {
-    margin-bottom: 2rem;
+	margin-bottom: 2rem;
 }
 
 #google-fonts-table.widefat thead td input {
-    margin: 0;
+	margin: 0;
 }
 
 #google-fonts-table tbody td {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 #google-fonts-table tbody p {
-    font-size: 2rem;
-    margin: 0;
+	font-size: 2rem;
+	margin: 0;
 }
 
 #google-fonts-table .demo-cell {
-    width: 100%;
-    font-size: 1.7rem;
+	width: 100%;
+	font-size: 1.7rem;
 }
 
 .select-font {
-    display: flex;
+	display: flex;
 }
