@@ -62,15 +62,10 @@ class Manage_Fonts_Admin {
     function can_read_and_write_font_assets_directory () {
 		// Create the font assets folder if it doesn't exist
         $temp_dir = get_temp_dir();
-		$assets_path = get_stylesheet_directory() . '/assets';
-		$font_assets_path = $assets_path . '/fonts';
-		if ( ! is_dir( $assets_path ) ) {
-			mkdir( $assets_path, 0755 );
-		}
-		if ( ! is_dir( $font_assets_path ) ) {
-			mkdir( $font_assets_path, 0755 );
-		}
-
+		$font_assets_path = get_stylesheet_directory() . '/assets/fonts/';
+        if ( ! is_dir( $font_assets_path ) ) {
+            wp_mkdir_p( $font_assets_path );
+        }
 		// If the font asset folder can't be written return an error
 		if ( ! wp_is_writable( $font_assets_path ) || ! is_readable( $font_assets_path ) || ! wp_is_writable( $temp_dir ) ) {
             add_action( 'admin_notices', [ $this, 'admin_notice_manage_fonts_permission_error' ] );

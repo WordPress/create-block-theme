@@ -297,7 +297,7 @@ class Create_Block_Theme_Admin {
 		$source = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
 		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
 		if ( ! file_exists( $blank_theme_path ) ) {
-			mkdir( $blank_theme_path, 0755 );
+			wp_mkdir_p( $blank_theme_path );
 			// Add readme.txt.
 			file_put_contents( 
 				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt', 
@@ -327,7 +327,7 @@ class Create_Block_Theme_Admin {
 					\RecursiveIteratorIterator::SELF_FIRST) as $item
 				) {
 				if ($item->isDir()) {
-					mkdir( $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+					wp_mkdir_p( $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
 				} else {
 					copy($item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
 				}
@@ -367,7 +367,7 @@ class Create_Block_Theme_Admin {
 		$file_counter = 0;
 
 		if ( ! file_exists( $variation_path ) ) {
-			mkdir( $variation_path, 0755, true );
+			wp_mkdir_p( $variation_path );
 		}
 		
 		if ( file_exists( $variation_path . $variation_slug . '.json' ) ) {
