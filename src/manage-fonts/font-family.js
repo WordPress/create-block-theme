@@ -13,12 +13,11 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
         handleToggleFamily( fontFamily.name || fontFamily.fontFamily );
     }
 
-    const fontFaces = fontFamily.fontFace.filter( face => !face.shouldBeRemoved );
-    const hasFontFaces = !!fontFaces.length;
-
     if ( fontFamily.shouldBeRemoved ) {
         return null;
     }
+
+    const hasFontFaces = !!fontFamily.fontFace && !!fontFamily.fontFace.length;
 
     return (
         <table className="wp-list-table widefat table-view-list">
@@ -28,7 +27,7 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                         <div>
                             <strong>{fontFamily.name || fontFamily.fontFamily}</strong>
                             { hasFontFaces &&
-                                <span className="variants-count"> ( { fontFaces.length } { _n( "Variant", "Variants",  fontFamily.fontFace.length, "create-block-theme" ) } )</span>
+                                <span className="variants-count"> ( { fontFamily.fontFace.length } { _n( "Variant", "Variants",  fontFamily.fontFace.length, "create-block-theme" ) } )</span>
                             }
                         </div>
                         <div>
@@ -61,18 +60,23 @@ function FontFamily ( { fontFamily, fontFamilyIndex, deleteFontFamily, deleteFon
                                 </tr>
                             </thead>
                             <tbody>
-                                { hasFontFaces && fontFaces.map((fontFace, i) => (
-                                    <FontFace
-                                        { ...fontFace }
-                                        fontFamilyIndex={fontFamilyIndex}
-                                        fontFaceIndex={i}
-                                        key={`fontface${i}`}
-                                        deleteFontFace={
-                                            () => deleteFontFace(fontFamilyIndex, i)
-                                        }
-                                        isFamilyOpen={isOpen}
-                                    />
-                                )) }
+                                { hasFontFaces && fontFamily.fontFace.map((fontFace, i) => {
+                                    if ( fontFace.shouldBeRemoved ) {
+                                        return null;
+                                    }
+                                    return (
+                                        <FontFace
+                                            { ...fontFace }
+                                            fontFamilyIndex={fontFamilyIndex}
+                                            fontFaceIndex={i}
+                                            key={`fontface${i}`}
+                                            deleteFontFace={
+                                                () => deleteFontFace(fontFamilyIndex, i)
+                                            }
+                                            isFamilyOpen={isOpen}
+                                        />
+                                    )
+                                }) }
                                 {
                                     ! hasFontFaces && fontFamily.fontFamily &&
                                     <FontFace
