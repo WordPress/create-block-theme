@@ -868,8 +868,6 @@ Tags: {$tags}
 								<div>
 									<?php theme_tags_section(); ?>
 								</div>
-								<br /><br />
-								<input type="submit" value="<?php _e('Generate', 'create-block-theme'); ?>" class="button button-primary" />
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
 							<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
