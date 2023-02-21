@@ -37,8 +37,6 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 == Changelog ==
 
 = 1.6.0 =
-* Merge branch 'trunk' into update/readme
-* Merge branch 'trunk' into add/bundle-images
 * Update main readme and add supporting docs
 * Fix Depreciation Warning
 * Cleanup Manage Theme Fonts UI
@@ -46,9 +44,6 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 * Cloned themes: Add original theme name to readme.txt and style.css
 * Font families collapsed by default
 * Fix: Unexpected action when clicking Collapse chevron
-* # Conflicts:
-#	src/manage-fonts/manage-fonts.css
-
 * Lint all CSS files
 * Fix: composer scripts doesn't work on Windows
 * Use Gutenberg Theme JSON resolver if its available
