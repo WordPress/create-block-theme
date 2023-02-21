@@ -43,6 +43,7 @@
 
 .font-family-contents .container {
     overflow: hidden;
+    display: block;
 }
 
 .font-family-contents .slide {
