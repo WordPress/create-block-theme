@@ -4,7 +4,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.1
-Stable tag: 1.5.1
+Stable tag: 1.6.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,6 +35,25 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.6.0 =
+* Merge branch 'trunk' into update/readme
+* Merge branch 'trunk' into add/bundle-images
+* Update main readme and add supporting docs
+* Fix Depreciation Warning
+* Cleanup Manage Theme Fonts UI
+* Bundle template images into theme assets and make their urls relative
+* Cloned themes: Add original theme name to readme.txt and style.css
+* Font families collapsed by default
+* Fix: Unexpected action when clicking Collapse chevron
+* # Conflicts:
+#	src/manage-fonts/manage-fonts.css
+
+* Lint all CSS files
+* Fix: composer scripts doesn't work on Windows
+* Use Gutenberg Theme JSON resolver if its available
+* Update Google Fonts JSON data from API
+* Replacing mkdir() calls with WordPress wp_mkdir_p() function
 
 = 1.5.1 =
 * check for DISALLOW_FILE_EDIT and simplify permission check logic
