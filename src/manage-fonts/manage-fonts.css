@@ -11,6 +11,23 @@
 
 .font-families > table {
 	margin-bottom: 2rem;
+	overflow: hidden;
+}
+
+.font-families > table > tbody {
+	position: relative;
+	z-index: 1;
+}
+
+.font-families > table > thead {
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+.font-families > table > thead .variants-count {
+	font-size: 0.8rem;
+	font-weight: 400;
 }
 
 .font-families > table > thead td {
@@ -31,13 +48,15 @@
 }
 
 .font-family-contents .slide.close {
-	transform: translateY(-80%);
+	transform: translateY(-50%);
 	opacity: 0;
 	max-height: 0;
+	pointer-events: none;
 }
 
 .font-family-contents .container {
 	overflow: hidden;
+	display: block;
 }
 
 .font-family-contents table {

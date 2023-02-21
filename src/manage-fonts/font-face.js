@@ -1,6 +1,4 @@
 import { Button } from '@wordpress/components'; 
-import { useContext } from '@wordpress/element';
-import { ManageFontsContext } from '../fonts-context';
 import Demo from "../demo-text-input/demo";
 const { __ } = wp.i18n;
 
@@ -9,10 +7,9 @@ function FontFace ( {
     fontWeight,
     fontStyle,
     deleteFontFace,
-    shouldBeRemoved
+    shouldBeRemoved,
+    isFamilyOpen
 } ) {
-    const { demoText, handleDemoTextChange, resetDefaults } = useContext( ManageFontsContext );
-
     const demoStyles = {
         fontFamily,
         fontStyle,
@@ -20,11 +17,6 @@ function FontFace ( {
         fontWeight: fontWeight ? String(fontWeight).split(' ')[0] : "normal",
     };
     
-    const handleChange = ( event ) => {
-        const newDemoText = event.target.value;
-        handleDemoTextChange( newDemoText );
-    }
-
     if ( shouldBeRemoved ) {
         return null;
     }
@@ -34,10 +26,19 @@ function FontFace ( {
             <td>{fontStyle}</td>
             <td>{fontWeight}</td>
             <td className="demo-cell">
-                {/* <input style={ demoStyles } onChange={ handleChange } value={ demoText }/> */}
                 <Demo style={ demoStyles } />
             </td>
-            { deleteFontFace && <td><Button variant="tertiary" onClick={deleteFontFace}>{__('Remove', 'create-block-theme')}</Button></td> }
+            { deleteFontFace && (
+                <td>
+                    <Button
+                        variant="tertiary"
+                        onClick={deleteFontFace}
+                        tabindex={isFamilyOpen ? 0 : -1}
+                    >
+                        {__('Remove', 'create-block-theme')}
+                    </Button>
+                </td>
+            )}
         </tr>
     );
 }
