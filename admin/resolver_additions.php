@@ -61,7 +61,11 @@ function augment_resolver_with_utilities() {
  				$theme->merge( $theme_theme );
 			}
 
-			$theme->merge( static::get_user_data() );
+			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+				$theme->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
+			} else {
+				$theme->merge( static::get_user_data() );
+			}
 
 			$data = $theme->get_data();
 
