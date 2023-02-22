@@ -644,8 +644,7 @@ class Create_Block_Theme_Admin {
 				if ( $style ) {
 					preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match);
 					$urls = $match[0];
-		$template_content = $template->content;
-		foreach ( $urls as $url ) {
+					foreach ( $urls as $url ) {
 						if ( $this->is_absolute_url( $url ) ) {
 							$html = str_replace( $url, $this->make_relative_media_url( $url ), $html );
 						}
