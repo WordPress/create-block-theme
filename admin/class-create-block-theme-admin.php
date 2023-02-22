@@ -1,6 +1,7 @@
 <?php
 
 require_once (__DIR__ . '/resolver_additions.php');
+include (__DIR__ . '/theme_tags.php');
 
 /**
  * The admin-specific functionality of the plugin.
@@ -107,6 +108,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
@@ -163,6 +165,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
@@ -220,6 +223,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
@@ -291,6 +295,7 @@ class Create_Block_Theme_Admin {
 		$theme['uri'] = sanitize_text_field( $theme['uri'] );
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['template'] = '';
 		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
 
@@ -1263,6 +1268,7 @@ GNU General Public License for more details.
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
 		$template = $theme['template'];
+		$tags = theme_tags_list( $theme );
 		return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -1277,7 +1283,7 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
 Text Domain: {$slug}
-Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
+Tags: {$tags}
 */";
 	}
 
@@ -1301,7 +1307,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<p><?php printf( esc_html__('Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?></p>
 
 							<label>
-								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
+								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php
 									printf(
 										/* translators: Theme Name. */
@@ -1315,7 +1321,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							<br /><br />
 							<?php if ( is_child_theme() ): ?>
 								<label>
-									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
+									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
 									<?php
 									printf(
 										/* translators: Theme Name. */
@@ -1330,7 +1336,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<br />
 							<?php else: ?>
 								<label>
-									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
+									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
 									<?php
 									printf(
 										/* translators: Theme Name. */
@@ -1343,7 +1349,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<?php _e('[Create a new child theme. The currently activated theme will be the parent theme.]', 'create-block-theme'); ?>
 								<br /><br />
 								<label>
-									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );"/>
+									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
 									<?php
 										printf(
 											/* translators: Theme Name. */
@@ -1357,7 +1363,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 								<br /><br />
 							<?php endif; ?>
 							<label>
-								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', true );toggleForm( 'new_variation_metadata_form', true );" />
+								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php
 									printf(
 										/* translators: Theme Name. */
@@ -1370,13 +1376,13 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 							</label>
 							<br /><br />
 							<label>
-								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_theme_metadata_form', false );" />
+								<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php _e('Create blank theme', 'create-block-theme'); ?><br />
 								<?php _e('[Generate a boilerplate "empty" theme inside of this site\'s themes directory.]', 'create-block-theme'); ?>
 							</label>
 							<br /><br />
 							<label>
-								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( 'new_variation_metadata_form', false );" />
+								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php _e('Create a style variation', 'create-block-theme'); ?><br />
 								<?php printf( esc_html__('[Save user changes as a style variation of %1$s.]', 'create-block-theme'),  esc_html( wp_get_theme()->get('Name') ) ); ?>
 							</label>
@@ -1388,13 +1394,15 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 					</div>
 					<div id="col-right">
 						<div class="col-wrap">
-							<div hidden id="new_variation_metadata_form">
+							<div hidden id="new_variation_metadata_form" class="theme-form">
+								<p><em><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></em></p>
 								<label>
 									<?php _e('Variation Name (*):', 'create-block-theme'); ?><br />
 									<input placeholder="<?php _e('Variation Name', 'create-block-theme'); ?>" type="text" name="theme[variation]" class="large-text" />
 								</label>
 							</div>
-							<div hidden id="new_theme_metadata_form">
+							<div hidden id="new_theme_metadata_form" class="theme-form">
+								<p><em><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></em></p>
 								<label>
 									<?php _e('Theme Name (*):', 'create-block-theme'); ?><br />
 									<input placeholder="<?php _e('Theme Name', 'create-block-theme'); ?>" type="text" name="theme[name]" class="large-text" />
@@ -1421,13 +1429,17 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 									<?php _e('Author URI:', 'create-block-theme'); ?><br />
 									<small><?php _e('The URL of the authoring individual or organization.', 'create-block-theme'); ?></small><br />
 									<input placeholder="<?php _e('https://wordpress.org/', 'create-block-theme'); ?>" type="text" name="theme[author_uri]" class="large-text code" />
-								</label><br /><br />
+								</label>
+								<br /><br />
 								<label for="screenshot">
 									<?php _e('Screenshot:', 'create-block-theme'); ?><br />
 									<small><?php _e('Upload a new theme screenshot (2mb max | .png only | 1200x900 recommended)', 'create-block-theme'); ?></small><br />
 									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
-								</label><br/>
-								<p><?php _e('Items indicated with (*) are required.', 'create-block-theme'); ?></p><br />
+								</label>
+								<br /><br />
+								<div>
+									<?php theme_tags_section(); ?>
+								</div>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
 							<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
@@ -1441,6 +1453,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 
 	function form_script() {
 		wp_enqueue_script('form-script', plugin_dir_url(__FILE__) . '/js/form-script.js');
+		wp_enqueue_style('form-style', plugin_dir_url(__FILE__) . '/css/form.css');
 	}
 
 	function blockbase_save_theme() {
