@@ -1,7 +1,7 @@
 <?php
 
-require_once (__DIR__ . '/resolver_additions.php');
-include (__DIR__ . '/theme_tags.php');
+require_once( __DIR__ . '/resolver_additions.php' );
+require_once( __DIR__ . '/create-theme/theme-tags.php' );
 
 /**
  * The admin-specific functionality of the plugin.
@@ -1256,7 +1256,7 @@ GNU General Public License for more details.
 		$author = $theme['author'];
 		$author_uri = $theme['author_uri'];
 		$template = $theme['template'];
-		$tags = theme_tags_list( $theme );
+		$tags = Theme_Tags::theme_tags_list( $theme );
 		return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -1426,7 +1426,7 @@ Tags: {$tags}
 								</label>
 								<br /><br />
 								<div>
-									<?php theme_tags_section(); ?>
+									<?php Theme_Tags::theme_tags_section(); ?>
 								</div>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
