@@ -1292,18 +1292,18 @@ Tags: {$tags}
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
-				return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
+				return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_name' ] );
 			}
 
 			// Check nonce
 			if ( ! wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) ) {
-				return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
+				return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_name' ] );
 			}
 
 			if ( $_POST['theme']['type'] === 'save' ) {
 				// Avoid running if WordPress dosn't have permission to overwrite the theme folder
 				if ( ! wp_is_writable( get_stylesheet_directory() ) ) {
-					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
+					return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_file_permissions' ] );
 				}
 
 				if ( is_child_theme() ) {
@@ -1315,18 +1315,18 @@ Tags: {$tags}
 				$this->clear_user_styles_customizations();
 				$this->clear_user_templates_customizations();
 
-				add_action( 'admin_notices', [ $this, 'admin_notice_save_success' ] );
+				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_save_success' ] );
 			}
 
 			else if ( $_POST['theme']['type'] === 'variation' ) {
 
 				if ( $_POST['theme']['variation'] === '' ) {
-					return add_action( 'admin_notices', [ $this, 'admin_notice_error_variation_name' ] );
+					return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_variation_name' ] );
 				}
 
 				// Avoid running if WordPress dosn't have permission to write the theme folder
 				if ( ! wp_is_writable ( get_stylesheet_directory() ) ) {
-					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_file_permissions' ] );
+					return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_file_permissions' ] );
 				}
 
 				if ( is_child_theme() ) {
@@ -1337,124 +1337,54 @@ Tags: {$tags}
 				}
 				$this->clear_user_styles_customizations();
 
-				add_action( 'admin_notices', [ $this, 'admin_notice_variation_success' ] );
+				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_variation_success' ] );
 			}
 
 			else if ( $_POST['theme']['type'] === 'blank' ) {
 				// Avoid running if WordPress dosn't have permission to write the themes folder
 				if ( ! wp_is_writable ( get_theme_root() ) ) {
-					return add_action( 'admin_notices', [ $this, 'admin_notice_error_themes_file_permissions' ] );
+					return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_themes_file_permissions' ] );
 				}
 
 				if ( $_POST['theme']['name'] === '' ) {
-					return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
+					return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_name' ] );
 				}
 				$this->create_blank_theme( $_POST['theme'], $_FILES['screenshot'] );
 
-				add_action( 'admin_notices', [ $this, 'admin_notice_blank_success' ] );
+				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_blank_success' ] );
 			}
 
 			else if ( is_child_theme() ) {
 				if ( $_POST['theme']['type'] === 'sibling' ) {
 					if ( $_POST['theme']['name'] === '' ) {
-						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
+						return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_name' ] );
 					}
 					$this->create_sibling_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else {
 					$this->export_child_theme( $_POST['theme'] );
 				}
-				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
+				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_export_success' ] );
 			} else {
 				if( $_POST['theme']['type'] === 'child' ) {
 					if ( $_POST['theme']['name'] === '' ) {
-						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
+						return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_name' ] );
 					}
 					$this->create_child_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else if( $_POST['theme']['type'] === 'clone' ) {
 					if ( $_POST['theme']['name'] === '' ) {
-						return add_action( 'admin_notices', [ $this, 'admin_notice_error_theme_name' ] );
+						return add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_error_theme_name' ] );
 					}
 					$this->clone_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				else {
 					$this->export_theme( $_POST['theme'] );
 				}
-				add_action( 'admin_notices', [ $this, 'admin_notice_export_success' ] );
+				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_export_success' ] );
 			}
 
 		}
-	}
-
-	function admin_notice_error_theme_name() {
-		$class = 'notice notice-error';
-		$message = __( 'Please specify a theme name.', 'create-block-theme' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-	}
-
-	function admin_notice_error_variation_name() {
-		$class = 'notice notice-error';
-		$message = __( 'Please specify a variation name.', 'create-block-theme' );
-
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-	}
-
-	function admin_notice_export_success() {
-		?>
-			<div class="notice notice-success is-dismissible">
-				<p><?php _e( 'Block theme exported successfully!', 'create-block-theme' ); ?></p>
-			</div>
-		<?php
-	}
-
-	function admin_notice_save_success() {
-		?>
-			<div class="notice notice-success is-dismissible">
-				<p><?php _e( 'Block theme saved and user customizations cleared!', 'create-block-theme' ); ?></p>
-			</div>
-		<?php
-	}
-
-	function admin_notice_blank_success() {
-		$theme_name = $_POST['theme']['name'];
-
-		?>
-			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Blank theme created, head over to Appearance > Themes to activate %1$s', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
-			</div>
-		<?php
-	}
-
-	function admin_notice_variation_success() {
-		$theme_name = wp_get_theme()->get( 'Name' );
-		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . $_POST['theme']['variation_slug'] .'.json';
-
-		?>
-			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Your variation of %1$s has been created successfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $variation_name )  ); ?></p>
-			</div>
-		<?php
-	}
-
-	function admin_notice_error_theme_file_permissions () {
-		$theme_name = wp_get_theme()->get( 'Name' );
-		$theme_dir = get_stylesheet_directory();
-		?>
-			<div class="notice notice-error">
-				<p><?php printf( esc_html__( 'Your theme ( %1$s ) directory ( %2$s ) is not writable. Please check your file permissions.', 'create-block-theme' ), esc_html( $theme_name ) , esc_html( $theme_dir )  ); ?></p>
-			</div>
-		<?php
-	}
-
-	function admin_notice_error_themes_file_permissions () {
-		$themes_dir = get_theme_root();
-		?>
-			<div class="notice notice-error">
-				<p><?php printf( esc_html__( 'Your themes directory ( %1$s ) is not writable. Please check your file permissions.', 'create-block-theme' ), esc_html( $themes_dir )  ); ?></p>
-			</div>
-		<?php
 	}
 
     const ALLOWED_SCREENSHOT_TYPES = array(
