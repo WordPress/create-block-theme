@@ -51,21 +51,6 @@ class Create_Block_Theme_Admin {
 		$this->add_theme_json_variation_to_local( $export_type, $theme );
 	}
 
-	function clear_user_styles_customizations(){
-		// Clear all values in the user theme.json
-		$user_custom_post_type_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
-		$global_styles_controller = new WP_REST_Global_Styles_Controller();
-		$update_request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' );
-		$update_request->set_param( 'id', $user_custom_post_type_id );
-		$update_request->set_param( 'settings', [] );
-		$update_request->set_param( 'styles', [] );
-		$updated_global_styles = $global_styles_controller->update_item( $update_request );
-		delete_transient( 'global_styles' );
-		delete_transient( 'global_styles_' . get_stylesheet() );
-		delete_transient( 'gutenberg_global_styles' );
-		delete_transient( 'gutenberg_global_styles_' . get_stylesheet() );
-	}
-
 	function clear_user_templates_customizations() {
 		//remove all user templates (they have been saved in the theme)
 		$templates = get_block_templates();
@@ -142,7 +127,7 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
 		// Add new metadata
-		$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
 		$zip->addFromString(
 			'style.css',
 			$css_contents
@@ -201,7 +186,7 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, "*/" ) + 2 ) );
 		// Add new metadata
-		$css_contents = $this->build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
 		$zip->addFromString(
 			'style.css',
 			$css_contents
@@ -254,7 +239,7 @@ class Create_Block_Theme_Admin {
 		// Add style.css.
 		$zip->addFromString(
 			'style.css',
-			$this->build_child_style_css( $theme )
+			Theme_Styles::build_child_style_css( $theme )
 		);
 		
 		// Add / replace screenshot.
@@ -322,7 +307,7 @@ class Create_Block_Theme_Admin {
 			);
 
 			// Add new metadata.
-			$css_contents = $this->build_child_style_css( $theme );
+			$css_contents = Theme_Styles::build_child_style_css( $theme );
 
 			// Add screenshot.
 			if ( $this->is_valid_screenshot( $screenshot ) ){
@@ -999,36 +984,6 @@ class Create_Block_Theme_Admin {
 		return $zip;
 	}
 
-	/**
-	 * Build a style.css file for CHILD/GRANDCHILD themes.
-	 */
-	function build_child_style_css( $theme ) {
-		$slug = $theme['slug'];
-		$name = $theme['name'];
-		$description = $theme['description'];
-		$uri = $theme['uri'];
-		$author = $theme['author'];
-		$author_uri = $theme['author_uri'];
-		$template = $theme['template'];
-		$tags = Theme_Tags::theme_tags_list( $theme );
-		return "/*
-Theme Name: {$name}
-Theme URI: {$uri}
-Author: {$author}
-Author URI: {$author_uri}
-Description: {$description}
-Requires at least: 5.8
-Tested up to: 5.9
-Requires PHP: 5.7
-Version: 0.0.1
-License: GNU General Public License v2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Template: {$template}
-Text Domain: {$slug}
-Tags: {$tags}
-*/";
-	}
-
 	function blockbase_save_theme() {
 
 		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_POST['theme'] ) ) {
@@ -1055,7 +1010,7 @@ Tags: {$tags}
 				else {
 					$this->save_theme_locally( 'all' );
 				}
-				$this->clear_user_styles_customizations();
+				Theme_Styles::clear_user_styles_customizations();
 				$this->clear_user_templates_customizations();
 
 				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_save_success' ] );
@@ -1078,7 +1033,7 @@ Tags: {$tags}
 				else {
 					$this->save_variation( 'all', $_POST['theme'] );
 				}
-				$this->clear_user_styles_customizations();
+				Theme_Styles::clear_user_styles_customizations();
 
 				add_action( 'admin_notices', [ 'Form_Messages', 'admin_notice_variation_success' ] );
 			}
