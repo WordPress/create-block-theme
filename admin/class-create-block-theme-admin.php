@@ -86,7 +86,7 @@ class Create_Block_Theme_Admin {
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 
 		// Create ZIP file in the temporary directory.
@@ -143,7 +143,7 @@ class Create_Block_Theme_Admin {
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'Template' );
 		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
 
@@ -201,7 +201,7 @@ class Create_Block_Theme_Admin {
 		$theme['author'] = sanitize_text_field( $theme['author'] );
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
 
 		// Create ZIP file in the temporary directory.
@@ -274,7 +274,7 @@ class Create_Block_Theme_Admin {
 		$theme['author_uri'] = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['template'] = '';
-		$theme['slug'] = $this->get_theme_slug( $theme['name'] );
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Create theme directory.
 		$source = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
@@ -328,34 +328,6 @@ class Create_Block_Theme_Admin {
 		}
 
 	}
-
-	function get_theme_slug( $new_theme_name ) {
-
-		// If the source theme has a single-word slug but the new theme has a multi-word slug
-		// then function will look like: function apple-bumpkin_support() and that won't work.
-		// There are no issues if it is multi-word>single-word or multi>multi or single>single.
-		// Due to the complexity of this situation (compared to the simplicity of the others)
-		// this will enforce the usage of a singleword slug for those themes.
-
-		$old_slug = wp_get_theme()->get( 'TextDomain' );
- 		$new_slug = sanitize_title( $new_theme_name );
-		$new_slug = preg_replace('/\s+/', '', $new_slug); // Remove spaces
-
-		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
-			return str_replace( '-', '', $new_slug );
-		}
-
-		return $new_slug;
-	}
-
-	function is_absolute_url( $url ) {
-		return ! empty( $url ) &&  isset( parse_url( $url )[ 'host' ] );
-	}
-
-	function get_file_extension_from_url ( $url ) {
-		$extension = pathinfo( $url, PATHINFO_EXTENSION );
-		return $extension;
-	} 
 
 	function blockbase_save_theme() {
 
