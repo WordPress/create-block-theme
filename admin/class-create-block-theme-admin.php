@@ -620,7 +620,7 @@ class Create_Block_Theme_Admin {
 	function make_image_video_block_local ( $block ) {
 		if ( 'core/image' === $block[ 'blockName' ] || 'core/video' === $block[ 'blockName' ] ) {
 			$inner_html =  $this->make_html_media_local( $block[ 'innerHTML' ] );
-			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
+			$inner_html = Theme_Patterns::escape_alt_for_pattern ( $inner_html );
 			$block['innerHTML'] = $inner_html;
 			$block['innerContent'] = array ( $inner_html );
 		}
@@ -630,11 +630,11 @@ class Create_Block_Theme_Admin {
 	function make_cover_block_local ( $block ) {
 		if ( 'core/cover' === $block[ 'blockName' ] ) {
 			$inner_html = $this->make_html_media_local( $block[ 'innerHTML' ] );
-			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
+			$inner_html = Theme_Patterns::escape_alt_for_pattern ( $inner_html );
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
 				$content_html = $this->make_html_media_local( $content );
-				$content_html = $this->escape_alt_for_pattern ( $content_html );
+				$content_html = Theme_Patterns::escape_alt_for_pattern ( $content_html );
 				$inner_content[] = $content_html;
 			}
 			$block['innerHTML'] = $inner_html;
@@ -649,11 +649,11 @@ class Create_Block_Theme_Admin {
 	function make_mediatext_block_local ( $block ) {
 		if ( 'core/media-text' === $block[ 'blockName' ] ) {
 			$inner_html = $this->make_html_media_local( $block[ 'innerHTML' ] );
-			$inner_html = $this->escape_alt_for_pattern ( $inner_html );
+			$inner_html = Theme_Patterns::escape_alt_for_pattern ( $inner_html );
 			$inner_content = [];
 			foreach ( $block['innerContent'] as $content ) {
 				$content_html = $this->make_html_media_local( $content );
-				$content_html = $this->escape_alt_for_pattern ( $content_html );
+				$content_html = Theme_Patterns::escape_alt_for_pattern ( $content_html );
 				$inner_content[] = $content_html;
 			}
 			$block['innerHTML'] = $inner_html;
@@ -713,68 +713,6 @@ class Create_Block_Theme_Admin {
 		return $markup;
 	}
 
-	function pattern_from_template ( $template ) {
-		$theme_slug = wp_get_theme()->get( 'TextDomain' );
-		$pattern_slug = $theme_slug . '/' . $template->slug;
-		$pattern_content = (
-'<?php
-/**
- * Title: '. $template->slug .'
- * Slug: ' . $pattern_slug. '
- * Categories: hidden
- * Inserter: no
- */
-?>
-'. $template->content
-		);
-		return array (
-			'slug' => $pattern_slug,
-			'content' => $pattern_content
-		);
-	}
-
-	function escape_text_for_pattern( $text ) {
-		if ( $text && trim ( $text ) !== "" ) {
-			return "<?php echo esc_attr_e( '" . $text . "', '". wp_get_theme()->get( "Name" ) ."' ); ?>";
-
-		}
-	}
-
-	function escape_alt_for_pattern ( $html ) {
-		if ( empty ( $html ) ){
-			return $html;
-		}
-
-		// Use WP_HTML_Tag_Processor if available
-		// see: https://github.com/WordPress/gutenberg/pull/42485
-		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			$html = new WP_HTML_Tag_Processor( $html );
-			while ( $html->next_tag( 'img' ) ) {
-				$alt_attribute = $html->get_attribute( 'alt' );
-				if ( !empty ( $alt_attribute ) ) {
-					$html->set_attribute( 'alt', $this->escape_text_for_pattern( $alt_attribute ) );
-				}
-			}
-			return $html->__toString();
-		}
-		
-		// Fallback to regex
-		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
-		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			preg_match( '@alt="([^"]+)"@' , $html, $match );
-			if ( isset( $match[0] ) ) {
-				$alt_attribute = $match[0];
-				$alt_value= $match[1];
-				$html = str_replace(
-					$alt_attribute,
-					'alt="'.$this->escape_text_for_pattern( $alt_value ).'"',
-					$html
-				);
-			}
-			return $html;
-		}
-	}
-
 	function get_file_extension_from_url ( $url ) {
 		$extension = pathinfo( $url, PATHINFO_EXTENSION );
 		return $extension;
@@ -815,7 +753,7 @@ class Create_Block_Theme_Admin {
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern = $this->pattern_from_template( $template_data );
+				$pattern = Theme_Patterns::pattern_from_template( $template_data );
 				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
 
 				// Add pattern to zip
@@ -841,7 +779,7 @@ class Create_Block_Theme_Admin {
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern = $this->pattern_from_template( $template_data );
+				$pattern = Theme_Patterns::pattern_from_template( $template_data );
 				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
 
 				// Add pattern to zip
@@ -885,7 +823,7 @@ class Create_Block_Theme_Admin {
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern = $this->pattern_from_template( $template_data );
+				$pattern = Theme_Patterns::pattern_from_template( $template_data );
 				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
 
 				// Write the pattern
@@ -922,7 +860,7 @@ class Create_Block_Theme_Admin {
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern = $this->pattern_from_template( $template_data );
+				$pattern = Theme_Patterns::pattern_from_template( $template_data );
 				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
 
 				// Write the pattern
