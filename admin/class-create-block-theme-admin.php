@@ -44,11 +44,11 @@ class Create_Block_Theme_Admin {
 
 	function save_theme_locally( $export_type ) {
 		$this->add_templates_to_local( $export_type );
-		$this->add_theme_json_to_local( $export_type );
+		Theme_Json::add_theme_json_to_local( $export_type );
 	}
 
 	function save_variation ( $export_type, $theme ) {
-		$this->add_theme_json_variation_to_local( $export_type, $theme );
+		Theme_Json::add_theme_json_variation_to_local( $export_type, $theme );
 	}
 
 	function clear_user_templates_customizations() {
@@ -354,38 +354,6 @@ class Create_Block_Theme_Admin {
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 		return $zip;
-	}
-
-	function add_theme_json_to_local ( $export_type ) {
-		file_put_contents(
-			get_stylesheet_directory() . '/theme.json',
-			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
-		);
-	}
-
-	function add_theme_json_variation_to_local ( $export_type, $theme ) {
-		$variation_slug = sanitize_title( $theme['variation'] );
-		$variation_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR;
-		$file_counter = 0;
-
-		if ( ! file_exists( $variation_path ) ) {
-			wp_mkdir_p( $variation_path );
-		}
-		
-		if ( file_exists( $variation_path . $variation_slug . '.json' ) ) {
-			$file_counter++;
-			while ( file_exists( $variation_path . $variation_slug . '_' . $file_counter . '.json' ) ) {
-				$file_counter++;
-		   	}
-			$variation_slug = $variation_slug . '_' . $file_counter;
-		}
-
-		$_POST['theme']['variation_slug'] = $variation_slug;
-		
-		file_put_contents(
-			$variation_path . $variation_slug . '.json',
-			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
-		);
 	}
 
 	function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
