@@ -1416,7 +1416,7 @@ Tags: {$tags}
 								<label>
 									<?php _e('Theme URI:', 'create-block-theme'); ?><br />
 									<small><?php _e('The URL of a public web page where users can find more information about the theme.', 'create-block-theme'); ?></small><br />
-									<input placeholder="<?php _e('https://github.com/wordpress/twentytwentytwo/', 'create-block-theme'); ?>" type="text" name="theme[uri]" class="large-text code" />
+									<input placeholder="<?php _e('https://github.com/wordpress/twentytwentythree/', 'create-block-theme'); ?>" type="text" name="theme[uri]" class="large-text code" />
 								</label>
 								<br /><br />
 								<label>
