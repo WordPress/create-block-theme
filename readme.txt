@@ -37,10 +37,8 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 == Changelog ==
 
 = 1.6.1 =
-* Merge branch 'trunk' into add/theme-tags-input
-* Merge branch 'trunk' into add/theme-tags-input
 * Add: input for theme tags
-* Is is better placeholder URL changing to TT3 ?
+* Placeholder URL change to TT3
 * Remove white spaces from theme slugs
 
 = 1.6.0 =
