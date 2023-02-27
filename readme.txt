@@ -4,7 +4,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.1
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,6 +35,13 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.6.1 =
+* Merge branch 'trunk' into add/theme-tags-input
+* Merge branch 'trunk' into add/theme-tags-input
+* Add: input for theme tags
+* Is is better placeholder URL changing to TT3 ?
+* Remove white spaces from theme slugs
 
 = 1.6.0 =
 * Update main readme and add supporting docs
