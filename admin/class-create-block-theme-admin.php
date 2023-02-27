@@ -474,6 +474,7 @@ class Create_Block_Theme_Admin {
 
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
  		$new_slug = sanitize_title( $new_theme_name );
+		$new_slug = preg_replace('/\s+/', '', $new_slug); // Remove spaces
 
 		if( ! str_contains( $old_slug , '-') && str_contains( $new_slug, '-' ) ) {
 			return str_replace( '-', '', $new_slug );
@@ -499,7 +500,6 @@ class Create_Block_Theme_Admin {
 			return false;
 		}
 
-		$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
 
 		// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
 		// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
@@ -709,15 +709,6 @@ class Create_Block_Theme_Admin {
 		return $block;
 	}
 
-	function add_theme_attr_to_template_part_block ( $block ) {
-		// The template parts included in the patterns need to indicate the theme they belong to
-		if ( 'core/template-part' === $block[ 'blockName' ] ) {
-			$block['attrs']['theme'] = ( $_POST['theme']['type'] === "export" || $_POST['theme']['type'] === "save" )
-			? strtolower( wp_get_theme()->get( 'Name' ) )
-			: $_POST['theme']['name'];
-		}
-		return $block;
-	}
 
 	function make_media_blocks_local ( $nested_blocks ) {
 		$new_blocks = [];
@@ -733,9 +724,6 @@ class Create_Block_Theme_Admin {
 					break;
 				case 'core/media-text':
 					$block = $this->make_mediatext_block_local( $block );
-					break;
-				case 'core/template-part':
-					$block = $this->add_theme_attr_to_template_part_block( $block );
 					break;
 			}
 			// recursive call for inner blocks
