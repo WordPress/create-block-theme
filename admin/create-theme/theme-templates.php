@@ -5,21 +5,21 @@ require_once( __DIR__ . '/theme-patterns.php' );
 require_once( __DIR__ . '/theme-blocks.php' );
 
 class Theme_Templates {
-    /*
+	/*
 	 * Build a collection of templates and template-parts that should be exported (and modified) based on the given export_type and new slug
 	 */
 	public static function get_theme_templates( $export_type, $new_slug ) {
 
-		$old_slug = wp_get_theme()->get( 'TextDomain' );
-		$templates = get_block_templates();
-		$template_parts = get_block_templates ( array(), 'wp_template_part' );
-		$exported_templates = [];
-		$exported_parts = [];
+		$old_slug           = wp_get_theme()->get( 'TextDomain' );
+		$templates          = get_block_templates();
+		$template_parts     = get_block_templates( array(), 'wp_template_part' );
+		$exported_templates = array();
+		$exported_parts     = array();
 
 		// build collection of templates/parts in currently activated theme
 		$templates_paths = get_block_theme_folders();
-		$templates_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template'] . '/';
-		$parts_path =  get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
+		$templates_path  = get_stylesheet_directory() . '/' . $templates_paths['wp_template'] . '/';
+		$parts_path      = get_stylesheet_directory() . '/' . $templates_paths['wp_template_part'] . '/';
 
 		foreach ( $templates as $template ) {
 			$template = self::filter_theme_template(
@@ -41,27 +41,26 @@ class Theme_Templates {
 				$parts_path,
 				$old_slug,
 				$new_slug
-
 			);
 			if ( $template ) {
 				$exported_parts[] = $template;
 			}
 		}
 
-		return (object)[
-			'templates'=>$exported_templates,
-			'parts'=>$exported_parts
-		];
+		return (object) array(
+			'templates' => $exported_templates,
+			'parts'     => $exported_parts,
+		);
 
 	}
 
-    /*
+	/*
 	 * Filter a template out (return false) based on the export_type expected and the templates origin.
 	 * Templates not filtered out are modified based on the slug information provided and cleaned up
 	 * to have the expected exported value.
 	 */
 	static function filter_theme_template( $template, $export_type, $path, $old_slug, $new_slug ) {
-		if ($template->source === 'theme' && $export_type === 'user') {
+		if ( $template->source === 'theme' && $export_type === 'user' ) {
 			return false;
 		}
 		if (
@@ -85,32 +84,32 @@ class Theme_Templates {
 		return $template;
 	}
 
-    public static function clear_user_templates_customizations() {
+	public static function clear_user_templates_customizations() {
 		//remove all user templates (they have been saved in the theme)
-		$templates = get_block_templates();
+		$templates      = get_block_templates();
 		$template_parts = get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template ) {
 			if ( $template->source !== 'custom' ) {
 				continue;
 			}
-			wp_delete_post($template->wp_id, true);
+			wp_delete_post( $template->wp_id, true );
 		}
 
 		foreach ( $templates as $template ) {
 			if ( $template->source !== 'custom' ) {
 				continue;
 			}
-			wp_delete_post($template->wp_id, true);
+			wp_delete_post( $template->wp_id, true );
 		}
 	}
 
-    public static function add_templates_to_local( $export_type ) {
+	public static function add_templates_to_local( $export_type ) {
 
-		$theme_templates = self::get_theme_templates( $export_type, null );
+		$theme_templates  = self::get_theme_templates( $export_type, null );
 		$template_folders = get_block_theme_folders();
 
 		// If there is no templates folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template']  ) ) {
+		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] ) ) {
 			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] );
 		}
 
@@ -118,20 +117,20 @@ class Theme_Templates {
 			$template_data = Theme_Blocks::make_template_images_local( $template );
 
 			// If there are images in the template, add it as a pattern
-			if ( ! empty ( $template_data->media ) ) {
+			if ( ! empty( $template_data->media ) ) {
 				// If there is no templates folder, create it.
-				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns'  ) ) {
+				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' ) ) {
 					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
 
 				// Write the pattern
 				file_put_contents(
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
-					$pattern[ 'content' ]
+					$pattern['content']
 				);
 			}
 
@@ -143,7 +142,7 @@ class Theme_Templates {
 
 			// Write the media assets
 			Theme_Media::add_media_to_local( $template_data->media );
-			
+
 		}
 
 		// If there is no parts folder, create it.
@@ -155,20 +154,20 @@ class Theme_Templates {
 			$template_data = Theme_Blocks::make_template_images_local( $template_part );
 
 			// If there are images in the template, add it as a pattern
-			if ( ! empty ( $template_data->media ) ) {
+			if ( ! empty( $template_data->media ) ) {
 				// If there is no templates folder, create it.
-				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns'  ) ) {
+				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' ) ) {
 					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
 
 				// Write the pattern
 				file_put_contents(
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
-					$pattern[ 'content' ]
+					$pattern['content']
 				);
 			}
 

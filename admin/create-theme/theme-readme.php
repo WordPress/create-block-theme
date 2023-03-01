@@ -1,27 +1,27 @@
 <?php
 
 class Theme_Readme {
-    /**
-    * Build a readme.txt file for CHILD/GRANDCHILD themes.
-    */
-    public static function build_readme_txt( $theme ) {
-       $slug = $theme['slug'];
-       $name = $theme['name'];
-       $description = $theme['description'];
-       $uri = $theme['uri'];
-       $author = $theme['author'];
-       $author_uri = $theme['author_uri'];
-       $copyYear = date('Y');
-       $original_theme = $theme['original_theme'] ?? '';
-       $original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
+	/**
+	* Build a readme.txt file for CHILD/GRANDCHILD themes.
+	*/
+	public static function build_readme_txt( $theme ) {
+		$slug                   = $theme['slug'];
+		$name                   = $theme['name'];
+		$description            = $theme['description'];
+		$uri                    = $theme['uri'];
+		$author                 = $theme['author'];
+		$author_uri             = $theme['author_uri'];
+		$copyYear               = date( 'Y' );
+		$original_theme         = $theme['original_theme'] ?? '';
+		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
-       if ( $original_theme_credits ) {
-           // Add a new line to the original theme credits
-           $original_theme_credits = "{$original_theme_credits}
+		if ( $original_theme_credits ) {
+			// Add a new line to the original theme credits
+			$original_theme_credits = "{$original_theme_credits}
 ";
-       }
+		}
 
-       return "=== {$name} ===
+		return "=== {$name} ===
 Contributors: {$author}
 Requires at least: 5.8
 Tested up to: 5.9
@@ -53,15 +53,15 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 ";
-   }
+	}
 
-   /**
-	 * Build string for original theme credits.
-	 * Used in readme.txt of cloned themes.
-	 *
-	 * @param string $new_name New theme name.
-	 * @return string
-	 */
+	/**
+	  * Build string for original theme credits.
+	  * Used in readme.txt of cloned themes.
+	  *
+	  * @param string $new_name New theme name.
+	  * @return string
+	  */
 	static function original_theme_credits( $new_name ) {
 		if ( ! $new_name ) {
 			return;

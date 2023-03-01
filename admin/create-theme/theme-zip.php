@@ -6,7 +6,7 @@ require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 
 class Theme_Zip {
-    public static function create_zip( $filename ) {
+	public static function create_zip( $filename ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );
 		}
@@ -15,7 +15,7 @@ class Theme_Zip {
 		return $zip;
 	}
 
-    public static function add_theme_json_to_zip ( $zip, $export_type ) {
+	public static function add_theme_json_to_zip( $zip, $export_type ) {
 		$zip->addFromString(
 			'theme.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
@@ -23,7 +23,7 @@ class Theme_Zip {
 		return $zip;
 	}
 
-    public static function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
+	public static function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
 
 		// Get real path for our folder
 		$theme_path = get_stylesheet_directory();
@@ -46,10 +46,10 @@ class Theme_Zip {
 
 				// If the path is for templates/parts ignore it
 				if (
-					strpos($file_path, 'block-template-parts/' ) ||
-					strpos($file_path, 'block-templates/' ) ||
-					strpos($file_path, 'templates/' ) ||
-					strpos($file_path, 'parts/' )
+					strpos( $file_path, 'block-template-parts/' ) ||
+					strpos( $file_path, 'block-templates/' ) ||
+					strpos( $file_path, 'templates/' ) ||
+					strpos( $file_path, 'parts/' )
 				) {
 					continue;
 				}
@@ -57,13 +57,11 @@ class Theme_Zip {
 				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
 				// Replace only text files, skip png's and other stuff.
-				$valid_extensions = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
+				$valid_extensions       = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
 				$valid_extensions_regex = implode( '|', $valid_extensions );
 				if ( ! preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
 					$zip->addFile( $file_path, $relative_path );
-				}
-
-				else {
+				} else {
 					$contents = file_get_contents( $file_path );
 
 					// Replace namespace values if provided
@@ -74,22 +72,21 @@ class Theme_Zip {
 					// Add current file to archive
 					$zip->addFromString( $relative_path, $contents );
 				}
-
 			}
 		}
 
 		return $zip;
 	}
 
-    /**
+	/**
 	 * Add block templates and parts to the zip.
 	 *
 	 * @since    0.0.2
 	 * @param    object               $zip          The zip archive to add the templates to.
 	 * @param    string               $export_type  Determine the templates that should be exported.
-	 * 						current = templates from currently activated theme (but not a parent theme if there is one) as well as user edited templates
-	 * 						user = only user edited templates
-	 * 						all = all templates no matter what
+	 *                      current = templates from currently activated theme (but not a parent theme if there is one) as well as user edited templates
+	 *                      user = only user edited templates
+	 *                      all = all templates no matter what
 	 */
 	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 		$theme_templates = Theme_Templates::get_theme_templates( $export_type, $new_slug );
@@ -107,13 +104,13 @@ class Theme_Zip {
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
 
 				// Add pattern to zip
 				$zip->addFromString(
 					'patterns/' . $template_data->slug . '.php',
-					$pattern[ 'content' ]
+					$pattern['content']
 				);
 
 				// Add media assets to zip
@@ -133,13 +130,13 @@ class Theme_Zip {
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"'. $pattern[ 'slug' ] .'"} /-->';
+				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
+				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
 
 				// Add pattern to zip
 				$zip->addFromString(
 					'patterns/' . $template_data->slug . '.php',
-					$pattern[ 'content' ]
+					$pattern['content']
 				);
 
 				// Add media assets to zip
@@ -156,21 +153,21 @@ class Theme_Zip {
 		return $zip;
 	}
 
-    static function add_media_to_zip ( $zip, $media ) {
+	static function add_media_to_zip( $zip, $media ) {
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
-			$folder_path = Theme_Media::get_media_folder_path_from_url( $url );
+			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
 			$download_file = file_get_contents( $url );
 			$zip->addFromString( $folder_path . basename( $url ), $download_file );
 		}
 	}
 
-    static function replace_namespace( $content, $new_slug, $new_name ) {
+	static function replace_namespace( $content, $new_slug, $new_name ) {
 
-		$old_slug = wp_get_theme()->get( 'TextDomain' );
+		$old_slug            = wp_get_theme()->get( 'TextDomain' );
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
-		$old_name = wp_get_theme()->get( 'Name' );
+		$old_name            = wp_get_theme()->get( 'Name' );
 
 		$content = str_replace( $old_slug, $new_slug, $content );
 		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );

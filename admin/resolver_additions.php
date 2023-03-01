@@ -32,7 +32,7 @@ function augment_resolver_with_utilities() {
 
 				// Get the schema from the parent JSON.
 				$schema = $parent_theme_json_data['$schema'];
-				if( array_key_exists( 'schema', $parent_theme_json_data ) ) {
+				if ( array_key_exists( 'schema', $parent_theme_json_data ) ) {
 					$schema = $parent_theme_json_data['$schema'];
 				}
 
@@ -41,7 +41,7 @@ function augment_resolver_with_utilities() {
 				} else {
 					$parent_theme = new WP_Theme_JSON( $parent_theme_json_data );
 				}
-				$theme->merge($parent_theme);
+				$theme->merge( $parent_theme );
 			}
 
 			if ( $content === 'all' || $content === 'current' ) {
@@ -49,7 +49,7 @@ function augment_resolver_with_utilities() {
 				$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 
 				// Get the schema from the parent JSON.
-				if( array_key_exists( 'schema', $theme_json_data ) ) {
+				if ( array_key_exists( 'schema', $theme_json_data ) ) {
 					$schema = $theme_json_data['$schema'];
 				}
 
@@ -58,7 +58,7 @@ function augment_resolver_with_utilities() {
 				} else {
 					$theme_theme = new WP_Theme_JSON( $theme_json_data );
 				}
- 				$theme->merge( $theme_theme );
+				$theme->merge( $theme_theme );
 			}
 
 			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
@@ -79,8 +79,8 @@ function augment_resolver_with_utilities() {
 				$schema = 'https://schemas.wp.org/' . $theme_json_version . '/theme.json';
 			}
 			$data['$schema'] = $schema;
-			$theme_json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-			return preg_replace ( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
+			$theme_json      = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
 
 		}
 
