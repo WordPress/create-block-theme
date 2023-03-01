@@ -290,14 +290,6 @@ class Create_Block_Theme_Admin {
 			// Add new metadata.
 			$css_contents = Theme_Styles::build_child_style_css( $theme );
 
-			// Add screenshot.
-			if ( $this->is_valid_screenshot( $screenshot ) ){
-				$zip->addFile(
-					$screenshot['tmp_name'],
-					'screenshot.png'
-				);
-			}
-
 			// Add style.css.
 			file_put_contents( 
 				$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css', 
@@ -314,6 +306,14 @@ class Create_Block_Theme_Admin {
 				} else {
 					copy($item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
 				}
+			}
+
+			// Overwrite default screenshot if one is provided.
+			if ( $this->is_valid_screenshot( $screenshot ) ){
+				file_put_contents(
+					$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png', 
+					file_get_contents( $screenshot['tmp_name'] )
+				);
 			}
 
 			if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) ) {
