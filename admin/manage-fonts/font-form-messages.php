@@ -14,7 +14,10 @@ class Font_Form_Messages {
 		?>
 			<div class="notice notice-success is-dismissible">
 				<p>
-					<?php printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) ); ?>
+					<?php
+					// translators: %1$s: Font family, %2$s: Theme name
+					printf( esc_html__( '%1$s font added to %2$s theme.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) );
+					?>
 					<a href="themes.php?page=manage-fonts"><?php printf( esc_html__( 'Manage Fonts', 'create-block-theme' ) ); ?></a>
 				</p>
 			</div>
@@ -33,7 +36,12 @@ class Font_Form_Messages {
 		}
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) ); ?></p>
+				<p>
+				<?php
+				// translators: %1$s: Font family, %2$s: Theme name
+				printf( esc_html__( 'Error adding %1$s font to %2$s theme. WordPress lack permissions to write the font assets.', 'create-block-theme' ), esc_html( $font_family ), esc_html( $theme_name ) );
+				?>
+				</p>
 			</div>
 		<?php
 	}
@@ -42,7 +50,12 @@ class Font_Form_Messages {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php printf( esc_html__( 'Error adding %1$s font to %2$s theme. The uploaded file is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) ); ?></p>
+				<p>
+				<?php
+				// translators: %1$s: Font name, %2$s: Theme name
+				printf( esc_html__( 'Error adding %1$s font to %2$s theme. The uploaded file is not valid.', 'create-block-theme' ), esc_html( $_POST['font-name'] ), esc_html( $theme_name ) );
+				?>
+				</p>
 			</div>
 		<?php
 	}
@@ -69,7 +82,12 @@ class Font_Form_Messages {
 		$theme_name = wp_get_theme()->get( 'Name' );
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Font definition removed from your theme (%1$s) theme.json file.', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+				<p>
+				<?php
+				// translators: %1$s: Theme name
+				printf( esc_html__( 'Font definition removed from your theme (%1$s) theme.json file.', 'create-block-theme' ), esc_html( $theme_name ) );
+				?>
+				</p>
 			</div>
 		<?php
 	}
