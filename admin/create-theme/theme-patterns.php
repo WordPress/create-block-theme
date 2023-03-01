@@ -1,28 +1,28 @@
 <?php
 
 class Theme_Patterns {
-    public static function pattern_from_template ( $template ) {
-		$theme_slug = wp_get_theme()->get( 'TextDomain' );
-		$pattern_slug = $theme_slug . '/' . $template->slug;
+	public static function pattern_from_template( $template ) {
+		$theme_slug      = wp_get_theme()->get( 'TextDomain' );
+		$pattern_slug    = $theme_slug . '/' . $template->slug;
 		$pattern_content = (
-'<?php
+		'<?php
 /**
- * Title: '. $template->slug .'
- * Slug: ' . $pattern_slug. '
+ * Title: ' . $template->slug . '
+ * Slug: ' . $pattern_slug . '
  * Categories: hidden
  * Inserter: no
  */
 ?>
-'. $template->content
+' . $template->content
 		);
-		return array (
-			'slug' => $pattern_slug,
-			'content' => $pattern_content
+		return array(
+			'slug'    => $pattern_slug,
+			'content' => $pattern_content,
 		);
 	}
 
-    public static function escape_alt_for_pattern ( $html ) {
-		if ( empty ( $html ) ){
+	public static function escape_alt_for_pattern( $html ) {
+		if ( empty( $html ) ) {
 			return $html;
 		}
 
@@ -32,21 +32,21 @@ class Theme_Patterns {
 			$html = new WP_HTML_Tag_Processor( $html );
 			while ( $html->next_tag( 'img' ) ) {
 				$alt_attribute = $html->get_attribute( 'alt' );
-				if ( !empty ( $alt_attribute ) ) {
+				if ( ! empty( $alt_attribute ) ) {
 					$html->set_attribute( 'alt', self::escape_text_for_pattern( $alt_attribute ) );
 				}
 			}
 			return $html->__toString();
 		}
-		
+
 		// Fallback to regex
 		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
 		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			preg_match( '@alt="([^"]+)"@' , $html, $match );
+			preg_match( '@alt="([^"]+)"@', $html, $match );
 			if ( isset( $match[0] ) ) {
 				$alt_attribute = $match[0];
-				$alt_value= $match[1];
-				$html = str_replace(
+				$alt_value     = $match[1];
+				$html          = str_replace(
 					$alt_attribute,
 					'alt="' . self::escape_text_for_pattern( $alt_value ) . '"',
 					$html
@@ -56,9 +56,9 @@ class Theme_Patterns {
 		}
 	}
 
-    static function escape_text_for_pattern( $text ) {
-		if ( $text && trim ( $text ) !== "" ) {
-			return "<?php echo esc_attr_e( '" . $text . "', '". wp_get_theme()->get( "Name" ) ."' ); ?>";
+	static function escape_text_for_pattern( $text ) {
+		if ( $text && trim( $text ) !== '' ) {
+			return "<?php echo esc_attr_e( '" . $text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
 		}
 	}
 }

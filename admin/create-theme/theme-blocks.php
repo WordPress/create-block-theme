@@ -5,25 +5,25 @@ require_once( __DIR__ . '/theme-patterns.php' );
 require_once( __DIR__ . '/theme-utils.php' );
 
 class Theme_Blocks {
-    // find all the media files used in the templates and add them to the zip
-	public static function make_template_images_local ( $template ) {
-		$new_content         = $template->content;
-		$template_blocks     = parse_blocks( $template->content );
-		$flatten_blocks	     = _flatten_blocks( $template_blocks );
-		
-		$blocks = self::make_media_blocks_local( $template_blocks );
-		$blocks = serialize_blocks ( $blocks );
+	// find all the media files used in the templates and add them to the zip
+	public static function make_template_images_local( $template ) {
+		$new_content     = $template->content;
+		$template_blocks = parse_blocks( $template->content );
+		$flatten_blocks  = _flatten_blocks( $template_blocks );
 
-		$template->content = self::clean_serialized_markup ( $blocks );
-		$template->media = Theme_Media::get_media_absolute_urls_from_blocks ( $flatten_blocks );
+		$blocks = self::make_media_blocks_local( $template_blocks );
+		$blocks = serialize_blocks( $blocks );
+
+		$template->content = self::clean_serialized_markup( $blocks );
+		$template->media   = Theme_Media::get_media_absolute_urls_from_blocks( $flatten_blocks );
 		return $template;
 	}
 
-    static function make_media_blocks_local ( $nested_blocks ) {
-		$new_blocks = [];
+	static function make_media_blocks_local( $nested_blocks ) {
+		$new_blocks = array();
 		foreach ( $nested_blocks as $block ) {
 			$inner_blocks = $block['innerBlocks'];
-			switch ( $block[ 'blockName' ] ) {
+			switch ( $block['blockName'] ) {
 				case 'core/image':
 				case 'core/video':
 					$block = self::make_image_video_block_local( $block );
@@ -39,7 +39,7 @@ class Theme_Blocks {
 					break;
 			}
 			// recursive call for inner blocks
-			if ( !empty ( $block['innerBlocks'] ) ) {
+			if ( ! empty( $block['innerBlocks'] ) ) {
 				$block['innerBlocks'] = self::make_media_blocks_local( $inner_blocks );
 			}
 			$new_blocks[] = $block;
@@ -47,65 +47,65 @@ class Theme_Blocks {
 		return $new_blocks;
 	}
 
-    static function make_image_video_block_local ( $block ) {
-		if ( 'core/image' === $block[ 'blockName' ] || 'core/video' === $block[ 'blockName' ] ) {
-			$inner_html =  self::make_html_media_local( $block[ 'innerHTML' ] );
-			$inner_html = Theme_Patterns::escape_alt_for_pattern ( $inner_html );
-			$block['innerHTML'] = $inner_html;
-			$block['innerContent'] = array ( $inner_html );
+	static function make_image_video_block_local( $block ) {
+		if ( 'core/image' === $block['blockName'] || 'core/video' === $block['blockName'] ) {
+			$inner_html            = self::make_html_media_local( $block['innerHTML'] );
+			$inner_html            = Theme_Patterns::escape_alt_for_pattern( $inner_html );
+			$block['innerHTML']    = $inner_html;
+			$block['innerContent'] = array( $inner_html );
 		}
 		return $block;
 	}
 
-    static function make_cover_block_local ( $block ) {
-		if ( 'core/cover' === $block[ 'blockName' ] ) {
-			$inner_html = self::make_html_media_local( $block[ 'innerHTML' ] );
-			$inner_html = Theme_Patterns::escape_alt_for_pattern ( $inner_html );
-			$inner_content = [];
+	static function make_cover_block_local( $block ) {
+		if ( 'core/cover' === $block['blockName'] ) {
+			$inner_html    = self::make_html_media_local( $block['innerHTML'] );
+			$inner_html    = Theme_Patterns::escape_alt_for_pattern( $inner_html );
+			$inner_content = array();
 			foreach ( $block['innerContent'] as $content ) {
-				$content_html = self::make_html_media_local( $content );
-				$content_html = Theme_Patterns::escape_alt_for_pattern ( $content_html );
+				$content_html    = self::make_html_media_local( $content );
+				$content_html    = Theme_Patterns::escape_alt_for_pattern( $content_html );
 				$inner_content[] = $content_html;
 			}
-			$block['innerHTML'] = $inner_html;
+			$block['innerHTML']    = $inner_html;
 			$block['innerContent'] = $inner_content;
-			if ( isset ( $block['attrs']['url'] ) && Theme_Utils::is_absolute_url( $block['attrs']['url'] ) ) {
+			if ( isset( $block['attrs']['url'] ) && Theme_Utils::is_absolute_url( $block['attrs']['url'] ) ) {
 				$block['attrs']['url'] = Theme_Media::make_relative_media_url( $block['attrs']['url'] );
 			}
 		}
 		return $block;
 	}
 
-    static function make_mediatext_block_local ( $block ) {
-		if ( 'core/media-text' === $block[ 'blockName' ] ) {
-			$inner_html = self::make_html_media_local( $block[ 'innerHTML' ] );
-			$inner_html = Theme_Patterns::escape_alt_for_pattern ( $inner_html );
-			$inner_content = [];
+	static function make_mediatext_block_local( $block ) {
+		if ( 'core/media-text' === $block['blockName'] ) {
+			$inner_html    = self::make_html_media_local( $block['innerHTML'] );
+			$inner_html    = Theme_Patterns::escape_alt_for_pattern( $inner_html );
+			$inner_content = array();
 			foreach ( $block['innerContent'] as $content ) {
-				$content_html = self::make_html_media_local( $content );
-				$content_html = Theme_Patterns::escape_alt_for_pattern ( $content_html );
+				$content_html    = self::make_html_media_local( $content );
+				$content_html    = Theme_Patterns::escape_alt_for_pattern( $content_html );
 				$inner_content[] = $content_html;
 			}
-			$block['innerHTML'] = $inner_html;
+			$block['innerHTML']    = $inner_html;
 			$block['innerContent'] = $inner_content;
-			if ( isset ( $block['attrs']['mediaLink'] ) && Theme_Utils::is_absolute_url( $block['attrs']['mediaLink'] ) ) {
+			if ( isset( $block['attrs']['mediaLink'] ) && Theme_Utils::is_absolute_url( $block['attrs']['mediaLink'] ) ) {
 				$block['attrs']['mediaLink'] = Theme_Media::make_relative_media_url( $block['attrs']['mediaLink'] );
 			}
 		}
 		return $block;
 	}
 
-    static function add_theme_attr_to_template_part_block ( $block ) {
+	static function add_theme_attr_to_template_part_block( $block ) {
 		// The template parts included in the patterns need to indicate the theme they belong to
-		if ( 'core/template-part' === $block[ 'blockName' ] ) {
-			$block['attrs']['theme'] = ( $_POST['theme']['type'] === "export" || $_POST['theme']['type'] === "save" )
+		if ( 'core/template-part' === $block['blockName'] ) {
+			$block['attrs']['theme'] = ( $_POST['theme']['type'] === 'export' || $_POST['theme']['type'] === 'save' )
 			? strtolower( wp_get_theme()->get( 'Name' ) )
 			: $_POST['theme']['name'];
 		}
 		return $block;
 	}
 
-    static function make_html_media_local ( $html ) {
+	static function make_html_media_local( $html ) {
 		if ( empty( $html ) ) {
 			return $html;
 		}
@@ -134,7 +134,7 @@ class Theme_Blocks {
 			while ( $html->next_tag( 'div' ) ) {
 				$style = $html->get_attribute( 'style' );
 				if ( $style ) {
-					preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match);
+					preg_match_all( '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match );
 					$urls = $match[0];
 					foreach ( $urls as $url ) {
 						if ( Theme_Utils::is_absolute_url( $url ) ) {
@@ -145,10 +145,10 @@ class Theme_Blocks {
 			}
 			return $html->__toString();
 		}
-		
+
 		// Fallback to DOMDocument.
 		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
-		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) { 
+		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 			$doc = new DOMDocument();
 			@$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 			// replace all images that have absolute urls
@@ -157,19 +157,19 @@ class Theme_Blocks {
 				$image_url = $tag->getAttribute( 'src' );
 				if ( Theme_Utils::is_absolute_url( $image_url ) ) {
 					$img_src = $tag->getAttribute( 'src' );
-					$html = str_replace( $img_src, Theme_Media::make_relative_media_url( $img_src ), $html );
+					$html    = str_replace( $img_src, Theme_Media::make_relative_media_url( $img_src ), $html );
 				}
 			}
 			// replace all video that have absolute urls
 			$video_tags = $doc->getElementsByTagName( 'video' );
 			foreach ( $video_tags as $tag ) {
 				$video_url = $tag->getAttribute( 'src' );
-				if ( !empty( $video_url ) && Theme_Utils::is_absolute_url( $video_url ) ) {
+				if ( ! empty( $video_url ) && Theme_Utils::is_absolute_url( $video_url ) ) {
 					$video_src = $tag->getAttribute( 'src' );
-					$html = str_replace( $video_src, Theme_Media::make_relative_media_url( $video_src ), $html );
+					$html      = str_replace( $video_src, Theme_Media::make_relative_media_url( $video_src ), $html );
 				}
 				$poster_url = $tag->getAttribute( 'poster' );
-				if ( !empty ( $poster_url ) && Theme_Utils::is_absolute_url( $poster_url ) ) {
+				if ( ! empty( $poster_url ) && Theme_Utils::is_absolute_url( $poster_url ) ) {
 					$html = str_replace( $poster_url, Theme_Media::make_relative_media_url( $poster_url ), $html );
 				}
 			}
@@ -178,7 +178,7 @@ class Theme_Blocks {
 			foreach ( $div_tags as $tag ) {
 				$style = $tag->getAttribute( 'style' );
 				if ( $style ) {
-					preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match);
+					preg_match_all( '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match );
 					$urls = $match[0];
 					foreach ( $urls as $url ) {
 						if ( Theme_Utils::is_absolute_url( $url ) ) {
@@ -192,7 +192,7 @@ class Theme_Blocks {
 
 	}
 
-    static function clean_serialized_markup ( $markup ) {
+	static function clean_serialized_markup( $markup ) {
 		$markup = str_replace( '%20', ' ', $markup );
 		$markup = str_replace( '\u003c', '<', $markup );
 		$markup = str_replace( '\u003e', '>', $markup );
