@@ -20,6 +20,8 @@ async function updateFiles() {
 		newApiData = await fetch( `${ API_URL }${ API_KEY }` );
 		newData = await newApiData.json();
 	} catch ( error ) {
+		// TODO: show in UI and remove console statement
+		// eslint-disable-next-line
 		console.error( '❎  Error fetching the Google Fonts API:', error );
 		process.exit( 1 );
 	}
@@ -41,11 +43,17 @@ async function updateFiles() {
 				'./assets/google-fonts/fallback-fonts-list.json',
 				newDataString
 			);
+			// TODO: show in UI and remove console statement
+			// eslint-disable-next-line
 			console.info( '✅  Google Fonts JSON file updated' );
 		} else {
+			// TODO: show in UI and remove console statement
+			// eslint-disable-next-line
 			console.info( 'ℹ️  Google Fonts JSON file is up to date' );
 		}
 	} else {
+		// TODO: show in UI and remove console statement
+		// eslint-disable-next-line
 		console.error(
 			'❎  No new data to check. Check the Google Fonts API key.'
 		);

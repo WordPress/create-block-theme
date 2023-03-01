@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from '@wordpress/element';
 import FontFamily from './font-family';
 import {
+	// eslint-disable-next-line
 	__experimentalConfirmDialog as ConfirmDialog,
 	Modal,
 	Icon,
@@ -9,7 +10,7 @@ import {
 import DemoTextInput from '../demo-text-input';
 import './manage-fonts.css';
 
-const { __ } = wp.i18n;
+const { __, sprintf } = wp.i18n;
 
 function ManageFonts() {
 	// The element where the list of theme fonts is rendered coming from the server as JSON
@@ -109,7 +110,7 @@ function ManageFonts() {
 				}
 
 				updatedFontFamily.fontFace = fontFace.map( ( face, i ) => {
-					if ( fontFamilyIndex == index && fontFaceIndex === i ) {
+					if ( fontFamilyIndex === index && fontFaceIndex === i ) {
 						return {
 							...face,
 							shouldBeRemoved: true,
@@ -181,16 +182,26 @@ function ManageFonts() {
 				{ fontToDelete?.fontFamilyIndex !== undefined &&
 				fontToDelete?.fontFaceIndex !== undefined ? (
 					<h3>
-						{ __(
-							`Are you sure you want to delete "${ fontFaceToDelete?.fontStyle } - ${ fontFaceToDelete?.fontWeight }"  variant of "${ fontFamilyToDelete?.fontFamily }" from your theme?`,
-							'create-block-theme'
+						{ sprintf(
+							// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
+							__(
+								`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
+								'create-block-theme'
+							),
+							fontFaceToDelete?.fontStyle,
+							fontFaceToDelete?.fontWeight,
+							fontFamilyToDelete?.fontFamily
 						) }
 					</h3>
 				) : (
 					<h3>
-						{ __(
-							`Are you sure you want to delete "${ fontFamilyToDelete?.fontFamily }" from your theme?`,
-							'create-block-theme'
+						{ sprintf(
+							// translators: %s: Font Family
+							__(
+								`Are you sure you want to delete "%s" from your theme?`,
+								'create-block-theme'
+							),
+							fontFamilyToDelete?.fontFamily
 						) }
 					</h3>
 				) }

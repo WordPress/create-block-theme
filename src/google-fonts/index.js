@@ -125,7 +125,9 @@ function GoogleFonts() {
 								{ __( 'Select a font…', 'create-block-theme' ) }
 							</option>
 							{ googleFontsData.items.map( ( font, index ) => (
-								<option value={ index }>{ font.family }</option>
+								<option key={ index } value={ index }>
+									{ font.family }
+								</option>
 							) ) }
 						</SelectControl>
 					</div>

@@ -1,6 +1,4 @@
-import { __ } from '@wordpress/i18n';
-import { useEffect, useContext } from '@wordpress/element';
-import { ManageFontsContext } from '../fonts-context';
+import { useEffect } from '@wordpress/element';
 import Demo from '../demo-text-input/demo';
 
 function FontVariant( { font, variant, isSelected, handleToggle } ) {
@@ -24,10 +22,12 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 		} );
 		newFont
 			.load()
-			.then( function ( loaded_face ) {
-				document.fonts.add( loaded_face );
+			.then( function ( loadedFace ) {
+				document.fonts.add( loadedFace );
 			} )
 			.catch( function ( error ) {
+				// TODO: show error in the UI
+				// eslint-disable-next-line
 				console.error( error );
 			} );
 	}, [ font, variant ] );

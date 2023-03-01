@@ -10,7 +10,7 @@ function resetForm() {
 }
 
 fontFileElement.onchange = ( evt ) => {
-	// Grab file frop drop event or file upload
+	// Grab file from drop event or file upload
 	const file = evt.target.files[ 0 ];
 
 	if ( ! file ) {
@@ -23,15 +23,15 @@ fontFileElement.onchange = ( evt ) => {
 
 	reader.onload = () => {
 		// Create a font object
-		const font = new Font( 'Uploaded Font' );
+		const fontObj = new Font( 'Uploaded Font' );
 
 		// Pass the buffer, and the original filename
-		font.fromDataBuffer( reader.result, file.name );
+		fontObj.fromDataBuffer( reader.result, file.name );
 
-		font.onload = ( evt ) => {
+		fontObj.onload = ( onloadEvent ) => {
 			// Map the details LibFont gathered from the font to the
 			// "font" variable
-			const font = evt.detail.font;
+			const font = onloadEvent.detail.font;
 
 			// From all the OpenType tables in the font, take the "name"
 			// table so we can inspect it further
