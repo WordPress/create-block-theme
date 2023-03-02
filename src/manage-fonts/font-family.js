@@ -12,9 +12,9 @@ function FontFamily( {
 } ) {
 	const { familiesOpen, handleToggleFamily } =
 		useContext( ManageFontsContext );
-	const isOpen = familiesOpen.includes(
-		fontFamily.name || fontFamily.fontFamily
-	);
+	const isOpen =
+		familiesOpen.includes( fontFamily.name ) ||
+		familiesOpen.includes( fontFamily.fontFamily );
 
 	const toggleIsOpen = () => {
 		handleToggleFamily( fontFamily.name || fontFamily.fontFamily );
@@ -29,6 +29,8 @@ function FontFamily( {
 
 	return (
 		<table className="wp-list-table widefat table-view-list">
+			{ /* TODO: Add keyboard event to fix accessibility issue */ }
+			{ /* eslint-disable-next-line */ }
 			<thead onClick={ toggleIsOpen }>
 				<tr>
 					<td className="font-family-head">
