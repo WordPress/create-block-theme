@@ -128,7 +128,7 @@ class Theme_Tags {
 					$features_one = array_slice( $tags, 0, $half );
 					$features_two = array_slice( $tags, $half );
 
-					echo '<fieldset id="features_tags_1">';
+					echo '<fieldset id="features-tags-1">';
 					echo '<legend class="large-text">' . $category . ':</legend>';
 
 					foreach ( $features_one as $tag => $pretty_tag ) {
@@ -136,7 +136,7 @@ class Theme_Tags {
 					}
 
 					echo '</fieldset>';
-					echo '<fieldset id="features_tags_2">';
+					echo '<fieldset id="features-tags-2">';
 
 					foreach ( $features_two as $tag => $pretty_tag ) {
 						tag_checkbox_input( $category, $tag, $pretty_tag );
