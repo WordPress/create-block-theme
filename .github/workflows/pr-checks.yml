@@ -1,0 +1,35 @@
+name: Run checks
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+jobs:
+    Lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Setup Composer
+              uses: php-actions/composer@v6
+
+            - name: Install Dependencies
+              run: npm i
+
+            - name: Run PHP Lint
+              run: npm run lint:php
+
+            - name: Run JS Lint
+              if: success() || failure()
+              run: npm run lint:js
+
+            - name: Run CSS Lint
+              if: success() || failure()
+              run: npm run lint:css
