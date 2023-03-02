@@ -20,13 +20,18 @@ class Theme_Form {
 				<div id="col-container">
 					<div id="col-left">
 						<div class="col-wrap">
-							<p><?php printf( esc_html__( 'Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme' ), esc_html( wp_get_theme()->get( 'Name' ) ) ); ?></p>
+							<p>
+							<?php
+							/* translators: %1$s: Theme Name. */
+							printf( esc_html__( 'Export your current block theme (%1$s) with changes you made to Templates, Template Parts and Global Styles.', 'create-block-theme' ), esc_html( wp_get_theme()->get( 'Name' ) ) );
+							?>
+							</p>
 
 							<label>
 								<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php
 									printf(
-										/* translators: Theme Name. */
+										/* translators: %s: Theme Name. */
 										__( 'Export %s', 'create-block-theme' ),
 										wp_get_theme()->get( 'Name' )
 									);
@@ -40,7 +45,7 @@ class Theme_Form {
 									<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
 									<?php
 									printf(
-										/* translators: Theme Name. */
+										/* translators: %s: Theme Name. */
 										__( 'Create sibling of %s', 'create-block-theme' ),
 										wp_get_theme()->get( 'Name' )
 									);
@@ -55,7 +60,7 @@ class Theme_Form {
 									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
 									<?php
 									printf(
-										/* translators: Theme Name. */
+										/* translators: %s: Theme Name. */
 										__( 'Create child of %s', 'create-block-theme' ),
 										wp_get_theme()->get( 'Name' )
 									);
@@ -68,7 +73,7 @@ class Theme_Form {
 									<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
 									<?php
 										printf(
-											/* translators: Theme Name. */
+											/* translators: %s: Theme Name. */
 											__( 'Clone %s', 'create-block-theme' ),
 											wp_get_theme()->get( 'Name' )
 										);
@@ -82,7 +87,7 @@ class Theme_Form {
 								<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php
 									printf(
-										/* translators: Theme Name. */
+										/* translators: %s: Theme Name. */
 										__( 'Overwrite %s', 'create-block-theme' ),
 										wp_get_theme()->get( 'Name' )
 									);
@@ -100,7 +105,13 @@ class Theme_Form {
 							<label>
 								<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" />
 								<?php _e( 'Create a style variation', 'create-block-theme' ); ?><br />
-								<?php printf( esc_html__( '[Save user changes as a style variation of %1$s.]', 'create-block-theme' ), esc_html( wp_get_theme()->get( 'Name' ) ) ); ?>
+								<?php
+								printf(
+									// translators: %1$s: Theme name
+									esc_html__( '[Save user changes as a style variation of %1$s.]', 'create-block-theme' ),
+									esc_html( wp_get_theme()->get( 'Name' ) )
+								);
+								?>
 							</label>
 							<br /><br />
 

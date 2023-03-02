@@ -36,7 +36,15 @@ class Form_Messages {
 
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Blank theme created, head over to Appearance > Themes to activate %1$s', 'create-block-theme' ), esc_html( $theme_name ) ); ?></p>
+				<p>
+				<?php
+				printf(
+					// translators: %1$s: Theme name
+					esc_html__( 'Blank theme created, head over to Appearance > Themes to activate %1$s', 'create-block-theme' ),
+					esc_html( $theme_name )
+				);
+				?>
+					</p>
 			</div>
 		<?php
 	}
@@ -44,10 +52,18 @@ class Form_Messages {
 	public static function admin_notice_variation_success() {
 		$theme_name     = wp_get_theme()->get( 'Name' );
 		$variation_name = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . $_POST['theme']['variation_slug'] . '.json';
-
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p><?php printf( esc_html__( 'Your variation of %1$s has been created successfully. The new variation file is in %2$s', 'create-block-theme' ), esc_html( $theme_name ), esc_html( $variation_name ) ); ?></p>
+				<p>
+				<?php
+				printf(
+					// translators: %1$s: Theme name, %2$s: Variation name
+					esc_html__( 'Your variation of %1$s has been created successfully. The new variation file is in %2$s', 'create-block-theme' ),
+					esc_html( $theme_name ),
+					esc_html( $variation_name )
+				);
+				?>
+					</p>
 			</div>
 		<?php
 	}
@@ -57,7 +73,16 @@ class Form_Messages {
 		$theme_dir  = get_stylesheet_directory();
 		?>
 			<div class="notice notice-error">
-				<p><?php printf( esc_html__( 'Your theme ( %1$s ) directory ( %2$s ) is not writable. Please check your file permissions.', 'create-block-theme' ), esc_html( $theme_name ), esc_html( $theme_dir ) ); ?></p>
+				<p>
+				<?php
+				printf(
+					// translators: %1$s: Theme name, %2$s: Theme directory
+					esc_html__( 'Your theme ( %1$s ) directory ( %2$s ) is not writable. Please check your file permissions.', 'create-block-theme' ),
+					esc_html( $theme_name ),
+					esc_html( $theme_dir )
+				);
+				?>
+					</p>
 			</div>
 		<?php
 	}
@@ -66,7 +91,15 @@ class Form_Messages {
 		$themes_dir = get_theme_root();
 		?>
 			<div class="notice notice-error">
-				<p><?php printf( esc_html__( 'Your themes directory ( %1$s ) is not writable. Please check your file permissions.', 'create-block-theme' ), esc_html( $themes_dir ) ); ?></p>
+				<p>
+				<?php
+				printf(
+					// translators: %1$s: Theme directory
+					esc_html__( 'Your themes directory ( %1$s ) is not writable. Please check your file permissions.', 'create-block-theme' ),
+					esc_html( $themes_dir )
+				);
+				?>
+					</p>
 			</div>
 		<?php
 	}

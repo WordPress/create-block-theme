@@ -11,7 +11,7 @@ class Theme_Readme {
 		$uri                    = $theme['uri'];
 		$author                 = $theme['author'];
 		$author_uri             = $theme['author_uri'];
-		$copyYear               = date( 'Y' );
+		$copy_year              = gmdate( 'Y' );
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
@@ -40,7 +40,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Copyright ==
 
-{$name} WordPress Theme, (C) {$copyYear} {$author}
+{$name} WordPress Theme, (C) {$copy_year} {$author}
 {$name} is distributed under the terms of the GNU GPL.
 {$original_theme_credits}
 This program is free software: you can redistribute it and/or modify
@@ -56,12 +56,12 @@ GNU General Public License for more details.
 	}
 
 	/**
-	  * Build string for original theme credits.
-	  * Used in readme.txt of cloned themes.
-	  *
-	  * @param string $new_name New theme name.
-	  * @return string
-	  */
+	 * Build string for original theme credits.
+	 * Used in readme.txt of cloned themes.
+	 *
+	 * @param string $new_name New theme name.
+	 * @return string
+	 */
 	static function original_theme_credits( $new_name ) {
 		if ( ! $new_name ) {
 			return;
@@ -98,8 +98,8 @@ GNU General Public License for more details.
 		}
 
 		$theme_credit_content = sprintf(
-			__( '%1$s is based on %2$s (%3$s), (C) %4$s, [%5$s](%6$s)', 'create-block-theme' ),
 			/* translators: 1: New Theme name, 2: Original Theme Name. 3. Original Theme URI. 4. Original Theme Author. 5. Original Theme License. 6. Original Theme License URI. */
+			__( '%1$s is based on %2$s (%3$s), (C) %4$s, [%5$s](%6$s)', 'create-block-theme' ),
 			$new_name,
 			$original_name,
 			$original_uri,

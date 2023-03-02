@@ -21,7 +21,15 @@ class Local_Fonts {
 		?>
 		<div class="wrap local-fonts-page">
 			<h2><?php _ex( 'Add local fonts to your theme', 'UI String', 'create-block-theme' ); ?></h2>
-			<h3><?php printf( esc_html__( 'Add local fonts assets and font face definitions to your currently active theme (%1$s)', 'create-block-theme' ), esc_html( wp_get_theme()->get( 'Name' ) ) ); ?></h3>
+			<h3>
+			<?php
+			printf(
+				// translators: %1$s: Theme name
+				esc_html__( 'Add local fonts assets and font face definitions to your currently active theme (%1$s)', 'create-block-theme' ),
+				esc_html( wp_get_theme()->get( 'Name' ) )
+			);
+			?>
+			</h3>
 			<form enctype="multipart/form-data" action="" method="POST">
 				<table class="form-table">
 					<tbody>

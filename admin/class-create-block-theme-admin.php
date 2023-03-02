@@ -296,11 +296,13 @@ class Create_Block_Theme_Admin {
 				$css_contents
 			);
 
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator( $source, \RecursiveDirectoryIterator::SKIP_DOTS ),
+				\RecursiveIteratorIterator::SELF_FIRST
+			);
+
 			foreach (
-				$iterator = new \RecursiveIteratorIterator(
-					new \RecursiveDirectoryIterator( $source, \RecursiveDirectoryIterator::SKIP_DOTS ),
-					\RecursiveIteratorIterator::SELF_FIRST
-				) as $item
+				$iterator as $item
 				) {
 				if ( $item->isDir() ) {
 					wp_mkdir_p( $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname() );
@@ -332,7 +334,7 @@ class Create_Block_Theme_Admin {
 
 	function blockbase_save_theme() {
 
-		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'create-block-theme' && ! empty( $_POST['theme'] ) ) {
+		if ( ! empty( $_GET['page'] ) && 'create-block-theme' === $_GET['page'] && ! empty( $_POST['theme'] ) ) {
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -344,7 +346,7 @@ class Create_Block_Theme_Admin {
 				return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
 			}
 
-			if ( $_POST['theme']['type'] === 'save' ) {
+			if ( 'save' === $_POST['theme']['type'] ) {
 				// Avoid running if WordPress dosn't have permission to overwrite the theme folder
 				if ( ! wp_is_writable( get_stylesheet_directory() ) ) {
 					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_file_permissions' ) );
@@ -359,9 +361,9 @@ class Create_Block_Theme_Admin {
 				Theme_Templates::clear_user_templates_customizations();
 
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_save_success' ) );
-			} elseif ( $_POST['theme']['type'] === 'variation' ) {
+			} elseif ( 'variation' === $_POST['theme']['type'] ) {
 
-				if ( $_POST['theme']['variation'] === '' ) {
+				if ( '' === $_POST['theme']['variation'] ) {
 					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_variation_name' ) );
 				}
 
@@ -378,21 +380,21 @@ class Create_Block_Theme_Admin {
 				Theme_Styles::clear_user_styles_customizations();
 
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_variation_success' ) );
-			} elseif ( $_POST['theme']['type'] === 'blank' ) {
+			} elseif ( 'blank' === $_POST['theme']['type'] ) {
 				// Avoid running if WordPress dosn't have permission to write the themes folder
 				if ( ! wp_is_writable( get_theme_root() ) ) {
 					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_themes_file_permissions' ) );
 				}
 
-				if ( $_POST['theme']['name'] === '' ) {
+				if ( '' === $_POST['theme']['name'] ) {
 					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
 				}
 				$this->create_blank_theme( $_POST['theme'], $_FILES['screenshot'] );
 
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_blank_success' ) );
 			} elseif ( is_child_theme() ) {
-				if ( $_POST['theme']['type'] === 'sibling' ) {
-					if ( $_POST['theme']['name'] === '' ) {
+				if ( 'sibling' === $_POST['theme']['type'] ) {
+					if ( '' === $_POST['theme']['name'] ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
 					}
 					$this->create_sibling_theme( $_POST['theme'], $_FILES['screenshot'] );
@@ -401,13 +403,13 @@ class Create_Block_Theme_Admin {
 				}
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_export_success' ) );
 			} else {
-				if ( $_POST['theme']['type'] === 'child' ) {
-					if ( $_POST['theme']['name'] === '' ) {
+				if ( 'child' === $_POST['theme']['type'] ) {
+					if ( '' === $_POST['theme']['name'] ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
 					}
 					$this->create_child_theme( $_POST['theme'], $_FILES['screenshot'] );
-				} elseif ( $_POST['theme']['type'] === 'clone' ) {
-					if ( $_POST['theme']['name'] === '' ) {
+				} elseif ( 'clone' === $_POST['theme']['type'] ) {
+					if ( '' === $_POST['theme']['name'] ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
 					}
 					$this->clone_theme( $_POST['theme'], $_FILES['screenshot'] );
@@ -425,7 +427,7 @@ class Create_Block_Theme_Admin {
 
 	function is_valid_screenshot( $file ) {
 		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
-		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES ) && $file['size'] < 2097152 ) {
+		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES, true ) && $file['size'] < 2097152 ) {
 			return 1;
 		}
 		return 0;

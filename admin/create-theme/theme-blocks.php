@@ -98,7 +98,7 @@ class Theme_Blocks {
 	static function add_theme_attr_to_template_part_block( $block ) {
 		// The template parts included in the patterns need to indicate the theme they belong to
 		if ( 'core/template-part' === $block['blockName'] ) {
-			$block['attrs']['theme'] = ( $_POST['theme']['type'] === 'export' || $_POST['theme']['type'] === 'save' )
+			$block['attrs']['theme'] = ( 'export' === $_POST['theme']['type'] || 'save' === $_POST['theme']['type'] )
 			? strtolower( wp_get_theme()->get( 'Name' ) )
 			: $_POST['theme']['name'];
 		}
@@ -150,6 +150,8 @@ class Theme_Blocks {
 		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
 		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 			$doc = new DOMDocument();
+			// TODO: do not silence errors, show in UI
+			// @codingStandardsIgnoreLine
 			@$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 			// replace all images that have absolute urls
 			$img_tags = $doc->getElementsByTagName( 'img' );

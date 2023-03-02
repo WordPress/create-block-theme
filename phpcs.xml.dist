@@ -18,7 +18,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="twentytwentythree"/>
+				<element value="create-block-theme"/>
 				<element value="default"/>
 			</property>
 		</properties>

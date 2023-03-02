@@ -20,7 +20,7 @@ class Theme_Tags {
 		$tags                 = $checkbox_tags . $custom_tags;
 
 		// Remove comma and space from start of tags list
-		if ( substr( $tags, 0, 2 ) === ', ' ) {
+		if ( ', ' === substr( $tags, 0, 2 ) ) {
 			$tags = substr( $tags, 2 );
 		}
 

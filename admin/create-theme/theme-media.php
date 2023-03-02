@@ -8,9 +8,9 @@ class Theme_Media {
 		$folder_path      = '';
 		$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' );
 		$video_extensions = array( 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'ogv', '3gp', '3g2' );
-		if ( in_array( $extension, $image_extensions ) ) {
+		if ( in_array( $extension, $image_extensions, true ) ) {
 			$folder_path = '/assets/images/';
-		} elseif ( in_array( $extension, $video_extensions ) ) {
+		} elseif ( in_array( $extension, $video_extensions, true ) ) {
 			$folder_path = '/assets/videos/';
 		} else {
 			$folder_path = '/assets/';
@@ -82,6 +82,8 @@ class Theme_Media {
 						'core/media-text' === $block['blockName']
 					) {
 					$doc = new DOMDocument();
+					// TODO: do not silence errors, show in UI
+					// @codingStandardsIgnoreLine
 					@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 
 					// Get the media urls from img tags

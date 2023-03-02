@@ -60,12 +60,12 @@ class Theme_Templates {
 	 * to have the expected exported value.
 	 */
 	static function filter_theme_template( $template, $export_type, $path, $old_slug, $new_slug ) {
-		if ( $template->source === 'theme' && $export_type === 'user' ) {
+		if ( 'theme' === $template->source && 'user' === $export_type ) {
 			return false;
 		}
 		if (
-			$template->source === 'theme' &&
-			$export_type === 'current' &&
+			'theme' === $template->source &&
+			'current' === $export_type &&
 			! file_exists( $path . $template->slug . '.html' )
 		) {
 			return false;
@@ -89,14 +89,14 @@ class Theme_Templates {
 		$templates      = get_block_templates();
 		$template_parts = get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template ) {
-			if ( $template->source !== 'custom' ) {
+			if ( 'custom' !== $template->source ) {
 				continue;
 			}
 			wp_delete_post( $template->wp_id, true );
 		}
 
 		foreach ( $templates as $template ) {
-			if ( $template->source !== 'custom' ) {
+			if ( 'custom' !== $template->source ) {
 				continue;
 			}
 			wp_delete_post( $template->wp_id, true );

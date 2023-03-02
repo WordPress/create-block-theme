@@ -25,7 +25,7 @@ function augment_resolver_with_utilities() {
 				$theme = new WP_Theme_JSON();
 			}
 
-			if ( $content === 'all' && wp_get_theme()->parent() ) {
+			if ( 'all' === $content && wp_get_theme()->parent() ) {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
 				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
@@ -44,7 +44,7 @@ function augment_resolver_with_utilities() {
 				$theme->merge( $parent_theme );
 			}
 
-			if ( $content === 'all' || $content === 'current' ) {
+			if ( 'all' === $content || 'current' === $content ) {
 				$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 				$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 
