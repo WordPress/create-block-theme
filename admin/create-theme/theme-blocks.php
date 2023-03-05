@@ -34,9 +34,6 @@ class Theme_Blocks {
 				case 'core/media-text':
 					$block = self::make_mediatext_block_local( $block );
 					break;
-				case 'core/template-part':
-					$block = self::add_theme_attr_to_template_part_block( $block );
-					break;
 			}
 			// recursive call for inner blocks
 			if ( ! empty( $block['innerBlocks'] ) ) {
@@ -91,16 +88,6 @@ class Theme_Blocks {
 			if ( isset( $block['attrs']['mediaLink'] ) && Theme_Utils::is_absolute_url( $block['attrs']['mediaLink'] ) ) {
 				$block['attrs']['mediaLink'] = Theme_Media::make_relative_media_url( $block['attrs']['mediaLink'] );
 			}
-		}
-		return $block;
-	}
-
-	static function add_theme_attr_to_template_part_block( $block ) {
-		// The template parts included in the patterns need to indicate the theme they belong to
-		if ( 'core/template-part' === $block['blockName'] ) {
-			$block['attrs']['theme'] = ( 'export' === $_POST['theme']['type'] || 'save' === $_POST['theme']['type'] )
-			? strtolower( wp_get_theme()->get( 'Name' ) )
-			: $_POST['theme']['name'];
 		}
 		return $block;
 	}
