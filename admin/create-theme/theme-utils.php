@@ -15,6 +15,7 @@ class Theme_Utils {
 
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		$new_slug = sanitize_title( $new_theme_name );
+		$new_slug = preg_replace( '/\s+/', '', $new_slug ); // Remove spaces
 
 		if ( ! str_contains( $old_slug, '-' ) && str_contains( $new_slug, '-' ) ) {
 			return str_replace( '-', '', $new_slug );

@@ -71,8 +71,6 @@ class Theme_Templates {
 			return false;
 		}
 
-		$template->content = _remove_theme_attribute_in_block_template_content( $template->content );
-
 		// NOTE: Dashes are encoded as \u002d in the content that we get (noteably in things like css variables used in templates)
 		// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 		$template->content = str_replace( '\u002d', '-', $template->content );
