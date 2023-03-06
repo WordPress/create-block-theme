@@ -13,6 +13,9 @@ import './manage-fonts.css';
 const { __, sprintf } = wp.i18n;
 
 function ManageFonts() {
+	const { adminUrl } = createBlockTheme;
+	const nonce = document.querySelector( '#nonce' ).value;
+
 	// The element where the list of theme fonts is rendered coming from the server as JSON
 	const themeFontsJsonElement = document.querySelector( '#theme-fonts-json' );
 
@@ -157,74 +160,104 @@ function ManageFonts() {
 					</p>
 				</Modal>
 			) }
-			<p className="help">
-				{ __(
-					'These are the fonts currently embedded in your theme ',
-					'create-block-theme'
-				) }
-				<Button
-					onClick={ toggleIsHelpOpen }
-					style={ { padding: '0', height: '1rem' } }
-				>
-					<Icon icon={ 'info' } />
-				</Button>
-			</p>
-			<input
-				type="hidden"
-				name="new-theme-fonts-json"
-				value={ JSON.stringify( newThemeFonts ) }
-			/>
-			<ConfirmDialog
-				isOpen={ showConfirmDialog }
-				onConfirm={ confirmDelete }
-				onCancel={ cancelDelete }
-			>
-				{ fontToDelete?.fontFamilyIndex !== undefined &&
-				fontToDelete?.fontFaceIndex !== undefined ? (
-					<h3>
-						{ sprintf(
-							// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
-							__(
-								`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
-								'create-block-theme'
-							),
-							fontFaceToDelete?.fontStyle,
-							fontFaceToDelete?.fontWeight,
-							fontFamilyToDelete?.fontFamily
-						) }
-					</h3>
-				) : (
-					<h3>
-						{ sprintf(
-							// translators: %s: Font Family
-							__(
-								`Are you sure you want to delete "%s" from your theme?`,
-								'create-block-theme'
-							),
-							fontFamilyToDelete?.fontFamily
-						) }
-					</h3>
-				) }
-				<p>
+
+			<div className="wrap">
+				<div className="manage-fonts-header-flex">
+					<h1 className="wp-heading-inline">
+						{ __( 'Manage Theme Fonts', 'create-block-theme' ) }
+					</h1>
+					<div className="buttons">
+						<Button
+							href={ `${ adminUrl }themes.php?page=add-google-font-to-theme-json` }
+							variant="secondary"
+						>
+							{ __( 'Add Google Font', 'create-block-theme' ) }
+						</Button>
+						<Button
+							href={ `${ adminUrl }themes.php?page=add-local-font-to-theme-json` }
+							variant="secondary"
+						>
+							{ __( 'Add Local Font', 'create-block-theme' ) }
+						</Button>
+					</div>
+				</div>
+
+				<hr className="wp-header-end" />
+
+				<p className="help">
 					{ __(
-						'This action will delete the font definition and the font file assets from your theme.',
+						'These are the fonts currently embedded in your theme ',
 						'create-block-theme'
 					) }
+					<Button
+						onClick={ toggleIsHelpOpen }
+						style={ { padding: '0', height: '1rem' } }
+					>
+						<Icon icon={ 'info' } />
+					</Button>
 				</p>
-			</ConfirmDialog>
 
-			<DemoTextInput />
+				<ConfirmDialog
+					isOpen={ showConfirmDialog }
+					onConfirm={ confirmDelete }
+					onCancel={ cancelDelete }
+				>
+					{ fontToDelete?.fontFamilyIndex !== undefined &&
+					fontToDelete?.fontFaceIndex !== undefined ? (
+						<h3>
+							{ sprintf(
+								// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
+								__(
+									`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
+									'create-block-theme'
+								),
+								fontFaceToDelete?.fontStyle,
+								fontFaceToDelete?.fontWeight,
+								fontFamilyToDelete?.fontFamily
+							) }
+						</h3>
+					) : (
+						<h3>
+							{ sprintf(
+								// translators: %s: Font Family
+								__(
+									`Are you sure you want to delete "%s" from your theme?`,
+									'create-block-theme'
+								),
+								fontFamilyToDelete?.fontFamily
+							) }
+						</h3>
+					) }
+					<p>
+						{ __(
+							'This action will delete the font definition and the font file assets from your theme.',
+							'create-block-theme'
+						) }
+					</p>
+				</ConfirmDialog>
 
-			<div className="font-families">
-				{ newThemeFonts.map( ( fontFamily, i ) => (
-					<FontFamily
-						fontFamily={ fontFamily }
-						fontFamilyIndex={ i }
-						key={ `fontfamily${ i }` }
-						deleteFontFamily={ requestDeleteConfirmation }
-						deleteFontFace={ requestDeleteConfirmation }
+				<DemoTextInput />
+
+				<div className="font-families">
+					{ newThemeFonts.map( ( fontFamily, i ) => (
+						<FontFamily
+							fontFamily={ fontFamily }
+							fontFamilyIndex={ i }
+							key={ `fontfamily${ i }` }
+							deleteFontFamily={ requestDeleteConfirmation }
+							deleteFontFace={ requestDeleteConfirmation }
+						/>
+					) ) }
+				</div>
+
+				<form method="POST" id="manage-fonts-form">
+					<input
+						type="hidden"
+						name="new-theme-fonts-json"
+						value={ JSON.stringify( newThemeFonts ) }
 					/>
-				) ) }
+					<input type="hidden" name="nonce" value={ nonce } />
+				</form>
 			</div>
 		</>
 	);
