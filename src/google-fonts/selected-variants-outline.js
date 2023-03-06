@@ -60,28 +60,33 @@ function SelectedVariantsOutline( { selectionData, removeVariant } ) {
 
 			{ !! selectionData && (
 				<>
-					<div className="variant-row">
+					{ /* <div className="variant-row">
 						<div>{ __( 'Variant', 'create-block-theme' ) }</div>
 						<div>{ __( 'File Size', 'create-block-theme' ) }</div>
 						<div></div>
-					</div>
+					</div> */ }
 					<div className="variants-list">
 						{ Object.keys( selectionData ).map( ( key, i ) => (
 							<div
 								className="variants-family"
 								key={ `variants-family-${ i }` }
 							>
-								<p>{ selectionData[ key ].family }</p>
+								<p>
+									<span>
+										{ selectionData[ key ].family }{ ' ' }
+									</span>
+									<span>{  }</span>
+								</p>
 								{ selectionData[ key ].faces.map(
 									( face, ii ) => (
 										<div
 											className="variant-row"
 											key={ `selected-variant-${ ii }` }
 										>
-											<div>
+											<div className="variant">
 												{ face.weight } { face.style }
 											</div>
-											<div>
+											<div className="size">
 												{ getFileSize( face.src ) }
 											</div>
 											<div>
@@ -109,7 +114,7 @@ function SelectedVariantsOutline( { selectionData, removeVariant } ) {
 			) }
 
 			<div className="variants-total">
-				<div>
+				<div className="variant">
 					{ variantsCount }{ ' ' }
 					{ _n(
 						'Variant',
@@ -118,7 +123,7 @@ function SelectedVariantsOutline( { selectionData, removeVariant } ) {
 						'create-block-theme'
 					) }
 				</div>
-				<div>{ totalSize }</div>
+				<div className="size">{ totalSize }</div>
 			</div>
 		</div>
 	);
