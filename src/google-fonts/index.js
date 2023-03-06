@@ -6,9 +6,14 @@ import { SelectControl, Spinner } from '@wordpress/components';
 
 import SelectedVariantsOutline from './selected-variants-outline';
 import FontVariant from './font-variant';
-import { getWeightFromGoogleVariant, getStyleFromGoogleVariant, forceHttps, getGoogleVariantFromStyleAndWeight } from './utils';
-import DemoTextInput from "../demo-text-input";
-import "./google-fonts.css";
+import {
+	getWeightFromGoogleVariant,
+	getStyleFromGoogleVariant,
+	forceHttps,
+	getGoogleVariantFromStyleAndWeight,
+} from './utils';
+import DemoTextInput from '../demo-text-input';
+import './google-fonts.css';
 
 const EMPTY_SELECTION_DATA = {};
 
@@ -25,48 +30,49 @@ const EMPTY_SELECTION_DATA = {};
 // 	}
 // };
 
-function GoogleFonts () {
-    const [ googleFontsData, setGoogleFontsData ] = useState( {} );
-    const [ selectedFont, setSelectedFont ] = useState( null );
-    const [ selectionData, setSelectionData ] = useState( EMPTY_SELECTION_DATA );
+function GoogleFonts() {
+	const [ googleFontsData, setGoogleFontsData ] = useState( {} );
+	const [ selectedFont, setSelectedFont ] = useState( null );
+	const [ selectionData, setSelectionData ] =
+		useState( EMPTY_SELECTION_DATA );
 
-    // pickup the nonce from the input printed in the server
-    const nonce = document.querySelector( "#nonce" ).value;
+	// pickup the nonce from the input printed in the server
+	const nonce = document.querySelector( '#nonce' ).value;
 
-    const handleToggleAllVariants = ( family ) => {
+	const handleToggleAllVariants = ( family ) => {
 		const existingFamily = selectionData[ family ];
-		if ( existingFamily && !!existingFamily?.faces?.length ) {
+		if ( existingFamily && !! existingFamily?.faces?.length ) {
 			setSelectionData( {
 				...selectionData,
 				[ family ]: {
-					faces: []
+					faces: [],
 				},
 			} );
 		} else {
 			const newFamily = {
-				family: family,
+				family,
 				faces: selectedFont.variants.map( ( variant ) => {
 					return {
 						weight: getWeightFromGoogleVariant( variant ),
 						style: getStyleFromGoogleVariant( variant ),
 						src: forceHttps( selectedFont.files[ variant ] ),
-					}
-				} )
+					};
+				} ),
 			};
 			setSelectionData( {
 				...selectionData,
 				[ family ]: newFamily,
 			} );
 		}
-    }
+	};
 
-	const isVariantSelected = ( family , weight, style ) => {
+	const isVariantSelected = ( family, weight, style ) => {
 		const existingFamily = selectionData[ family ];
 		if ( existingFamily ) {
 			const existingFace = existingFamily.faces.find( ( face ) => {
 				return face.weight === weight && face.style === style;
 			} );
-			return !!existingFace;
+			return !! existingFace;
 		}
 		return false;
 	};
@@ -82,38 +88,38 @@ function GoogleFonts () {
 					faces: [
 						...( existingFamily?.faces || [] ),
 						{
-							weight: weight,
-							style: style,
+							weight,
+							style,
 							src: forceHttps( selectedFont.files[ variant ] ),
-						}
-					]
-				}
+						},
+					],
+				},
 			} );
 		} else {
-			setSelectionData({
+			setSelectionData( {
 				...selectionData,
 				[ family ]: {
-					family: family,
+					family,
 					faces: [
 						{
-							weight: weight,
-							style: style,
+							weight,
+							style,
 							src: forceHttps( selectedFont.files[ variant ] ),
-						}
-					]
-				}
-			})
+						},
+					],
+				},
+			} );
 		}
-		
-	}
+	};
 
 	const removeVariant = ( family, weight, style ) => {
 		const existingFamily = selectionData[ family ];
-		const newFaces = existingFamily.faces.filter(face => (
-			!(face.weight === weight && face.style === style)
-		))
-		if ( !newFaces.length ) {
-			const { [ family ]: removedFamily, ...newSelectionData } = selectionData;
+		const newFaces = existingFamily.faces.filter(
+			( face ) => ! ( face.weight === weight && face.style === style )
+		);
+		if ( ! newFaces.length ) {
+			const { [ family ]: removedFamily, ...newSelectionData } =
+				selectionData;
 			setSelectionData( newSelectionData );
 		} else {
 			setSelectionData( {
@@ -121,126 +127,216 @@ function GoogleFonts () {
 				[ family ]: {
 					...existingFamily,
 					faces: newFaces,
-				}
-			});
+				},
+			} );
 		}
 	};
 
-    const handleToggleVariant = ( family, weight, style ) => {
-		isVariantSelected( family, weight, style )
-			? removeVariant( family, weight, style )
-			: addVariant( family, weight, style );
-    }
+	const handleToggleVariant = ( family, weight, style ) => {
+		if ( isVariantSelected( family, weight, style ) ) {
+			removeVariant( family, weight, style );
+		} else {
+			addVariant( family, weight, style );
+		}
+	};
 
-    // Load google fonts data
-    useEffect(() => {
-        (async () => {
-            const responseData = await fetch( createBlockTheme.googleFontsDataUrl );
-            const parsedData = await responseData.json();
-            setGoogleFontsData( parsedData );
-        })();
-    }, []);
+	// Load google fonts data
+	useEffect( () => {
+		( async () => {
+			const responseData = await fetch(
+				createBlockTheme.googleFontsDataUrl
+			);
+			const parsedData = await responseData.json();
+			setGoogleFontsData( parsedData );
+		} )();
+	}, [] );
 
-    const theme = useSelect( ( select ) => {
-        return select( coreDataStore ).getCurrentTheme();
-    }, null );
+	const theme = useSelect( ( select ) => {
+		return select( coreDataStore ).getCurrentTheme();
+	}, null );
 
-    const handleSelectChange = ( value ) => {
-        setSelectedFont( googleFontsData.items[ value ] ) ;
-    }
+	const handleSelectChange = ( value ) => {
+		setSelectedFont( googleFontsData.items[ value ] );
+	};
 
-    return (
-        <div className="wrap google-fonts-page">
-
-            <main>
-                <h1 className="wp-heading-inline">{ __('Add Google fonts to your theme', 'create-block-theme') }</h1>
-                <h3>{ __('Add Google fonts assets and font face definitions to your currently active theme', 'create-block-theme')} ({ theme?.name.rendered })</h3>
-                { ! googleFontsData?.items && (
-                    <p>
-                        <Spinner />
-                        <span>{ __('Loading Google fonts data...', 'create-block-theme') }</span>
-                    </p>
-                ) }
-                { googleFontsData?.items && (
-                    <>
-                        <div className="select-font">
-                            <SelectControl
-                                    label={ __('Select Font', 'create-block-theme') }
-                                    name="google-font"
-                                    onChange={ handleSelectChange }
-                                    size="__unstable-large"
-                                >
-                                    <option value={null}>{ __('Select a font...', 'create-block-theme') }</option>
-                                    { googleFontsData.items.map( ( font, index ) => (
-                                            <option value={ index }>{ font.family }</option>
-                                    ))}
-                            </SelectControl>
-                        </div>
-                        <DemoTextInput />
-                        { selectedFont && <p>{ __('Select the font variants you want to include:', 'create-block-theme') }</p> }
-                        { selectedFont && (
-                            <table className="wp-list-table widefat striped table-view-list" id="google-fonts-table">
-                                <thead>
-                                    <tr>
-                                        <td className="">
-                                            <input
-                                                type="checkbox"
-                                                onClick={ () => handleToggleAllVariants( selectedFont.family ) }
-                                                checked={ selectedFont.variants.length === selectionData[ selectedFont.family ]?.faces?.length }
-                                            />
-                                        </td>
-                                        <td className="">{ __('Weight', 'create-block-theme') }</td>
-                                        <td className="">{ __('Style', 'create-block-theme') }</td>
-                                        <td className="">{ __('Preview', 'create-block-theme') }</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedFont.variants.map( ( variant, i ) => (
-                                        <FontVariant
-                                            font={ selectedFont }
-                                            variant={ variant }
-                                            key={`font-variant-${i}`}
-                                            isSelected={ isVariantSelected(
-												selectedFont.family,
-												getWeightFromGoogleVariant(variant),
-												getStyleFromGoogleVariant(variant)
+	return (
+		<div className="wrap google-fonts-page">
+			<main>
+				<h1 className="wp-heading-inline">
+					{ __(
+						'Add Google fonts to your theme',
+						'create-block-theme'
+					) }
+				</h1>
+				<h3>
+					{ __(
+						'Add Google fonts assets and font face definitions to your currently active theme',
+						'create-block-theme'
+					) }{ ' ' }
+					({ theme?.name.rendered })
+				</h3>
+				{ ! googleFontsData?.items && (
+					<p>
+						<Spinner />
+						<span>
+							{ __(
+								'Loading Google fonts data…',
+								'create-block-theme'
+							) }
+						</span>
+					</p>
+				) }
+				{ googleFontsData?.items && (
+					<>
+						<div className="select-font">
+							<SelectControl
+								label={ __(
+									'Select Font',
+									'create-block-theme'
+								) }
+								name="google-font"
+								onChange={ handleSelectChange }
+								size="__unstable-large"
+							>
+								<option value={ null }>
+									{ __(
+										'Select a font…',
+										'create-block-theme'
+									) }
+								</option>
+								{ googleFontsData.items.map(
+									( font, index ) => (
+										<option
+											value={ index }
+											key={ `option${ index }` }
+										>
+											{ font.family }
+										</option>
+									)
+								) }
+							</SelectControl>
+						</div>
+						<DemoTextInput />
+						{ selectedFont && (
+							<p>
+								{ __(
+									'Select the font variants you want to include:',
+									'create-block-theme'
+								) }
+							</p>
+						) }
+						{ selectedFont && (
+							<table
+								className="wp-list-table widefat striped table-view-list"
+								id="google-fonts-table"
+							>
+								<thead>
+									<tr>
+										<td className="">
+											<input
+												type="checkbox"
+												onClick={ () =>
+													handleToggleAllVariants(
+														selectedFont.family
+													)
+												}
+												checked={
+													selectedFont.variants
+														.length ===
+													selectionData[
+														selectedFont.family
+													]?.faces?.length
+												}
+											/>
+										</td>
+										<td className="">
+											{ __(
+												'Weight',
+												'create-block-theme'
 											) }
-                                            handleToggle={ () => handleToggleVariant(
-												selectedFont.family,
-												getWeightFromGoogleVariant(variant),
-												getStyleFromGoogleVariant(variant)
+										</td>
+										<td className="">
+											{ __(
+												'Style',
+												'create-block-theme'
 											) }
-                                        />
-                                    ))}
-                                </tbody>
-                            </table>
-                        ) }
-                        <form enctype="multipart/form-data" action="" method="POST">
-                            <input type="hidden" name="selection-data" value={ JSON.stringify( selectionData ) } />
-                            <input
-                                type="submit"
-                                value={ __('Add google fonts to your theme', 'create-block-theme') }
-                                className="button button-primary"
-                                disabled={ false }
-                            />
-                            <input type="hidden" name="nonce" value={ nonce } />
-                        </form>
-                    </>
-                ) }
-            </main>
+										</td>
+										<td className="">
+											{ __(
+												'Preview',
+												'create-block-theme'
+											) }
+										</td>
+									</tr>
+								</thead>
+								<tbody>
+									{ selectedFont.variants.map(
+										( variant, i ) => (
+											<FontVariant
+												font={ selectedFont }
+												variant={ variant }
+												key={ `font-variant-${ i }` }
+												isSelected={ isVariantSelected(
+													selectedFont.family,
+													getWeightFromGoogleVariant(
+														variant
+													),
+													getStyleFromGoogleVariant(
+														variant
+													)
+												) }
+												handleToggle={ () =>
+													handleToggleVariant(
+														selectedFont.family,
+														getWeightFromGoogleVariant(
+															variant
+														),
+														getStyleFromGoogleVariant(
+															variant
+														)
+													)
+												}
+											/>
+										)
+									) }
+								</tbody>
+							</table>
+						) }
+						<form
+							encType="multipart/form-data"
+							action=""
+							method="POST"
+						>
+							<input
+								type="hidden"
+								name="selection-data"
+								value={ JSON.stringify( selectionData ) }
+							/>
+							<input
+								type="submit"
+								value={ __(
+									'Add google fonts to your theme',
+									'create-block-theme'
+								) }
+								className="button button-primary"
+								disabled={ false }
+							/>
+							<input type="hidden" name="nonce" value={ nonce } />
+						</form>
+					</>
+				) }
+			</main>
 
-            <div className="sidebar">
-                <div className="sidebar-container">
-                    <SelectedVariantsOutline
-                        selectionData={ selectionData }
+			<div className="sidebar">
+				<div className="sidebar-container">
+					<SelectedVariantsOutline
+						selectionData={ selectionData }
 						removeVariant={ handleToggleVariant }
-                    />
-                </div>
-            </div>
-
-
+					/>
+				</div>
+			</div>
 		</div>
-    )
+	);
 }
 
 export default GoogleFonts;
