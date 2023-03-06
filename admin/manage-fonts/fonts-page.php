@@ -24,20 +24,9 @@ class Fonts_Page {
 		$fonts_json_string = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $fonts_json );
 
 		?>
-	<div class="wrap">
-		<div class="manage-fonts-header-flex">
-			<h1 class="wp-heading-inline"><?php _e( 'Manage Theme Fonts', 'create-block-theme' ); ?></h1>
-			<a href="<?php echo admin_url( 'themes.php?page=add-google-font-to-theme-json' ); ?>" class="components-button page-title-action"><?php _e( 'Add Google Font', 'create-block-theme' ); ?></a>
-			<a href="<?php echo admin_url( 'themes.php?page=add-local-font-to-theme-json' ); ?>" class="components-button page-title-action"><?php _e( 'Add Local Font', 'create-block-theme' ); ?></a>
-		</div>
-		<hr class="wp-header-end" />
 		<p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string; ?></p>
-		<form method="POST"  id="manage-fonts-form">
-			<div id="fonts-app"></div>
-			<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-		</form>
-
-	</div>
+		<div id="fonts-app"></div>
+		<input type="hidden" name="nonce" id="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
 		<?php
 	}
 
@@ -64,6 +53,7 @@ class Fonts_Page {
 			'createBlockTheme',
 			array(
 				'googleFontsDataUrl' => plugins_url( 'assets/google-fonts/fallback-fonts-list.json', dirname( __DIR__ ) ),
+				'adminUrl'           => admin_url(),
 			)
 		);
 	}
