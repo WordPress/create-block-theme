@@ -1,21 +1,21 @@
 #wpwrap {
-    background: white;
+	background: #fff;
 }
 
 #wpcontent {
-    padding: 0;
+	padding: 0;
 }
 
 .google-fonts-page {
-    display: grid;
-    grid-template-columns: 1fr 250px;
-    margin: 0;
-    padding: 0;
-    min-height: calc( 100vh - 100px );
+	display: grid;
+	grid-template-columns: 1fr 250px;
+	margin: 0;
+	padding: 0;
+	min-height: calc(100vh - 100px);
 }
 
 .google-fonts-page main {
-    padding: 2rem;
+	padding: 2rem;
 }
 
 #google-fonts-table {
@@ -41,14 +41,18 @@
 }
 
 .select-font {
-    display: flex;
+	display: flex;
 }
 
 .sidebar-container {
-    padding: 1rem;
-    max-height: calc( 100vh - 100px );
-    position: sticky;
-    top: 0;
-    height: 100%;
-    border-left: 1px solid #e2e2e2;
+	padding: 1rem;
+	max-height: calc(100vh - 100px);
+	position: sticky;
+	top: 0;
+	height: 100%;
+	border-left: 1px solid #e2e2e2;
+}
+
+.widefat td {
+	padding: 0.2rem 1rem;
 }

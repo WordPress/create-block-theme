@@ -1,20 +1,24 @@
 .variants-family p {
-    font-weight: bold;
-    margin: 0 0 .3rem 0;
+	font-weight: bold;
+	margin: 0 0 0.3rem 0;
+}
+
+.variants-family {
+	padding: 0.25rem 0;
 }
 
 .variant-row {
-    display: grid;
-    grid-template-columns: 1fr min-content min-content;
-    white-space: nowrap;
-    align-items: center;
-    gap: 0.3rem;
-    margin-bottom: 0.5rem;
+	display: grid;
+	grid-template-columns: 1fr min-content min-content;
+	white-space: nowrap;
+	align-items: center;
+	gap: 0.3rem;
+	margin-bottom: 0.1rem;
 }
 
 .variants-total {
-    border-top: 1px solid #e2e2e2;
-    padding-top: 1rem;
-    display: flex;
-    justify-content: space-between;
+	border-top: 1px solid #e2e2e2;
+	padding-top: 1rem;
+	display: flex;
+	justify-content: space-between;
 }
