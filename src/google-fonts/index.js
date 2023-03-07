@@ -310,7 +310,9 @@ function GoogleFonts() {
 							<input
 								type="hidden"
 								name="selection-data"
-								value={ JSON.stringify( selectionData ) }
+								value={ JSON.stringify(
+									Object.values( selectionData )
+								) }
 							/>
 							<input
 								type="submit"
