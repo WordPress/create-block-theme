@@ -1,6 +1,16 @@
 .variants-family p {
-	font-weight: bold;
+	display: flex;
+	justify-content: space-between;
 	margin: 0 0 0.3rem 0;
+}
+
+.variants-family p span:first-child {
+	font-weight: bold;
+}
+
+.variants-family p span:last-child {
+	font-size: 0.7rem;
+	color: #7e7e7e;
 }
 
 .variants-family {
@@ -13,7 +23,7 @@
 	white-space: nowrap;
 	align-items: center;
 	gap: 0.3rem;
-	padding: 0 0.5rem 0;
+	padding: 0 0 0 0.5rem;
 	margin-bottom: 0.1rem;
 }
 
@@ -29,7 +39,7 @@
 }
 
 .size {
-	font-size: 0.6rem;
+	font-size: 0.7rem;
 	color: #7e7e7e;
 }
 
