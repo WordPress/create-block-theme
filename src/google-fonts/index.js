@@ -4,14 +4,14 @@ import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { SelectControl, Spinner } from '@wordpress/components';
 
-import SelectedVariantsOutline from './selected-variants-outline';
+import FontsSidebar from '../fonts-sidebar';
 import FontVariant from './font-variant';
 import {
 	getWeightFromGoogleVariant,
 	getStyleFromGoogleVariant,
 	forceHttps,
 	getGoogleVariantFromStyleAndWeight,
-} from './utils';
+} from '../utils';
 import DemoTextInput from '../demo-text-input';
 import FontsPageLayout from '../fonts-page-layout';
 import './google-fonts.css';
@@ -119,9 +119,9 @@ function GoogleFonts() {
 			( face ) => ! ( face.weight === weight && face.style === style )
 		);
 		if ( ! newFaces.length ) {
-			const { [ family ]: removedFamily, ...newSelectionData } =
+			const { [ family ]: removedFamily, ...newfontsOutline } =
 				selectionData;
-			setSelectionData( newSelectionData );
+			setSelectionData( newfontsOutline );
 		} else {
 			setSelectionData( {
 				...selectionData,
@@ -330,14 +330,11 @@ function GoogleFonts() {
 				) }
 			</main>
 
-			<div className="sidebar">
-				<div className="sidebar-container">
-					<SelectedVariantsOutline
-						selectionData={ selectionData }
-						removeVariant={ handleToggleVariant }
-					/>
-				</div>
-			</div>
+			<FontsSidebar
+				title={ __( 'Selected Variants', 'create-block-theme' ) }
+				fontsOutline={ selectionData }
+				removeVariant={ handleToggleVariant }
+			/>
 		</FontsPageLayout>
 	);
 }
