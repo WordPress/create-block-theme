@@ -27,3 +27,5 @@ node_modules/
 
 # plugin build folder
 build/
+
+vendor/
