@@ -75,7 +75,16 @@ function SelectedVariantsOutline( { selectionData, removeVariant } ) {
 									<span>
 										{ selectionData[ key ].family }{ ' ' }
 									</span>
-									<span>{  }</span>
+									<span>
+										( { selectionData[ key ].faces.length }{ ' ' }
+										{ _n(
+											'Variant',
+											'Variants',
+											selectionData[ key ].faces.length,
+											'create-block-theme'
+										) }{ ' ' }
+										)
+									</span>
 								</p>
 								{ selectionData[ key ].faces.map(
 									( face, ii ) => (
