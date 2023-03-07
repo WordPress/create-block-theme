@@ -13,6 +13,7 @@ import {
 	getGoogleVariantFromStyleAndWeight,
 } from './utils';
 import DemoTextInput from '../demo-text-input';
+import FontsPageLayout from '../fonts-page-layout';
 import './google-fonts.css';
 
 const EMPTY_SELECTION_DATA = {};
@@ -160,7 +161,7 @@ function GoogleFonts() {
 	};
 
 	return (
-		<div className="wrap google-fonts-page">
+		<FontsPageLayout>
 			<main>
 				<h1 className="wp-heading-inline">
 					{ __(
@@ -337,7 +338,7 @@ function GoogleFonts() {
 					/>
 				</div>
 			</div>
-		</div>
+		</FontsPageLayout>
 	);
 }
 

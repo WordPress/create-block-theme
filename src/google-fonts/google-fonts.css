@@ -6,18 +6,6 @@
 	padding: 0;
 }
 
-.google-fonts-page {
-	display: grid;
-	grid-template-columns: 1fr 250px;
-	margin: 0;
-	padding: 0;
-	min-height: calc(100vh - 100px);
-}
-
-.google-fonts-page main {
-	padding: 2rem;
-}
-
 #google-fonts-table {
 	margin-bottom: 2rem;
 }
