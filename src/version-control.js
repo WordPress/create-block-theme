@@ -5,15 +5,10 @@ import './version-control.css';
 const VersionControl = () => {
 	const [ theme, setTheme ] = useState('');
 	const [ status, setStatus ] = useState( false );
+	const [ pr, setPr ] = useState( '' );
 	const [ commitMessage, setCommitMessage ] = useState('');
 	
 	useEffect(() =>{
-		// fetch('/wp-json/create-block-theme/v1/themes')
-		// 	.then( response => response.json() )
-		// 	.then( json => {
-		// 		setThemes( json );
-		// 	})
-		// 	.catch( err => console.log(err));
 		fetch('/wp-json/create-block-theme/v1/theme-status')
 			.then( response => response.json() )
 			.then( json => {
@@ -39,11 +34,14 @@ const VersionControl = () => {
 				body: JSON.stringify(data)
 			})
 			.then( response => {
-				return response.json()
+				const data = response.json();
+				return data;
 			})
 			.catch( err => console.log(err));
 
 			console.log(res);
+		
+		setPr( res['pr'] );
 	};
 
 	return (
@@ -63,6 +61,7 @@ const VersionControl = () => {
 					disabled={ ! status }
 				/>
 			</form>
+			{ pr ? <a href={pr}>{pr}</a> : null }
 		</>
 	)
 }

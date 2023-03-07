@@ -57,14 +57,17 @@ class Version_Control_Admin extends Create_Block_Theme_Admin {
 	}
 
     function get_changes() {
+        // Save any changes to the theme itself.
         $this->save_theme_locally( 'all' );
 
         $current_theme = get_current_theme();
+        // Report if changes exist.
         $cmd = sprintf(
             'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s && 
             git status', $current_theme );
         exec( $cmd, $output );
 
+        // Restore to previous state.
         $cmd = sprintf(
             'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s && 
             git stash', $current_theme );
@@ -78,40 +81,31 @@ class Version_Control_Admin extends Create_Block_Theme_Admin {
 
     function create_pull_request( $request ) {
         $parameters = $request->get_json_params();
-        // $commit_message = 'My test commit';
-        // $random_id = wp_rand();
-        // $branch = 'update/' . $parameters->theme_slug . '-' . $random_id;
+        // TODO: Use the commit message from the form in the branch name.
+        $commit_message = 'My test commit';
+        $random_id = wp_rand();
+        $branch = 'update/' . $parameters->theme_slug . $random_id;
 
-        // $cmd = sprintf( 
-        //     'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s &&
-        //     git checkout -b \'%2$s\' &&
-        //     git stash apply &&
-        //     git commit -m ', $theme_slug, $branch );
-        // exec( $cmd, $output, $ret_val );
+        // Check out the new branch and create a commit.
+        $cmd = sprintf( 
+            'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s &&
+            git checkout -b \'%2$s\'
+            git stash apply &&
+            git add . &&
+            git commit -m \'%3$s\' &&
+            git push origin \'%2$s\' > /dev/null &&
+            gh pr create --repo=automattic/themes --web > /dev/null &&
+            git checkout trunk', $theme_slug, $branch, $commit_message );
+        exec( $cmd, $output, $ret_val );
 
-        // $cmd = sprintf( 
-        //     'cd ~/Local\ Sites/gutenbergtest/app/public/wp-content/themes/themes/%1$s &&
-        //     git checkout -b try/\'%2$s\'
-        //     git add . &&
-        //     git commit -m \'%3$s\' &&
-        //     git push origin try/\'%2$s\' > /dev/null &&
-        //     gh pr create --repo=automattic/themes --web > /dev/null &', $theme_slug, $branch, $commit_message );
-        // exec( $cmd, $output, $ret_val );
-        return rest_ensure_response(
-            array(
-                'theme' => $parameters->theme_slug,
-                'commit_message' => $parameters->commit_message
-            )
-        );
-
-        // return rest_ensure_response(array(
-        //     'slug' => $theme_slug,
-        //     'template' => $template,
-        //     // 'output' => $output,
-        //     // 'return' => $ret_val,
-        //     // 'cmd' => $cmd,
-        //     'pr' => sprintf( 'https://github.com/automattic/themes/compare/trunk...%s?body=&expand=1', urlencode( $branch ) )
-        // ));
+        // Return the URL to the PR.
+        return rest_ensure_response(array(
+            'slug' => $theme_slug,
+            'template' => $template,
+            'output' => $output,
+            'return' => $ret_val,
+            'pr' => sprintf( 'https://github.com/automattic/themes/compare/trunk...%s?body=&expand=1', urlencode( $branch ) )
+        ));
     }
 
     function version_control_admin_page () {
