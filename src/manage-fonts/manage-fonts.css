@@ -115,7 +115,13 @@ table.widefat table {
 
 .manage-fonts-header-flex {
 	display: flex;
-	align-items: flex-end;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.manage-fonts-header-flex .buttons {
+	display: flex;
+	gap: 1rem;
 }
 
 .manage-fonts-header-flex .wp-heading-inline + .page-title-action {
