@@ -54,6 +54,7 @@ class Fonts_Page {
 			array(
 				'googleFontsDataUrl' => plugins_url( 'assets/google-fonts/fallback-fonts-list.json', dirname( __DIR__ ) ),
 				'adminUrl'           => admin_url(),
+				'themeUrl'           => get_stylesheet_directory_uri(),
 			)
 		);
 	}
