@@ -32,3 +32,10 @@ export function bytesToSize( bytes ) {
 	if ( i === 0 ) return bytes + ' ' + sizes[ i ];
 	return ( bytes / Math.pow( 1024, i ) ).toFixed( 1 ) + ' ' + sizes[ i ];
 }
+
+export function localFileAsThemeAssetUrl( url ) {
+	if ( ! url ) {
+		return url;
+	}
+	return url.replace( 'file:./', createBlockTheme.themeUrl + '/' );
+}
