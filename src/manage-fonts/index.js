@@ -107,7 +107,11 @@ function ManageFonts() {
 				updatedFamily.shouldBeRemoved = true;
 			}
 			updatedFamily.fontFace = fontFace.map( ( face ) => {
-				if ( weight === face.fontWeight && style === face.fontStyle ) {
+				if (
+					weight === face.fontWeight &&
+					style === face.fontStyle &&
+					fontFamily === family.fontFamily
+				) {
 					return {
 						...face,
 						shouldBeRemoved: true,
