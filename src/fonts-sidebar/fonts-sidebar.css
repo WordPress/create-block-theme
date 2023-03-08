@@ -78,7 +78,9 @@
 
 .sidebar {
 	border-left: 1px solid #e2e2e2;
-	height: calc(100vh - 33px);
+	height: calc(100vh - 32px);
+	position: sticky;
+	top: 32px; /* 32px is the height of the admin bar */
 }
 
 .sidebar-container {
