@@ -1,17 +1,15 @@
 import { useState, useEffect } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import FontFamily from './font-family';
-import {
-	// eslint-disable-next-line
-	__experimentalConfirmDialog as ConfirmDialog,
-} from '@wordpress/components';
+
 import DemoTextInput from '../demo-text-input';
 import FontsPageLayout from '../fonts-page-layout';
-import './manage-fonts.css';
 import HelpModal from './help-modal';
 import FontsSidebar from '../fonts-sidebar';
 import PageHeader from './page-header';
+import ConfirmDeleteModal from './confirm-delete-modal';
 import { localFileAsThemeAssetUrl } from '../utils';
+import './manage-fonts.css';
 
 function ManageFonts() {
 	const nonce = document.querySelector( '#nonce' ).value;
@@ -122,16 +120,6 @@ function ManageFonts() {
 		setNewThemeFonts( updatedFonts );
 	}
 
-	const fontFamilyToDelete = newThemeFonts.find(
-		( family ) => family.fontFamily === fontToDelete.fontFamily
-	);
-	const fontFaceToDelete =
-		fontFamilyToDelete?.fontFace.find(
-			( face ) =>
-				face.fontWeight === fontToDelete.weight &&
-				face.fontStyle === fontToDelete.style
-		) || {};
-
 	// format the theme fonts object to be used by the FontsSidebar component
 	const fontsOutline = newThemeFonts.reduce( ( acc, fontFamily ) => {
 		acc[ fontFamily.fontFamily ] = {
@@ -155,44 +143,12 @@ function ManageFonts() {
 				<main>
 					<PageHeader toggleIsHelpOpen={ toggleIsHelpOpen } />
 
-					<ConfirmDialog
+					<ConfirmDeleteModal
 						isOpen={ showConfirmDialog }
 						onConfirm={ confirmDelete }
 						onCancel={ cancelDelete }
-					>
-						{ fontToDelete?.weight !== undefined &&
-						fontToDelete.style !== undefined ? (
-							<h3>
-								{ sprintf(
-									// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
-									__(
-										`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
-										'create-block-theme'
-									),
-									fontFaceToDelete?.fontStyle,
-									fontFaceToDelete?.fontWeight,
-									fontFamilyToDelete?.fontFamily
-								) }
-							</h3>
-						) : (
-							<h3>
-								{ sprintf(
-									// translators: %s: Font Family
-									__(
-										`Are you sure you want to delete "%s" from your theme?`,
-										'create-block-theme'
-									),
-									fontFamilyToDelete?.fontFamily
-								) }
-							</h3>
-						) }
-						<p>
-							{ __(
-								'This action will delete the font definition and the font file assets from your theme.',
-								'create-block-theme'
-							) }
-						</p>
-					</ConfirmDialog>
+						fontToDelete={ fontToDelete }
+					/>
 
 					<DemoTextInput />
 
