@@ -1,5 +1,5 @@
 .variants-list {
-	height: calc(100vh - 160px);
+	height: calc(100vh - 200px);
 	overflow-y: auto;
 	/* Firefox scrollbar */
 	scrollbar-color: #e2e2e2 #fff;
@@ -75,3 +75,15 @@
 	font-size: 0.7rem;
 	color: #7e7e7e;
 }
+
+.sidebar {
+	border-left: 1px solid #e2e2e2;
+	height: calc(100vh - 33px);
+}
+
+.sidebar-container {
+	padding: 1rem;
+	position: sticky;
+	top: 0;
+}
+

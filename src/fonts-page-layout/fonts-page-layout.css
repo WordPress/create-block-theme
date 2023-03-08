@@ -8,3 +8,11 @@
 .fonts-page-layout > main {
 	padding: 2rem;
 }
+
+#wpfooter {
+	display: none;
+}
+
+#wpbody-content {
+	padding: 0;
+}

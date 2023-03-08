@@ -32,15 +32,6 @@
 	display: flex;
 }
 
-.sidebar-container {
-	padding: 1rem;
-	max-height: calc(100vh - 100px);
-	position: sticky;
-	top: 0;
-	height: 100%;
-	border-left: 1px solid #e2e2e2;
-}
-
 .widefat td {
 	padding: 0.2rem 1rem;
 }
