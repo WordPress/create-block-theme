@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { SelectControl, Spinner } from '@wordpress/components';
+import { SelectControl, Spinner, Button } from '@wordpress/components';
 
 import FontsSidebar from '../fonts-sidebar';
 import FontVariant from './font-variant';
@@ -43,12 +43,8 @@ function GoogleFonts() {
 	const handleToggleAllVariants = ( family ) => {
 		const existingFamily = selectionData[ family ];
 		if ( existingFamily && !! existingFamily?.faces?.length ) {
-			setSelectionData( {
-				...selectionData,
-				[ family ]: {
-					faces: [],
-				},
-			} );
+			const { [ family ]: removedFamily, ...rest } = selectionData;
+			setSelectionData( rest );
 		} else {
 			const newFamily = {
 				family,
@@ -119,9 +115,8 @@ function GoogleFonts() {
 			( face ) => ! ( face.weight === weight && face.style === style )
 		);
 		if ( ! newFaces.length ) {
-			const { [ family ]: removedFamily, ...newfontsOutline } =
-				selectionData;
-			setSelectionData( newfontsOutline );
+			const { [ family ]: removedFamily, ...rest } = selectionData;
+			setSelectionData( rest );
 		} else {
 			setSelectionData( {
 				...selectionData,
@@ -315,15 +310,18 @@ function GoogleFonts() {
 									Object.values( selectionData )
 								) }
 							/>
-							<input
+							<Button
+								variant="primary"
 								type="submit"
-								value={ __(
+								disabled={
+									Object.values( selectionData ).length === 0
+								}
+							>
+								{ __(
 									'Add google fonts to your theme',
 									'create-block-theme'
 								) }
-								className="button button-primary"
-								disabled={ false }
-							/>
+							</Button>
 							<input type="hidden" name="nonce" value={ nonce } />
 						</form>
 					</>
