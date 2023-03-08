@@ -1,5 +1,6 @@
 import { useContext } from '@wordpress/element';
-import { ManageFontsContext, DEMO_DEFAULTS } from '../fonts-context';
+import { ManageFontsContext } from '../fonts-context';
+import { DEMO_DEFAULTS } from '../constants';
 
 function Demo( { style } ) {
 	const { demoText, demoType, demoFontSize } =
