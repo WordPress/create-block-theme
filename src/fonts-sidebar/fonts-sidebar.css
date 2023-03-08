@@ -22,13 +22,21 @@
 	grid-template-columns: 1fr min-content min-content;
 	white-space: nowrap;
 	align-items: center;
-	gap: 0.3rem;
+	gap: 0.1rem;
 	padding: 0 0 0 0.5rem;
 	margin-bottom: 0.1rem;
 }
 
 .variant-row:hover {
 	background-color: #f2f2f2;
+}
+
+.variant-row button {
+	visibility: hidden;
+}
+
+.variant-row:hover button {
+	visibility: visible;
 }
 
 .variants-total {
