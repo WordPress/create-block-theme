@@ -3,7 +3,6 @@
 	grid-template-columns: 1fr 250px;
 	margin: 0;
 	padding: 0;
-	min-height: calc(100vh - 100px);
 }
 
 .fonts-page-layout > main {

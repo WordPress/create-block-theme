@@ -63,73 +63,79 @@ function FontsSidebar( { title, fontsOutline, handleDelete } ) {
 					{ !! fontsOutline && (
 						<>
 							<div className="variants-list">
-								{ Object.keys( fontsOutline ).map(
-									( key, i ) => (
-										<div
-											className="variants-family"
-											key={ `variants-family-${ i }` }
-										>
-											<p>
-												<span>
-													{
-														fontsOutline[ key ]
-															.family
-													}{ ' ' }
-												</span>
-												<span>
-													({ ' ' }
-													{
-														fontsOutline[ key ]
-															.faces.length
-													}{ ' ' }
-													{ _n(
-														'Variant',
-														'Variants',
-														fontsOutline[ key ]
-															.faces.length,
-														'create-block-theme'
-													) }{ ' ' }
+								<div className="content">
+									{ Object.keys( fontsOutline ).map(
+										( key, i ) => (
+											<div
+												className="variants-family"
+												key={ `variants-family-${ i }` }
+											>
+												<p>
+													<span>
+														{
+															fontsOutline[ key ]
+																.family
+														}{ ' ' }
+													</span>
+													<span>
+														({ ' ' }
+														{
+															fontsOutline[ key ]
+																.faces.length
+														}{ ' ' }
+														{ _n(
+															'Variant',
+															'Variants',
+															fontsOutline[ key ]
+																.faces.length,
+															'create-block-theme'
+														) }{ ' ' }
+														)
+													</span>
+												</p>
+												{ fontsOutline[ key ].faces.map(
+													( face, ii ) => (
+														<div
+															className="variant-row"
+															key={ `selected-variant-${ ii }` }
+														>
+															<div className="variant">
+																{ face.weight }{ ' ' }
+																{ face.style }
+															</div>
+															<div className="size">
+																{ getFileSize(
+																	face.src
+																) }
+															</div>
+															<div>
+																<Button
+																	onClick={ () =>
+																		handleDelete(
+																			fontsOutline[
+																				key
+																			]
+																				.family,
+																			face.weight,
+																			face.style
+																		)
+																	}
+																	icon={
+																		trash
+																	}
+																	iconSize={
+																		15
+																	}
+																	isSmall
+																/>
+															</div>
+														</div>
 													)
-												</span>
-											</p>
-											{ fontsOutline[ key ].faces.map(
-												( face, ii ) => (
-													<div
-														className="variant-row"
-														key={ `selected-variant-${ ii }` }
-													>
-														<div className="variant">
-															{ face.weight }{ ' ' }
-															{ face.style }
-														</div>
-														<div className="size">
-															{ getFileSize(
-																face.src
-															) }
-														</div>
-														<div>
-															<Button
-																onClick={ () =>
-																	handleDelete(
-																		fontsOutline[
-																			key
-																		]
-																			.family,
-																		face.weight,
-																		face.style
-																	)
-																}
-																icon={ trash }
-																iconSize={ 15 }
-																isSmall
-															/>
-														</div>
-													</div>
-												)
-											) }
-										</div>
-									)
-								) }
+												) }
+											</div>
+										)
+									) }
+								</div>
 							</div>
 						</>
 					) }

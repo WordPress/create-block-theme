@@ -1,7 +1,27 @@
+.variants-list {
+	height: calc(100vh - 160px);
+	overflow-y: auto;
+	/* Firefox scrollbar */
+	scrollbar-color: #e2e2e2 #fff;
+	scrollbar-width: thin;
+}
+
+/* WebKit and Chromiums */
+.variants-list::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+	background-color: #fff;
+	margin-left: 10px;
+}
+.variants-list::-webkit-scrollbar-thumb {
+	background: #e2e2e2;
+	border-radius: 5px;
+}
+
 .variants-family p {
 	display: flex;
 	justify-content: space-between;
-	margin: 0 0 0.3rem 0;
+	margin: 0 0 0.1rem 0;
 }
 
 .variants-family p span:first-child {
@@ -46,8 +66,12 @@
 	justify-content: space-between;
 }
 
+.variants-total .variant,
+.variants-total .size {
+	font-size: 0.9rem;
+}
+
 .size {
 	font-size: 0.7rem;
 	color: #7e7e7e;
 }
-
