@@ -179,7 +179,8 @@ function ManageFonts() {
 				<FontsSidebar
 					title={ __( 'Theme Fonts', 'create-block-theme' ) }
 					fontsOutline={ fontsOutline }
-					handleDelete={ requestDeleteConfirmation }
+					handleDeleteFontFace={ requestDeleteConfirmation }
+					handleDeleteFontFamily={ requestDeleteConfirmation }
 				/>
 			</FontsPageLayout>
 		</>

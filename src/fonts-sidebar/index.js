@@ -5,7 +5,12 @@ import './fonts-sidebar.css';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 
-function FontsSidebar( { title, fontsOutline, handleDelete } ) {
+function FontsSidebar( {
+	title,
+	fontsOutline,
+	handleDeleteFontFace,
+	handleDeleteFontFamily,
+} ) {
 	const [ fileSizes, setFileSizes ] = useState( {} );
 
 	const flatfontsOutline = Object.keys( fontsOutline )
@@ -70,29 +75,45 @@ function FontsSidebar( { title, fontsOutline, handleDelete } ) {
 												className="variants-family"
 												key={ `variants-family-${ i }` }
 											>
-												<p>
-													<span>
+												<div className="header">
+													<span className="name">
 														{
 															fontsOutline[ key ]
 																.family
 														}{ ' ' }
 													</span>
-													<span>
-														({ ' ' }
-														{
-															fontsOutline[ key ]
-																.faces.length
-														}{ ' ' }
-														{ _n(
-															'Variant',
-															'Variants',
-															fontsOutline[ key ]
-																.faces.length,
-															'create-block-theme'
-														) }{ ' ' }
-														)
-													</span>
-												</p>
+													<div>
+														<span className="variants">
+															({ ' ' }
+															{
+																fontsOutline[
+																	key
+																].faces.length
+															}{ ' ' }
+															{ _n(
+																'Variant',
+																'Variants',
+																fontsOutline[
+																	key
+																].faces.length,
+																'create-block-theme'
+															) }{ ' ' }
+															)
+														</span>
+														<Button
+															icon={ trash }
+															iconSize={ 15 }
+															isSmall
+															onClick={ () =>
+																handleDeleteFontFamily(
+																	fontsOutline[
+																		key
+																	].family
+																)
+															}
+														/>
+													</div>
+												</div>
 												{ fontsOutline[ key ].faces.map(
 													( face, ii ) => (
 														<div
@@ -111,7 +132,7 @@ function FontsSidebar( { title, fontsOutline, handleDelete } ) {
 															<div>
 																<Button
 																	onClick={ () =>
-																		handleDelete(
+																		handleDeleteFontFace(
 																			fontsOutline[
 																				key
 																			]

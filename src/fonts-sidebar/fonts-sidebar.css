@@ -18,17 +18,27 @@
 	border-radius: 5px;
 }
 
-.variants-family p {
+.variants-family .header,
+.variants-family .header div {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	margin: 0 0 0.1rem 0;
 }
 
-.variants-family p span:first-child {
+.variants-family .header button {
+	visibility: hidden;
+}
+
+.variants-family .header:hover button {
+	visibility: visible;
+}
+
+.variants-family .name {
 	font-weight: bold;
 }
 
-.variants-family p span:last-child {
+.variants-family .variants {
 	font-size: 0.7rem;
 	color: #7e7e7e;
 	white-space: nowrap;
