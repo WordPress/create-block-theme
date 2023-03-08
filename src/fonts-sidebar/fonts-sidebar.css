@@ -31,6 +31,7 @@
 .variants-family p span:last-child {
 	font-size: 0.7rem;
 	color: #7e7e7e;
+	white-space: nowrap;
 }
 
 .variants-family {
