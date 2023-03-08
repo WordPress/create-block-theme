@@ -5,7 +5,7 @@ import './fonts-sidebar.css';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 
-function FontsSidebar( { title, fontsOutline, removeVariant } ) {
+function FontsSidebar( { title, fontsOutline, handleDelete } ) {
 	const [ fileSizes, setFileSizes ] = useState( {} );
 
 	const flatfontsOutline = Object.keys( fontsOutline )
@@ -110,7 +110,7 @@ function FontsSidebar( { title, fontsOutline, removeVariant } ) {
 														<div>
 															<Button
 																onClick={ () =>
-																	removeVariant(
+																	handleDelete(
 																		fontsOutline[
 																			key
 																		]

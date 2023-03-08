@@ -6,7 +6,7 @@ function FontFace( {
 	fontFamily,
 	fontWeight,
 	fontStyle,
-	deleteFontFace,
+	deleteFont,
 	shouldBeRemoved,
 	isFamilyOpen,
 } ) {
@@ -30,11 +30,11 @@ function FontFace( {
 			<td className="demo-cell">
 				<Demo style={ demoStyles } />
 			</td>
-			{ deleteFontFace && (
+			{ deleteFont && (
 				<td>
 					<Button
 						variant="tertiary"
-						onClick={ deleteFontFace }
+						onClick={ deleteFont }
 						tabindex={ isFamilyOpen ? 0 : -1 }
 					>
 						{ __( 'Remove', 'create-block-theme' ) }

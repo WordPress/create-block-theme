@@ -333,7 +333,7 @@ function GoogleFonts() {
 			<FontsSidebar
 				title={ __( 'Selected Variants', 'create-block-theme' ) }
 				fontsOutline={ selectionData }
-				removeVariant={ handleToggleVariant }
+				handleDelete={ handleToggleVariant }
 			/>
 		</FontsPageLayout>
 	);

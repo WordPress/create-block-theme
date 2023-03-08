@@ -33,8 +33,9 @@ function ManageFonts() {
 
 	// Object where we store the font family or font face index position in the newThemeFonts array that is about to be removed
 	const [ fontToDelete, setFontToDelete ] = useState( {
-		fontFamilyIndex: undefined,
-		fontFaceIndex: undefined,
+		fontFamily: undefined,
+		weight: undefined,
+		style: undefined,
 	} );
 
 	// dialogs states
@@ -44,10 +45,7 @@ function ManageFonts() {
 	// When client side font list changes, we update the server side font list
 	useEffect( () => {
 		// Avoids running this effect on the first render
-		if (
-			fontToDelete.fontFamilyIndex !== undefined ||
-			fontToDelete.fontFaceIndex !== undefined
-		) {
+		if ( fontToDelete.fontFamily !== undefined ) {
 			// Submit the form to the server
 			manageFontsFormElement.submit();
 		}
@@ -57,26 +55,27 @@ function ManageFonts() {
 		setIsHelpOpen( ! isHelpOpen );
 	};
 
-	function requestDeleteConfirmation( fontFamilyIndex, fontFaceIndex ) {
+	function requestDeleteConfirmation( fontFamily, weight, style ) {
 		setFontToDelete(
-			{ fontFamilyIndex, fontFaceIndex },
+			{ fontFamily, weight, style },
 			setShowConfirmDialog( true )
 		);
 	}
 
 	function confirmDelete() {
 		setShowConfirmDialog( false );
-		// if fontFaceIndex is undefined, we are deleting a font family
+		// if fontFaceIndex.weight and fontFace.styles are undefined, we are deleting a font family
 		if (
-			fontToDelete.fontFamilyIndex !== undefined &&
-			fontToDelete.fontFaceIndex !== undefined
+			fontToDelete.weight !== undefined &&
+			fontToDelete.style !== undefined
 		) {
 			deleteFontFace(
-				fontToDelete.fontFamilyIndex,
-				fontToDelete.fontFaceIndex
+				fontToDelete.fontFamily,
+				fontToDelete.weight,
+				fontToDelete.style
 			);
 		} else {
-			deleteFontFamily( fontToDelete.fontFamilyIndex );
+			deleteFontFamily( fontToDelete.fontFamily );
 		}
 	}
 
@@ -85,9 +84,9 @@ function ManageFonts() {
 		setShowConfirmDialog( false );
 	}
 
-	function deleteFontFamily( fontFamilyIndex ) {
-		const updatedFonts = newThemeFonts.map( ( family, index ) => {
-			if ( index === fontFamilyIndex ) {
+	function deleteFontFamily( fontFamily ) {
+		const updatedFonts = newThemeFonts.map( ( family ) => {
+			if ( fontFamily === family.fontFamily ) {
 				return {
 					...family,
 					shouldBeRemoved: true,
@@ -99,41 +98,41 @@ function ManageFonts() {
 	}
 
 	function deleteFontFace() {
-		const { fontFamilyIndex, fontFaceIndex } = fontToDelete;
-		const updatedFonts = newThemeFonts.reduce(
-			( acc, fontFamily, index ) => {
-				const { fontFace = [], ...updatedFontFamily } = fontFamily;
-
-				if (
-					fontFamilyIndex === index &&
-					fontFace.filter( ( face ) => ! face.shouldBeRemoved )
-						.length === 1
-				) {
-					updatedFontFamily.shouldBeRemoved = true;
+		const { fontFamily, weight, style } = fontToDelete;
+		const updatedFonts = newThemeFonts.reduce( ( acc, family ) => {
+			const { fontFace = [], ...updatedFamily } = family;
+			if (
+				fontFamily === family.fontFamily &&
+				fontFace.filter( ( face ) => ! face.shouldBeRemoved ).length ===
+					1
+			) {
+				updatedFamily.shouldBeRemoved = true;
+			}
+			updatedFamily.fontFace = fontFace.map( ( face ) => {
+				if ( weight === face.fontWeight && style === face.fontStyle ) {
+					return {
+						...face,
+						shouldBeRemoved: true,
+					};
 				}
-
-				updatedFontFamily.fontFace = fontFace.map( ( face, i ) => {
-					if ( fontFamilyIndex === index && fontFaceIndex === i ) {
-						return {
-							...face,
-							shouldBeRemoved: true,
-						};
-					}
-					return face;
-				} );
-				return [ ...acc, updatedFontFamily ];
-			},
-			[]
-		);
+				return face;
+			} );
+			return [ ...acc, updatedFamily ];
+		}, [] );
 		setNewThemeFonts( updatedFonts );
 	}
 
-	const fontFamilyToDelete = newThemeFonts[ fontToDelete.fontFamilyIndex ];
+	const fontFamilyToDelete = newThemeFonts.find(
+		( family ) => family.fontFamily === fontToDelete.fontFamily
+	);
 	const fontFaceToDelete =
-		newThemeFonts[ fontToDelete.fontFamilyIndex ]?.fontFace?.[
-			fontToDelete.fontFaceIndex
-		];
+		fontFamilyToDelete?.fontFace.find(
+			( face ) =>
+				face.fontWeight === fontToDelete.weight &&
+				face.fontStyle === fontToDelete.style
+		) || {};
 
+	// format the theme fonts object to be used by the FontsSidebar component
 	const fontsOutline = newThemeFonts.reduce( ( acc, fontFamily ) => {
 		acc[ fontFamily.fontFamily ] = {
 			family: fontFamily.fontFamily,
@@ -161,8 +160,8 @@ function ManageFonts() {
 						onConfirm={ confirmDelete }
 						onCancel={ cancelDelete }
 					>
-						{ fontToDelete?.fontFamilyIndex !== undefined &&
-						fontToDelete?.fontFaceIndex !== undefined ? (
+						{ fontToDelete?.weight !== undefined &&
+						fontToDelete.style !== undefined ? (
 							<h3>
 								{ sprintf(
 									// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
@@ -201,10 +200,8 @@ function ManageFonts() {
 						{ newThemeFonts.map( ( fontFamily, i ) => (
 							<FontFamily
 								fontFamily={ fontFamily }
-								fontFamilyIndex={ i }
 								key={ `fontfamily${ i }` }
-								deleteFontFamily={ requestDeleteConfirmation }
-								deleteFontFace={ requestDeleteConfirmation }
+								deleteFont={ requestDeleteConfirmation }
 							/>
 						) ) }
 					</div>
@@ -222,6 +219,7 @@ function ManageFonts() {
 				<FontsSidebar
 					title={ __( 'Theme Fonts', 'create-block-theme' ) }
 					fontsOutline={ fontsOutline }
+					handleDelete={ requestDeleteConfirmation }
 				/>
 			</FontsPageLayout>
 		</>
