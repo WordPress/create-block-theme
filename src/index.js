@@ -1,6 +1,7 @@
 import { render } from '@wordpress/element';
 import ManageFonts from './manage-fonts';
 import GoogleFonts from './google-fonts';
+import LocalFonts from './local-fonts';
 import { ManageFontsProvider } from './fonts-context';
 
 function App() {
@@ -14,6 +15,9 @@ function App() {
 			break;
 		case 'add-google-font-to-theme-json':
 			PageComponent = GoogleFonts;
+			break;
+		case 'add-local-font-to-theme-json':
+			PageComponent = LocalFonts;
 			break;
 		default:
 			PageComponent = () => <h1>This page is not implemented yet.</h1>;
