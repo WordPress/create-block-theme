@@ -33,7 +33,13 @@ class Fonts_Page {
 	public static function load_fonts_react_app() {
 		// Load the required WordPress packages.
 		// Automatically load imported dependencies and assets version.
-		$asset_file = include plugin_dir_path( dirname( __DIR__ ) ) . 'build/index.asset.php';
+		$asset_file_path = plugin_dir_path( dirname( __DIR__ ) ) . 'build/index.asset.php';
+
+		if ( ! file_exists( $asset_file_path ) ) {
+			return;
+		}
+
+		$asset_file = require_once( $asset_file_path );
 
 		// Enqueue CSS dependencies of the scripts included in the build.
 		foreach ( $asset_file['dependencies'] as $style ) {
