@@ -23,13 +23,24 @@ function LocalFonts() {
 		);
 	};
 
-	const demoStyle = isFormValid()
-		? {
-				fontFamily: formData.name,
-				fontWeight: formData.weight,
-				fontStyle: formData.style,
-		  }
-		: {};
+	const demoStyle = () => {
+		if ( ! isFormValid() ) {
+			return {};
+		}
+		const style = {
+			fontFamily: formData.name,
+			fontWeight: formData.weight,
+			fontStyle: formData.style,
+		};
+		if ( formData.variable ) {
+			style.fontVariationSettings = Object.keys( formData.axes )
+				.map( ( key ) => {
+					return `'${ formData.axes[ key ].tag }' ${ formData.axes[ key ].currentValue }`;
+				} )
+				.join( ', ' );
+		}
+		return style;
+	};
 
 	// load the local font in the browser to make the preview work
 	const onFormDataChange = async () => {
@@ -81,7 +92,7 @@ function LocalFonts() {
 			{ isFormValid() && (
 				<div className="preview">
 					<DemoTextInput />
-					<Demo style={ demoStyle } />
+					<Demo style={ demoStyle() } />
 				</div>
 			) }
 		</div>

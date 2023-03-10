@@ -4,8 +4,10 @@ import {
 	__experimentalInputControl as InputControl,
 	SelectControl,
 } from '@wordpress/components';
+import { update } from '@wordpress/icons';
 import { Font } from 'lib-font';
 import { __ } from '@wordpress/i18n';
+import AxisRangeControl from './axis-range-control';
 
 function UploadFontForm( { formData, setFormData, isFormValid } ) {
 	// pickup the nonce from the input printed in the server
@@ -50,14 +52,54 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 				const fontWeight =
 					font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
 
+				// Variable fonts info
+				const isVariable = !! font.opentype.tables.fvar;
+				const axes = isVariable
+					? font.opentype.tables.fvar.axes.reduce(
+							(
+								acc,
+								{ tag, minValue, defaultValue, maxValue }
+							) => {
+								acc[ tag ] = {
+									tag,
+									minValue,
+									defaultValue,
+									maxValue,
+									currentValue: defaultValue,
+								};
+								return acc;
+							},
+							{}
+					  )
+					: {};
+
 				setFormData( {
 					file,
 					name: fontName,
 					weight: fontWeight,
 					style: isItalic ? 'italic' : 'normal',
+					variable: isVariable,
+					axes,
 				} );
 			};
 		};
+	};
+
+	const resetDefaultVariableSettings = () => {
+		const newAxes = Object.keys( formData.axes ).reduce(
+			( acc, axisTag ) => {
+				acc[ axisTag ] = {
+					...formData.axes[ axisTag ],
+					currentValue: formData.axes[ axisTag ].defaultValue,
+				};
+				return acc;
+			},
+			{}
+		);
+		setFormData( {
+			...formData,
+			axes: newAxes,
+		} );
 	};
 
 	return (
@@ -139,6 +181,30 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 					}
 				/>
 			</div>
+
+			{ formData.variable && (
+				<div className="variable-settings">
+					<div className="header">
+						<p>Variable font settings:</p>
+						<Button
+							isSmall
+							icon={ update }
+							variant="secondary"
+							onClick={ resetDefaultVariableSettings }
+						>
+							Default settings
+						</Button>
+					</div>
+					{ Object.keys( formData.axes ).map( ( key ) => (
+						<AxisRangeControl
+							axis={ formData.axes[ key ] }
+							key={ `axis-range-${ key }` }
+							formData={ formData }
+							setFormData={ setFormData }
+						/>
+					) ) }
+				</div>
+			) }
 
 			<Button
 				variant="primary"

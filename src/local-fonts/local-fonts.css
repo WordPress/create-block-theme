@@ -3,9 +3,15 @@
 	grid-template-columns: 350px 1fr;
 }
 
-.layout > div,
+.layout > .preview,
 .layout main {
 	padding: 2rem;
+}
+
+.preview {
+	position: sticky;
+	top: 32px;
+	max-height: calc(100vh - 32px);
 }
 
 .form-group {
@@ -16,4 +22,10 @@
 .form-group input {
 	width: 100%;
 	column-gap: 2rem;
+}
+
+.variable-settings .header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
