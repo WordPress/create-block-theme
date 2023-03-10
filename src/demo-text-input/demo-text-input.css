@@ -16,12 +16,3 @@
 	flex-direction: column;
 	justify-content: center;
 }
-
-.demo-text-input .components-range-control__root {
-	flex-direction: row-reverse;
-}
-
-.demo-text-input .components-range-control__number {
-	margin-left: unset !important;
-	margin-right: 1rem;
-}

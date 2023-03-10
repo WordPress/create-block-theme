@@ -159,8 +159,7 @@ class Manage_Fonts_Admin {
 
 				move_uploaded_file( $_FILES['font-file']['tmp_name'], get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 
-				$new_font_faces   = array();
-				$new_font_faces[] = array(
+				$uploaded_font_face = array(
 					'fontFamily' => $_POST['font-name'],
 					'fontStyle'  => $_POST['font-style'],
 					'fontWeight' => $_POST['font-weight'],
@@ -168,6 +167,14 @@ class Manage_Fonts_Admin {
 						'file:./assets/fonts/' . $file_name,
 					),
 				);
+
+				if ( ! empty( $_POST['font-variation-settings'] ) ) {
+					// replace escaped single quotes with single quotes
+					$font_variation_settings                     = str_replace( "\\'", "'", $_POST['font-variation-settings'] );
+					$uploaded_font_face['fontVariationSettings'] = $font_variation_settings;
+				}
+
+				$new_font_faces = array( $uploaded_font_face );
 
 				$this->add_or_update_theme_font_faces( $_POST['font-name'], $font_slug, $new_font_faces );
 				return add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );

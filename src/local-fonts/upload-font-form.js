@@ -8,6 +8,7 @@ import { update } from '@wordpress/icons';
 import { Font } from 'lib-font';
 import { __ } from '@wordpress/i18n';
 import AxisRangeControl from './axis-range-control';
+import { variableAxesToCss } from './utils';
 
 function UploadFontForm( { formData, setFormData, isFormValid } ) {
 	// pickup the nonce from the input printed in the server
@@ -102,86 +103,103 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 		} );
 	};
 
+	const fontVariationSettings = variableAxesToCss( formData.axes );
+
 	return (
-		<form method="POST" action="" encType="multipart/form-data">
-			<div className="form-group">
-				<label htmlFor="font-file">
-					{ __( 'Font file:', 'create-block-theme' ) }
-				</label>
-				<input
-					type="file"
-					name="font-file"
-					id="font-file"
-					onChange={ onFileSelectChange }
-					accept=".ttf, .woff, .woff2"
-				/>
-				<small>
+		<>
+			<form
+				method="POST"
+				id="font-upload-form"
+				action=""
+				encType="multipart/form-data"
+			>
+				<input type="hidden" name="nonce" value={ nonce } />
+
+				<div className="form-group">
+					<label htmlFor="font-file">
+						{ __( 'Font file:', 'create-block-theme' ) }
+					</label>
+					<input
+						type="file"
+						name="font-file"
+						id="font-file"
+						onChange={ onFileSelectChange }
+						accept=".ttf, .woff, .woff2"
+					/>
+					<small>
+						{ __(
+							'.ttf, .woff, .woff2 file extensions supported',
+							'create-block-theme'
+						) }
+					</small>
+				</div>
+
+				<h4>
 					{ __(
-						'.ttf, .woff, .woff2 file extensions supported',
+						'Font face definition for this font file:',
 						'create-block-theme'
 					) }
-				</small>
-			</div>
+				</h4>
 
-			<h4>
-				{ __(
-					'Font face definition for this font file:',
-					'create-block-theme'
+				<div className="form-group">
+					<InputControl
+						label={ __( 'Font name:', 'create-block-theme' ) }
+						type="text"
+						name="font-name"
+						id="font-name"
+						placeholder={ __( 'Font name', 'create-block-theme' ) }
+						required
+						value={ formData.name }
+						onChange={ ( val ) =>
+							setFormData( { ...formData, name: val } )
+						}
+					/>
+				</div>
+
+				<div className="form-group">
+					<SelectControl
+						label={ __( 'Font style:', 'create-block-theme' ) }
+						name="font-style"
+						id="font-style"
+						required
+						value={ formData.style }
+						onChange={ ( val ) =>
+							setFormData( { ...formData, style: val } )
+						}
+					>
+						<option value="normal">Normal</option>
+						<option value="italic">Italic</option>
+					</SelectControl>
+				</div>
+
+				<div className="form-group">
+					<InputControl
+						label={ __( 'Font weight:', 'create-block-theme' ) }
+						type="text"
+						name="font-weight"
+						id="font-weight"
+						placeholder={ __(
+							'Font weight:',
+							'create-block-theme'
+						) }
+						required
+						value={ formData.weight }
+						onChange={ ( val ) =>
+							setFormData( { ...formData, weight: val } )
+						}
+					/>
+				</div>
+
+				{ formData.variable && (
+					<input
+						type="hidden"
+						name="font-variation-settings"
+						value={ fontVariationSettings }
+					/>
 				) }
-			</h4>
+			</form>
 
-			<div className="form-group">
-				<label htmlFor="font-name">
-					{ __( 'Font name:', 'create-block-theme' ) }
-				</label>
-				<InputControl
-					type="text"
-					name="font-name"
-					id="font-name"
-					placeholder={ __( 'Font name', 'create-block-theme' ) }
-					required
-					value={ formData.name }
-					onChange={ ( val ) =>
-						setFormData( { ...formData, name: val } )
-					}
-				/>
-			</div>
-
-			<div className="form-group">
-				<label htmlFor="font-style">
-					{ __( 'Font style:', 'create-block-theme' ) }
-				</label>
-				<SelectControl
-					name="font-style"
-					id="font-style"
-					required
-					value={ formData.style }
-					onChange={ ( val ) =>
-						setFormData( { ...formData, style: val } )
-					}
-				>
-					<option value="normal">Normal</option>
-					<option value="italic">Italic</option>
-				</SelectControl>
-			</div>
-
-			<div className="form-group">
-				<label htmlFor="font-weight">
-					{ __( 'Font weight:', 'create-block-theme' ) }
-				</label>
-				<InputControl
-					type="text"
-					name="font-weight"
-					id="font-weight"
-					placeholder={ __( 'Font weight:', 'create-block-theme' ) }
-					required
-					value={ formData.weight }
-					onChange={ ( val ) =>
-						setFormData( { ...formData, weight: val } )
-					}
-				/>
-			</div>
-
+			{ /* Render the range controls for each available axis of a variable font */ }
 			{ formData.variable && (
 				<div className="variable-settings">
 					<div className="header">
@@ -210,11 +228,11 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 				variant="primary"
 				type="submit"
 				disabled={ ! isFormValid() }
+				form="font-upload-form"
 			>
 				{ __( 'Upload font to your theme', 'create-block-theme' ) }
 			</Button>
-			<input type="hidden" name="nonce" value={ nonce } />
-		</form>
+		</>
 	);
 }
 

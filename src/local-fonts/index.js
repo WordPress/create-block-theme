@@ -6,6 +6,7 @@ import UploadFontForm from './upload-font-form';
 import './local-fonts.css';
 import DemoTextInput from '../demo-text-input';
 import Demo from '../demo-text-input/demo';
+import { variableAxesToCss } from './utils';
 
 const INITIAL_FORM_DATA = {
 	file: null,
@@ -33,11 +34,7 @@ function LocalFonts() {
 			fontStyle: formData.style,
 		};
 		if ( formData.variable ) {
-			style.fontVariationSettings = Object.keys( formData.axes )
-				.map( ( key ) => {
-					return `'${ formData.axes[ key ].tag }' ${ formData.axes[ key ].currentValue }`;
-				} )
-				.join( ', ' );
+			style.fontVariationSettings = variableAxesToCss( formData.axes );
 		}
 		return style;
 	};
@@ -92,6 +89,7 @@ function LocalFonts() {
 			{ isFormValid() && (
 				<div className="preview">
 					<DemoTextInput />
+					<p>{ __( 'Demo:', 'create-block-theme' ) }</p>
 					<Demo style={ demoStyle() } />
 				</div>
 			) }
