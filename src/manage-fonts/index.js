@@ -192,11 +192,9 @@ function ManageFonts() {
 					<Button
 						onClick={ toggleIsHelpOpen }
 						style={ { padding: '0', height: '1rem' } }
+						aria-label={ __( 'Alert Popup', 'create-block-theme' ) }
 					>
 						<Icon icon={ 'info' } aria-hidden="true" />
-						<span className="screen-reader-text">
-							{ __( 'Alert Popup', 'create-block-theme' ) }
-						</span>
 					</Button>
 				</p>
 

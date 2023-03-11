@@ -74,6 +74,17 @@ function FontFamily( {
 								variant="tertiary"
 								onClick={ toggleIsOpen }
 								aria-expanded={ isOpen }
+								aria-label={
+									isOpen
+										? __(
+												'Collapse Font Family',
+												'create-block-theme'
+										  )
+										: __(
+												'Expand Font Family',
+												'create-block-theme'
+										  )
+								}
 							>
 								<Icon
 									icon={
@@ -83,17 +94,6 @@ function FontFamily( {
 									}
 									aria-hidden="true"
 								/>
-								<span className="screen-reader-text">
-									{ isOpen
-										? __(
-												'Collapse Fonts',
-												'create-block-theme'
-										  )
-										: __(
-												'Expands Fonts',
-												'create-block-theme'
-										  ) }
-								</span>
 							</Button>
 						</div>
 					</td>
