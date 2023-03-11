@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components';
 import Demo from '../demo-text-input/demo';
-const { __ } = wp.i18n;
+const { __, sprintf } = wp.i18n;
 
 function FontFace( {
 	fontFamily,
@@ -36,6 +36,13 @@ function FontFace( {
 						variant="tertiary"
 						onClick={ deleteFontFace }
 						tabindex={ isFamilyOpen ? 0 : -1 }
+						aria-label={ sprintf(
+							/* translators: %1$s: Font Family name, %2$s: Font style name, %3$s: Font weight name. */
+							__( 'Remove %1$s style %2$s weight %3$s variant' ),
+							fontFamily,
+							fontStyle,
+							fontWeight
+						) }
 					>
 						{ __( 'Remove', 'create-block-theme' ) }
 					</Button>
