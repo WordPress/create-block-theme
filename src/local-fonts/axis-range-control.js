@@ -14,6 +14,7 @@ function AxisRangeControl( { axis, formData, setFormData } ) {
 		setFormData( {
 			...formData,
 			axes: newAxes,
+			...( axis.tag === 'wght' ? { weight: val } : {} ),
 		} );
 	};
 
