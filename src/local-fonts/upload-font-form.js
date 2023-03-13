@@ -124,11 +124,11 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 						name="font-file"
 						id="font-file"
 						onChange={ onFileSelectChange }
-						accept=".ttf, .woff, .woff2"
+						accept=".otf, .ttf, .woff, .woff2"
 					/>
 					<small>
 						{ __(
-							'.ttf, .woff, .woff2 file extensions supported',
+							'.otf, .ttf, .woff, .woff2 file extensions supported',
 							'create-block-theme'
 						) }
 					</small>
