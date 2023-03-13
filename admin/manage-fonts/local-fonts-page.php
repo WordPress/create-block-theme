@@ -37,10 +37,10 @@ class Local_Fonts {
 							<th scope="row">
 								<label for="font-file"><?php _e( 'Font file', 'create-block-theme' ); ?></label>
 								<br>
-								<small style="font-weight:normal;"><?php _e( '.ttf, .woff, .woff2 file extensions supported', 'create-block-theme' ); ?></small>
+								<small style="font-weight:normal;"><?php _e( '.otf, .ttf, .woff, .woff2 file extensions supported', 'create-block-theme' ); ?></small>
 							</th>
 							<td>
-								<input type="file" accept=".ttf, .woff, .woff2"  name="font-file" id="font-file" class="upload" required/>
+								<input type="file" accept=".otf, .ttf, .woff, .woff2"  name="font-file" id="font-file" class="upload" required/>
 							</td>
 						</tr>
 						<tr>
