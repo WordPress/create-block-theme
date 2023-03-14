@@ -1,3 +1,7 @@
+#wpfooter {
+	display: none;
+}
+
 #wpwrap {
 	background: #fff;
 }
@@ -6,6 +10,7 @@
 	display: grid;
 	grid-template-columns: 350px 1fr;
 	margin-left: -20px;
+	min-height: calc(100vh - 32px);
 }
 
 .layout > .preview,
@@ -17,6 +22,7 @@
 	position: sticky;
 	top: 32px;
 	max-height: calc(100vh - 32px);
+	border-left: 1px solid #e2e2e2;
 }
 
 .form-group {
