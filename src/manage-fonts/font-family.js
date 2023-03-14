@@ -3,7 +3,7 @@ import { Button, Icon } from '@wordpress/components';
 import FontFace from './font-face';
 import { ManageFontsContext } from '../fonts-context';
 
-const { __, _n } = wp.i18n;
+const { __, _n, sprintf } = wp.i18n;
 function FontFamily( {
 	fontFamily,
 	fontFamilyIndex,
@@ -59,19 +59,40 @@ function FontFamily( {
 									e.stopPropagation();
 									deleteFontFamily( fontFamilyIndex );
 								} }
+								aria-label={ sprintf(
+									/* translators: %s: Font Family. */
+									__( 'Remove %s Font Family' ),
+									fontFamily.name || fontFamily.fontFamily
+								) }
 							>
 								{ __(
 									'Remove Font Family',
 									'create-block-theme'
 								) }
 							</Button>
-							<Button onClick={ toggleIsOpen }>
+							<Button
+								variant="tertiary"
+								onClick={ toggleIsOpen }
+								aria-expanded={ isOpen }
+								aria-label={
+									isOpen
+										? __(
+												'Collapse Font Family',
+												'create-block-theme'
+										  )
+										: __(
+												'Expand Font Family',
+												'create-block-theme'
+										  )
+								}
+							>
 								<Icon
 									icon={
 										isOpen
 											? 'arrow-up-alt2'
 											: 'arrow-down-alt2'
 									}
+									aria-hidden="true"
 								/>
 							</Button>
 						</div>
