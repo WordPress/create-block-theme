@@ -16,6 +16,7 @@ class Manage_Fonts_Admin {
 	}
 
 	const ALLOWED_FONT_MIME_TYPES = array(
+		'otf'   => 'font/otf',
 		'ttf'   => 'font/ttf',
 		'woff'  => 'font/woff',
 		'woff2' => 'font/woff2',
