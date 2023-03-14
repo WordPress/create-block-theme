@@ -56,6 +56,18 @@ export function ManageFontsProvider( { children } ) {
 			DEMO_DEFAULTS[ demoType ].size
 	);
 
+	const [ axes, setAxes ] = useState( {} );
+
+	const handleAxesChange = ( tag, value ) => {
+		setAxes( {
+			...axes,
+			[ tag ]: {
+				...axes[ tag ],
+				currentValue: value,
+			},
+		} );
+	};
+
 	const handleDemoTextChange = ( newDemoText ) => {
 		setDemoText( newDemoText );
 		localStorage.setItem( 'cbt_default-demo-text', newDemoText );
@@ -112,6 +124,8 @@ export function ManageFontsProvider( { children } ) {
 				handleDemoFontSizeChange,
 				familiesOpen,
 				handleToggleFamily,
+				axes,
+				handleAxesChange,
 			} }
 		>
 			{ children }

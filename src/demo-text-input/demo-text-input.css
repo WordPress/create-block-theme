@@ -7,8 +7,25 @@
 
 .demo-text-input .container {
 	display: grid;
-	column-gap: 1rem;
-	grid-template-columns: 0.5fr 1fr 0.5fr min-content;
+	column-gap: 2rem;
+	grid-template-columns: 1fr min-content;
+	align-items: center;
+}
+
+.demo-text-input .controls {
+	padding-right: 2rem;
+	border-right: 1px solid #e2e2e2;
+}
+
+.demo-text-input .extra-controls {
+	margin-top: 2rem;
+}
+
+.demo-text-input .container .standard-controls,
+.demo-text-input .container .extra-controls {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1rem;
 }
 
 .demo-text-input .container > div:last-child {

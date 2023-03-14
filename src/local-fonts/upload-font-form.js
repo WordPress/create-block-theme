@@ -4,13 +4,17 @@ import {
 	__experimentalInputControl as InputControl,
 	SelectControl,
 } from '@wordpress/components';
-import { update } from '@wordpress/icons';
 import { Font } from 'lib-font';
 import { __ } from '@wordpress/i18n';
-import AxisRangeControl from './axis-range-control';
-import { variableAxesToCss } from './utils';
+import { variableAxesToCss } from '../demo-text-input/utils';
 
-function UploadFontForm( { formData, setFormData, isFormValid } ) {
+function UploadFontForm( {
+	formData,
+	setFormData,
+	resetFormData,
+	isFormValid,
+	setAxes,
+} ) {
 	// pickup the nonce from the input printed in the server
 	const nonce = document.querySelector( '#nonce' ).value;
 
@@ -18,7 +22,8 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 		const file = event.target.files[ 0 ];
 
 		if ( ! file ) {
-			setFormData( INITIAL_FORM_DATA );
+			resetFormData();
+			return;
 		}
 
 		// Use FileReader to, well, read the file
@@ -55,6 +60,11 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 
 				// Variable fonts info
 				const isVariable = !! font.opentype.tables.fvar;
+				const isVariableWeight =
+					isVariable &&
+					!! font.opentype.tables.fvar.axes.find(
+						( { tag } ) => tag === 'wght'
+					);
 				const axes = isVariable
 					? font.opentype.tables.fvar.axes.reduce(
 							(
@@ -77,30 +87,14 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 				setFormData( {
 					file,
 					name: fontName,
-					weight: fontWeight,
 					style: isItalic ? 'italic' : 'normal',
+					...( ! isVariableWeight ? { weight: fontWeight } : {} ),
 					variable: isVariable,
-					axes,
+					variableWeight: isVariableWeight,
 				} );
+				setAxes( axes );
 			};
 		};
-	};
-
-	const resetDefaultVariableSettings = () => {
-		const newAxes = Object.keys( formData.axes ).reduce(
-			( acc, axisTag ) => {
-				acc[ axisTag ] = {
-					...formData.axes[ axisTag ],
-					currentValue: formData.axes[ axisTag ].defaultValue,
-				};
-				return acc;
-			},
-			{}
-		);
-		setFormData( {
-			...formData,
-			axes: newAxes,
-		} );
 	};
 
 	const fontVariationSettings = variableAxesToCss( formData.axes );
@@ -176,15 +170,27 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 						type="text"
 						name="font-weight"
 						id="font-weight"
-						placeholder={ __(
-							'Font weight:',
-							'create-block-theme'
-						) }
-						value={ formData.weight }
+						placeholder={
+							! formData.variableWeight
+								? __( 'Font weight:', 'create-block-theme' )
+								: ''
+						}
+						value={ formData.weight || '' }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, weight: val } )
 						}
+						// Disable the input if the font is a variable font with the wght axis
+						disabled={ formData.variableWeight }
 					/>
+					{ formData.variableWeight && (
+						<small>
+							{  }
+							{ __(
+								'This font is a variable font with the wght axis, for this reason the font weight selector is disabled',
+								'create-block-theme'
+							) }
+						</small>
+					) }
 				</div>
 
 				{ formData.variable && (
@@ -195,36 +201,6 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 					/>
 				) }
 			</form>
-
-			{ /* Render the range controls for each available axis of a variable font */ }
-			{ formData.variable && (
-				<div className="variable-settings">
-					<div className="header">
-						<p>
-							{ __(
-								'Variable font settings:',
-								'create-block-theme'
-							) }
-						</p>
-						<Button
-							isSmall
-							icon={ update }
-							variant="secondary"
-							onClick={ resetDefaultVariableSettings }
-						>
-							{ __( 'Default settings', 'create-block-theme' ) }
-						</Button>
-					</div>
-					{ Object.keys( formData.axes ).map( ( key ) => (
-						<AxisRangeControl
-							axis={ formData.axes[ key ] }
-							key={ `axis-range-${ key }` }
-							formData={ formData }
-							setFormData={ setFormData }
-						/>
-					) ) }
-				</div>
-			) }
 
 			<Button
 				variant="primary"

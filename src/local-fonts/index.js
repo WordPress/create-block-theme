@@ -1,12 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
-
 import UploadFontForm from './upload-font-form';
 import './local-fonts.css';
 import DemoTextInput from '../demo-text-input';
 import Demo from '../demo-text-input/demo';
-import { variableAxesToCss } from './utils';
+import { variableAxesToCss } from '../demo-text-input/utils';
 
 const INITIAL_FORM_DATA = {
 	file: null,
@@ -17,11 +15,32 @@ const INITIAL_FORM_DATA = {
 
 function LocalFonts() {
 	const [ formData, setFormData ] = useState( INITIAL_FORM_DATA );
+	const [ axes, setAxes ] = useState( {} );
+
+	const resetFormData = () => {
+		setFormData( INITIAL_FORM_DATA );
+	};
+
+	const resetAxes = () => {
+		const newAxes = Object.keys( axes ).reduce( ( acc, axisTag ) => {
+			acc[ axisTag ] = {
+				...axes[ axisTag ],
+				currentValue: axes[ axisTag ].defaultValue,
+			};
+			return acc;
+		}, {} );
+		setAxes( newAxes );
+	};
 
 	const isFormValid = () => {
-		return (
-			formData.file && formData.name && formData.weight && formData.style
-		);
+		const isValid = formData.file && formData.name && formData.style;
+
+		// if the font is not variable weight, the weight is required
+		if ( ! formData.variableWeight ) {
+			return isValid && formData.weight;
+		}
+
+		return isValid;
 	};
 
 	const demoStyle = () => {
@@ -34,7 +53,7 @@ function LocalFonts() {
 			fontStyle: formData.style,
 		};
 		if ( formData.variable ) {
-			style.fontVariationSettings = variableAxesToCss( formData.axes );
+			style.fontVariationSettings = variableAxesToCss( axes );
 		}
 		return style;
 	};
@@ -62,10 +81,8 @@ function LocalFonts() {
 			} );
 	};
 
-	const debounceOnFormDataChange = useDebounce( onFormDataChange, 500 );
-
 	useEffect( () => {
-		debounceOnFormDataChange();
+		onFormDataChange();
 	}, [ formData ] );
 
 	return (
@@ -83,6 +100,8 @@ function LocalFonts() {
 					isFormValid={ isFormValid }
 					formData={ formData }
 					setFormData={ setFormData }
+					resetFormData={ resetFormData }
+					setAxes={ setAxes }
 				/>
 			</main>
 
@@ -91,7 +110,11 @@ function LocalFonts() {
 
 				{ isFormValid() ? (
 					<>
-						<DemoTextInput />
+						<DemoTextInput
+							axes={ axes }
+							setAxes={ setAxes }
+							resetAxes={ resetAxes }
+						/>
 						<p>{ __( 'Demo:', 'create-block-theme' ) }</p>
 						<Demo style={ demoStyle() } />
 					</>
