@@ -148,7 +148,6 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 						name="font-name"
 						id="font-name"
 						placeholder={ __( 'Font name', 'create-block-theme' ) }
-						required
 						value={ formData.name }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, name: val } )
@@ -161,7 +160,6 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 						label={ __( 'Font style:', 'create-block-theme' ) }
 						name="font-style"
 						id="font-style"
-						required
 						value={ formData.style }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, style: val } )
@@ -182,7 +180,6 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 							'Font weight:',
 							'create-block-theme'
 						) }
-						required
 						value={ formData.weight }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, weight: val } )
