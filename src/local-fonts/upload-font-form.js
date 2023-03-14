@@ -203,14 +203,19 @@ function UploadFontForm( { formData, setFormData, isFormValid } ) {
 			{ formData.variable && (
 				<div className="variable-settings">
 					<div className="header">
-						<p>Variable font settings:</p>
+						<p>
+							{ __(
+								'Variable font settings:',
+								'create-block-theme'
+							) }
+						</p>
 						<Button
 							isSmall
 							icon={ update }
 							variant="secondary"
 							onClick={ resetDefaultVariableSettings }
 						>
-							Default settings
+							{ __( 'Default settings', 'create-block-theme' ) }
 						</Button>
 					</div>
 					{ Object.keys( formData.axes ).map( ( key ) => (
