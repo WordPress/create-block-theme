@@ -71,7 +71,7 @@ function LocalFonts() {
 	return (
 		<div className="layout">
 			<main>
-				<h1>Local Fonts</h1>
+				<h1>{ __( 'Local Fonts', 'create-block-theme' ) }</h1>
 				<h3>
 					{ __(
 						'Add local fonts assets and font face definitions to your currently active theme',
