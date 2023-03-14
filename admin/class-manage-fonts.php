@@ -146,7 +146,6 @@ class Manage_Fonts_Admin {
 			! empty( $_FILES['font-file'] ) &&
 			! empty( $_POST['font-name'] ) &&
 			! empty( $_POST['font-style'] ) &&
-			! empty( $_POST['font-weight'] ) &&
 			$this->has_file_and_user_permissions()
 		) {
 			if (
@@ -162,11 +161,14 @@ class Manage_Fonts_Admin {
 				$uploaded_font_face = array(
 					'fontFamily' => $_POST['font-name'],
 					'fontStyle'  => $_POST['font-style'],
-					'fontWeight' => $_POST['font-weight'],
 					'src'        => array(
 						'file:./assets/fonts/' . $file_name,
 					),
 				);
+
+				if ( ! empty( $_POST['font-weight'] ) ) {
+					$uploaded_font_face['fontWeight'] = $_POST['font-weight'];
+				}
 
 				if ( ! empty( $_POST['font-variation-settings'] ) ) {
 					// replace escaped single quotes with single quotes
