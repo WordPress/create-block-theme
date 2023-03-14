@@ -86,13 +86,24 @@ function LocalFonts() {
 				/>
 			</main>
 
-			{ isFormValid() && (
-				<div className="preview">
-					<DemoTextInput />
-					<p>{ __( 'Demo:', 'create-block-theme' ) }</p>
-					<Demo style={ demoStyle() } />
-				</div>
-			) }
+			<div className="preview">
+				<h2>{ __( 'Font file preview', 'create-block-theme' ) }</h2>
+
+				{ isFormValid() ? (
+					<>
+						<DemoTextInput />
+						<p>{ __( 'Demo:', 'create-block-theme' ) }</p>
+						<Demo style={ demoStyle() } />
+					</>
+				) : (
+					<p>
+						{ __(
+							'Load a font file to preview it.',
+							'create-block-theme'
+						) }
+					</p>
+				) }
+			</div>
 		</div>
 	);
 }
