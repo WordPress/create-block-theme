@@ -2,21 +2,17 @@ import { Button } from '@wordpress/components';
 import Demo from '../demo-text-input/demo';
 const { __ } = wp.i18n;
 
-function FontFace( {
-	fontFamily,
-	fontWeight,
-	fontStyle,
-	deleteFont,
-	shouldBeRemoved,
-	isFamilyOpen,
-} ) {
+function FontFace( { face, deleteFont, shouldBeRemoved, isFamilyOpen } ) {
 	const demoStyles = {
-		fontFamily,
-		fontStyle,
+		fontFamily: face.fontFamily,
+		fontStyle: face.fontStyle,
 		// Handle cases like fontWeight is a number instead of a string or when the fontweight is a 'range', a string like "800 900".
-		fontWeight: fontWeight
-			? String( fontWeight ).split( ' ' )[ 0 ]
+		fontWeight: face.fontWeight
+			? String( face.fontWeight ).split( ' ' )[ 0 ]
 			: 'normal',
+		...( face.fontVariationSettings
+			? { fontVariationSettings: face.fontVariationSettings }
+			: {} ),
 	};
 
 	if ( shouldBeRemoved ) {
@@ -25,8 +21,8 @@ function FontFace( {
 
 	return (
 		<tr className="font-face">
-			<td>{ fontStyle }</td>
-			<td>{ fontWeight }</td>
+			<td>{ face.fontStyle }</td>
+			<td>{ face.fontWeight }</td>
 			<td className="demo-cell">
 				<Demo style={ demoStyles } />
 			</td>
@@ -44,10 +40,5 @@ function FontFace( {
 		</tr>
 	);
 }
-
-FontFace.defaultProps = {
-	fontWeight: 'normal',
-	fontStyle: 'normal',
-};
 
 export default FontFace;

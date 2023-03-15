@@ -10,8 +10,9 @@ import { useContext } from '@wordpress/element';
 import { ManageFontsContext } from '../fonts-context';
 import { update } from '@wordpress/icons';
 import './demo-text-input.css';
+import VariableControls from './variable-controls';
 
-function DemoTextInput() {
+function DemoTextInput( { axes, setAxes, resetAxes } ) {
 	const {
 		demoText,
 		handleDemoTextChange,
@@ -25,37 +26,53 @@ function DemoTextInput() {
 	return (
 		<div className="demo-text-input">
 			<div className="container">
-				<SelectControl
-					label={ __( 'Preview type', 'create-block-theme' ) }
-					onChange={ handleDemoTypeChange }
-					value={ demoType }
-				>
-					<option value="heading">
-						{ __( 'Heading', 'create-block-theme' ) }
-					</option>
-					<option value="sentence">
-						{ __( 'Sentence', 'create-block-theme' ) }
-					</option>
-					<option value="paragraph">
-						{ __( 'Paragraph', 'create-block-theme' ) }
-					</option>
-				</SelectControl>
+				<div className="controls">
+					<div className="standard-controls">
+						<SelectControl
+							label={ __( 'Preview type', 'create-block-theme' ) }
+							onChange={ handleDemoTypeChange }
+							value={ demoType }
+						>
+							<option value="heading">
+								{ __( 'Heading', 'create-block-theme' ) }
+							</option>
+							<option value="sentence">
+								{ __( 'Sentence', 'create-block-theme' ) }
+							</option>
+							<option value="paragraph">
+								{ __( 'Paragraph', 'create-block-theme' ) }
+							</option>
+						</SelectControl>
 
-				<InputControl
-					label="Demo text"
-					value={ demoText }
-					onChange={ handleDemoTextChange }
-				/>
+						<InputControl
+							label="Demo text"
+							value={ demoText }
+							onChange={ handleDemoTextChange }
+						/>
 
-				<div>
-					<RangeControl
-						label={ __( 'Font size (px)', 'create-block-theme' ) }
-						value={ demoFontSize }
-						onChange={ handleDemoFontSizeChange }
-						min={ 8 }
-						max={ 140 }
-						withInputField={ true }
-					/>
+						<div>
+							<RangeControl
+								label={ __(
+									'Font size (px)',
+									'create-block-theme'
+								) }
+								value={ demoFontSize }
+								onChange={ handleDemoFontSizeChange }
+								min={ 8 }
+								max={ 140 }
+								withInputField={ true }
+							/>
+						</div>
+					</div>
+
+					{ !! axes && !! Object.keys( axes ).length && (
+						<div className="extra-controls">
+							<VariableControls
+								axes={ axes }
+								setAxes={ setAxes }
+							/>
+						</div>
+					) }
 				</div>
 
 				<div>
@@ -65,6 +82,7 @@ function DemoTextInput() {
 						onClick={ () => {
 							resetDefaults( 'sentence' );
 							handleDemoTypeChange( 'sentence' );
+							resetAxes();
 						} }
 					>
 						{ __( 'Reset', 'create-block-theme' ) }

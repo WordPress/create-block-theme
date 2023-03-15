@@ -16,6 +16,7 @@ class Manage_Fonts_Admin {
 	}
 
 	const ALLOWED_FONT_MIME_TYPES = array(
+		'otf'   => 'font/otf',
 		'ttf'   => 'font/ttf',
 		'woff'  => 'font/woff',
 		'woff2' => 'font/woff2',
@@ -146,7 +147,6 @@ class Manage_Fonts_Admin {
 			! empty( $_FILES['font-file'] ) &&
 			! empty( $_POST['font-name'] ) &&
 			! empty( $_POST['font-style'] ) &&
-			! empty( $_POST['font-weight'] ) &&
 			$this->has_file_and_user_permissions()
 		) {
 			if (
@@ -159,15 +159,25 @@ class Manage_Fonts_Admin {
 
 				move_uploaded_file( $_FILES['font-file']['tmp_name'], get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 
-				$new_font_faces   = array();
-				$new_font_faces[] = array(
+				$uploaded_font_face = array(
 					'fontFamily' => $_POST['font-name'],
 					'fontStyle'  => $_POST['font-style'],
-					'fontWeight' => $_POST['font-weight'],
 					'src'        => array(
 						'file:./assets/fonts/' . $file_name,
 					),
 				);
+
+				if ( ! empty( $_POST['font-weight'] ) ) {
+					$uploaded_font_face['fontWeight'] = $_POST['font-weight'];
+				}
+
+				if ( ! empty( $_POST['font-variation-settings'] ) ) {
+					// replace escaped single quotes with single quotes
+					$font_variation_settings                     = str_replace( "\\'", "'", $_POST['font-variation-settings'] );
+					$uploaded_font_face['fontVariationSettings'] = $font_variation_settings;
+				}
+
+				$new_font_faces = array( $uploaded_font_face );
 
 				$this->add_or_update_theme_font_faces( $_POST['font-name'], $font_slug, $new_font_faces );
 				return add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );

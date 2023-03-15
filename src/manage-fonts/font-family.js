@@ -105,7 +105,7 @@ function FontFamily( { fontFamily, deleteFont } ) {
 											}
 											return (
 												<FontFace
-													{ ...fontFace }
+													face={ fontFace }
 													key={ `fontface${ i }` }
 													deleteFont={ () =>
 														deleteFont(
@@ -122,7 +122,7 @@ function FontFamily( { fontFamily, deleteFont } ) {
 									) }
 								{ ! hasFontFaces && fontFamily.fontFamily && (
 									<FontFace
-										{ ...fontFamily }
+										face={ fontFamily }
 										isFamilyOpen={ isOpen }
 									/>
 								) }
