@@ -123,10 +123,10 @@ function FontsSidebar( {
 													</div>
 												</div>
 												{ fontsOutline[ key ].faces.map(
-													( face, ii ) => (
+													( face, faceIndex ) => (
 														<div
 															className="variant-row"
-															key={ `selected-variant-${ ii }` }
+															key={ `selected-variant-${ faceIndex }` }
 														>
 															<div className="variant">
 																{ face.weight }{ ' ' }
