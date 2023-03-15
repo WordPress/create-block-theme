@@ -15,6 +15,7 @@ import {
 import DemoTextInput from '../demo-text-input';
 import FontsPageLayout from '../fonts-page-layout';
 import './google-fonts.css';
+import BackButton from '../manage-fonts/back-button';
 
 const EMPTY_SELECTION_DATA = {};
 
@@ -159,6 +160,7 @@ function GoogleFonts() {
 		<FontsPageLayout>
 			<main>
 				<h1 className="wp-heading-inline">
+					<BackButton />
 					{ __(
 						'Add Google fonts to your theme',
 						'create-block-theme'

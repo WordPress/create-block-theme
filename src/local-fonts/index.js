@@ -5,6 +5,7 @@ import './local-fonts.css';
 import DemoTextInput from '../demo-text-input';
 import Demo from '../demo-text-input/demo';
 import { variableAxesToCss } from '../demo-text-input/utils';
+import BackButton from '../manage-fonts/back-button';
 
 const INITIAL_FORM_DATA = {
 	file: null,
@@ -88,7 +89,9 @@ function LocalFonts() {
 	return (
 		<div className="layout">
 			<main>
-				<h1>{ __( 'Local Fonts', 'create-block-theme' ) }</h1>
+				<h1>
+					<BackButton /> { __( 'Local Fonts', 'create-block-theme' ) }
+				</h1>
 				<h3>
 					{ __(
 						'Add local fonts assets and font face definitions to your currently active theme',
