@@ -37,13 +37,9 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 == Changelog ==
 
 = 1.7.0 =
-* merge with trunk
 * Manage fonts minor refactor. Move elements from PHP to react
-* Merge branch 'trunk' into add/fonts-sidebar
 * Allow otf font file upload
-* Merge branch 'trunk' into refactor/localfonts
 * Local fonts section implementation in React
-* merging trunk
 * Fonts outline sidebar
 * Update Google Fonts JSON data from API
 
