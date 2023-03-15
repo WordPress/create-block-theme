@@ -1,19 +1,17 @@
 import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import FontFamily from './font-family';
-import {
-	// eslint-disable-next-line
-	__experimentalConfirmDialog as ConfirmDialog,
-	Modal,
-	Icon,
-	Button,
-} from '@wordpress/components';
+
 import DemoTextInput from '../demo-text-input';
+import FontsPageLayout from '../fonts-page-layout';
+import HelpModal from './help-modal';
+import FontsSidebar from '../fonts-sidebar';
+import PageHeader from './page-header';
+import ConfirmDeleteModal from './confirm-delete-modal';
+import { localFileAsThemeAssetUrl } from '../utils';
 import './manage-fonts.css';
 
-const { __, sprintf } = wp.i18n;
-
 function ManageFonts() {
-	const { adminUrl } = createBlockTheme;
 	const nonce = document.querySelector( '#nonce' ).value;
 
 	// The element where the list of theme fonts is rendered coming from the server as JSON
@@ -33,8 +31,9 @@ function ManageFonts() {
 
 	// Object where we store the font family or font face index position in the newThemeFonts array that is about to be removed
 	const [ fontToDelete, setFontToDelete ] = useState( {
-		fontFamilyIndex: undefined,
-		fontFaceIndex: undefined,
+		fontFamily: undefined,
+		weight: undefined,
+		style: undefined,
 	} );
 
 	// dialogs states
@@ -44,10 +43,7 @@ function ManageFonts() {
 	// When client side font list changes, we update the server side font list
 	useEffect( () => {
 		// Avoids running this effect on the first render
-		if (
-			fontToDelete.fontFamilyIndex !== undefined ||
-			fontToDelete.fontFaceIndex !== undefined
-		) {
+		if ( fontToDelete.fontFamily !== undefined ) {
 			// Submit the form to the server
 			manageFontsFormElement.submit();
 		}
@@ -57,26 +53,27 @@ function ManageFonts() {
 		setIsHelpOpen( ! isHelpOpen );
 	};
 
-	function requestDeleteConfirmation( fontFamilyIndex, fontFaceIndex ) {
+	function requestDeleteConfirmation( fontFamily, weight, style ) {
 		setFontToDelete(
-			{ fontFamilyIndex, fontFaceIndex },
+			{ fontFamily, weight, style },
 			setShowConfirmDialog( true )
 		);
 	}
 
 	function confirmDelete() {
 		setShowConfirmDialog( false );
-		// if fontFaceIndex is undefined, we are deleting a font family
+		// if fontFaceIndex.weight and fontFace.styles are undefined, we are deleting a font family
 		if (
-			fontToDelete.fontFamilyIndex !== undefined &&
-			fontToDelete.fontFaceIndex !== undefined
+			fontToDelete.weight !== undefined &&
+			fontToDelete.style !== undefined
 		) {
 			deleteFontFace(
-				fontToDelete.fontFamilyIndex,
-				fontToDelete.fontFaceIndex
+				fontToDelete.fontFamily,
+				fontToDelete.weight,
+				fontToDelete.style
 			);
 		} else {
-			deleteFontFamily( fontToDelete.fontFamilyIndex );
+			deleteFontFamily( fontToDelete.fontFamily );
 		}
 	}
 
@@ -85,9 +82,9 @@ function ManageFonts() {
 		setShowConfirmDialog( false );
 	}
 
-	function deleteFontFamily( fontFamilyIndex ) {
-		const updatedFonts = newThemeFonts.map( ( family, index ) => {
-			if ( index === fontFamilyIndex ) {
+	function deleteFontFamily( fontFamily ) {
+		const updatedFonts = newThemeFonts.map( ( family ) => {
+			if ( fontFamily === family.fontFamily ) {
 				return {
 					...family,
 					shouldBeRemoved: true,
@@ -99,166 +96,93 @@ function ManageFonts() {
 	}
 
 	function deleteFontFace() {
-		const { fontFamilyIndex, fontFaceIndex } = fontToDelete;
-		const updatedFonts = newThemeFonts.reduce(
-			( acc, fontFamily, index ) => {
-				const { fontFace = [], ...updatedFontFamily } = fontFamily;
-
+		const { fontFamily, weight, style } = fontToDelete;
+		const updatedFonts = newThemeFonts.reduce( ( acc, family ) => {
+			const { fontFace = [], ...updatedFamily } = family;
+			if (
+				fontFamily === family.fontFamily &&
+				fontFace.filter( ( face ) => ! face.shouldBeRemoved ).length ===
+					1
+			) {
+				updatedFamily.shouldBeRemoved = true;
+			}
+			updatedFamily.fontFace = fontFace.map( ( face ) => {
 				if (
-					fontFamilyIndex === index &&
-					fontFace.filter( ( face ) => ! face.shouldBeRemoved )
-						.length === 1
+					weight === face.fontWeight &&
+					style === face.fontStyle &&
+					fontFamily === family.fontFamily
 				) {
-					updatedFontFamily.shouldBeRemoved = true;
+					return {
+						...face,
+						shouldBeRemoved: true,
+					};
 				}
-
-				updatedFontFamily.fontFace = fontFace.map( ( face, i ) => {
-					if ( fontFamilyIndex === index && fontFaceIndex === i ) {
-						return {
-							...face,
-							shouldBeRemoved: true,
-						};
-					}
-					return face;
-				} );
-				return [ ...acc, updatedFontFamily ];
-			},
-			[]
-		);
+				return face;
+			} );
+			return [ ...acc, updatedFamily ];
+		}, [] );
 		setNewThemeFonts( updatedFonts );
 	}
 
-	const fontFamilyToDelete = newThemeFonts[ fontToDelete.fontFamilyIndex ];
-	const fontFaceToDelete =
-		newThemeFonts[ fontToDelete.fontFamilyIndex ]?.fontFace?.[
-			fontToDelete.fontFaceIndex
-		];
+	// format the theme fonts object to be used by the FontsSidebar component
+	const fontsOutline = newThemeFonts.reduce( ( acc, fontFamily ) => {
+		acc[ fontFamily.fontFamily ] = {
+			family: fontFamily.name || fontFamily.fontFamily,
+			faces: ( fontFamily.fontFace || [] ).map( ( face ) => {
+				return {
+					weight: face.fontWeight,
+					style: face.fontStyle,
+					src: localFileAsThemeAssetUrl( face.src[ 0 ] ),
+				};
+			} ),
+		};
+		return acc;
+	}, {} );
 
 	return (
 		<>
-			{ isHelpOpen && (
-				<Modal
-					title={
-						<>
-							<Icon icon={ 'info' } />{ ' ' }
-							{ __( 'Info', 'create-block-theme' ) }
-						</>
-					}
-					onRequestClose={ toggleIsHelpOpen }
-				>
-					<p>
-						{ __(
-							'This is a list of your font families listed in the theme.json file of your theme.',
-							'create-block-theme'
-						) }
-					</p>
-					<p>
-						{ __(
-							'If your theme.json makes reference to fonts providers other than local they may not be displayed correctly.',
-							'create-block-theme'
-						) }
-					</p>
-				</Modal>
-			) }
+			<HelpModal isOpen={ isHelpOpen } onClose={ toggleIsHelpOpen } />
 
-			<div className="wrap">
-				<div className="manage-fonts-header-flex">
-					<h1 className="wp-heading-inline">
-						{ __( 'Manage Theme Fonts', 'create-block-theme' ) }
-					</h1>
-					<div className="buttons">
-						<Button
-							href={ `${ adminUrl }themes.php?page=add-google-font-to-theme-json` }
-							variant="secondary"
-						>
-							{ __( 'Add Google Font', 'create-block-theme' ) }
-						</Button>
-						<Button
-							href={ `${ adminUrl }themes.php?page=add-local-font-to-theme-json` }
-							variant="secondary"
-						>
-							{ __( 'Add Local Font', 'create-block-theme' ) }
-						</Button>
-					</div>
-				</div>
+			<FontsPageLayout>
+				<main>
+					<PageHeader toggleIsHelpOpen={ toggleIsHelpOpen } />
 
-				<hr className="wp-header-end" />
-
-				<p className="help">
-					{ __(
-						'These are the fonts currently embedded in your theme ',
-						'create-block-theme'
-					) }
-					<Button
-						onClick={ toggleIsHelpOpen }
-						style={ { padding: '0', height: '1rem' } }
-					>
-						<Icon icon={ 'info' } />
-					</Button>
-				</p>
-
-				<ConfirmDialog
-					isOpen={ showConfirmDialog }
-					onConfirm={ confirmDelete }
-					onCancel={ cancelDelete }
-				>
-					{ fontToDelete?.fontFamilyIndex !== undefined &&
-					fontToDelete?.fontFaceIndex !== undefined ? (
-						<h3>
-							{ sprintf(
-								// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
-								__(
-									`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
-									'create-block-theme'
-								),
-								fontFaceToDelete?.fontStyle,
-								fontFaceToDelete?.fontWeight,
-								fontFamilyToDelete?.fontFamily
-							) }
-						</h3>
-					) : (
-						<h3>
-							{ sprintf(
-								// translators: %s: Font Family
-								__(
-									`Are you sure you want to delete "%s" from your theme?`,
-									'create-block-theme'
-								),
-								fontFamilyToDelete?.fontFamily
-							) }
-						</h3>
-					) }
-					<p>
-						{ __(
-							'This action will delete the font definition and the font file assets from your theme.',
-							'create-block-theme'
-						) }
-					</p>
-				</ConfirmDialog>
-
-				<DemoTextInput />
-
-				<div className="font-families">
-					{ newThemeFonts.map( ( fontFamily, i ) => (
-						<FontFamily
-							fontFamily={ fontFamily }
-							fontFamilyIndex={ i }
-							key={ `fontfamily${ i }` }
-							deleteFontFamily={ requestDeleteConfirmation }
-							deleteFontFace={ requestDeleteConfirmation }
-						/>
-					) ) }
-				</div>
-
-				<form method="POST" id="manage-fonts-form">
-					<input
-						type="hidden"
-						name="new-theme-fonts-json"
-						value={ JSON.stringify( newThemeFonts ) }
+					<ConfirmDeleteModal
+						isOpen={ showConfirmDialog }
+						onConfirm={ confirmDelete }
+						onCancel={ cancelDelete }
+						fontToDelete={ fontToDelete }
 					/>
-					<input type="hidden" name="nonce" value={ nonce } />
-				</form>
-			</div>
+
+					<DemoTextInput />
+
+					<div className="font-families">
+						{ newThemeFonts.map( ( fontFamily, i ) => (
+							<FontFamily
+								fontFamily={ fontFamily }
+								key={ `fontfamily${ i }` }
+								deleteFont={ requestDeleteConfirmation }
+							/>
+						) ) }
+					</div>
+
+					<form method="POST" id="manage-fonts-form">
+						<input
+							type="hidden"
+							name="new-theme-fonts-json"
+							value={ JSON.stringify( newThemeFonts ) }
+						/>
+						<input type="hidden" name="nonce" value={ nonce } />
+					</form>
+				</main>
+
+				<FontsSidebar
+					title={ __( 'Theme Fonts', 'create-block-theme' ) }
+					fontsOutline={ fontsOutline }
+					handleDeleteFontFace={ requestDeleteConfirmation }
+					handleDeleteFontFamily={ requestDeleteConfirmation }
+				/>
+			</FontsPageLayout>
 		</>
 	);
 }

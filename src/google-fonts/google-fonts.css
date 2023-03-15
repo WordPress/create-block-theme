@@ -1,3 +1,11 @@
+#wpwrap {
+	background: #fff;
+}
+
+#wpcontent {
+	padding: 0;
+}
+
 #google-fonts-table {
 	margin-bottom: 2rem;
 }
@@ -22,4 +30,8 @@
 
 .select-font {
 	display: flex;
+}
+
+.widefat td {
+	padding: 0.2rem 1rem;
 }

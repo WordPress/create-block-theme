@@ -186,6 +186,12 @@ class Manage_Fonts_Admin {
 		}
 	}
 
+	function get_font_slug( $name ) {
+		$slug = sanitize_title( $name );
+		$slug = preg_replace( '/\s+/', '', $slug ); // Remove spaces
+		return $slug;
+	}
+
 	function save_google_fonts_to_theme() {
 		if (
 			! empty( $_POST['nonce'] ) &&
@@ -194,38 +200,40 @@ class Manage_Fonts_Admin {
 			$this->has_file_and_user_permissions()
 		) {
 			// Gets data from the form
-			$data             = json_decode( stripslashes( $_POST['selection-data'] ), true );
-			$google_font_name = $data['family'];
-			$font_slug        = sanitize_title( $google_font_name );
-			$variants         = $data['faces'];
+			$data = json_decode( stripslashes( $_POST['selection-data'] ), true );
 
-			$new_font_faces = array();
-			foreach ( $variants as $variant ) {
-				// variant name is $variant_and_url[0] and font asset url is $variant_and_url[1]
-				$file_extension = pathinfo( $variant['src'], PATHINFO_EXTENSION );
-				$file_name      = $font_slug . '_' . $variant['style'] . '_' . $variant['weight'] . '.' . $file_extension;
+			foreach ( $data as $font_family ) {
+				$google_font_name = $font_family['family'];
+				$font_slug        = $this->get_font_slug( $google_font_name );
+				$variants         = $font_family['faces'];
+				$new_font_faces   = array();
+				foreach ( $variants as $variant ) {
+					// variant name is $variant_and_url[0] and font asset url is $variant_and_url[1]
+					$file_extension = pathinfo( $variant['src'], PATHINFO_EXTENSION );
+					$file_name      = $font_slug . '_' . $variant['style'] . '_' . $variant['weight'] . '.' . $file_extension;
 
-				// Download font asset in temp folder
-				$temp_file = download_url( $variant['src'] );
+					// Download font asset in temp folder
+					$temp_file = download_url( $variant['src'] );
 
-				if ( $this->has_font_mime_type( $variant['src'] ) ) {
+					if ( $this->has_font_mime_type( $variant['src'] ) ) {
 
-					// Move font asset to theme assets folder
-					rename( $temp_file, get_stylesheet_directory() . '/assets/fonts/' . $file_name );
+						// Move font asset to theme assets folder
+						rename( $temp_file, get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 
-					// Add each variant as one font face
-					$new_font_faces[] = array(
-						'fontFamily' => $google_font_name,
-						'fontStyle'  => $variant['style'],
-						'fontWeight' => $variant['weight'],
-						'src'        => array(
-							'file:./assets/fonts/' . $file_name,
-						),
-					);
+						// Add each variant as one font face
+						$new_font_faces[] = array(
+							'fontFamily' => $google_font_name,
+							'fontStyle'  => $variant['style'],
+							'fontWeight' => $variant['weight'],
+							'src'        => array(
+								'file:./assets/fonts/' . $file_name,
+							),
+						);
+					}
 				}
-			}
+				$this->add_or_update_theme_font_faces( $google_font_name, $font_slug, $new_font_faces );
 
-			$this->add_or_update_theme_font_faces( $google_font_name, $font_slug, $new_font_faces );
+			}
 
 			add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );
 		}

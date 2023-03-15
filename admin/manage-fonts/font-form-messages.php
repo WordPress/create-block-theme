@@ -5,8 +5,12 @@ class Font_Form_Messages {
 		$theme_name  = wp_get_theme()->get( 'Name' );
 		$font_family = '';
 		if ( isset( $_POST['selection-data'] ) ) {
-			$data        = json_decode( stripslashes( $_POST['selection-data'] ), true );
-			$font_family = $data['family'];
+			$data       = json_decode( stripslashes( $_POST['selection-data'] ), true );
+			$font_names = array();
+			foreach ( $data as $font_family ) {
+				$font_names[] = $font_family['family'];
+			}
+			$font_family = implode( ', ', $font_names );
 		}
 		if ( isset( $_POST['font-name'] ) ) {
 			$font_family = $_POST['font-name'];

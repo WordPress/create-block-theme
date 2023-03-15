@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import Demo from '../demo-text-input/demo';
 const { __ } = wp.i18n;
 
-function FontFace( { face, deleteFontFace, shouldBeRemoved, isFamilyOpen } ) {
+function FontFace( { face, deleteFont, shouldBeRemoved, isFamilyOpen } ) {
 	const demoStyles = {
 		fontFamily: face.fontFamily,
 		fontStyle: face.fontStyle,
@@ -26,11 +26,11 @@ function FontFace( { face, deleteFontFace, shouldBeRemoved, isFamilyOpen } ) {
 			<td className="demo-cell">
 				<Demo style={ demoStyles } />
 			</td>
-			{ deleteFontFace && (
+			{ deleteFont && (
 				<td>
 					<Button
 						variant="tertiary"
-						onClick={ deleteFontFace }
+						onClick={ deleteFont }
 						tabindex={ isFamilyOpen ? 0 : -1 }
 					>
 						{ __( 'Remove', 'create-block-theme' ) }

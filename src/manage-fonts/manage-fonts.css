@@ -26,12 +26,13 @@
 }
 
 .font-families > table > thead .variants-count {
-	font-size: 0.8rem;
+	font-size: 0.7rem;
 	font-weight: 400;
+	color: #7e7e7e;
 }
 
 .font-families > table > thead td {
-	font-size: 1.1rem;
+	font-size: 0.9rem;
 }
 
 .font-family-contents .slide {

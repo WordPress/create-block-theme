@@ -4,12 +4,7 @@ import FontFace from './font-face';
 import { ManageFontsContext } from '../fonts-context';
 
 const { __, _n } = wp.i18n;
-function FontFamily( {
-	fontFamily,
-	fontFamilyIndex,
-	deleteFontFamily,
-	deleteFontFace,
-} ) {
+function FontFamily( { fontFamily, deleteFont } ) {
 	const { familiesOpen, handleToggleFamily } =
 		useContext( ManageFontsContext );
 	const isOpen =
@@ -57,7 +52,9 @@ function FontFamily( {
 								variant="tertiary"
 								onClick={ ( e ) => {
 									e.stopPropagation();
-									deleteFontFamily( fontFamilyIndex );
+									deleteFont(
+										fontFamily.name || fontFamily.fontFamily
+									);
 								} }
 							>
 								{ __(
@@ -109,15 +106,13 @@ function FontFamily( {
 											return (
 												<FontFace
 													face={ fontFace }
-													fontFamilyIndex={
-														fontFamilyIndex
-													}
-													fontFaceIndex={ i }
 													key={ `fontface${ i }` }
-													deleteFontFace={ () =>
-														deleteFontFace(
-															fontFamilyIndex,
-															i
+													deleteFont={ () =>
+														deleteFont(
+															fontFamily.name ||
+																fontFamily.fontFamily,
+															fontFace.fontWeight,
+															fontFace.fontStyle
 														)
 													}
 													isFamilyOpen={ isOpen }
