@@ -5,6 +5,26 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 
 function ConfirmDeleteModal( { isOpen, onConfirm, onCancel, fontToDelete } ) {
+	const deleteFontFaceMessage = sprintf(
+		// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
+		__(
+			`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
+			'create-block-theme'
+		),
+		fontToDelete?.weight,
+		fontToDelete?.style,
+		fontToDelete?.fontFamily
+	);
+
+	const deleteFontFamilyMessage = sprintf(
+		// translators: %s: Font Family
+		__(
+			`Are you sure you want to delete "%s" from your theme?`,
+			'create-block-theme'
+		),
+		fontToDelete?.fontFamily
+	);
+
 	return (
 		<ConfirmDialog
 			isOpen={ isOpen }
@@ -13,29 +33,9 @@ function ConfirmDeleteModal( { isOpen, onConfirm, onCancel, fontToDelete } ) {
 		>
 			{ fontToDelete?.weight !== undefined &&
 			fontToDelete.style !== undefined ? (
-				<h3>
-					{ sprintf(
-						// translators: %1$s: Font Style, %2$s: Font Weight, %3$s: Font Family
-						__(
-							`Are you sure you want to delete "%1$s - %2$s" variant of "%3$s" from your theme?`,
-							'create-block-theme'
-						),
-						fontToDelete?.weight,
-						fontToDelete?.style,
-						fontToDelete?.fontFamily
-					) }
-				</h3>
+				<h3>{ deleteFontFaceMessage }</h3>
 			) : (
-				<h3>
-					{ sprintf(
-						// translators: %s: Font Family
-						__(
-							`Are you sure you want to delete "%s" from your theme?`,
-							'create-block-theme'
-						),
-						fontToDelete?.fontFamily
-					) }
-				</h3>
+				<h3>{ deleteFontFamilyMessage }</h3>
 			) }
 			<p>
 				{ __(
