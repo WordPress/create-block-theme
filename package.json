@@ -1,72 +1,72 @@
 {
-	"name": "create-block-theme",
-	"version": "1.6.3",
-	"private": true,
-	"description": "Create a block-based theme",
-	"author": "The WordPress Contributors",
-	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"WordPress",
-		"block"
-	],
-	"homepage": "https://wordpress.org/plugins/create-block-theme/",
-	"repository": "git+https://github.com/WordPress/create-block-theme.git",
-	"bugs": {
-		"url": "https://wordpress.org/support/plugin/create-block-theme/"
-	},
-	"engines": {
-		"node": ">=16.9.1",
-		"npm": ">=7 <8"
-	},
-	"main": "build/index.js",
-	"dependencies": {
-		"@wordpress/icons": "^9.17.0",
-		"lib-font": "^2.4.0"
-	},
-	"devDependencies": {
-		"@actions/core": "^1.10.0",
-		"@emotion/babel-plugin": "^11.10.5",
-		"@wordpress/browserslist-config": "^5.8.0",
-		"@wordpress/element": "^5.2.0",
-		"@wordpress/prettier-config": "^2.9.0",
-		"@wordpress/scripts": "^25.2.0",
-		"@wordpress/stylelint-config": "^21.9.0",
-		"babel-plugin-inline-json-import": "^0.3.2",
-		"husky": "^8.0.3",
-		"lint-staged": "^13.1.0",
-		"prettier": "npm:wp-prettier@2.6.2",
-		"semver": "^7.3.8",
-		"simple-git": "^3.14.1"
-	},
-	"scripts": {
-		"build": "wp-scripts build",
-		"format": "wp-scripts format",
-		"lint:css": "wp-scripts lint-style",
-		"lint:css:fix": "npm run lint:css -- --fix",
-		"lint:js": "wp-scripts lint-js",
-		"lint:js:fix": "npm run lint:js -- --fix",
-		"lint:php": "composer run-script lint",
-		"lint:php:fix": "composer run-script format",
-		"packages-update": "wp-scripts packages-update",
-		"start": "wp-scripts start",
-		"update-version": "node update-version-and-changelog.js",
-		"prepare": "husky install"
-	},
-	"lint-staged": {
-		"*.{js,json,yml}": [
-			"wp-scripts format"
-		],
-		"*.js": [
-			"npm run lint:js"
-		],
-		"*.{css,scss}": [
-			"npm run lint:css"
-		],
-		"*.php": [
-			"npm run lint:php"
-		],
-		"package.json": [
-			"wp-scripts lint-pkg-json"
-		]
-	}
+  "name": "create-block-theme",
+  "version": "1.7.0",
+  "private": true,
+  "description": "Create a block-based theme",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "WordPress",
+    "block"
+  ],
+  "homepage": "https://wordpress.org/plugins/create-block-theme/",
+  "repository": "git+https://github.com/WordPress/create-block-theme.git",
+  "bugs": {
+    "url": "https://wordpress.org/support/plugin/create-block-theme/"
+  },
+  "engines": {
+    "node": ">=16.9.1",
+    "npm": ">=7 <8"
+  },
+  "main": "build/index.js",
+  "dependencies": {
+    "@wordpress/icons": "^9.17.0",
+    "lib-font": "^2.4.0"
+  },
+  "devDependencies": {
+    "@actions/core": "^1.10.0",
+    "@emotion/babel-plugin": "^11.10.5",
+    "@wordpress/browserslist-config": "^5.8.0",
+    "@wordpress/element": "^5.2.0",
+    "@wordpress/prettier-config": "^2.9.0",
+    "@wordpress/scripts": "^25.2.0",
+    "@wordpress/stylelint-config": "^21.9.0",
+    "babel-plugin-inline-json-import": "^0.3.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "prettier": "npm:wp-prettier@2.6.2",
+    "semver": "^7.3.8",
+    "simple-git": "^3.14.1"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:css:fix": "npm run lint:css -- --fix",
+    "lint:js": "wp-scripts lint-js",
+    "lint:js:fix": "npm run lint:js -- --fix",
+    "lint:php": "composer run-script lint",
+    "lint:php:fix": "composer run-script format",
+    "packages-update": "wp-scripts packages-update",
+    "start": "wp-scripts start",
+    "update-version": "node update-version-and-changelog.js",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{js,json,yml}": [
+      "wp-scripts format"
+    ],
+    "*.js": [
+      "npm run lint:js"
+    ],
+    "*.{css,scss}": [
+      "npm run lint:css"
+    ],
+    "*.php": [
+      "npm run lint:php"
+    ],
+    "package.json": [
+      "wp-scripts lint-pkg-json"
+    ]
+  }
 }
