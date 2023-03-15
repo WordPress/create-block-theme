@@ -159,20 +159,22 @@ function GoogleFonts() {
 	return (
 		<FontsPageLayout>
 			<main>
-				<h1 className="wp-heading-inline">
+				<header>
 					<BackButton />
-					{ __(
-						'Add Google fonts to your theme',
-						'create-block-theme'
-					) }
-				</h1>
-				<h3>
-					{ __(
-						'Add Google fonts assets and font face definitions to your currently active theme',
-						'create-block-theme'
-					) }{ ' ' }
-					({ theme?.name.rendered })
-				</h3>
+					<h1 className="wp-heading-inline">
+						{ __(
+							'Add Google fonts to your theme',
+							'create-block-theme'
+						) }
+					</h1>
+					<p>
+						{ __(
+							'Add Google fonts assets and font face definitions to your currently active theme',
+							'create-block-theme'
+						) }{ ' ' }
+						({ theme?.name.rendered })
+					</p>
+				</header>
 				{ ! googleFontsData?.items && (
 					<p>
 						<Spinner />
