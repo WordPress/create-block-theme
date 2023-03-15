@@ -108,7 +108,7 @@ function FontFamily( {
 											}
 											return (
 												<FontFace
-													{ ...fontFace }
+													face={ fontFace }
 													fontFamilyIndex={
 														fontFamilyIndex
 													}
@@ -127,7 +127,7 @@ function FontFamily( {
 									) }
 								{ ! hasFontFaces && fontFamily.fontFamily && (
 									<FontFace
-										{ ...fontFamily }
+										face={ fontFamily }
 										isFamilyOpen={ isOpen }
 									/>
 								) }
