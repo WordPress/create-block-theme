@@ -127,8 +127,8 @@ function ManageFonts() {
 	// format the theme fonts object to be used by the FontsSidebar component
 	const fontsOutline = newThemeFonts.reduce( ( acc, fontFamily ) => {
 		acc[ fontFamily.fontFamily ] = {
-			family: fontFamily.fontFamily,
-			faces: fontFamily.fontFace.map( ( face ) => {
+			family: fontFamily.name || fontFamily.fontFamily,
+			faces: ( fontFamily.fontFace || [] ).map( ( face ) => {
 				return {
 					weight: face.fontWeight,
 					style: face.fontStyle,

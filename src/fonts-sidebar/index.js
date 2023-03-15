@@ -84,21 +84,29 @@ function FontsSidebar( {
 													</span>
 													<div>
 														<span className="variants">
-															({ ' ' }
-															{
-																fontsOutline[
-																	key
-																].faces.length
-															}{ ' ' }
-															{ _n(
-																'Variant',
-																'Variants',
-																fontsOutline[
-																	key
-																].faces.length,
-																'create-block-theme'
-															) }{ ' ' }
-															)
+															{ !! fontsOutline[
+																key
+															].faces.length && (
+																<>
+																	({ ' ' }
+																	{
+																		fontsOutline[
+																			key
+																		].faces
+																			.length
+																	}{ ' ' }
+																	{ _n(
+																		'Variant',
+																		'Variants',
+																		fontsOutline[
+																			key
+																		].faces
+																			.length,
+																		'create-block-theme'
+																	) }{ ' ' }
+																	)
+																</>
+															) }
 														</span>
 														<Button
 															icon={ trash }
