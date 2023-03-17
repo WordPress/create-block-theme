@@ -3,6 +3,8 @@ import {
 	RangeControl,
 	SelectControl,
 	// eslint-disable-next-line
+	__experimentalNumberControl as NumberControl,
+	// eslint-disable-next-line
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -47,14 +49,30 @@ function DemoTextInput() {
 					onChange={ handleDemoTextChange }
 				/>
 
-				<div>
-					<RangeControl
+				<div className="font-size-input">
+					<NumberControl
 						label={ __( 'Font size (px)', 'create-block-theme' ) }
+						aria-label={ __(
+							'Font size (px)',
+							'create-block-theme'
+						) }
+						inputMode="decimal"
+						max={ 140 }
+						min={ 8 }
+						onChange={ handleDemoFontSizeChange }
+						shiftStep={ 1 }
+						value={ demoFontSize }
+					/>
+					<RangeControl
+						aria-label={ __(
+							'Font size (px)',
+							'create-block-theme'
+						) }
 						value={ demoFontSize }
 						onChange={ handleDemoFontSizeChange }
 						min={ 8 }
 						max={ 140 }
-						withInputField={ true }
+						withInputField={ false }
 					/>
 				</div>
 

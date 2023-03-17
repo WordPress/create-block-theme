@@ -25,3 +25,17 @@
 	margin-left: unset !important;
 	margin-right: 1rem;
 }
+
+.font-size-input {
+	display: flex;
+}
+
+.font-size-input .components-number-control {
+	flex: 2;
+}
+
+.font-size-input .components-range-control {
+	flex: 3;
+	align-self: flex-end;
+	padding-left: 5px;
+}
