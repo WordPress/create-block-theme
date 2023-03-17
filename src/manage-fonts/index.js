@@ -24,7 +24,7 @@ function ManageFonts() {
 	// The theme font list coming from the server as JSON
 	const themeFontsJsonValue = themeFontsJsonElement.innerHTML;
 
-	const themeFontsJson = JSON.parse( themeFontsJsonValue );
+	const themeFontsJson = JSON.parse( themeFontsJsonValue ) || [];
 
 	// The client-side theme font list is initizaliased with the server-side theme font list
 	const [ newThemeFonts, setNewThemeFonts ] = useState( themeFontsJson );
@@ -156,15 +156,24 @@ function ManageFonts() {
 
 					<DemoTextInput />
 
-					<div className="font-families">
-						{ newThemeFonts.map( ( fontFamily, i ) => (
-							<FontFamily
-								fontFamily={ fontFamily }
-								key={ `fontfamily${ i }` }
-								deleteFont={ requestDeleteConfirmation }
-							/>
-						) ) }
-					</div>
+					{ newThemeFonts.length === 0 ? (
+						<p>
+							{ __(
+								'There are no font families defined in your theme.json file.',
+								'create-block-theme'
+							) }
+						</p>
+					) : (
+						<div className="font-families">
+							{ newThemeFonts.map( ( fontFamily, i ) => (
+								<FontFamily
+									fontFamily={ fontFamily }
+									key={ `fontfamily${ i }` }
+									deleteFont={ requestDeleteConfirmation }
+								/>
+							) ) }
+						</div>
+					) }
 
 					<form method="POST" id="manage-fonts-form">
 						<input
