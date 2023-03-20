@@ -48,7 +48,7 @@ class Create_Block_Theme_Admin {
 	}
 
 	function save_variation( $export_type, $theme ) {
-		Theme_Json::add_theme_json_variation_to_local( $export_type, $theme );
+		Theme_Json::add_theme_json_variation_to_local( 'variation', $theme );
 	}
 
 	/**
