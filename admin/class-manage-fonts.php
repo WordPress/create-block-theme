@@ -146,6 +146,7 @@ class Manage_Fonts_Admin {
 			wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) &&
 			! empty( $_FILES['font-file'] ) &&
 			! empty( $_POST['font-name'] ) &&
+			! empty( $_POST['font-weight'] ) &&
 			! empty( $_POST['font-style'] ) &&
 			$this->has_file_and_user_permissions()
 		) {
@@ -161,15 +162,12 @@ class Manage_Fonts_Admin {
 
 				$uploaded_font_face = array(
 					'fontFamily' => $_POST['font-name'],
+					'fontWeight' => $_POST['font-weight'],
 					'fontStyle'  => $_POST['font-style'],
 					'src'        => array(
 						'file:./assets/fonts/' . $file_name,
 					),
 				);
-
-				if ( ! empty( $_POST['font-weight'] ) ) {
-					$uploaded_font_face['fontWeight'] = $_POST['font-weight'];
-				}
 
 				if ( ! empty( $_POST['font-variation-settings'] ) ) {
 					// replace escaped single quotes with single quotes

@@ -34,14 +34,9 @@ function LocalFonts() {
 	};
 
 	const isFormValid = () => {
-		const isValid = formData.file && formData.name && formData.style;
-
-		// if the font is not variable weight, the weight is required
-		if ( ! formData.variableWeight ) {
-			return isValid && formData.weight;
-		}
-
-		return isValid;
+		return (
+			formData.file && formData.name && formData.weight && formData.style
+		);
 	};
 
 	const demoStyle = () => {

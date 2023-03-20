@@ -60,11 +60,14 @@ function UploadFontForm( {
 
 				// Variable fonts info
 				const isVariable = !! font.opentype.tables.fvar;
-				const isVariableWeight =
+				const weightAxis =
 					isVariable &&
-					!! font.opentype.tables.fvar.axes.find(
+					font.opentype.tables.fvar.axes.find(
 						( { tag } ) => tag === 'wght'
 					);
+				const weightRange = !! weightAxis
+					? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
+					: null;
 				const axes = isVariable
 					? font.opentype.tables.fvar.axes.reduce(
 							(
@@ -88,9 +91,8 @@ function UploadFontForm( {
 					file,
 					name: fontName,
 					style: isItalic ? 'italic' : 'normal',
-					...( ! isVariableWeight ? { weight: fontWeight } : {} ),
+					weight: !! weightAxis ? weightRange : fontWeight,
 					variable: isVariable,
-					variableWeight: isVariableWeight,
 				} );
 				setAxes( axes );
 			};
@@ -170,27 +172,16 @@ function UploadFontForm( {
 						type="text"
 						name="font-weight"
 						id="font-weight"
-						placeholder={
-							! formData.variableWeight
-								? __( 'Font weight:', 'create-block-theme' )
-								: ''
-						}
+						placeholder={ __(
+							'Font weight:',
+							'create-block-theme'
+						) }
 						value={ formData.weight || '' }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, weight: val } )
 						}
 						// Disable the input if the font is a variable font with the wght axis
-						disabled={ formData.variableWeight }
 					/>
-					{ formData.variableWeight && (
-						<small>
-							{  }
-							{ __(
-								'This font is a variable font with the wght axis, for this reason the font weight selector is disabled',
-								'create-block-theme'
-							) }
-						</small>
-					) }
 				</div>
 
 				{ formData.variable && (
