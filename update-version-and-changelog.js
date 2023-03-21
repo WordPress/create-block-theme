@@ -1,7 +1,9 @@
-const semver = require( 'semver' );
+/* eslint-disable no-console */
 const fs = require( 'fs' );
 const core = require( '@actions/core' );
 const simpleGit = require( 'simple-git' );
+const { promisify } = require( 'util' );
+const exec = promisify( require( 'child_process' ).exec );
 
 const git = simpleGit.default();
 
@@ -28,49 +30,45 @@ async function getHasChangesSinceGitTag( tag ) {
 
 async function updateVersion() {
 	if ( ! VALID_RELEASE_TYPES.includes( releaseType ) ) {
-		// TODO: show in UI and remove console statement
-		// eslint-disable-next-line
 		console.error(
-			'❎  Error: Release type is not valid. Valid release types are: major, minor, patch.'
+			'❌ Error: Release type is not valid. Valid release types are: major, minor, patch.'
 		);
 		process.exit( 1 );
 	}
 
-	if ( ! fs.existsSync( './package.json' ) ) {
-		// TODO: show in UI and remove console statement
-		// eslint-disable-next-line
-		console.error( '❎  Error: package.json file not found.' );
+	if (
+		! fs.existsSync( './package.json' ) ||
+		! fs.existsSync( './package-lock.json' )
+	) {
+		console.error( '❌ Error: package.json or lock file not found.' );
 		process.exit( 1 );
 	}
 
 	if ( ! fs.existsSync( './readme.txt' ) ) {
-		// TODO: show in UI and remove console statement
-		// eslint-disable-next-line
-		console.error( '❎  Error: readme.txt file not found.' );
+		console.error( '❌ Error: readme.txt file not found.' );
 		process.exit( 1 );
 	}
 
 	if ( ! fs.existsSync( './create-block-theme.php' ) ) {
-		// TODO: show in UI and remove console statement
-		// eslint-disable-next-line
-		console.error( '❎  Error: create-block-theme.php file not found.' );
+		console.error( '❌ Error: create-block-theme.php file not found.' );
 		process.exit( 1 );
 	}
 
 	const packageJson = require( './package.json' );
 	const currentVersion = packageJson.version;
-	const newVersion = semver.inc( currentVersion, releaseType );
-	const currentTag = `v${ currentVersion }`;
-	const newTag = `v${ newVersion }`;
 
-	if ( ! semver.valid( currentTag ) ) {
-		// TODO: show in UI and remove console statement
-		// eslint-disable-next-line
-		console.error(
-			`❎  Error: current tag ( ${ currentTag } ) is not a valid semver version."`
-		);
+	// version bump package.json and package-lock.json using npm
+	const { stdout, stderr } = await exec(
+		`npm version --commit-hooks false --git-tag-version false ${ releaseType }`
+	);
+	if ( stderr ) {
+		console.error( `❌ Error: failed to bump the version."` );
 		process.exit( 1 );
 	}
+
+	const currentTag = `v${ currentVersion }`;
+	const newTag = stdout.trim();
+	const newVersion = newTag.replace( 'v', '' );
 
 	// get changes since last tag
 	const changes = await getChangesSinceGitTag( currentTag );
@@ -78,22 +76,16 @@ async function updateVersion() {
 
 	// check if there are any changes
 	if ( ! hasChangesSinceGitTag ) {
-		// TODO: show in UI and remove console statement
-		// eslint-disable-next-line
 		console.error(
-			'❎  No changes since last tag. There is nothing to release.'
+			'❌ No changes since last tag. There is nothing to release.'
+		);
+		// revert version update
+		await exec(
+			`npm version --commit-hooks false --git-tag-version false ${ currentVersion }`
 		);
 		process.exit( 1 );
 	}
 
-	// update package.json version
-	packageJson.version = newVersion;
-	fs.writeFileSync(
-		'./package.json',
-		JSON.stringify( packageJson, null, 2 )
-	);
-	// TODO: show in UI and remove console statement
-	// eslint-disable-next-line
 	console.info( '✅ Version updated', currentTag, '=>', newTag );
 
 	// update readme.txt version with the new changelog
@@ -109,8 +101,6 @@ async function updateVersion() {
 		`Stable tag: ${ newVersion }`
 	);
 	fs.writeFileSync( './readme.txt', newReadme );
-	// TODO: show in UI and remove console statement
-	// eslint-disable-next-line
 	console.info( '✅  Readme version updated', currentTag, '=>', newTag );
 
 	// update create-block-theme.php version
@@ -120,8 +110,6 @@ async function updateVersion() {
 		`Version: ${ newVersion }`
 	);
 	fs.writeFileSync( './create-block-theme.php', newPluginPhpFile );
-	// TODO: show in UI and remove console statement
-	// eslint-disable-next-line
 	console.info(
 		'✅  create-block-theme.php file version updated',
 		currentTag,
