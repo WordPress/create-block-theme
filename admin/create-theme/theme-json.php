@@ -27,9 +27,16 @@ class Theme_Json {
 
 		$_POST['theme']['variation_slug'] = $variation_slug;
 
+		$extra_theme_data = array(
+			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'title'   => $theme['variation'],
+		);
+
+		$variation_theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type, $extra_theme_data );
+
 		file_put_contents(
 			$variation_path . $variation_slug . '.json',
-			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
+			$variation_theme_json
 		);
 	}
 }
