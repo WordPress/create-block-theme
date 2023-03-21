@@ -14,11 +14,13 @@ function augment_resolver_with_utilities() {
 		 * Export the combined (and flattened) THEME and CUSTOM data.
 		 *
 		 * @param string $content ['all', 'current', 'user'] Determines which settings content to include in the export.
+		 * @param array $extra_theme_data Any theme json extra data to be included in the export.
 		 * All options include user settings.
 		 * 'current' will include settings from the currently installed theme but NOT from the parent theme.
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
+		 * 'variation' will include just the user custom styles and settings.
 		 */
-		public static function export_theme_data( $content ) {
+		public static function export_theme_data( $content, $extra_theme_data ) {
 			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
 				$theme = new WP_Theme_JSON_Gutenberg();
 			} else {
@@ -65,6 +67,16 @@ function augment_resolver_with_utilities() {
 				$theme->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
 			} else {
 				$theme->merge( static::get_user_data() );
+			}
+
+			// Merge the extra theme data received as a parameter
+			if ( ! empty( $extra_theme_data ) ) {
+				if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
+					$extra_data = new WP_Theme_JSON_Gutenberg( $extra_theme_data );
+				} else {
+					$extra_data = new WP_Theme_JSON( $extra_theme_data );
+				}
+				$theme->merge( $extra_data );
 			}
 
 			$data = $theme->get_data();
