@@ -71,13 +71,21 @@ async function updateVersion() {
 	const newVersion = newTag.replace( 'v', '' );
 
 	// get changes since last tag
-	const changes = await getChangesSinceGitTag( currentTag );
-	const hasChangesSinceGitTag = await getHasChangesSinceGitTag( currentTag );
+	let changes = [];
+	let hasChangesSinceGitTag = false;
+	try {
+		changes = await getChangesSinceGitTag( currentTag );
+		hasChangesSinceGitTag = await getHasChangesSinceGitTag( currentTag );
+	} catch ( e ) {
+		console.error(
+			`❌ Error: failed to get changes since last tag. Verify that the tag ${ currentTag } exists in the git repo.`
+		);
+	}
 
 	// check if there are any changes
 	if ( ! hasChangesSinceGitTag ) {
 		console.error(
-			'❌ No changes since last tag. There is nothing to release.'
+			`❌ No changes since last tag (${ currentTag }). There is nothing new to release.`
 		);
 		// revert version update
 		await exec(
@@ -86,7 +94,7 @@ async function updateVersion() {
 		process.exit( 1 );
 	}
 
-	console.info( '✅ Version updated', currentTag, '=>', newTag );
+	console.info( '✅ Package.json version updated', currentTag, '=>', newTag );
 
 	// update readme.txt version with the new changelog
 	const readme = fs.readFileSync( './readme.txt', 'utf8' );
