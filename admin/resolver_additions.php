@@ -20,7 +20,7 @@ function augment_resolver_with_utilities() {
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
 		 * 'variation' will include just the user custom styles and settings.
 		 */
-		public static function export_theme_data( $content, $extra_theme_data ) {
+		public static function export_theme_data( $content, $extra_theme_data = null ) {
 			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
 				$theme = new WP_Theme_JSON_Gutenberg();
 			} else {
