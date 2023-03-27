@@ -29,6 +29,21 @@ class Create_Block_Theme_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'blockbase_save_theme' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ));
+	}
+
+	function create_block_theme_enqueue() {
+		$asset_file = include( plugin_dir_path( dirname( __FILE__ ) ) . 'build/editor.asset.php');
+	
+		wp_register_script(
+			'create-block-theme-slot-fill',
+			plugins_url( 'build/editor.js', dirname( __FILE__ ) ),
+			$asset_file['dependencies'],
+			$asset_file['version']
+		);
+		wp_enqueue_script(
+			'create-block-theme-slot-fill',
+		);
 	}
 
 	function create_admin_menu() {
