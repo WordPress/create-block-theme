@@ -137,15 +137,12 @@ class Theme_Media {
 
 	public static function add_media_to_local( $media ) {
 		foreach ( $media as $url ) {
-			$download_file = file_get_contents( $url );
+			$download_file = download_url( $url );
 			$media_path    = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
 			if ( ! is_dir( $media_path ) ) {
 				wp_mkdir_p( $media_path );
 			}
-			file_put_contents(
-				$media_path . basename( $url ),
-				$download_file
-			);
+			rename( $download_file, $media_path . basename( $url ) );
 		}
 	}
 }
