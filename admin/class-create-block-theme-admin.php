@@ -30,6 +30,7 @@ class Create_Block_Theme_Admin {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'blockbase_save_theme' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ));
+		add_action( 'rest_api_init', array( $this, 'register_theme_export' ));
 	}
 
 	function create_block_theme_enqueue() {
@@ -202,9 +203,27 @@ class Create_Block_Theme_Admin {
 		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
-		echo readfile( $filename );
-		die();
+		readfile( $filename );
+		unlink( $filename );
+		exit;
 	}
+
+	function rest_export_theme( $request ) {
+		$theme = $request->get_params();
+		$this->clone_theme($theme, null);
+	}
+
+	public function register_theme_export() {
+		register_rest_route('create-block-theme/v1', '/export', array(
+			'methods' => 'POST',
+			'callback' => array( $this, 'rest_export_theme' ),
+			'permission_callback' => function () {
+				return true;
+				// return current_user_can( 'edit_theme_options' );
+			}
+		));
+	}
+
 	/**
 	 * Create a child theme of the activated theme
 	 */
