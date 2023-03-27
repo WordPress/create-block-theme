@@ -29,13 +29,13 @@ class Create_Block_Theme_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'blockbase_save_theme' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ));
-		add_action( 'rest_api_init', array( $this, 'register_theme_export' ));
+		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ) );
+		add_action( 'rest_api_init', array( $this, 'register_theme_export' ) );
 	}
 
 	function create_block_theme_enqueue() {
-		$asset_file = include( plugin_dir_path( dirname( __FILE__ ) ) . 'build/editor.asset.php');
-	
+		$asset_file = include( plugin_dir_path( dirname( __FILE__ ) ) . 'build/editor.asset.php' );
+
 		wp_register_script(
 			'create-block-theme-slot-fill',
 			plugins_url( 'build/editor.js', dirname( __FILE__ ) ),
@@ -210,18 +210,22 @@ class Create_Block_Theme_Admin {
 
 	function rest_export_theme( $request ) {
 		$theme = $request->get_params();
-		$this->clone_theme($theme, null);
+		$this->clone_theme( $theme, null );
 	}
 
 	public function register_theme_export() {
-		register_rest_route('create-block-theme/v1', '/export', array(
-			'methods' => 'POST',
-			'callback' => array( $this, 'rest_export_theme' ),
-			'permission_callback' => function () {
-				return true;
-				// return current_user_can( 'edit_theme_options' );
-			}
-		));
+		register_rest_route(
+			'create-block-theme/v1',
+			'/export',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_export_theme' ),
+				'permission_callback' => function () {
+					return true;
+					// return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
 	}
 
 	/**
