@@ -65,7 +65,7 @@ class Create_Block_Theme_Admin {
 	}
 
 	function save_theme_locally( $export_type ) {
-		Theme_Templates::add_templates_to_local( $export_type );
+		Theme_Templates::add_templates_to_dest( $export_type );
 		Theme_Json::add_theme_json_to_local( $export_type );
 	}
 
@@ -83,7 +83,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
+		$zip = Theme_Utils::copy_theme_to_dest( $zip, null, null );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
 
@@ -118,7 +118,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
+		$zip = Theme_Utils::copy_theme_to_dest( $zip, $theme['slug'], $theme['name'] );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
 
@@ -180,49 +180,51 @@ class Create_Block_Theme_Admin {
 			$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
 		}
 
-		// Create ZIP file in the temporary directory.
-		$filename = tempnam( get_temp_dir(), $theme['slug'] );
-		$zip      = Theme_Zip::create_zip( $filename );
+		// Create theme directory.
+		$source           = get_stylesheet_directory();
+		$cloned_theme_dir = dirname( $source ) . DIRECTORY_SEPARATOR . $theme['slug'];
+		if ( ! file_exists( $cloned_theme_dir ) ) {
+			wp_mkdir_p( $cloned_theme_dir );
 
-		$zip = Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
-
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', $theme['slug'] );
-		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
-
-		// Add readme.txt.
-		$zip->addFromString(
-			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
-		);
-
-		// Augment style.css
-		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
-		// Remove metadata from style.css file
-		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
-		// Add new metadata
-		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
-		$zip->addFromString(
-			'style.css',
-			$css_contents
-		);
-
-		// Add / replace screenshot.
-		if ( $this->is_valid_screenshot( $screenshot ) ) {
-			$zip->addFile(
-				$screenshot['tmp_name'],
-				'screenshot.png'
+			// Add readme.txt.
+			file_put_contents(
+				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'readme.txt',
+				Theme_Readme::build_readme_txt( $theme )
 			);
+
+			// Augment style.css
+			$css_contents = file_get_contents( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'style.css' );
+			// Remove metadata from style.css file
+			$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
+			// Add new metadata
+			$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+
+			// Add style.css.
+			file_put_contents(
+				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'style.css',
+				$css_contents
+			);
+
+			// Copy theme files.
+			Theme_Utils::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
+
+			// Add theme templates including user modifications.
+			Theme_Templates::add_templates_to_dest( $export_type, $cloned_theme_dir, $theme['slug'] );
+
+			// Add theme.json with user changes.
+			file_put_contents(
+				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'theme.json',
+				MY_Theme_JSON_Resolver::export_theme_data( 'current' )
+			);
+
+			// Overwrite default screenshot if one is provided.
+			if ( $this->is_valid_screenshot( $screenshot ) ) {
+				file_put_contents(
+					$cloned_theme_dir . DIRECTORY_SEPARATOR . 'screenshot.png',
+					file_get_contents( $screenshot['tmp_name'] )
+				);
+			}
 		}
-
-		$zip->close();
-
-		header( 'Content-Type: application/zip' );
-		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
-		header( 'Content-Length: ' . filesize( $filename ) );
-		flush();
-		readfile( $filename );
-		unlink( $filename );
-		exit;
 	}
 
 	function rest_export_theme( $request ) {
@@ -311,7 +313,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
+		$zip = Theme_Utils::copy_theme_to_dest( $zip, null, null );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
 
@@ -340,13 +342,13 @@ class Create_Block_Theme_Admin {
 		$theme['text_domain'] = $theme_slug;
 
 		// Create theme directory.
-		$source           = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
-		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
-		if ( ! file_exists( $blank_theme_path ) ) {
-			wp_mkdir_p( $blank_theme_path );
+		$source          = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
+		$blank_theme_dir = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
+		if ( ! file_exists( $blank_theme_dir ) ) {
+			wp_mkdir_p( $blank_theme_dir );
 			// Add readme.txt.
 			file_put_contents(
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
+				$blank_theme_dir . DIRECTORY_SEPARATOR . 'readme.txt',
 				Theme_Readme::build_readme_txt( $theme )
 			);
 
@@ -355,29 +357,16 @@ class Create_Block_Theme_Admin {
 
 			// Add style.css.
 			file_put_contents(
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css',
+				$blank_theme_dir . DIRECTORY_SEPARATOR . 'style.css',
 				$css_contents
 			);
 
-			$iterator = new \RecursiveIteratorIterator(
-				new \RecursiveDirectoryIterator( $source, \RecursiveDirectoryIterator::SKIP_DOTS ),
-				\RecursiveIteratorIterator::SELF_FIRST
-			);
-
-			foreach (
-				$iterator as $item
-				) {
-				if ( $item->isDir() ) {
-					wp_mkdir_p( $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname() );
-				} else {
-					copy( $item, $blank_theme_path . DIRECTORY_SEPARATOR . $iterator->getSubPathname() );
-				}
-			}
+			Theme_Utils::recursively_iterate_copy( $source, $blank_theme_dir );
 
 			// Overwrite default screenshot if one is provided.
 			if ( $this->is_valid_screenshot( $screenshot ) ) {
 				file_put_contents(
-					$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
+					$blank_theme_dir . DIRECTORY_SEPARATOR . 'screenshot.png',
 					file_get_contents( $screenshot['tmp_name'] )
 				);
 			}
@@ -386,7 +375,7 @@ class Create_Block_Theme_Admin {
 				global $wp_version;
 				$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
 					$schema         = '"$schema": "https://schemas.wp.org/' . $theme_json_version . '/theme.json"';
-				$theme_json_path    = $blank_theme_path . DIRECTORY_SEPARATOR . 'theme.json';
+				$theme_json_path    = $blank_theme_dir . DIRECTORY_SEPARATOR . 'theme.json';
 				$theme_json_string  = file_get_contents( $theme_json_path );
 				$theme_json_string  = str_replace( '"$schema": "https://schemas.wp.org/trunk/theme.json"', $schema, $theme_json_string );
 				file_put_contents( $theme_json_path, $theme_json_string );
@@ -474,8 +463,11 @@ class Create_Block_Theme_Admin {
 				} elseif ( 'clone' === $_POST['theme']['type'] ) {
 					if ( '' === $_POST['theme']['name'] ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+					} elseif ( ! wp_is_writable( get_theme_root() ) ) {
+						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_themes_file_permissions' ) );
 					}
 					$this->clone_theme( $_POST['theme'], $_FILES['screenshot'] );
+					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_clone_success' ) );
 				} else {
 					$this->export_theme( $_POST['theme'] );
 				}

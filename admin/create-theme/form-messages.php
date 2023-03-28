@@ -23,6 +23,14 @@ class Form_Messages {
 		<?php
 	}
 
+	public static function admin_notice_clone_success() {
+		?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php _e( 'Block theme cloned successfully, head over to Appearance > Themes to activate.', 'create-block-theme' ); ?></p>
+			</div>
+		<?php
+	}
+
 	public static function admin_notice_save_success() {
 		?>
 			<div class="notice notice-success is-dismissible">

@@ -99,14 +99,17 @@ class Theme_Templates {
 		}
 	}
 
-	public static function add_templates_to_local( $export_type ) {
+	public static function add_templates_to_dest( $export_type, $theme_dir = null, $slug = null ) {
+		if ( ! $theme_dir ) {
+			$theme_dir = get_stylesheet_directory();
+		}
 
 		$theme_templates  = self::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
 
 		// If there is no templates folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] );
+		if ( ! is_dir( $theme_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'] ) ) {
+			wp_mkdir_p( $theme_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'] );
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
@@ -115,8 +118,8 @@ class Theme_Templates {
 			// If there are images in the template, add it as a pattern
 			if ( ! empty( $template_data->media ) ) {
 				// If there is no templates folder, create it.
-				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' ) ) {
-					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
+				if ( ! is_dir( $theme_dir . DIRECTORY_SEPARATOR . 'patterns' ) ) {
+					wp_mkdir_p( $theme_dir . DIRECTORY_SEPARATOR . 'patterns' );
 				}
 
 				// If there are external images, add it as a pattern
@@ -135,7 +138,7 @@ class Theme_Templates {
 
 			// Write the template content
 			file_put_contents(
-				get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				$theme_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
 				$template_data->content
 			);
 
@@ -145,8 +148,8 @@ class Theme_Templates {
 		}
 
 		// If there is no parts folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] );
+		if ( ! is_dir( $theme_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] ) ) {
+			wp_mkdir_p( $theme_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] );
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
@@ -155,8 +158,8 @@ class Theme_Templates {
 			// If there are images in the template, add it as a pattern
 			if ( ! empty( $template_data->media ) ) {
 				// If there is no templates folder, create it.
-				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' ) ) {
-					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
+				if ( ! is_dir( $theme_dir . DIRECTORY_SEPARATOR . 'patterns' ) ) {
+					wp_mkdir_p( $theme_dir . DIRECTORY_SEPARATOR . 'patterns' );
 				}
 
 				// If there are external images, add it as a pattern
@@ -168,14 +171,14 @@ class Theme_Templates {
 
 				// Write the pattern
 				file_put_contents(
-					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
+					$theme_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
 					$pattern['content']
 				);
 			}
 
 			// Write the template content
 			file_put_contents(
-				get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . $template_data->slug . '.html',
+				$theme_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . $template_data->slug . '.html',
 				$template_data->content
 			);
 
