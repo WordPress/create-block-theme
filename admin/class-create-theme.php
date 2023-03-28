@@ -118,7 +118,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Utils::copy_theme_to_dest( $zip, $theme['slug'], $theme['name'] );
+		$zip = Theme_Zip::copy_theme_to_dest( $zip, $theme['slug'], $theme['name'] );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
 
@@ -206,7 +206,7 @@ class Create_Block_Theme_Admin {
 			);
 
 			// Copy theme files.
-			Theme_Utils::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
+			Theme_Zip::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
 
 			// Add theme templates including user modifications.
 			Theme_Templates::add_templates_to_dest( $export_type, $cloned_theme_dir, $theme['slug'] );
@@ -313,7 +313,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Utils::copy_theme_to_dest( $zip, null, null );
+		$zip = Theme_Zip::copy_theme_to_dest( $zip, null, null );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
 
@@ -361,7 +361,20 @@ class Create_Block_Theme_Admin {
 				$css_contents
 			);
 
-			Theme_Utils::recursively_iterate_copy( $source, $blank_theme_dir );
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator( $source, \RecursiveDirectoryIterator::SKIP_DOTS ),
+				\RecursiveIteratorIterator::SELF_FIRST
+			);
+
+			foreach (
+				$iterator as $item
+				) {
+				if ( $item->isDir() ) {
+					wp_mkdir_p( $blank_theme_dir . DIRECTORY_SEPARATOR . $iterator->getSubPathname() );
+				} else {
+					copy( $item, $blank_theme_dir . DIRECTORY_SEPARATOR . $iterator->getSubPathname() );
+				}
+			}
 
 			// Overwrite default screenshot if one is provided.
 			if ( $this->is_valid_screenshot( $screenshot ) ) {
