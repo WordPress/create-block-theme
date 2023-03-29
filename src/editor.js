@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalVStack as VStack,
+    __experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	PanelBody,
@@ -75,6 +76,7 @@ const ExportTheme = () => {
 						'create-block-theme'
 					) }
 				</Text>
+				<Spacer/>
 				<TextControl
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
@@ -128,9 +130,12 @@ const ExportTheme = () => {
 					) }
 				/>
 			</VStack>
-			<Button variant="secondary" onClick={ handleSubmit }>
+			<Spacer/>
+			<Button variant="secondary" disabled={ ! theme.name } onClick={ handleSubmit }>
 				{ __( 'Export', 'create-block-theme' ) }
 			</Button>
+			<Spacer/>
+			{ ! theme.name && (<Text variant="muted">{ __( 'Theme name is required for export.', 'create-block-theme' ) }</Text>)}
 		</PanelBody>
 	);
 };
