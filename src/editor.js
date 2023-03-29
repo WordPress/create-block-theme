@@ -99,7 +99,7 @@ const ExportTheme = () => {
 						setTheme( { ...theme, uri: value } )
 					}
 					placeholder={ __(
-						'https://github.com/wordpress/twentytwentytwo/',
+						'https://github.com/wordpress/twentytwentythree/',
 						'create-block-theme'
 					) }
 				/>
