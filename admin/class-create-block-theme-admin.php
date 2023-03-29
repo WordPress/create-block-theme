@@ -221,8 +221,7 @@ class Create_Block_Theme_Admin {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_export_theme' ),
 				'permission_callback' => function () {
-					return true;
-					// return current_user_can( 'edit_theme_options' );
+					return current_user_can( 'edit_theme_options' );
 				},
 			)
 		);

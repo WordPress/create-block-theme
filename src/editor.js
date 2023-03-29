@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
 
 const ExportTheme = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -36,13 +37,16 @@ const ExportTheme = () => {
 	}, [] );
 
 	const handleSubmit = () => {
-		fetch( '/wp-json/create-block-theme/v1/export', {
+		const fetchOptions = {
+			path: '/create-block-theme/v1/export',
 			method: 'POST',
+			data: theme,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify( theme ),
-		} )
+			parse: false,
+		};
+		apiFetch( fetchOptions )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => {
 				const url = URL.createObjectURL( blob );
