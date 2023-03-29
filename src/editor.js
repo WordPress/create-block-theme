@@ -1,6 +1,6 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
-import { blockDefault } from '@wordpress/icons';
+import { tool } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -46,21 +46,23 @@ const ExportTheme = () => {
 			},
 			parse: false,
 		};
-		apiFetch( fetchOptions )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => {
-				const url = URL.createObjectURL( blob );
+
+		async function exportTheme() {
+			try {
+				const response = await apiFetch(fetchOptions);
+				const blob = await response.blob();
+				const url = URL.createObjectURL(blob);
 				window.location.href = url;
-			} )
-			.catch( ( error ) => {
+			} catch (error) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
 						? error.message
-						: __(
-								'An error occurred while attempting to export the theme.'
-						  );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
+						: __('An error occurred while attempting to export the theme.');
+				createErrorNotice(errorMessage, { type: 'snackbar' });
+			}
+		}
+		
+		exportTheme();
 	};
 
 	return (
@@ -69,7 +71,7 @@ const ExportTheme = () => {
 			<VStack>
 				<Text variant="muted">
 					{ __(
-						"Make any changes to the current theme's metadata and export as a new theme.",
+						"Export your theme with updated templates and styles.",
 						'create-block-theme'
 					) }
 				</Text>
@@ -125,10 +127,10 @@ const ExportTheme = () => {
 						'create-block-theme'
 					) }
 				/>
-				<Button variant="secondary" onClick={ handleSubmit }>
-					{ __( 'Export', 'create-block-theme' ) }
-				</Button>
 			</VStack>
+			<Button variant="secondary" onClick={ handleSubmit }>
+				{ __( 'Export', 'create-block-theme' ) }
+			</Button>
 		</PanelBody>
 	);
 };
@@ -138,13 +140,13 @@ const CreateBlockThemePlugin = () => {
 		<>
 			<PluginSidebarMoreMenuItem
 				target="create-block-theme-sidebar"
-				icon={ blockDefault }
+				icon={ tool }
 			>
 				{ __( 'Create Block Theme' ) }
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
 				name="create-block-theme-sidebar"
-				icon={ blockDefault }
+				icon={ tool }
 				title={ __( 'Create Block Theme' ) }
 			>
 				<ExportTheme />
