@@ -131,7 +131,7 @@ class Theme_Templates {
 
 				// Write the pattern
 				file_put_contents(
-					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
+					$theme_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
 					$pattern['content']
 				);
 			}

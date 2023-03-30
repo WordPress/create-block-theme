@@ -185,6 +185,9 @@ class Create_Block_Theme_Admin {
 		if ( ! file_exists( $cloned_theme_dir ) ) {
 			wp_mkdir_p( $cloned_theme_dir );
 
+			// Copy theme files.
+			Theme_Zip::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
+
 			// Add readme.txt.
 			file_put_contents(
 				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'readme.txt',
@@ -203,9 +206,6 @@ class Create_Block_Theme_Admin {
 				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'style.css',
 				$css_contents
 			);
-
-			// Copy theme files.
-			Theme_Zip::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
 
 			// Add theme templates including user modifications.
 			Theme_Templates::add_templates_to_dest( $export_type, $cloned_theme_dir, $theme['slug'] );
