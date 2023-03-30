@@ -54,6 +54,11 @@ class Theme_Utils {
 				continue;
 			}
 
+			// Skip directories (they would be added automatically)
+			if ( $file->isDir() ) {
+				continue;
+			}
+
 			// If the path is for templates/parts ignore it
 			if (
 				strpos( $file_path, 'block-template-parts/' ) ||
