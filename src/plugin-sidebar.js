@@ -5,9 +5,13 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
+	// eslint-disable-next-line
 	__experimentalVStack as VStack,
+	// eslint-disable-next-line
 	__experimentalSpacer as Spacer,
+	// eslint-disable-next-line
 	__experimentalText as Text,
+	// eslint-disable-next-line
 	__experimentalHeading as Heading,
 	PanelBody,
 	TextControl,
