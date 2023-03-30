@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalVStack as VStack,
-    __experimentalSpacer as Spacer,
+	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	PanelBody,
@@ -50,19 +50,21 @@ const ExportTheme = () => {
 
 		async function exportTheme() {
 			try {
-				const response = await apiFetch(fetchOptions);
+				const response = await apiFetch( fetchOptions );
 				const blob = await response.blob();
-				const url = URL.createObjectURL(blob);
+				const url = URL.createObjectURL( blob );
 				window.location.href = url;
-			} catch (error) {
+			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
 						? error.message
-						: __('An error occurred while attempting to export the theme.');
-				createErrorNotice(errorMessage, { type: 'snackbar' });
+						: __(
+								'An error occurred while attempting to export the theme.'
+						  );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			}
 		}
-		
+
 		exportTheme();
 	};
 
@@ -72,11 +74,11 @@ const ExportTheme = () => {
 			<VStack>
 				<Text variant="muted">
 					{ __(
-						"Export your theme with updated templates and styles.",
+						'Export your theme with updated templates and styles.',
 						'create-block-theme'
 					) }
 				</Text>
-				<Spacer/>
+				<Spacer />
 				<TextControl
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
@@ -130,12 +132,23 @@ const ExportTheme = () => {
 					) }
 				/>
 			</VStack>
-			<Spacer/>
-			<Button variant="secondary" disabled={ ! theme.name } onClick={ handleSubmit }>
+			<Spacer />
+			<Button
+				variant="secondary"
+				disabled={ ! theme.name }
+				onClick={ handleSubmit }
+			>
 				{ __( 'Export', 'create-block-theme' ) }
 			</Button>
-			<Spacer/>
-			{ ! theme.name && (<Text variant="muted">{ __( 'Theme name is required for export.', 'create-block-theme' ) }</Text>)}
+			<Spacer />
+			{ ! theme.name && (
+				<Text variant="muted">
+					{ __(
+						'Theme name is required for export.',
+						'create-block-theme'
+					) }
+				</Text>
+			) }
 		</PanelBody>
 	);
 };
