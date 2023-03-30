@@ -84,7 +84,7 @@ class Create_Block_Theme_Admin {
 		$zip      = Theme_Zip::create_zip( $filename );
 
 		$zip = Theme_Utils::copy_theme_to_dest( $zip, null, null );
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
+		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', null );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
 
 		$zip->close();
@@ -118,7 +118,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Zip::copy_theme_to_dest( $zip, $theme['slug'], $theme['name'] );
+		$zip = Theme_Utils::copy_theme_to_dest( $zip, $theme['slug'], $theme['name'] );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
 
@@ -186,7 +186,7 @@ class Create_Block_Theme_Admin {
 			wp_mkdir_p( $cloned_theme_dir );
 
 			// Copy theme files.
-			Theme_Zip::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
+			Theme_Utils::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
 
 			// Add readme.txt.
 			file_put_contents(
@@ -312,7 +312,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Zip::copy_theme_to_dest( $zip, null, null );
+		$zip = Theme_Utils::copy_theme_to_dest( $zip, null, null );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
 
