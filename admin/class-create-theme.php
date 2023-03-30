@@ -160,9 +160,8 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Clone the activated theme to create a new theme
 	 */
-	function clone_theme( $theme, $screenshot ) {
+	function clone_theme( $export_type, $theme, $screenshot ) {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
-
 		// Sanitize inputs.
 		$theme['name']           = sanitize_text_field( $theme['name'] );
 		$theme['description']    = sanitize_text_field( $theme['description'] );
@@ -214,7 +213,7 @@ class Create_Block_Theme_Admin {
 			// Add theme.json with user changes.
 			file_put_contents(
 				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'theme.json',
-				MY_Theme_JSON_Resolver::export_theme_data( 'current' )
+				MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 			);
 
 			// Overwrite default screenshot if one is provided.
@@ -479,7 +478,7 @@ class Create_Block_Theme_Admin {
 					} elseif ( ! wp_is_writable( get_theme_root() ) ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_themes_file_permissions' ) );
 					}
-					$this->clone_theme( $_POST['theme'], $_FILES['screenshot'] );
+					$this->clone_theme( 'current', $_POST['theme'], $_FILES['screenshot'] );
 					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_clone_success' ) );
 				} else {
 					$this->export_theme( $_POST['theme'] );
