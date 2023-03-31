@@ -156,9 +156,12 @@ class Theme_Zip {
 	static function add_media_to_zip( $zip, $media ) {
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
-			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
-			$download_file = file_get_contents( $url );
-			$zip->addFromString( $folder_path . basename( $url ), $download_file );
+			$folder_path    = Theme_Media::get_media_folder_path_from_url( $url );
+			$download_file  = download_url( $url );
+			$content_array  = file( $download_file );
+			$file_as_string = implode( '', $content_array );
+
+			$zip->addFromString( $folder_path . basename( $url ), $file_as_string );
 		}
 	}
 
