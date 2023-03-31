@@ -231,6 +231,9 @@ class Manage_Fonts_Admin {
 				}
 				$this->add_or_update_theme_font_faces( $google_font_name, $font_slug, $new_font_faces );
 
+				// Add font license to readme.txt
+				$this->add_font_license_to_theme( $font_family['family'] );
+
 			}
 
 			add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );
@@ -297,6 +300,42 @@ class Manage_Fonts_Admin {
 			$theme_json_string
 		);
 
+	}
+
+	function add_font_license_to_theme( $font_name ) {
+		if ( ! $font_name ) {
+			return;
+		}
+
+		// Get theme readme.txt
+		$readme_file = get_stylesheet_directory() . '/readme.txt';
+
+		if ( ! $readme_file ) {
+			return;
+		}
+
+		// Format font name for font source link
+		$formatted_font_name = str_replace( ' ', '+', $font_name );
+
+		// Check if the font is already credited in readme.txt
+		if ( strpos( file_get_contents( $readme_file ), $font_name ) === false ) {
+			// All Google Fonts are licensed under SIL Open Font License
+			$font_source = 'https://www.google.com/fonts/specimen/' . $formatted_font_name;
+
+			// Build the font credits string
+			$font_credits = "
+{$font_name} Font
+Licensed under SIL Open Font License, 1.1 (http://scripts.sil.org/OFL)
+Source: {$font_source}
+";
+
+			// Add font credits to the end of readme.txt
+			file_put_contents(
+				$readme_file,
+				$font_credits,
+				FILE_APPEND
+			);
+		}
 	}
 }
 
