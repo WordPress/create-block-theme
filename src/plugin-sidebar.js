@@ -20,6 +20,8 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
+import { downloadFile } from './utils';
+
 const ExportTheme = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const [ theme, setTheme ] = useState( {
@@ -55,9 +57,7 @@ const ExportTheme = () => {
 		async function exportTheme() {
 			try {
 				const response = await apiFetch( fetchOptions );
-				const blob = await response.blob();
-				const url = URL.createObjectURL( blob );
-				window.location.href = url;
+				downloadFile( response );
 			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
