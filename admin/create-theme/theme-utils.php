@@ -122,4 +122,14 @@ class Theme_Utils {
 		return $content;
 	}
 
+	static function is_theme_slug_exists( $theme_slug ) {
+		$themes = wp_get_themes();
+		foreach ( $themes as $theme ) {
+			if ( $theme->get_stylesheet() === $theme_slug ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

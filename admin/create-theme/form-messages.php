@@ -8,6 +8,13 @@ class Form_Messages {
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 	}
 
+	public static function admin_notice_error_theme_exists() {
+		$class   = 'notice notice-error';
+		$message = __( 'Theme name already exists, please choose a different name.', 'create-block-theme' );
+
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+	}
+
 	public static function admin_notice_error_variation_name() {
 		$class   = 'notice notice-error';
 		$message = __( 'Please specify a variation name.', 'create-block-theme' );
