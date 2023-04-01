@@ -232,7 +232,7 @@ class Manage_Fonts_Admin {
 				$this->add_or_update_theme_font_faces( $google_font_name, $font_slug, $new_font_faces );
 
 				// Add font license to readme.txt
-				$this->add_font_license_to_theme( $font_family['family'] );
+				$this->add_font_license_to_theme( $font_family['family'], $file_name );
 
 			}
 
@@ -302,8 +302,8 @@ class Manage_Fonts_Admin {
 
 	}
 
-	function add_font_license_to_theme( $font_name ) {
-		if ( ! $font_name ) {
+	function add_font_license_to_theme( $font_name, $file_name ) {
+		if ( ! $font_name || ! $file_name ) {
 			return;
 		}
 
@@ -319,13 +319,22 @@ class Manage_Fonts_Admin {
 
 		// Check if the font is already credited in readme.txt
 		if ( strpos( file_get_contents( $readme_file ), $font_name ) === false ) {
-			// All Google Fonts are licensed under SIL Open Font License
+			// Require php-font-lib
+			require_once( __DIR__ . '/../includes/FontLib/Autoloader.php' );
+
+			// Build font source URL
 			$font_source = 'https://www.google.com/fonts/specimen/' . $formatted_font_name;
+
+			// Get license info from font file
+			$font = \FontLib\Font::load( get_stylesheet_directory() . '/assets/fonts/' . $file_name );
+			$font->parse();
+			$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : 'SIL Open Font License, 1.1';
+			$license_url  = $font->getNameTableString( 14 ) ? "({$font->getNameTableString(14)})" : '(http://scripts.sil.org/OFL)';
 
 			// Build the font credits string
 			$font_credits = "
 {$font_name} Font
-Licensed under SIL Open Font License, 1.1 (http://scripts.sil.org/OFL)
+{$license_info} {$license_url}
 Source: {$font_source}
 ";
 
