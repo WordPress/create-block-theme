@@ -32,12 +32,16 @@
 		"sirbrillig/phpcs-variable-analysis": "^2.8"
 	},
 	"require": {
-		"composer/installers": "~1.0"
+		"composer/installers": "~1.0",
+		"dnru/php-font-lib": "^0.5.2"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
 		"test": "phpunit",
-		"test:watch": "phpunit-watcher watch < /dev/tty"
+		"test:watch": "phpunit-watcher watch < /dev/tty",
+		"post-autoload-dump": [
+			"cp -r vendor/dnru/php-font-lib/src/FontLib includes"
+		]
 	}
 }

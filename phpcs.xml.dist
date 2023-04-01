@@ -58,6 +58,7 @@
 	<!-- Directories and third party library exclusions. -->
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/includes/FontLib/*</exclude-pattern>
 
 	<!-- Assignments in while conditions are a valid method of looping over iterables. -->
 	<rule ref="WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition">
