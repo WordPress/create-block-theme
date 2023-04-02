@@ -328,8 +328,14 @@ class Manage_Fonts_Admin {
 			// Get license info from font file
 			$font = \FontLib\Font::load( get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 			$font->parse();
-			$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : 'SIL Open Font License, 1.1';
-			$license_url  = $font->getNameTableString( 14 ) ? "({$font->getNameTableString(14)})" : '(http://scripts.sil.org/OFL)';
+			$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : '';
+
+			if ( strpos( $font->getNameTableString( 13 ), 'SIL Open Font License' ) ) {
+				// If license is SIL Open Font License, use custom format
+				$license_info = 'Licensed under the SIL Open Font License, Version 1.1';
+			}
+
+			$license_url = $font->getNameTableString( 14 ) ? "({$font->getNameTableString(14)})" : '';
 
 			// Build the font credits string
 			$font_credits = "
