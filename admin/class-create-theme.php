@@ -228,7 +228,7 @@ class Create_Block_Theme_Admin {
 
 	function rest_export_theme( $request ) {
 		$theme = $request->get_params();
-		$this->clone_theme( $theme, null );
+		$this->export_theme( $theme, null );
 	}
 
 	public function register_theme_export() {
@@ -305,16 +305,54 @@ class Create_Block_Theme_Admin {
 	/**
 	 * Export activated parent theme
 	 */
-	function export_theme( $theme ) {
-		$theme['slug'] = wp_get_theme()->get( 'TextDomain' );
+	function export_theme( $theme, $screenshot ) {
+		// Sanitize inputs.
+		$theme['name']           = sanitize_text_field( $theme['name'] );
+		$theme['description']    = sanitize_text_field( $theme['description'] );
+		$theme['uri']            = sanitize_text_field( $theme['uri'] );
+		$theme['author']         = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']     = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']    = sanitize_text_field( $theme['tags_custom'] );
+		$theme['slug']           = Theme_Utils::get_theme_slug( $theme['name'] );
+		$theme['template']       = wp_get_theme()->get( 'Template' );
+		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
+
+		// Use previous theme's tags if custom tags are empty.
+		if ( empty( $theme['tags_custom'] ) ) {
+			$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
+		}
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
+		$zip      = Theme_Utils::copy_theme_to_dest( $zip, $theme['slug'], $theme['name'] );
+		$zip      = Theme_Zip::add_templates_to_zip( $zip, 'all', $theme['slug'] );
+		$zip      = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
 
-		$zip = Theme_Utils::copy_theme_to_dest( $zip, null, null );
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
-		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
+		// Add readme.txt.
+		$zip->addFromString(
+			'readme.txt',
+			Theme_Readme::build_readme_txt( $theme )
+		);
+
+		// Augment style.css
+		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
+		// Remove metadata from style.css file
+		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
+		// Add new metadata
+		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$zip->addFromString(
+			'style.css',
+			$css_contents
+		);
+
+		// Add / replace screenshot.
+		if ( $this->is_valid_screenshot( $screenshot ) ) {
+			$zip->addFile(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
 
 		$zip->close();
 
@@ -322,8 +360,9 @@ class Create_Block_Theme_Admin {
 		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
-		echo readfile( $filename );
-		die();
+		readfile( $filename );
+		unlink( $filename );
+		exit;
 	}
 
 	function create_blank_theme( $theme, $screenshot ) {
@@ -483,7 +522,7 @@ class Create_Block_Theme_Admin {
 					$this->clone_theme( 'current', $_POST['theme'], $_FILES['screenshot'] );
 					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_clone_success' ) );
 				} else {
-					$this->export_theme( $_POST['theme'] );
+					$this->export_theme( $_POST['theme'], $_FILES['screenshot'] );
 				}
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_export_success' ) );
 			}

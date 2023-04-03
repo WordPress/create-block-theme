@@ -7,6 +7,14 @@ function toggleForm( element ) {
 
 	switch ( themeType ) {
 		case 'export':
+			// Show New Theme form
+			document
+				.getElementById( 'new_theme_metadata_form' )
+				.toggleAttribute( 'hidden', false );
+
+			resetThemeTags( element.value );
+			// Forms should stay hidden
+			break;
 		case 'save':
 			// Forms should stay hidden
 			break;

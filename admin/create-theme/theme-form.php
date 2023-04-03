@@ -78,7 +78,7 @@ class Theme_Form {
 										);
 									?>
 									<br />
-									<?php _e( '[Create a new theme cloning the activated theme. The resulting theme will have all of the assets of the activated theme as well as user changes.]', 'create-block-theme' ); ?>
+									<?php _e( 'Create a new theme within your site, cloning the active theme plus any modifications to styles and templates.', 'create-block-theme' ); ?>
 								</label>
 								<br /><br />
 							<?php endif; ?>
@@ -127,34 +127,34 @@ class Theme_Form {
 									<input placeholder="<?php _e( 'Variation Name', 'create-block-theme' ); ?>" type="text" name="theme[variation]" class="large-text" />
 								</label>
 							</div>
-							<div hidden id="new_theme_metadata_form" class="theme-form">
+							<div id="new_theme_metadata_form" class="theme-form">
 								<p><em><?php _e( 'Items indicated with (*) are required.', 'create-block-theme' ); ?></em></p>
 								<label>
 									<?php _e( 'Theme Name (*):', 'create-block-theme' ); ?><br />
-									<input placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" />
+									<input placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" value="<?php echo esc_html( wp_get_theme()->get( 'Name' ), 'create-block-theme' ); ?>"/>
 								</label>
 								<br /><br />
 								<label>
 									<?php _e( 'Theme Description:', 'create-block-theme' ); ?><br />
-									<textarea placeholder="<?php _e( 'A short description of the theme.', 'create-block-theme' ); ?>" rows="4" cols="50" name="theme[description]" class="large-text"></textarea>
+									<textarea placeholder="<?php _e( 'A short description of the theme.', 'create-block-theme' ); ?>" rows="4" cols="50" name="theme[description]" class="large-text"><?php echo esc_html( wp_get_theme()->get( 'Description' ), 'create-block-theme' ); ?></textarea>
 								</label>
 								<br /><br />
 								<label>
 									<?php _e( 'Theme URI:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'The URL of a public web page where users can find more information about the theme.', 'create-block-theme' ); ?></small><br />
-									<input placeholder="<?php _e( 'https://github.com/wordpress/twentytwentythree/', 'create-block-theme' ); ?>" type="text" name="theme[uri]" class="large-text code" />
+									<input placeholder="<?php _e( 'https://github.com/wordpress/twentytwentythree/', 'create-block-theme' ); ?>" type="text" name="theme[uri]" class="large-text code" value="<?php echo esc_html( wp_get_theme()->get( 'ThemeURI' ), 'create-block-theme' ); ?>"/>
 								</label>
 								<br /><br />
 								<label>
 									<?php _e( 'Author:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'The name of the individual or organization who developed the theme.', 'create-block-theme' ); ?></small><br />
-									<input placeholder="<?php _e( 'the WordPress team', 'create-block-theme' ); ?>" type="text" name="theme[author]" class="large-text" />
+									<input placeholder="<?php _e( 'the WordPress team', 'create-block-theme' ); ?>" type="text" name="theme[author]" class="large-text" value="<?php echo esc_html( wp_get_theme()->get( 'Author' ), 'create-block-theme' ); ?>"/>
 								</label>
 								<br /><br />
 								<label>
 									<?php _e( 'Author URI:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'The URL of the authoring individual or organization.', 'create-block-theme' ); ?></small><br />
-									<input placeholder="<?php _e( 'https://wordpress.org/', 'create-block-theme' ); ?>" type="text" name="theme[author_uri]" class="large-text code" />
+									<input placeholder="<?php _e( 'https://wordpress.org/', 'create-block-theme' ); ?>" type="text" name="theme[author_uri]" class="large-text code" value="<?php echo esc_html( wp_get_theme()->get( 'AuthorURI' ), 'create-block-theme' ); ?>"/>
 								</label>
 								<br /><br />
 								<label for="screenshot">
