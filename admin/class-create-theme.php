@@ -516,7 +516,7 @@ class Create_Block_Theme_Admin {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
 					} elseif ( ! wp_is_writable( get_theme_root() ) ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_themes_file_permissions' ) );
-					} elseif ( ! Theme_Utils::is_theme_slug_exists( Theme_Utils::get_theme_slug( $_POST['theme']['name'] ) ) ) {
+					} elseif ( Theme_Utils::is_theme_slug_exists( Theme_Utils::get_theme_slug( $_POST['theme']['name'] ) ) ) {
 						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_exists' ) );
 					}
 					$this->clone_theme( 'current', $_POST['theme'], $_FILES['screenshot'] );

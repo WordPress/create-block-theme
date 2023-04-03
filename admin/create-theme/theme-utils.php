@@ -125,7 +125,8 @@ class Theme_Utils {
 	static function is_theme_slug_exists( $theme_slug ) {
 		$themes = wp_get_themes();
 		foreach ( $themes as $theme ) {
-			if ( $theme->get_stylesheet() === $theme_slug ) {
+			$slug = basename( $theme->get_stylesheet() );
+			if ( $slug === $theme_slug ) {
 				return true;
 			}
 		}
