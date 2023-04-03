@@ -14,6 +14,7 @@ class Theme_Styles {
 		$author      = $theme['author'];
 		$author_uri  = $theme['author_uri'];
 		$template    = $theme['template'];
+		$text_domain = $theme['text_domain'];
 		$tags        = Theme_Tags::theme_tags_list( $theme );
 		return "/*
 Theme Name: {$name}
@@ -28,7 +29,7 @@ Version: 0.0.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
-Text Domain: {$slug}
+Text Domain: {$text_domain}
 Tags: {$tags}
 */";
 	}

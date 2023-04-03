@@ -95,6 +95,8 @@ class Create_Block_Theme_Admin {
 	 * Create a sibling theme of the activated theme
 	 */
 	function create_sibling_theme( $theme, $screenshot ) {
+		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+
 		// Sanitize inputs.
 		$theme['name']        = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -102,8 +104,9 @@ class Create_Block_Theme_Admin {
 		$theme['author']      = sanitize_text_field( $theme['author'] );
 		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug']        = Theme_Utils::get_theme_slug( $theme['name'] );
+		$theme['slug']        = $theme_slug;
 		$theme['template']    = wp_get_theme()->get( 'Template' );
+		$theme['text_domain'] = $theme_slug;
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
@@ -152,6 +155,8 @@ class Create_Block_Theme_Admin {
 	 * Clone the activated theme to create a new theme
 	 */
 	function clone_theme( $theme, $screenshot ) {
+		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+
 		// Sanitize inputs.
 		$theme['name']           = sanitize_text_field( $theme['name'] );
 		$theme['description']    = sanitize_text_field( $theme['description'] );
@@ -159,9 +164,10 @@ class Create_Block_Theme_Admin {
 		$theme['author']         = sanitize_text_field( $theme['author'] );
 		$theme['author_uri']     = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom']    = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug']           = Theme_Utils::get_theme_slug( $theme['name'] );
-		$theme['template']       = wp_get_theme()->get( 'Template' );
+		$theme['slug']           = $theme_slug;
+		$theme['template']       = '';
 		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
+		$theme['text_domain']    = $theme_slug;
 
 		// Use previous theme's tags if custom tags are empty.
 		if ( empty( $theme['tags_custom'] ) ) {
@@ -236,6 +242,10 @@ class Create_Block_Theme_Admin {
 	 * Create a child theme of the activated theme
 	 */
 	function create_child_theme( $theme, $screenshot ) {
+
+		$parent_theme_slug = Theme_Utils::get_theme_slug( wp_get_theme()->get( 'Name' ) );
+		$child_theme_slug  = Theme_Utils::get_theme_slug( $theme['name'] );
+
 		// Sanitize inputs.
 		$theme['name']        = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -243,8 +253,10 @@ class Create_Block_Theme_Admin {
 		$theme['author']      = sanitize_text_field( $theme['author'] );
 		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug']        = Theme_Utils::get_theme_slug( $theme['name'] );
-		$theme['template']    = wp_get_theme()->get( 'TextDomain' );
+
+		$theme['text_domain'] = $child_theme_slug;
+		$theme['template']    = $parent_theme_slug;
+		$theme['slug']        = $child_theme_slug;
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
@@ -308,6 +320,8 @@ class Create_Block_Theme_Admin {
 	}
 
 	function create_blank_theme( $theme, $screenshot ) {
+		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+
 		// Sanitize inputs.
 		$theme['name']        = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
@@ -316,7 +330,8 @@ class Create_Block_Theme_Admin {
 		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 		$theme['template']    = '';
-		$theme['slug']        = Theme_Utils::get_theme_slug( $theme['name'] );
+		$theme['slug']        = $theme_slug;
+		$theme['text_domain'] = $theme_slug;
 
 		// Create theme directory.
 		$source           = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
