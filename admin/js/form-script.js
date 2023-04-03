@@ -14,6 +14,7 @@ function toggleForm( element ) {
 		case 'child':
 		case 'clone':
 		case 'blank':
+		case 'sibling':
 			// Show New Theme form
 			document
 				.getElementById( 'new_theme_metadata_form' )
