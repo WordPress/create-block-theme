@@ -61,4 +61,10 @@ class Theme_Patterns {
 			return "<?php echo esc_attr_e( '" . $text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
 		}
 	}
+
+	public static function create_pattern_link( $attributes ) {
+		$block_attributes = array_filter( $attributes );
+		$attributes_json  = json_encode( $block_attributes );
+		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
+	}
 }

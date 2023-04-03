@@ -71,14 +71,14 @@ class Create_Block_Theme_Admin {
 	 * Export activated child theme
 	 */
 	function export_child_theme( $theme ) {
-		$theme['slug'] = wp_get_theme()->get( 'TextDomain' );
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
 		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', null );
+		$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
 
 		$zip->close();
@@ -262,7 +262,7 @@ class Create_Block_Theme_Admin {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
 
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'user', null );
+		$zip = Theme_Zip::add_templates_to_zip( $zip, 'user', $theme['slug'] );
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'user' );
 
 		// Add readme.txt.
