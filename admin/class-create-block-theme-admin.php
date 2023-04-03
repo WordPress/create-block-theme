@@ -163,6 +163,11 @@ class Create_Block_Theme_Admin {
 		$theme['template']       = wp_get_theme()->get( 'Template' );
 		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
 
+		// Use previous theme's tags if custom tags are empty.
+		if ( empty( $theme['tags_custom'] ) ) {
+			$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
+		}
+
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
