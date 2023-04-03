@@ -78,7 +78,7 @@ class Theme_Form {
 										);
 									?>
 									<br />
-									<?php _e( 'Create a new theme within your site, cloning the active theme plus any modifications to styles and templates.', 'create-block-theme' ); ?>
+									<?php _e( 'Create a new theme within your site, cloning the active theme plus any customizations to styles and templates.', 'create-block-theme' ); ?>
 								</label>
 								<br /><br />
 							<?php endif; ?>
