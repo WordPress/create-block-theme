@@ -92,6 +92,8 @@ class Manage_Fonts_Admin {
 		}
 
 		if ( file_exists( $font_asset_path ) ) {
+			// Remove font license from readme.txt
+			$this->manage_font_license( $font_face['fontFamily'], 'remove' );
 			return unlink( $font_asset_path );
 		}
 
@@ -178,6 +180,10 @@ class Manage_Fonts_Admin {
 				$new_font_faces = array( $uploaded_font_face );
 
 				$this->add_or_update_theme_font_faces( $_POST['font-name'], $font_slug, $new_font_faces );
+
+				// Add font license to readme.txt
+				$this->manage_font_license( $_POST['font-name'], $file_name );
+
 				return add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );
 			}
 			return add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_file_error' ) );
@@ -229,11 +235,11 @@ class Manage_Fonts_Admin {
 						);
 					}
 				}
+
 				$this->add_or_update_theme_font_faces( $google_font_name, $font_slug, $new_font_faces );
 
 				// Add font license to readme.txt
-				$this->add_font_license_to_theme( $font_family['family'], $file_name );
-
+				$this->manage_font_license( $font_family['family'], $file_name );
 			}
 
 			add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );
@@ -299,16 +305,16 @@ class Manage_Fonts_Admin {
 			get_stylesheet_directory() . '/theme.json',
 			$theme_json_string
 		);
-
 	}
 
-	function add_font_license_to_theme( $font_name, $file_name ) {
-		if ( ! $font_name || ! $file_name ) {
+	function manage_font_license( $font_name, $file_name ) {
+		if ( ! $font_name ) {
 			return;
 		}
 
 		// Get theme readme.txt
-		$readme_file = get_stylesheet_directory() . '/readme.txt';
+		$readme_file          = get_stylesheet_directory() . '/readme.txt';
+		$readme_file_contents = file_get_contents( $readme_file );
 
 		if ( ! $readme_file ) {
 			return;
@@ -317,39 +323,56 @@ class Manage_Fonts_Admin {
 		// Format font name for font source link
 		$formatted_font_name = str_replace( ' ', '+', $font_name );
 
-		// Check if the font is already credited in readme.txt
-		if ( strpos( file_get_contents( $readme_file ), $font_name ) === false ) {
-			// Require php-font-lib
-			require_once( __DIR__ . '/../includes/FontLib/Autoloader.php' );
+		// If file_name exists, then add font license to readme.txt
+		if ( 'remove' !== $file_name && is_string( $file_name ) ) {
+			// Check that the font is not already credited in readme.txt
+			if ( false === strpos( $readme_file_contents, $font_name ) ) {
+				// Require php-font-lib
+				require_once( __DIR__ . '/../includes/FontLib/Autoloader.php' );
 
-			// Build font source URL
-			$font_source = 'https://www.google.com/fonts/specimen/' . $formatted_font_name;
+				// Build font source URL
+				$font_source = 'https://www.google.com/fonts/specimen/' . $formatted_font_name;
 
-			// Get license info from font file
-			$font = \FontLib\Font::load( get_stylesheet_directory() . '/assets/fonts/' . $file_name );
-			$font->parse();
-			$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : '';
+				// Get license info from font file
+				$font = \FontLib\Font::load( get_stylesheet_directory() . '/assets/fonts/' . $file_name );
+				$font->parse();
+				$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : '';
 
-			if ( strpos( $font->getNameTableString( 13 ), 'SIL Open Font License' ) ) {
-				// If license is SIL Open Font License, use custom format
-				$license_info = 'Licensed under the SIL Open Font License, Version 1.1';
-			}
+				if ( strpos( $font->getNameTableString( 13 ), 'SIL Open Font License' ) ) {
+					// If license is SIL Open Font License, use custom format
+					$license_info = 'Licensed under the SIL Open Font License, Version 1.1';
+				}
 
-			$license_url = $font->getNameTableString( 14 ) ? "({$font->getNameTableString(14)})" : '';
+				$license_url = $font->getNameTableString( 14 ) ? "({$font->getNameTableString(14)})" : '';
 
-			// Build the font credits string
-			$font_credits = "
+				// Build the font credits string
+				$font_credits = "
 {$font_name} Font
 {$license_info} {$license_url}
 Source: {$font_source}
 ";
 
-			// Add font credits to the end of readme.txt
-			file_put_contents(
-				$readme_file,
-				$font_credits,
-				FILE_APPEND
-			);
+				// Add font credits to the end of readme.txt
+				file_put_contents(
+					$readme_file,
+					$font_credits,
+					FILE_APPEND
+				);
+			}
+		}
+
+		// If file_name is set to 'remove', then remove font license from readme.txt
+		if ( 'remove' === $file_name ) {
+			// Find the font credits in readme.txt
+			if ( false !== strpos( $readme_file_contents, $font_name ) ) {
+				$starts       = strpos( $readme_file_contents, $font_name ) + strlen( $font_name );
+				$ends         = strpos( $readme_file_contents, '/' . $formatted_font_name, $starts );
+				$font_credits = substr( $readme_file_contents, $starts - strlen( $font_name ) - 1, $ends );
+
+				// Remove the font credits from readme.txt
+				$removed_font_credits = str_replace( $font_credits, '', $readme_file_contents );
+				file_put_contents( $readme_file, $removed_font_credits );
+			}
 		}
 	}
 }
