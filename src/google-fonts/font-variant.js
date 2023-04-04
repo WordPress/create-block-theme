@@ -32,21 +32,31 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 			} );
 	}, [ font, variant ] );
 
+	const formattedFontFamily = font.family.toLowerCase().replace( ' ', '-' );
+	const fontId = `${ formattedFontFamily }-${ variant }`;
+
 	return (
 		<tr>
 			<td className="">
 				<input
 					type="checkbox"
 					name="google-font-variant"
+					id={ fontId }
 					value={ variant }
 					checked={ isSelected }
 					onClick={ handleToggle }
 				/>
 			</td>
-			<td className="">{ weight }</td>
-			<td className="">{ style }</td>
+			<td className="">
+				<label htmlFor={ fontId }>{ weight }</label>
+			</td>
+			<td className="">
+				<label htmlFor={ fontId }>{ style }</label>
+			</td>
 			<td className="demo-cell">
-				<Demo style={ previewStyles } />
+				<label htmlFor={ fontId }>
+					<Demo style={ previewStyles } />
+				</label>
 			</td>
 		</tr>
 	);

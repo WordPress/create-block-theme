@@ -156,6 +156,13 @@ function GoogleFonts() {
 		setSelectedFont( googleFontsData.items[ value ] );
 	};
 
+	let selectedFontFamilyId = '';
+	if ( selectedFont ) {
+		selectedFontFamilyId = selectedFont.family
+			.toLowerCase()
+			.replace( ' ', '-' );
+	}
+
 	return (
 		<FontsPageLayout>
 			<main>
@@ -235,6 +242,7 @@ function GoogleFonts() {
 										<td className="">
 											<input
 												type="checkbox"
+												id={ `select-all-${ selectedFontFamilyId }` }
 												onClick={ () =>
 													handleToggleAllVariants(
 														selectedFont.family
@@ -250,22 +258,34 @@ function GoogleFonts() {
 											/>
 										</td>
 										<td className="">
-											{ __(
-												'Weight',
-												'create-block-theme'
-											) }
+											<label
+												htmlFor={ `select-all-${ selectedFontFamilyId }` }
+											>
+												{ __(
+													'Weight',
+													'create-block-theme'
+												) }
+											</label>
 										</td>
 										<td className="">
-											{ __(
-												'Style',
-												'create-block-theme'
-											) }
+											<label
+												htmlFor={ `select-all-${ selectedFontFamilyId }` }
+											>
+												{ __(
+													'Style',
+													'create-block-theme'
+												) }
+											</label>
 										</td>
 										<td className="">
-											{ __(
-												'Preview',
-												'create-block-theme'
-											) }
+											<label
+												htmlFor={ `select-all-${ selectedFontFamilyId }` }
+											>
+												{ __(
+													'Preview',
+													'create-block-theme'
+												) }
+											</label>
 										</td>
 									</tr>
 								</thead>
