@@ -189,45 +189,4 @@ class Theme_Blocks {
 		return $markup;
 	}
 
-	// update pattern and template-parts theme attribute
-	public static function update_patterns_and_templates_theme_attribute( $template, $theme_slug ) {
-		$new_content     = $template->content;
-		$template_blocks = parse_blocks( $template->content );
-
-		$blocks = self::update_blocks_theme_attribute( $template_blocks, $theme_slug );
-		$blocks = serialize_blocks( $blocks );
-
-		$template->content = self::clean_serialized_markup( $blocks );
-		return $template;
-	}
-
-	static function update_blocks_theme_attribute( $nested_blocks, $theme_slug ) {
-		$new_blocks = array();
-		foreach ( $nested_blocks as $block ) {
-			$inner_blocks = $block['innerBlocks'];
-			switch ( $block['blockName'] ) {
-				case 'core/pattern':
-				case 'core/template-part':
-					$block = self::update_block_theme_attribute( $block, $theme_slug );
-					break;
-			}
-			// recursive call for inner blocks
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$block['innerBlocks'] = self::update_blocks_theme_attribute( $inner_blocks, $theme_slug );
-			}
-			$new_blocks[] = $block;
-		}
-		return $new_blocks;
-	}
-
-	static function update_block_theme_attribute( $block, $theme_slug ) {
-		if ( 'core/pattern' === $block['blockName'] || 'core/template-part' === $block['blockName'] ) {
-			// Adds the theme attribute to the block only if is set, otherwise it won't be added
-			if ( ! empty( $block['attrs']['theme'] ) ) {
-				$block['attrs']['theme'] = $theme_slug;
-			}
-		}
-		return $block;
-	}
-
 }
