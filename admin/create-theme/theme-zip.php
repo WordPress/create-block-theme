@@ -104,8 +104,11 @@ class Theme_Zip {
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to zip
 				$zip->addFromString(
@@ -130,8 +133,11 @@ class Theme_Zip {
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to zip
 				$zip->addFromString(

@@ -122,8 +122,11 @@ class Theme_Templates {
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Write the pattern
 				file_put_contents(
@@ -159,8 +162,11 @@ class Theme_Templates {
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Write the pattern
 				file_put_contents(
