@@ -326,7 +326,7 @@ class Manage_Fonts_Admin {
 		// If file_name exists, then add font license to readme.txt
 		if ( 'remove' !== $file_name && is_string( $file_name ) ) {
 			// Check that the font is not already credited in readme.txt
-			if ( false === strpos( $readme_file_contents, $font_name ) ) {
+			if ( false === stripos( $readme_file_contents, $font_name ) ) {
 				// Require php-font-lib
 				require_once( __DIR__ . '/../includes/FontLib/Autoloader.php' );
 
@@ -338,7 +338,7 @@ class Manage_Fonts_Admin {
 				$font->parse();
 				$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : '';
 
-				if ( strpos( $font->getNameTableString( 13 ), 'SIL Open Font License' ) ) {
+				if ( stripos( $font->getNameTableString( 13 ), 'SIL Open Font License' ) ) {
 					// If license is SIL Open Font License, use custom format
 					$license_info = 'Licensed under the SIL Open Font License, Version 1.1';
 				}
