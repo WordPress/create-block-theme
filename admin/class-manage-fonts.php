@@ -321,7 +321,7 @@ class Manage_Fonts_Admin {
 		}
 
 		// Format font name for font source link
-		$formatted_font_name = str_replace( ' ', '+', $font_name );
+		$google_formatted_font_name = str_replace( ' ', '+', $font_name );
 
 		// If file_name exists, then add font license to readme.txt
 		if ( 'remove' !== $file_name && is_string( $file_name ) ) {
@@ -331,7 +331,7 @@ class Manage_Fonts_Admin {
 				require_once( __DIR__ . '/../includes/FontLib/Autoloader.php' );
 
 				// Build font source URL
-				$font_source = 'https://www.google.com/fonts/specimen/' . $formatted_font_name;
+				$font_source = 'https://www.google.com/fonts/specimen/' . $google_formatted_font_name;
 
 				// Get license info from font file
 				$font = \FontLib\Font::load( get_stylesheet_directory() . '/assets/fonts/' . $file_name );
