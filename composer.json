@@ -33,7 +33,7 @@
 	},
 	"require": {
 		"composer/installers": "~1.0",
-		"dnru/php-font-lib": "^0.5.2"
+		"phenx/php-font-lib": "^0.5.4"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
@@ -41,7 +41,7 @@
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty",
 		"post-autoload-dump": [
-			"cp -r vendor/dnru/php-font-lib/src/FontLib includes"
+			"cp -r vendor/phenx/php-font-lib/src/FontLib includes"
 		]
 	}
 }
