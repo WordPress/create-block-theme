@@ -29,22 +29,6 @@ class Create_Block_Theme_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'blockbase_save_theme' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ) );
-		add_action( 'rest_api_init', array( $this, 'register_theme_export' ) );
-	}
-
-	function create_block_theme_enqueue() {
-		$asset_file = include( plugin_dir_path( dirname( __FILE__ ) ) . 'build/plugin-sidebar.asset.php' );
-
-		wp_register_script(
-			'create-block-theme-slot-fill',
-			plugins_url( 'build/plugin-sidebar.js', dirname( __FILE__ ) ),
-			$asset_file['dependencies'],
-			$asset_file['version']
-		);
-		wp_enqueue_script(
-			'create-block-theme-slot-fill',
-		);
 	}
 
 	function create_admin_menu() {
@@ -163,11 +147,6 @@ class Create_Block_Theme_Admin {
 		$theme['template']       = wp_get_theme()->get( 'Template' );
 		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
 
-		// Use previous theme's tags if custom tags are empty.
-		if ( empty( $theme['tags_custom'] ) ) {
-			$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
-		}
-
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename );
@@ -208,30 +187,9 @@ class Create_Block_Theme_Admin {
 		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
-		readfile( $filename );
-		unlink( $filename );
-		exit;
+		echo readfile( $filename );
+		die();
 	}
-
-	function rest_export_theme( $request ) {
-		$theme = $request->get_params();
-		$this->clone_theme( $theme, null );
-	}
-
-	public function register_theme_export() {
-		register_rest_route(
-			'create-block-theme/v1',
-			'/export',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'rest_export_theme' ),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
-				},
-			)
-		);
-	}
-
 	/**
 	 * Create a child theme of the activated theme
 	 */

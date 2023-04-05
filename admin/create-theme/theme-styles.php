@@ -13,7 +13,6 @@ class Theme_Styles {
 		$uri         = $theme['uri'];
 		$author      = $theme['author'];
 		$author_uri  = $theme['author_uri'];
-		$wp_version  = get_bloginfo( 'version' );
 		$template    = $theme['template'];
 		$tags        = Theme_Tags::theme_tags_list( $theme );
 		return "/*
@@ -23,7 +22,7 @@ Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
 Requires at least: 5.8
-Tested up to: {$wp_version}
+Tested up to: 5.9
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
