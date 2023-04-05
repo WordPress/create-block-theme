@@ -151,11 +151,11 @@ const ERROR_NAME_CONTAINS_RELATED_WORDS = __(
 	'Theme name cannot contain the words as "Blog", "Web log", "Template", "Skin", etc.'
 );
 
-/* eslint-disable @wordpress/no-unused-vars-before-return */
 function isThemeNameValid( themeName ) {
 	// Check the validity of the theme name following the WordPress.org theme directory rules
 	// https://make.wordpress.org/themes/2013/02/26/clarifying-guidelines-for-theme-name/
 
+	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const lowerCaseName = themeName.toLowerCase();
 	const slug = slugify( themeName );
 	const slugDashes = slugifyUnderscores( themeName );
