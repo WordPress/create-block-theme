@@ -1,3 +1,5 @@
+const { __ } = wp.i18n;
+
 // Toggles the visibility of the forms based on the selected theme type
 // eslint-disable-next-line no-unused-vars
 function toggleForm( element ) {
@@ -9,6 +11,7 @@ function toggleForm( element ) {
 		case 'export':
 		case 'save':
 			// Forms should stay hidden
+			resetThemeName();
 			break;
 
 		case 'child':
@@ -94,11 +97,152 @@ function limitCheckboxSelection( checkboxesSelector, max = 0 ) {
 
 // Store active theme tags when page is loaded
 let activeThemeTags = [];
-window.onload = () => {
+function onWindowLoad() {
 	activeThemeTags = document.querySelectorAll(
 		'.theme-tags input[type="checkbox"]:checked'
 	);
-};
+}
+
+window.addEventListener( 'load', onWindowLoad );
+window.addEventListener( 'load', prepareThemeNameValidation );
+
+function prepareThemeNameValidation() {
+	const themeNameInput = document.getElementById( 'theme-name' );
+	themeNameInput.addEventListener( 'input', validateThemeNameInput );
+}
+
+function slugify( text ) {
+	// Removes spaces
+	return text.toLowerCase().replace( / /g, '' );
+}
+
+function slugifyUnderscores( text ) {
+	// Replaces spaces with underscores
+	return text.toLowerCase().replace( / /g, '_' );
+}
+
+function slugifyDashes( text ) {
+	// Replaces spaces with dashes
+	return text.toLowerCase().replace( / /g, '-' );
+}
+
+function slugifyNoDashes( text ) {
+	// Removes spaces, dashes, and underscores
+	return text.toLowerCase().replace( / /g, '' ).replace( /[-_]/g, '' );
+}
+
+const ERROR_NAME_NOT_AVAILABLE = __(
+	'Theme name is not available in the WordPress.org theme directory',
+	'create-block-theme'
+);
+const ERROR_NAME_CONTAINS_THEME = __(
+	'Theme name cannot contain the word "theme"',
+	'create-block-theme'
+);
+const ERROR_NAME_CONTAINS_WORDPRESS = __(
+	'Theme name cannot contain the word "WordPress"',
+	'create-block-theme'
+);
+const ERROR_NAME_CONTAINS_MARKUP_WORDS = __(
+	'Theme name cannot contain the words as "HTML", "CSS", or "PHP"',
+	'create-block-theme'
+);
+const ERROR_NAME_CONTAINS_RELATED_WORDS = __(
+	'Theme name cannot contain the words as "Blog", "Web log", "Template", "Skin", etc.'
+);
+
+/* eslint-disable @wordpress/no-unused-vars-before-return */
+function isThemeNameValid( themeName ) {
+	// Check the validity of the theme name following the WordPress.org theme directory rules
+	// https://make.wordpress.org/themes/2013/02/26/clarifying-guidelines-for-theme-name/
+
+	const lowerCaseName = themeName.toLowerCase();
+	const slug = slugify( themeName );
+	const slugDashes = slugifyUnderscores( themeName );
+	const slugUnderscores = slugifyDashes( themeName );
+	const slugNoDashes = slugifyNoDashes( themeName );
+
+	const validityStatus = {
+		isValid: true,
+		errorMessage: '',
+	};
+
+	// Check if the theme contains the word theme
+	if ( lowerCaseName.includes( 'theme' ) ) {
+		validityStatus.isValid = false;
+		validityStatus.errorMessage = ERROR_NAME_CONTAINS_THEME;
+		return validityStatus;
+	}
+
+	// Check if the theme name contains WordPress
+	if ( slugNoDashes.includes( 'wordpress' ) ) {
+		validityStatus.isValid = false;
+		validityStatus.errorMessage = ERROR_NAME_CONTAINS_WORDPRESS;
+		return validityStatus;
+	}
+
+	// Check if the theme name contains markup words
+	const markupWords = [
+		'html',
+		'html5',
+		'css',
+		'css3',
+		'php',
+		'js',
+		'javascript',
+	];
+	if ( markupWords.some( ( w ) => lowerCaseName.includes( w ) ) ) {
+		validityStatus.isValid = false;
+		validityStatus.errorMessage = ERROR_NAME_CONTAINS_MARKUP_WORDS;
+		return validityStatus;
+	}
+
+	// Check if the theme name contains related words
+	const relatedWords = [ 'blog', 'weblog', 'template', 'skin' ];
+	if ( relatedWords.some( ( w ) => lowerCaseName.includes( w ) ) ) {
+		validityStatus.isValid = false;
+		validityStatus.errorMessage = ERROR_NAME_CONTAINS_RELATED_WORDS;
+		return validityStatus;
+	}
+
+	// Check if the theme name is available
+	const isNameAvailable = () => {
+		// default to empty array if the unavailable theme names are not loaded yet from the API
+		const notAvailableSlugs = wpOrgThemeDirectory.themeSlugs || [];
+
+		// Compare the theme name to the list of unavailable theme names using several different slug formats
+		return ! notAvailableSlugs.some(
+			( s ) =>
+				s === slug ||
+				s === slugDashes ||
+				s === slugUnderscores ||
+				slugifyNoDashes( s ) === slugNoDashes
+		);
+	};
+
+	if ( ! isNameAvailable() ) {
+		validityStatus.isValid = false;
+		validityStatus.errorMessage = ERROR_NAME_NOT_AVAILABLE;
+		return validityStatus;
+	}
+
+	return validityStatus;
+}
+
+function validateThemeNameInput() {
+	const themeName = this?.value;
+	if ( ! themeName ) return true;
+
+	// Check if theme name is available
+	const validityStatus = isThemeNameValid( themeName );
+
+	if ( ! validityStatus.isValid ) {
+		this.setCustomValidity( validityStatus.errorMessage );
+		this.reportValidity();
+	} else {
+		this.setCustomValidity( '' );
+	}
+}
 
 // Resets all theme tag states (checked, disabled) to default values
 function resetThemeTags( themeType ) {
@@ -127,4 +271,10 @@ function resetThemeTags( themeType ) {
 			checkbox.checked = true;
 		} );
 	}
+}
+
+function resetThemeName() {
+	const themeNameInput = document.getElementById( 'theme-name' );
+	themeNameInput.value = '';
+	themeNameInput.setCustomValidity( '' );
 }

@@ -131,7 +131,7 @@ class Theme_Form {
 								<p><em><?php _e( 'Items indicated with (*) are required.', 'create-block-theme' ); ?></em></p>
 								<label>
 									<?php _e( 'Theme Name (*):', 'create-block-theme' ); ?><br />
-									<input placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" />
+									<input placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" id="theme-name" autocomplete="off" />
 								</label>
 								<br /><br />
 								<label>
