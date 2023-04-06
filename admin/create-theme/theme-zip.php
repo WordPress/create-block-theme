@@ -89,7 +89,7 @@ class Theme_Zip {
 	 *                      all = all templates no matter what
 	 */
 	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
-		$theme_templates = Theme_Templates::get_theme_templates( $export_type, $new_slug );
+		$theme_templates = Theme_Templates::get_theme_templates( $export_type );
 
 		if ( $theme_templates->templates ) {
 			$zip->addEmptyDir( 'templates' );
