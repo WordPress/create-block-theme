@@ -101,6 +101,7 @@ class Theme_Zip {
 
 		foreach ( $theme_templates->templates as $template ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template );
+			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
@@ -130,6 +131,7 @@ class Theme_Zip {
 
 		foreach ( $theme_templates->parts as $template_part ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template_part );
+			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
@@ -162,12 +164,15 @@ class Theme_Zip {
 	static function add_media_to_zip( $zip, $media ) {
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
-			$folder_path    = Theme_Media::get_media_folder_path_from_url( $url );
-			$download_file  = download_url( $url );
-			$content_array  = file( $download_file );
-			$file_as_string = implode( '', $content_array );
-
-			$zip->addFromString( $folder_path . basename( $url ), $file_as_string );
+			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
+			$download_file = download_url( $url );
+			// If there was an error downloading the file, skip it.
+			// TODO: Implement a warning if the file is missing
+			if ( ! is_wp_error( $download_file ) ) {
+				$content_array  = file( $download_file );
+				$file_as_string = implode( '', $content_array );
+				$zip->addFromString( $folder_path . basename( $url ), $file_as_string );
+			}
 		}
 	}
 

@@ -75,10 +75,18 @@ class Theme_Templates {
 		// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 		$template->content = str_replace( '\u002d', '-', $template->content );
 
+		// if ( $new_slug ) {
+		// 	$template->content = str_replace( $old_slug, $new_slug, $template->content );
+		// }
+
+		return $template;
+	}
+
+	public static function replace_template_namespace( $template, $new_slug ) {
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		if ( $new_slug ) {
 			$template->content = str_replace( $old_slug, $new_slug, $template->content );
 		}
-
 		return $template;
 	}
 
@@ -113,6 +121,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->templates as $template ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template );
+			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
 			if ( ! empty( $template_data->media ) ) {
@@ -153,6 +162,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->parts as $template_part ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template_part );
+			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
 			if ( ! empty( $template_data->media ) ) {
