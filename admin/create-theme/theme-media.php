@@ -138,11 +138,14 @@ class Theme_Media {
 	public static function add_media_to_local( $media ) {
 		foreach ( $media as $url ) {
 			$download_file = download_url( $url );
-			$media_path    = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
-			if ( ! is_dir( $media_path ) ) {
-				wp_mkdir_p( $media_path );
+			// TODO: implement a warning if the file is missing
+			if ( is_wp_error( $download_file ) ) {
+				$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
+				if ( ! is_dir( $media_path ) ) {
+					wp_mkdir_p( $media_path );
+				}
+				rename( $download_file, $media_path . basename( $url ) );
 			}
-			rename( $download_file, $media_path . basename( $url ) );
 		}
 	}
 }
