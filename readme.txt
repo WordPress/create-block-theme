@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
-Tested up to: 6.1
+Tested up to: 6.2
 Stable tag: 1.8.0
 Requires PHP: 7.0
 License: GPLv2 or later
