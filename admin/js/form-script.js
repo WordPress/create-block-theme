@@ -143,17 +143,10 @@ const ERROR_NAME_CONTAINS_WORDPRESS = __(
 	'Theme name cannot contain the word "WordPress"',
 	'create-block-theme'
 );
-const ERROR_NAME_CONTAINS_MARKUP_WORDS = __(
-	'Theme name cannot contain the words as "HTML", "CSS", or "PHP"',
-	'create-block-theme'
-);
-const ERROR_NAME_CONTAINS_RELATED_WORDS = __(
-	'Theme name cannot contain the words as "Blog", "Web log", "Template", "Skin", etc.'
-);
 
 function isThemeNameValid( themeName ) {
 	// Check the validity of the theme name following the WordPress.org theme directory rules
-	// https://make.wordpress.org/themes/2013/02/26/clarifying-guidelines-for-theme-name/
+	// https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/theme-directory/class-wporg-themes-upload.php
 
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const lowerCaseName = themeName.toLowerCase();
@@ -178,30 +171,6 @@ function isThemeNameValid( themeName ) {
 	if ( slugNoDashes.includes( 'wordpress' ) ) {
 		validityStatus.isValid = false;
 		validityStatus.errorMessage = ERROR_NAME_CONTAINS_WORDPRESS;
-		return validityStatus;
-	}
-
-	// Check if the theme name contains markup words
-	const markupWords = [
-		'html',
-		'html5',
-		'css',
-		'css3',
-		'php',
-		'js',
-		'javascript',
-	];
-	if ( markupWords.some( ( w ) => lowerCaseName.includes( w ) ) ) {
-		validityStatus.isValid = false;
-		validityStatus.errorMessage = ERROR_NAME_CONTAINS_MARKUP_WORDS;
-		return validityStatus;
-	}
-
-	// Check if the theme name contains related words
-	const relatedWords = [ 'blog', 'weblog', 'template', 'skin' ];
-	if ( relatedWords.some( ( w ) => lowerCaseName.includes( w ) ) ) {
-		validityStatus.isValid = false;
-		validityStatus.errorMessage = ERROR_NAME_CONTAINS_RELATED_WORDS;
 		return validityStatus;
 	}
 
