@@ -4,7 +4,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,6 +35,12 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.8.1 =
+* Add current WordPress version to style.css and readme.txt
+* Add labels around Google font family checkbox controls
+* Fix theme slug, textdomain, and template for cloned, child and sibling themes.
+* Replace theme slug in templates after getting media urls from them
 
 = 1.8.0 =
 * Export style variations just with the changes made by the user
