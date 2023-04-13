@@ -10,6 +10,20 @@ function augment_resolver_with_utilities() {
 
 	class MY_Theme_JSON_Resolver extends WP_Theme_JSON_Resolver {
 
+		public static function get_custom_user_data() {
+			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+				return WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
+			}
+			return static::get_user_data();
+		}
+
+		public static function new_theme_json() {
+			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
+				return new WP_Theme_JSON_Gutenberg();
+			}
+			return new WP_Theme_JSON();
+		}
+
 		/**
 		 * Export the combined (and flattened) THEME and CUSTOM data.
 		 *
@@ -21,11 +35,7 @@ function augment_resolver_with_utilities() {
 		 * 'variation' will include just the user custom styles and settings.
 		 */
 		public static function export_theme_data( $content, $extra_theme_data = null ) {
-			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-				$theme = new WP_Theme_JSON_Gutenberg();
-			} else {
-				$theme = new WP_Theme_JSON();
-			}
+			$theme = static::new_theme_json();
 
 			if ( 'all' === $content && wp_get_theme()->parent() ) {
 				// Get parent theme.json.
@@ -63,11 +73,7 @@ function augment_resolver_with_utilities() {
 				$theme->merge( $theme_theme );
 			}
 
-			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
-				$theme->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
-			} else {
-				$theme->merge( static::get_user_data() );
-			}
+			$theme->merge( static::get_custom_user_data() );
 
 			// Merge the extra theme data received as a parameter
 			if ( ! empty( $extra_theme_data ) ) {
