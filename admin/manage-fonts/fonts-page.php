@@ -27,7 +27,7 @@ class Fonts_Page {
 
 		?>
 		<p name="theme-fonts-json" id="theme-fonts-json" class="hidden"><?php echo $fonts_json_string; ?></p>
-		<div id="fonts-app"></div>
+		<div id="create-block-theme-app"></div>
 		<input type="hidden" name="nonce" id="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
 		<?php
 	}

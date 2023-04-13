@@ -12,7 +12,7 @@ class React_App {
 		}
 
 		// Enqueue CSS of the app
-		wp_enqueue_style( 'fonts-app', plugins_url( 'build/index.css', __DIR__ ), array(), $asset_file['version'] );
+		wp_enqueue_style( 'create-block-theme-app', plugins_url( 'build/index.css', __DIR__ ), array(), $asset_file['version'] );
 
 		// Load our app.js.
 		array_push( $asset_file['dependencies'], 'wp-i18n' );

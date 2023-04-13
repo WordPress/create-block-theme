@@ -12,7 +12,7 @@ class Local_Fonts {
 
 		?>
 		<input id="nonce" type="hidden" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-		<div id="fonts-app"></div>
+		<div id="create-block-theme-app"></div>
 
 		<?php
 	}
