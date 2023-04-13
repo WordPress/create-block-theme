@@ -32,7 +32,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Template: {$template}
 Text Domain: {$text_domain}
 Tags: {$tags}
-*/";
+*/
+
+";
 	}
 
 	public static function clear_user_styles_customizations() {
