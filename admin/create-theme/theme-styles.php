@@ -7,18 +7,18 @@ class Theme_Styles {
 	 * Build a style.css file for CHILD/GRANDCHILD themes.
 	 */
 	public static function build_child_style_css( $theme ) {
-		$slug          = $theme['slug'];
-		$name          = $theme['name'];
-		$description   = $theme['description'];
-		$uri           = $theme['uri'];
-		$author        = $theme['author'];
-		$author_uri    = $theme['author_uri'];
-		$wp_version    = get_bloginfo( 'version' );
-		$template      = $theme['template'];
-		$template_text = ! empty( $template ) ? "Template: {$template}" : '';
-		$text_domain   = $theme['text_domain'];
-		$tags          = Theme_Tags::theme_tags_list( $theme );
-		return "/*
+		$slug        = $theme['slug'];
+		$name        = $theme['name'];
+		$description = $theme['description'];
+		$uri         = $theme['uri'];
+		$author      = $theme['author'];
+		$author_uri  = $theme['author_uri'];
+		$wp_version  = get_bloginfo( 'version' );
+		$template    = $theme['template'];
+		$text_domain = $theme['text_domain'];
+		$tags        = Theme_Tags::theme_tags_list( $theme );
+
+		$style_css = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
 Author: {$author}
@@ -30,10 +30,17 @@ Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-{$template_text}
-Text Domain: {$text_domain}
+";
+
+		if ( ! empty( $template ) ) {
+			$style_css .= "Template: {$template}";
+		}
+
+		$style_css .= "Text Domain: {$text_domain}
 Tags: {$tags}
 */";
+
+		return $style_css;
 	}
 
 	public static function clear_user_styles_customizations() {
