@@ -1,8 +1,38 @@
 <?php
 
+require_once( dirname(__DIR__) . '/class-react-app.php' );
 require_once( __DIR__ . '/theme-tags.php' );
 
 class Theme_Form {
+	public static function create_theme_form_page() {
+		if ( ! wp_is_block_theme() ) {
+			?>
+			<div class="wrap">
+				<h2><?php _ex( 'Create Block Theme', 'UI String', 'create-block-theme' ); ?></h2>
+				<p><?php _e( 'Activate a block theme to use this tool.', 'create-block-theme' ); ?></p>
+			</div>
+			<?php
+			return;
+		}
+
+		React_App::bootstrap();
+		
+		$nounce = wp_create_nonce( 'create_block_theme' );
+		$themeName = wp_get_theme()->get( 'Name' );
+		$isChildTheme = is_child_theme();
+		$tags = get_theme_feature_list();
+		if ( ! is_array( $tags ) ) {
+			$tags = array();
+		}
+
+		$metadata = json_encode(array( 'themeName' => $themeName, 'isChildTheme' => $isChildTheme, 'tags' => $tags));
+		?>
+		<input id="nonce" type="hidden" value="<?php echo $nounce; ?>" />
+		<div id="create-block-theme-app" data-metadata='<?php echo $metadata; ?>'></div>
+
+		<?php
+	}
+
 	public static function create_admin_form_page() {
 		if ( ! wp_is_block_theme() ) {
 			?>
