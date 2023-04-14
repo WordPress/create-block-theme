@@ -1,0 +1,102 @@
+.variants-list {
+	height: calc(100vh - 200px);
+	overflow-y: auto;
+	/* Firefox scrollbar */
+	scrollbar-color: #e2e2e2 #fff;
+	scrollbar-width: thin;
+}
+
+/* WebKit and Chromiums */
+.variants-list::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+	background-color: #fff;
+	margin-left: 10px;
+}
+.variants-list::-webkit-scrollbar-thumb {
+	background: #e2e2e2;
+	border-radius: 5px;
+}
+
+.variants-family .header,
+.variants-family .header div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 0 0 0.1rem 0;
+}
+
+.variants-family .header button {
+	visibility: hidden;
+}
+
+.variants-family .header:hover button {
+	visibility: visible;
+}
+
+.variants-family .name {
+	font-weight: bold;
+}
+
+.variants-family .variants {
+	font-size: 0.7rem;
+	color: #7e7e7e;
+	white-space: nowrap;
+}
+
+.variants-family {
+	padding: 0.25rem 0;
+}
+
+.variant-row {
+	display: grid;
+	grid-template-columns: 1fr min-content min-content;
+	white-space: nowrap;
+	align-items: center;
+	gap: 0.1rem;
+	padding: 0 0 0 0.5rem;
+	margin-bottom: 0.1rem;
+}
+
+.variant-row:hover {
+	background-color: #f2f2f2;
+}
+
+.variant-row button {
+	visibility: hidden;
+}
+
+.variant-row:hover button {
+	visibility: visible;
+}
+
+.variants-total {
+	border-top: 1px solid #e2e2e2;
+	padding-top: 1rem;
+	display: flex;
+	justify-content: space-between;
+}
+
+.variants-total .variant,
+.variants-total .size {
+	font-size: 0.9rem;
+}
+
+.size {
+	font-size: 0.7rem;
+	color: #7e7e7e;
+}
+
+.sidebar {
+	border-left: 1px solid #e2e2e2;
+	height: calc(100vh - 32px);
+	position: sticky;
+	top: 32px; /* 32px is the height of the admin bar */
+}
+
+.sidebar-container {
+	padding: 1rem;
+	position: sticky;
+	top: 0;
+}
+

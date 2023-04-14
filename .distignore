@@ -1,0 +1,11 @@
+# Files to be ignored in the plugin release
+
+node_modules/
+.gitignore
+update-google-fonts-json-file.js
+update-version-and-changelog.js
+package.json
+src/
+.git
+.github
+.wordpress-org

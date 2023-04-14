@@ -1,0 +1,20 @@
+/* Theme Tag Checkboxes */
+.theme-tags {
+	display: flex;
+	gap: 4rem;
+	margin-top: 0.5rem;
+}
+
+.theme-tags legend {
+	margin-bottom: 0.5rem;
+}
+
+.theme-tags label {
+	display: inline-block;
+	margin-left: 0.25rem;
+	margin-bottom: 0.25rem;
+}
+
+.theme-tags #features-tags-2 {
+	margin-top: 1.5rem;
+}
