@@ -12,6 +12,9 @@ import {
 	__experimentalHeading as Heading,
 	PanelBody,
 	TextControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	CheckboxControl
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -21,6 +24,10 @@ import { downloadFile } from '../utils';
 
 const ExportTheme = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const [ edit, setEdit ] = useState( false );
+	const [ activate, setActivate ] = useState( false ); 
+	const [ exportType, setExportType ] = useState( 'zip' ); // zip or folder
+	const [ createChild, setCreateChild ] = useState( false );
 	const [ theme, setTheme ] = useState( {
 		name: '',
 		description: '',
@@ -69,6 +76,24 @@ const ExportTheme = () => {
 		exportTheme();
 	};
 
+	const onTypeChange = ( value ) => {
+		if ( value === "zip" ) {
+			setActivate( false );
+		}
+		if ( value === "folder" ) {
+			setEdit( true );
+		}
+		setExportType( value );
+	}
+
+	const onSetCreateChildChange = ( value ) => {
+		if ( value === true ) {
+			setEdit( true );
+		}
+		setCreateChild( value );
+	}
+
+
 	return (
 		<PanelBody>
 			<Heading>{ __( 'Export', 'create-block-theme' ) }</Heading>
@@ -79,61 +104,112 @@ const ExportTheme = () => {
 						'create-block-theme'
 					) }
 				</Text>
+
+				<ToggleGroupControl
+					__nextHasNoMarginBottom
+					isBlock
+					label="Create:"
+					onChange={ onTypeChange }
+					value={ exportType }
+				>
+					<ToggleGroupControlOption
+						label="Zip"
+						value="zip"
+					/>
+					<ToggleGroupControlOption
+						label="Folder"
+						value="folder"
+					/>
+				</ToggleGroupControl>
+
 				<Spacer />
-				<TextControl
-					label={ __( 'Theme name', 'create-block-theme' ) }
-					value={ theme.name }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, name: value } )
-					}
-					placeholder={ __( 'Theme name', 'create-block-theme' ) }
+
+				<CheckboxControl
+					label="Export as Child Theme"
+					checked={ createChild }
+					onChange={ onSetCreateChildChange }
 				/>
-				<TextControl
-					label={ __( 'Theme description', 'create-block-theme' ) }
-					value={ theme.description }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, description: value } )
-					}
-					placeholder={ __(
-						'A short description of the theme',
-						'create-block-theme'
-					) }
+
+				<Spacer />
+
+				<CheckboxControl
+					label="Edit Theme Info"
+					checked={ edit }
+					onChange={ () => setEdit( ! edit ) }
+					disabled={ createChild || exportType === "folder" }
 				/>
-				<TextControl
-					label={ __( 'Theme URI', 'create-block-theme' ) }
-					value={ theme.uri }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, uri: value } )
-					}
-					placeholder={ __(
-						'https://github.com/wordpress/twentytwentythree/',
-						'create-block-theme'
-					) }
-				/>
-				<TextControl
-					label={ __( 'Author', 'create-block-theme' ) }
-					value={ theme.author }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, author: value } )
-					}
-					placeholder={ __(
-						'the WordPress team',
-						'create-block-theme'
-					) }
-				/>
-				<TextControl
-					label={ __( 'Author URI', 'create-block-theme' ) }
-					value={ theme.author_uri }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, author_uri: value } )
-					}
-					placeholder={ __(
-						'https://wordpress.org/',
-						'create-block-theme'
-					) }
-				/>
+
+				<Spacer />
+
+				{ edit &&(
+					<>
+						<TextControl
+							label={ __( 'Theme name', 'create-block-theme' ) }
+							value={ theme.name }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, name: value } )
+							}
+							placeholder={ __( 'Theme name', 'create-block-theme' ) }
+						/>
+						<TextControl
+							label={ __( 'Theme description', 'create-block-theme' ) }
+							value={ theme.description }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, description: value } )
+							}
+							placeholder={ __(
+								'A short description of the theme',
+								'create-block-theme'
+							) }
+						/>
+						<TextControl
+							label={ __( 'Theme URI', 'create-block-theme' ) }
+							value={ theme.uri }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, uri: value } )
+							}
+							placeholder={ __(
+								'https://github.com/wordpress/twentytwentythree/',
+								'create-block-theme'
+							) }
+						/>
+						<TextControl
+							label={ __( 'Author', 'create-block-theme' ) }
+							value={ theme.author }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, author: value } )
+							}
+							placeholder={ __(
+								'the WordPress team',
+								'create-block-theme'
+							) }
+						/>
+						<TextControl
+							label={ __( 'Author URI', 'create-block-theme' ) }
+							value={ theme.author_uri }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, author_uri: value } )
+							}
+							placeholder={ __(
+								'https://wordpress.org/',
+								'create-block-theme'
+							) }
+						/>
+					</>
+				) }
+				
 			</VStack>
+
 			<Spacer />
+			{ exportType === "folder" && (
+				<CheckboxControl
+					label="Activate After Export"
+					checked={ activate }
+					onChange={ (value) => setActivate( value ) }
+				/>
+			)}
+
+			<Spacer margin={8}/>
 			<Button
 				variant="secondary"
 				disabled={ ! theme.name }
