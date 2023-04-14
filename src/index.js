@@ -34,7 +34,7 @@ function App() {
 window.addEventListener(
 	'load',
 	function () {
-		render( <App />, document.querySelector( '#fonts-app' ) );
+		render( <App />, document.querySelector( '#create-block-theme-app' ) );
 	},
 	false
 );
