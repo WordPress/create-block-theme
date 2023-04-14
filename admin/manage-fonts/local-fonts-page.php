@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . '/fonts-page.php' );
+require_once( dirname( __DIR__ ) . '/class-react-app.php' );
 
 class Local_Fonts {
 	public static function local_fonts_admin_page() {
@@ -8,11 +8,11 @@ class Local_Fonts {
 		wp_enqueue_script( 'inflate', plugin_dir_url( dirname( __FILE__ ) ) . 'js/lib/inflate.js', array(), '', false );
 		wp_enqueue_script( 'unbrotli', plugin_dir_url( dirname( __FILE__ ) ) . 'js/lib/unbrotli.js', array(), '', false );
 
-		Fonts_Page::load_fonts_react_app();
+		React_App::bootstrap();
 
 		?>
 		<input id="nonce" type="hidden" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
-		<div id="fonts-app"></div>
+		<div id="create-block-theme-app"></div>
 
 		<?php
 	}

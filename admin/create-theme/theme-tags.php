@@ -14,17 +14,15 @@ class Theme_Tags {
 	 * @since 1.5.2
 	 */
 	public static function theme_tags_list( $theme ) {
-		$checkbox_tags_merged = array_merge( $theme['tags-subject'] ?? array(), $theme['tags-layout'] ?? array(), $theme['tags-features'] ?? array() );
-		$checkbox_tags        = $checkbox_tags_merged ? ', ' . implode( ', ', $checkbox_tags_merged ) : '';
-		$custom_tags          = $theme['tags_custom'] ? ', ' . $theme['tags_custom'] : '';
-		$tags                 = $checkbox_tags . $custom_tags;
+		$checkbox_tags_merged = array_merge(
+			$theme['tags-subject'] ?? array(),
+			$theme['tags-layout'] ?? array(),
+			$theme['tags-features'] ?? array(),
+		);
+		$custom_tags          = array_map( 'trim', explode( ',', $theme['tags_custom'] ?? '' ) );
+		$tags                 = array_unique( array_merge( $checkbox_tags_merged, $custom_tags ) );
 
-		// Remove comma and space from start of tags list
-		if ( ', ' === substr( $tags, 0, 2 ) ) {
-			$tags = substr( $tags, 2 );
-		}
-
-		return $tags;
+		return implode( ', ', $tags );
 	}
 
 	/**
