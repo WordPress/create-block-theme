@@ -1,6 +1,15 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { getThemeExportOptions } from './create-theme-options';
 import styles from './styles.module.css';
+import {
+	Button,
+	RangeControl,
+	SelectControl,
+	// eslint-disable-next-line
+	__experimentalInputControl as InputControl,
+    TextareaControl,
+    CheckboxControl
+} from '@wordpress/components';
 
 export function CreateThemeForm( { themeName, tags, selectedOption } ) {
 	const themeOptions = getThemeExportOptions( themeName );
@@ -34,107 +43,67 @@ export function CreateThemeForm( { themeName, tags, selectedOption } ) {
 function ThemeForm() {
 	return (
 		<div id="new_theme_metadata_form" className="theme-form">
-			<p>
+			{/* <p>
 				<em>
 					{ __(
 						'Items indicated with (*) are required.',
 						'create-block-theme'
 					) }
 				</em>
-			</p>
-			<label>
-				{ __( 'Theme Name (*):', 'create-block-theme' ) }
-				<br />
-				<input
-					placeholder={ __( 'Theme Name', 'create-block-theme' ) }
-					type="text"
-					name="theme[name]"
-					className="large-text"
-				/>
-			</label>
+			</p> */}
+
+            <InputControl
+                label="Theme Name"
+                required
+                value={ '' }
+                onChange={ () => {} }
+            />
+
+            <br />
+            <TextareaControl
+                __nextHasNoMarginBottom
+                label={ __( 'Theme Description' ) }
+                value={ '' }
+                onChange={ ( ) => {} }
+                placeholder='A short description of the theme.'
+            />
+			
+            <br />
+            <InputControl
+                label="Theme URI"
+                placeholder={ __(
+                    'https://github.com/wordpress/twentytwentythree/',
+                    'create-block-theme'
+                ) }
+                help="The URL of a public web page where users can find more information about the theme."
+                value={ '' }
+                onChange={ () => {} }
+            />
+
 			<br />
+            <InputControl
+                label="Author"
+                placeholder={ __(
+                    'WordPress Team',
+                    'create-block-theme'
+                ) }
+                help="The name of the individual or organization who developed the theme."
+                value={ '' }
+                onChange={ () => {} }
+            />
+
 			<br />
-			<label>
-				{ __( 'Theme Description:', 'create-block-theme' ) }
-				<br />
-				<textarea
-					placeholder={ __(
-						'A short description of the theme.',
-						'create-block-theme'
-					) }
-					rows="4"
-					cols="50"
-					name="theme[description]"
-					className="large-text"
-				></textarea>
-			</label>
-			<br />
-			<br />
-			<label>
-				{ __( 'Theme URI:', 'create-block-theme' ) }
-				<br />
-				<small>
-					{ __(
-						'The URL of a public web page where users can find more information about the theme.',
-						'create-block-theme'
-					) }
-				</small>
-				<br />
-				<input
-					placeholder={ __(
-						'https://github.com/wordpress/twentytwentythree/',
-						'create-block-theme'
-					) }
-					type="text"
-					name="theme[uri]"
-					className="large-text code"
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				{ __( 'Author:', 'create-block-theme' ) }
-				<br />
-				<small>
-					{ __(
-						'The name of the individual or organization who developed the theme.',
-						'create-block-theme'
-					) }
-				</small>
-				<br />
-				<input
-					placeholder={ __(
-						'the WordPress team',
-						'create-block-theme'
-					) }
-					type="text"
-					name="theme[author]"
-					className="large-text"
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				{ __( 'Author URI:', 'create-block-theme' ) }
-				<br />
-				<small>
-					{ __(
-						'The URL of the authoring individual or organization.',
-						'create-block-theme'
-					) }
-				</small>
-				<br />
-				<input
-					placeholder={ __(
-						'https://wordpress.org/',
-						'create-block-theme'
-					) }
-					type="text"
-					name="theme[author_uri]"
-					className="large-text code"
-				/>
-			</label>
-			<br />
+			<InputControl
+                label="Author URI"
+                placeholder={ __(
+                    'https://wordpress.org/',
+                    'create-block-theme'
+                ) }
+                help="The URL of the authoring individual or organization."
+                value={ '' }
+                onChange={ () => {} }
+            />
+
 			<br />
 			<label htmlFor="screenshot">
 				{ __( 'Screenshot:', 'create-block-theme' ) }
@@ -163,24 +132,12 @@ function ThemeForm() {
 function VariationForm() {
 	return (
 		<div id="new_variation_metadata_form" className="theme-form">
-			<p>
-				<em>
-					{ __(
-						'Items indicated with (*) are required.',
-						'create-block-theme'
-					) }
-				</em>
-			</p>
-			<label>
-				{ __( 'Variation Name (*):', 'create-block-theme' ) }
-				<br />
-				<input
-					placeholder={ __( 'Variation Name', 'create-block-theme' ) }
-					type="text"
-					name="theme[variation]"
-					className="large-text"
-				/>
-			</label>
+			<InputControl
+                label="Variation Name"
+                required
+                value={ '' }
+                onChange={ () => {} }
+            />
 		</div>
 	);
 }
@@ -204,24 +161,39 @@ function ThemeTags( { tags } ) {
             <div style={{marginTop: '1rem', marginBottom: '0.5rem'}}>Subject (max 3):</div>
 			<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr'}}>{ subjectTags.map(tag => {
                 return <div>
-                    <input type="checkbox" name={tag.value} value={tag.value} />
-			        <label>{tag.label}</label>
+                    <CheckboxControl
+						// __nextHasNoMarginBottom
+						label={ tag.label }
+						checked={ false }
+						// indeterminate={ isMixed }
+						onChange={ ( newValue ) => {}}
+					/>
                 </div>
             }) }</div>
 
             <div style={{marginTop: '1rem', marginBottom: '0.5rem'}}>Layout:</div>
 			<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr'}}>{ layoutTags.map(tag => {
                 return <div>
-                    <input type="checkbox" name={tag.value} value={tag.value} />
-			        <label>{tag.label}</label>
+                    <CheckboxControl
+						// __nextHasNoMarginBottom
+						label={ tag.label }
+						checked={ false }
+						// indeterminate={ isMixed }
+						onChange={ ( newValue ) => {}}
+					/>
                 </div>
             }) }</div>
 
             <div style={{marginTop: '1rem', marginBottom: '0.5rem'}}>Features:</div>
 			<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr'}}>{ featureTags.map(tag => {
                 return <div>
-                    <input type="checkbox" name={tag.value} value={tag.value} />
-			        <label>{tag.label}</label>
+                    <CheckboxControl
+						// __nextHasNoMarginBottom
+						label={ tag.label }
+						checked={ false }
+						// indeterminate={ isMixed }
+						onChange={ ( newValue ) => {}}
+					/>
                 </div>
             }) }</div>
 		</div>
