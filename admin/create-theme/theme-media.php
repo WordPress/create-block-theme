@@ -139,7 +139,7 @@ class Theme_Media {
 		foreach ( $media as $url ) {
 			$download_file = download_url( $url );
 			// TODO: implement a warning if the file is missing
-			if ( is_wp_error( $download_file ) ) {
+			if ( ! is_wp_error( $download_file ) ) {
 				$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
 				if ( ! is_dir( $media_path ) ) {
 					wp_mkdir_p( $media_path );
