@@ -33,7 +33,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 ";
 
 		if ( ! empty( $template ) ) {
-			$style_css .= "Template: {$template}";
+			$style_css .= "Template: {$template}\n";
 		}
 
 		$style_css .= "Text Domain: {$text_domain}
