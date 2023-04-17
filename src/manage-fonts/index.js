@@ -84,7 +84,10 @@ function ManageFonts() {
 
 	function deleteFontFamily( fontFamily ) {
 		const updatedFonts = newThemeFonts.map( ( family ) => {
-			if ( fontFamily === family.fontFamily ) {
+			if (
+				fontFamily === family.fontFamily ||
+				fontFamily === family.name
+			) {
 				return {
 					...family,
 					shouldBeRemoved: true,
@@ -110,7 +113,8 @@ function ManageFonts() {
 				if (
 					weight === face.fontWeight &&
 					style === face.fontStyle &&
-					fontFamily === family.fontFamily
+					( fontFamily === family.fontFamily ||
+						fontFamily === family.name )
 				) {
 					return {
 						...face,
