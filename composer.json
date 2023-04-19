@@ -32,16 +32,12 @@
 		"sirbrillig/phpcs-variable-analysis": "^2.8"
 	},
 	"require": {
-		"composer/installers": "~1.0",
-		"phenx/php-font-lib": "^0.5.4"
+		"composer/installers": "~1.0"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
 		"test": "phpunit",
-		"test:watch": "phpunit-watcher watch < /dev/tty",
-		"post-autoload-dump": [
-			"cp -r vendor/phenx/php-font-lib/src/FontLib includes"
-		]
+		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}
 }
