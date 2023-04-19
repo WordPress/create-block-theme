@@ -324,32 +324,22 @@ class Manage_Fonts_Admin {
 		$google_formatted_font_name = str_replace( ' ', '+', $font_name );
 
 		// If file_name exists, then add font license to readme.txt
-		if ( 'remove' !== $file_name && is_string( $file_name ) ) {
+		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) ) {
 			// Check that the font is not already credited in readme.txt
 			if ( false === stripos( $readme_file_contents, $font_name ) ) {
-				// Require php-font-lib
-				require_once( __DIR__ . '/../includes/FontLib/Autoloader.php' );
+				// Get font credits from font file metadata
+				$font_credits = json_decode( stripslashes( $_POST['font-credits'] ), true );
 
-				// Build font source URL
-				$font_source = 'https://www.google.com/fonts/specimen/' . $google_formatted_font_name;
-
-				// Get license info from font file
-				$font = \FontLib\Font::load( get_stylesheet_directory() . '/assets/fonts/' . $file_name );
-				$font->parse();
-				$license_info = $font->getNameTableString( 13 ) ? $font->getNameTableString( 13 ) : '';
-
-				if ( stripos( $font->getNameTableString( 13 ), 'SIL Open Font License' ) ) {
-					// If license is SIL Open Font License, use custom format
-					$license_info = 'Licensed under the SIL Open Font License, Version 1.1';
-				}
-
-				$license_url = $font->getNameTableString( 14 ) ? "({$font->getNameTableString(14)})" : '';
+				// Assign font credits to variables
+				$copyright    = $font_credits['copyright'] ? $font_credits['copyright'] : '';
+				$license_info = array_key_exists( 'license', $font_credits ) ? "\n" . $font_credits['license'] : '';
+				$license_url  = array_key_exists( 'licenseURL', $font_credits ) ? "\n" . 'License URL: ' . $font_credits['licenseURL'] : '';
+				$font_source  = $font_credits['source'] ? "\n" . 'Source: ' . $font_credits['source'] : '';
 
 				// Build the font credits string
 				$font_credits = "
 {$font_name} Font
-{$license_info} {$license_url}
-Source: {$font_source}
+{$copyright} {$license_info} {$license_url} {$font_source}
 ";
 
 				// Add font credits to the end of readme.txt
