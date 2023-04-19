@@ -161,9 +161,9 @@ class Create_Block_Theme_Admin {
 	 * Clone the activated theme to create a new theme
 	 */
 	function clone_theme( $export_type, $theme, $screenshot ) {
-		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 		// Sanitize inputs.
 		$theme['name']           = sanitize_text_field( $theme['name'] );
+		$theme_slug              = Theme_Utils::get_theme_slug( $theme['name'] );
 		$theme['description']    = sanitize_text_field( $theme['description'] );
 		$theme['uri']            = sanitize_text_field( $theme['uri'] );
 		$theme['author']         = sanitize_text_field( $theme['author'] );
@@ -184,6 +184,9 @@ class Create_Block_Theme_Admin {
 		$cloned_theme_dir = dirname( $source ) . DIRECTORY_SEPARATOR . $theme['slug'];
 		if ( ! file_exists( $cloned_theme_dir ) ) {
 			wp_mkdir_p( $cloned_theme_dir );
+
+			// Add theme templates including user modifications.
+			Theme_Templates::add_templates_to_dest( $export_type, $cloned_theme_dir, $theme['slug'] );
 
 			// Copy theme files.
 			Theme_Utils::copy_theme_to_dest( $cloned_theme_dir, $theme['slug'], $theme['name'] );
@@ -206,9 +209,6 @@ class Create_Block_Theme_Admin {
 				$cloned_theme_dir . DIRECTORY_SEPARATOR . 'style.css',
 				$css_contents
 			);
-
-			// Add theme templates including user modifications.
-			Theme_Templates::add_templates_to_dest( $export_type, $cloned_theme_dir, $theme['slug'] );
 
 			// Add theme.json with user changes.
 			file_put_contents(

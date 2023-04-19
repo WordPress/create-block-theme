@@ -59,16 +59,6 @@ class Theme_Utils {
 				continue;
 			}
 
-			// If the path is for templates/parts ignore it
-			if (
-				strpos( $file_path, 'block-template-parts/' ) ||
-				strpos( $file_path, 'block-templates/' ) ||
-				strpos( $file_path, 'templates/' ) ||
-				strpos( $file_path, 'parts/' )
-			) {
-				continue;
-			}
-
 			// Replace only text files, skip png's and other stuff.
 			$valid_extensions       = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
 			$valid_extensions_regex = implode( '|', $valid_extensions );
