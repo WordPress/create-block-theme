@@ -320,9 +320,6 @@ class Manage_Fonts_Admin {
 			return;
 		}
 
-		// Format font name for font source link
-		$google_formatted_font_name = str_replace( ' ', '+', $font_name );
-
 		// If file_name exists, then add font license to readme.txt
 		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) ) {
 			// Check that the font is not already credited in readme.txt
@@ -340,6 +337,7 @@ class Manage_Fonts_Admin {
 				$font_credits = "
 {$font_name} Font
 {$copyright} {$license_info} {$license_url} {$font_source}
+-- End of {$font_name} Font credits --
 ";
 
 				// Add font credits to the end of readme.txt
@@ -355,11 +353,14 @@ class Manage_Fonts_Admin {
 		if ( 'remove' === $file_name ) {
 			// Check if font credits are in readme.txt
 			if ( false !== stripos( $readme_file_contents, $font_name ) ) {
+				// Build end of credits string
+				$end_credits_note = '-- End of ' . $font_name . ' Font credits --';
+
 				// Calculate the start and end positions of the font credits
-				$font_name_strlength        = strlen( $font_name . ' Font' ) + 1;
-				$google_font_name_strlength = strlen( '/' . $google_formatted_font_name ) + 1;
-				$font_start                 = stripos( $readme_file_contents, $font_name . ' Font' ) + $font_name_strlength;
-				$font_end                   = stripos( $readme_file_contents, '/' . $google_formatted_font_name, $font_start );
+				$font_name_strlength   = strlen( $font_name . ' Font' ) + 1;
+				$end_credits_strlength = strlen( $end_credits_note ) + 1;
+				$font_start            = stripos( $readme_file_contents, "\n" . $font_name . ' Font' ) + $font_name_strlength;
+				$font_end              = stripos( $readme_file_contents, $end_credits_note, $font_start );
 
 				// Check if the start and end positions are valid
 				if ( false === $font_start || false === $font_end ) {
@@ -367,7 +368,7 @@ class Manage_Fonts_Admin {
 				}
 
 				// Remove the font credits from readme.txt
-				$removed_font_credits = substr_replace( $readme_file_contents, '', $font_start - $font_name_strlength, $font_end + $google_font_name_strlength - $font_start + $font_name_strlength );
+				$removed_font_credits = substr_replace( $readme_file_contents, '', $font_start - $font_name_strlength, $font_end + $end_credits_strlength - $font_start + $font_name_strlength );
 				file_put_contents( $readme_file, $removed_font_credits );
 			}
 		}
