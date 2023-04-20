@@ -23,7 +23,7 @@ import {
 } from '@wordpress/components';
 import ExportTheme from './editor/export-theme';
 import EditTheme from './editor/edit-theme';
-import ThemeVariations from './editor/theme-variations';
+import Fonts from './editor/fonts';
 import { edit, typography, brush, addCard, copy, download, file, cog } from '@wordpress/icons';
 
 function SidebarMenu() {
@@ -46,9 +46,6 @@ function SidebarMenu() {
 				<NavigatorButton path="/edit" icon={cog}>
 					{ __( 'Edit Info' ) }
 				</NavigatorButton>
-				<NavigatorButton path="/variations" icon={brush}>
-					{ __( 'Style Variations' ) }
-				</NavigatorButton>
 				<NavigatorButton path="/fonts" icon={typography}>
 					{ __( 'Manage Fonts' ) }
 				</NavigatorButton>
@@ -69,8 +66,8 @@ function SidebarNavigator() {
 			<NavigatorScreen path="/edit">
 				<EditTheme />
 			</NavigatorScreen>
-			<NavigatorScreen path="/variations">
-				<ThemeVariations />
+			<NavigatorScreen path="/fonts">
+				<Fonts />
 			</NavigatorScreen>
 		</NavigatorProvider>
 	);

@@ -1,11 +1,11 @@
 import SidebarSection from "./sidebar-section";
 
-function ThemeVariations () {
+function Fonts () {
     return (
         <SidebarSection>
-            Theme Variations
+            Fonts
         </SidebarSection> 
     );
 }
 
-export default ThemeVariations;
+export default Fonts;
