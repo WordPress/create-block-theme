@@ -41,7 +41,7 @@ class Form_Messages {
 				printf(
 					// translators: %1$s: Theme name
 					esc_html__( 'Blank theme created, head over to Appearance > Themes to activate %1$s', 'create-block-theme' ),
-					esc_html( $theme_name )
+					esc_html( stripslashes( $theme_name ) )
 				);
 				?>
 					</p>
