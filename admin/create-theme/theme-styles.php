@@ -8,10 +8,10 @@ class Theme_Styles {
 	 */
 	public static function build_child_style_css( $theme ) {
 		$slug        = $theme['slug'];
-		$name        = $theme['name'];
-		$description = $theme['description'];
+		$name        = stripslashes( $theme['name'] );
+		$description = stripslashes( $theme['description'] );
 		$uri         = $theme['uri'];
-		$author      = $theme['author'];
+		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
 		$wp_version  = get_bloginfo( 'version' );
 		$template    = $theme['template'];
