@@ -162,6 +162,10 @@ class Theme_Zip {
 	}
 
 	static function add_media_to_zip( $zip, $media ) {
+		if ( ! is_admin() ) {
+			include( ABSPATH . 'wp-admin/includes/admin.php' );
+		}
+
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
 			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
