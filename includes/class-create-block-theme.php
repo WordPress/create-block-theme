@@ -42,6 +42,7 @@ class Create_Block_Theme {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-create-theme.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-manage-fonts.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/wp-org-theme-directory.php';
 
 		$this->loader = new Create_Block_Theme_Loader();
 
@@ -58,6 +59,7 @@ class Create_Block_Theme {
 
 		$plugin_admin       = new Create_Block_Theme_Admin();
 		$manage_fonts_admin = new Manage_Fonts_Admin();
+		$wp_theme_directory = new WP_Theme_Directory();
 	}
 
 	/**
