@@ -336,9 +336,15 @@ class Manage_Fonts_Admin {
 				$license_url  = array_key_exists( 'licenseURL', $font_credits ) ? "\n" . 'License URL: ' . trim( $font_credits['licenseURL'] ) : '';
 				$font_source  = array_key_exists( 'source', $font_credits ) ? "\n" . 'Source: ' . trim( $font_credits['source'] ) : '';
 
-				// Prevent license info from being over 200 characters
-				if ( is_string( $license_info ) && strlen( $license_info ) > 200 ) {
-					$license_info = substr( $license_info, 0, strrpos( substr( $license_info, 0, 200 ), ' ' ) ) . '...';
+				// Handle longer, multi-line license info content
+				if ( is_string( $license_info ) ) {
+					// Split license info at first new line
+					$license_info = "\n" . strtok( $license_info, "\n" );
+
+					// Prevent license info from being over 200 characters
+					if ( strlen( $license_info ) > 200 ) {
+						$license_info = substr( $license_info, 0, strrpos( substr( $license_info, 0, 200 ), ' ' ) ) . '...';
+					}
 				}
 
 				// Build the font credits string
