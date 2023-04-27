@@ -312,6 +312,9 @@ class Manage_Fonts_Admin {
 			return;
 		}
 
+		// Build end of credits note
+		$end_credits_note = '-- End of ' . $font_name . ' Font credits --';
+
 		// Get theme readme.txt
 		$readme_file          = get_stylesheet_directory() . '/readme.txt';
 		$readme_file_contents = file_get_contents( $readme_file );
@@ -342,7 +345,7 @@ class Manage_Fonts_Admin {
 				$font_credits = "
 {$font_name} Font
 {$copyright} {$license_info} {$license_url} {$font_source}
--- End of {$font_name} Font credits --
+{$end_credits_note}
 ";
 
 				// Add font credits to the end of readme.txt
@@ -358,9 +361,6 @@ class Manage_Fonts_Admin {
 		if ( 'remove' === $file_name ) {
 			// Check if font credits are in readme.txt
 			if ( false !== stripos( $readme_file_contents, $font_name ) ) {
-				// Build end of credits string
-				$end_credits_note = '-- End of ' . $font_name . ' Font credits --';
-
 				// Calculate the start and end positions of the font credits
 				$font_name_strlength   = strlen( $font_name . ' Font' ) + 1;
 				$end_credits_strlength = strlen( $end_credits_note ) + 1;
