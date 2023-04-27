@@ -30,6 +30,7 @@ const ExportTheme = () => {
 		uri: '',
 		author: '',
 		author_uri: '',
+		tags_custom: '',
 	} );
 
 	useSelect( ( select ) => {
