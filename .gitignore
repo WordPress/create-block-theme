@@ -25,6 +25,7 @@ vendor/
 
 # ignore system files
 .DS_Store
+.vscode
 
 # plugin build folder
 build/
