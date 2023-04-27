@@ -17,7 +17,8 @@ class Theme_Styles {
 		$template    = $theme['template'];
 		$text_domain = $theme['text_domain'];
 		$tags        = Theme_Tags::theme_tags_list( $theme );
-		return "/*
+
+		$style_css = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
 Author: {$author}
@@ -29,12 +30,17 @@ Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Template: {$template}
-Text Domain: {$text_domain}
-Tags: {$tags}
-*/
-
 ";
+
+		if ( ! empty( $template ) ) {
+			$style_css .= "Template: {$template}\n";
+		}
+
+		$style_css .= "Text Domain: {$text_domain}
+Tags: {$tags}
+*/";
+
+		return $style_css;
 	}
 
 	public static function clear_user_styles_customizations() {
