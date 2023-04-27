@@ -34,6 +34,12 @@ class Create_Block_Theme_Admin {
 	}
 
 	function create_block_theme_enqueue() {
+		global $pagenow;
+
+		if ( 'site-editor.php' !== $pagenow ) {
+			return;
+		}
+
 		$asset_file = include( plugin_dir_path( dirname( __FILE__ ) ) . 'build/plugin-sidebar.asset.php' );
 
 		wp_register_script(
