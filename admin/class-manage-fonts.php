@@ -328,10 +328,10 @@ class Manage_Fonts_Admin {
 				$font_credits = json_decode( stripslashes( $_POST['font-credits'] ), true );
 
 				// Assign font credits to variables
-				$copyright    = array_key_exists( 'copyright', $font_credits ) ? $font_credits['copyright'] : '';
-				$license_info = array_key_exists( 'license', $font_credits ) ? "\n" . $font_credits['license'] : '';
-				$license_url  = array_key_exists( 'licenseURL', $font_credits ) ? "\n" . 'License URL: ' . $font_credits['licenseURL'] : '';
-				$font_source  = array_key_exists( 'source', $font_credits ) ? "\n" . 'Source: ' . $font_credits['source'] : '';
+				$copyright    = array_key_exists( 'copyright', $font_credits ) ? trim( $font_credits['copyright'] ) : '';
+				$license_info = array_key_exists( 'license', $font_credits ) ? "\n" . trim( $font_credits['license'] ) : '';
+				$license_url  = array_key_exists( 'licenseURL', $font_credits ) ? "\n" . 'License URL: ' . trim( $font_credits['licenseURL'] ) : '';
+				$font_source  = array_key_exists( 'source', $font_credits ) ? "\n" . 'Source: ' . trim( $font_credits['source'] ) : '';
 
 				// Build the font credits string
 				$font_credits = "
