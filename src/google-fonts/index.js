@@ -165,12 +165,13 @@ function GoogleFonts() {
 
 		function getFontData( event ) {
 			const font = event.detail.font;
+			const nameTable = font.opentype.tables.name;
 
 			const fontCredits = {
-				copyright: font.opentype.tables.name.nameRecords[ 0 ]?.string,
-				source: font.opentype.tables.name.nameRecords[ 10 ]?.string,
-				license: font.opentype.tables.name.nameRecords[ 12 ]?.string,
-				licenseURL: font.opentype.tables.name.nameRecords[ 13 ]?.string,
+				copyright: nameTable.get( 0 ),
+				source: nameTable.get( 11 ),
+				license: nameTable.get( 13 ),
+				licenseURL: nameTable.get( 14 ),
 			};
 
 			setSelectedFontCredits( fontCredits );
