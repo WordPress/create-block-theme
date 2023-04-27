@@ -4,7 +4,7 @@ Donate link: https://automattic.com/
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,6 +35,27 @@ Make changes to your site styles and templates using the Site Editor. You can al
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
 == Changelog ==
+
+= 1.8.2 =
+* Merge branch 'trunk' into update/tested-up-wp-version-62
+* Updating Tested up to: 6.2 WordPress version
+* fix tag duplication in exported theme
+* Fixing error checking
+* Update Google Fonts JSON data from API
+* Refactor react app code for general purpose
+* add build directory to php exclude list
+* Do not call replace_template_namespace when overwrting theme
+* Merge branch 'trunk' into fix/314
+* Fix error when switching to template edit mode in the post editor
+* Add useRootPaddingAwareAlignments to blank theme
+* Update Google Fonts JSON data from API
+* Merge branch 'trunk' into fix/314
+* Avoid adding Template info to style.css if it's empty
+* Fix delete font family/face when name is different from family
+* Add theme name validation
+* Fix export theme from Site Editor
+* Strip escaping characters before printing stylesheet
+* Linting unlinted file
 
 = 1.8.1 =
 * Add current WordPress version to style.css and readme.txt
