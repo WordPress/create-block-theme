@@ -12,6 +12,7 @@ class Theme_Readme {
 		$author                 = $theme['author'];
 		$author_uri             = $theme['author_uri'];
 		$copy_year              = gmdate( 'Y' );
+		$wp_version             = get_bloginfo( 'version' );
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
@@ -24,7 +25,7 @@ class Theme_Readme {
 		return "=== {$name} ===
 Contributors: {$author}
 Requires at least: 5.8
-Tested up to: 5.9
+Tested up to: {$wp_version}
 Requires PHP: 5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

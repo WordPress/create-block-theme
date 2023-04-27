@@ -188,4 +188,5 @@ class Theme_Blocks {
 		$markup = html_entity_decode( $markup, ENT_QUOTES | ENT_XML1, 'UTF-8' );
 		return $markup;
 	}
+
 }

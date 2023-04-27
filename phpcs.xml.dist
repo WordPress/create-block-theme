@@ -56,6 +56,7 @@
 	</rule>
 
 	<!-- Directories and third party library exclusions. -->
+	<exclude-pattern>/build/*</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 

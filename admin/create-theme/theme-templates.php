@@ -8,9 +8,7 @@ class Theme_Templates {
 	/*
 	 * Build a collection of templates and template-parts that should be exported (and modified) based on the given export_type and new slug
 	 */
-	public static function get_theme_templates( $export_type, $new_slug ) {
-
-		$old_slug           = wp_get_theme()->get( 'TextDomain' );
+	public static function get_theme_templates( $export_type ) {
 		$templates          = get_block_templates();
 		$template_parts     = get_block_templates( array(), 'wp_template_part' );
 		$exported_templates = array();
@@ -25,9 +23,7 @@ class Theme_Templates {
 			$template = self::filter_theme_template(
 				$template,
 				$export_type,
-				$templates_path,
-				$old_slug,
-				$new_slug
+				$templates_path
 			);
 			if ( $template ) {
 				$exported_templates[] = $template;
@@ -38,9 +34,7 @@ class Theme_Templates {
 			$template = self::filter_theme_template(
 				$template,
 				$export_type,
-				$parts_path,
-				$old_slug,
-				$new_slug
+				$parts_path
 			);
 			if ( $template ) {
 				$exported_parts[] = $template;
@@ -59,7 +53,7 @@ class Theme_Templates {
 	 * Templates not filtered out are modified based on the slug information provided and cleaned up
 	 * to have the expected exported value.
 	 */
-	static function filter_theme_template( $template, $export_type, $path, $old_slug, $new_slug ) {
+	static function filter_theme_template( $template, $export_type, $path ) {
 		if ( 'theme' === $template->source && 'user' === $export_type ) {
 			return false;
 		}
@@ -75,10 +69,14 @@ class Theme_Templates {
 		// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 		$template->content = str_replace( '\u002d', '-', $template->content );
 
+		return $template;
+	}
+
+	public static function replace_template_namespace( $template, $new_slug ) {
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		if ( $new_slug ) {
 			$template->content = str_replace( $old_slug, $new_slug, $template->content );
 		}
-
 		return $template;
 	}
 
@@ -103,7 +101,7 @@ class Theme_Templates {
 
 	public static function add_templates_to_local( $export_type ) {
 
-		$theme_templates  = self::get_theme_templates( $export_type, null );
+		$theme_templates  = self::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
 
 		// If there is no templates folder, create it.
@@ -122,8 +120,11 @@ class Theme_Templates {
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Write the pattern
 				file_put_contents(
@@ -159,8 +160,11 @@ class Theme_Templates {
 				}
 
 				// If there are external images, add it as a pattern
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Write the pattern
 				file_put_contents(

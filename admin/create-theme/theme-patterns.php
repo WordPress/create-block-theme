@@ -1,8 +1,8 @@
 <?php
 
 class Theme_Patterns {
-	public static function pattern_from_template( $template ) {
-		$theme_slug      = wp_get_theme()->get( 'TextDomain' );
+	public static function pattern_from_template( $template, $new_slug = null ) {
+		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$pattern_slug    = $theme_slug . '/' . $template->slug;
 		$pattern_content = (
 		'<?php
@@ -60,5 +60,11 @@ class Theme_Patterns {
 		if ( $text && trim( $text ) !== '' ) {
 			return "<?php echo esc_attr_e( '" . $text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
 		}
+	}
+
+	public static function create_pattern_link( $attributes ) {
+		$block_attributes = array_filter( $attributes );
+		$attributes_json  = json_encode( $block_attributes, JSON_UNESCAPED_SLASHES );
+		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
 	}
 }

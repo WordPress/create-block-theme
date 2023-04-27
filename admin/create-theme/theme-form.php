@@ -53,8 +53,7 @@ class Theme_Form {
 								</label>
 								<br />
 								<?php _e( '[Create a new theme cloning the activated child theme.  The parent theme will be the same as the parent of the currently activated theme. The resulting theme will have all of the assets of the activated theme, none of the assets provided by the parent theme, as well as user changes.]', 'create-block-theme' ); ?>
-								<p><b><?php _e( 'NOTE: Sibling themes created from this theme will have the original namespacing. This should be changed manually once the theme has been created.', 'create-block-theme' ); ?></b></p>
-								<br />
+								<br /><br />
 							<?php else : ?>
 								<label>
 									<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );"/>
@@ -132,7 +131,7 @@ class Theme_Form {
 								<p><em><?php _e( 'Items indicated with (*) are required.', 'create-block-theme' ); ?></em></p>
 								<label>
 									<?php _e( 'Theme Name (*):', 'create-block-theme' ); ?><br />
-									<input placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" />
+									<input placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" id="theme-name" autocomplete="off" />
 								</label>
 								<br /><br />
 								<label>

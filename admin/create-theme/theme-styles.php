@@ -8,29 +8,39 @@ class Theme_Styles {
 	 */
 	public static function build_child_style_css( $theme ) {
 		$slug        = $theme['slug'];
-		$name        = $theme['name'];
-		$description = $theme['description'];
+		$name        = stripslashes( $theme['name'] );
+		$description = stripslashes( $theme['description'] );
 		$uri         = $theme['uri'];
-		$author      = $theme['author'];
+		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
+		$wp_version  = get_bloginfo( 'version' );
 		$template    = $theme['template'];
+		$text_domain = $theme['text_domain'];
 		$tags        = Theme_Tags::theme_tags_list( $theme );
-		return "/*
+
+		$style_css = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
 Requires at least: 5.8
-Tested up to: 5.9
+Tested up to: {$wp_version}
 Requires PHP: 5.7
 Version: 0.0.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Template: {$template}
-Text Domain: {$slug}
+";
+
+		if ( ! empty( $template ) ) {
+			$style_css .= "Template: {$template}\n";
+		}
+
+		$style_css .= "Text Domain: {$text_domain}
 Tags: {$tags}
 */";
+
+		return $style_css;
 	}
 
 	public static function clear_user_styles_customizations() {

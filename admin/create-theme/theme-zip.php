@@ -89,7 +89,7 @@ class Theme_Zip {
 	 *                      all = all templates no matter what
 	 */
 	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
-		$theme_templates = Theme_Templates::get_theme_templates( $export_type, $new_slug );
+		$theme_templates = Theme_Templates::get_theme_templates( $export_type );
 
 		if ( $theme_templates->templates ) {
 			$zip->addEmptyDir( 'templates' );
@@ -101,11 +101,15 @@ class Theme_Zip {
 
 		foreach ( $theme_templates->templates as $template ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template );
+			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to zip
 				$zip->addFromString(
@@ -127,11 +131,15 @@ class Theme_Zip {
 
 		foreach ( $theme_templates->parts as $template_part ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template_part );
+			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
-				$pattern                = Theme_Patterns::pattern_from_template( $template_data );
-				$template_data->content = '<!-- wp:pattern {"slug":"' . $pattern['slug'] . '"} /-->';
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
+				$pattern_link_attributes = array(
+					'slug' => $pattern['slug'],
+				);
+				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to zip
 				$zip->addFromString(
@@ -154,11 +162,21 @@ class Theme_Zip {
 	}
 
 	static function add_media_to_zip( $zip, $media ) {
+		if ( ! function_exists( 'download_url' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
 			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
-			$download_file = file_get_contents( $url );
-			$zip->addFromString( $folder_path . basename( $url ), $download_file );
+			$download_file = download_url( $url );
+			// If there was an error downloading the file, skip it.
+			// TODO: Implement a warning if the file is missing
+			if ( ! is_wp_error( $download_file ) ) {
+				$content_array  = file( $download_file );
+				$file_as_string = implode( '', $content_array );
+				$zip->addFromString( $folder_path . basename( $url ), $file_as_string );
+			}
 		}
 	}
 
