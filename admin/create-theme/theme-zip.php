@@ -162,8 +162,8 @@ class Theme_Zip {
 	}
 
 	static function add_media_to_zip( $zip, $media ) {
-		if ( ! is_admin() ) {
-			include( ABSPATH . 'wp-admin/includes/admin.php' );
+		if ( ! function_exists( 'download_url' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
 		$media = array_unique( $media );
