@@ -108,7 +108,9 @@ window.addEventListener( 'load', prepareThemeNameValidation );
 
 function prepareThemeNameValidation() {
 	const themeNameInput = document.getElementById( 'theme-name' );
-	themeNameInput.addEventListener( 'input', validateThemeNameInput );
+	if ( themeNameInput ) {
+		themeNameInput.addEventListener( 'input', validateThemeNameInput );
+	}
 }
 
 function slugify( text ) {
