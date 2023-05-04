@@ -349,6 +349,7 @@ class Manage_Fonts_Admin {
 
 				// Build the font credits string
 				$font_credits = "
+
 {$font_name} Font
 {$copyright} {$license_info} {$license_url} {$font_source}
 {$end_credits_note}
