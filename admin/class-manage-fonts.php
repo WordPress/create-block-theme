@@ -92,8 +92,6 @@ class Manage_Fonts_Admin {
 		}
 
 		if ( file_exists( $font_asset_path ) ) {
-			// Remove font license from readme.txt
-			$this->manage_font_license( $font_face['fontFamily'], 'remove' );
 			return unlink( $font_asset_path );
 		}
 
@@ -108,6 +106,10 @@ class Manage_Fonts_Admin {
 				$new_font_faces = array();
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					$updated_font_face = $font_face;
+					// Remove font license from readme.txt if font family is removed
+					if ( isset( $font_family['shouldBeRemoved'] ) ) {
+						$this->manage_font_license( $font_face['fontFamily'], 'remove' );
+					}
 					if ( ! isset( $font_face['shouldBeRemoved'] ) && ! isset( $font_family['shouldBeRemoved'] ) ) {
 						$new_font_faces[] = $updated_font_face;
 					} else {
