@@ -36,7 +36,13 @@ Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Them
 
 == Frequently Asked Questions ==
 
-If you run into an issue, you should check the [Support forum](https://wordpress.org/support/plugin/create-block-theme/) first. The forum is a great place to get help. If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
+= How do I get support? =
+
+If you run into an issue, you should check the [Support forum](https://wordpress.org/support/plugin/create-block-theme/) first. The forum is a great place to get help.
+
+= How do I report an issue? =
+
+If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
 
 == Changelog ==
 
