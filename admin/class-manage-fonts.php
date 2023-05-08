@@ -106,6 +106,10 @@ class Manage_Fonts_Admin {
 				$new_font_faces = array();
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					$updated_font_face = $font_face;
+					// Remove font license from readme.txt if font family is removed
+					if ( isset( $font_family['shouldBeRemoved'] ) ) {
+						$this->manage_font_license( $font_face['fontFamily'], 'remove' );
+					}
 					if ( ! isset( $font_face['shouldBeRemoved'] ) && ! isset( $font_family['shouldBeRemoved'] ) ) {
 						$new_font_faces[] = $updated_font_face;
 					} else {
@@ -178,6 +182,10 @@ class Manage_Fonts_Admin {
 				$new_font_faces = array( $uploaded_font_face );
 
 				$this->add_or_update_theme_font_faces( $_POST['font-name'], $font_slug, $new_font_faces );
+
+				// Add font license to readme.txt
+				$this->manage_font_license( $_POST['font-name'], $file_name );
+
 				return add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );
 			}
 			return add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_file_error' ) );
@@ -229,8 +237,11 @@ class Manage_Fonts_Admin {
 						);
 					}
 				}
+
 				$this->add_or_update_theme_font_faces( $google_font_name, $font_slug, $new_font_faces );
 
+				// Add font license to readme.txt
+				$this->manage_font_license( $font_family['family'], $file_name );
 			}
 
 			add_action( 'admin_notices', array( 'Font_Form_Messages', 'admin_notice_embed_font_success' ) );
@@ -296,7 +307,85 @@ class Manage_Fonts_Admin {
 			get_stylesheet_directory() . '/theme.json',
 			$theme_json_string
 		);
+	}
 
+	function manage_font_license( $font_name, $file_name ) {
+		if ( ! $font_name ) {
+			return;
+		}
+
+		// Build end of credits note
+		$end_credits_note = '-- End of ' . $font_name . ' Font credits --';
+
+		// Get theme readme.txt
+		$readme_file          = get_stylesheet_directory() . '/readme.txt';
+		$readme_file_contents = file_get_contents( $readme_file );
+
+		if ( ! $readme_file ) {
+			return;
+		}
+
+		// If file_name exists, then add font license to readme.txt
+		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) ) {
+			// Check that the font is not already credited in readme.txt
+			if ( false === stripos( $readme_file_contents, $font_name ) ) {
+				// Get font credits from font file metadata
+				$font_credits = json_decode( stripslashes( $_POST['font-credits'] ), true );
+
+				// Assign font credits to variables
+				$copyright    = array_key_exists( 'copyright', $font_credits ) ? trim( $font_credits['copyright'] ) : '';
+				$license_info = array_key_exists( 'license', $font_credits ) ? "\n" . trim( $font_credits['license'] ) : '';
+				$license_url  = array_key_exists( 'licenseURL', $font_credits ) ? "\n" . 'License URL: ' . trim( $font_credits['licenseURL'] ) : '';
+				$font_source  = array_key_exists( 'source', $font_credits ) ? "\n" . 'Source: ' . trim( $font_credits['source'] ) : '';
+
+				// Handle longer, multi-line license info content
+				if ( is_string( $license_info ) ) {
+					// Split license info at first new line
+					$license_info = "\n" . strtok( $license_info, "\n" );
+
+					// Prevent license info from being over 200 characters
+					if ( strlen( $license_info ) > 200 ) {
+						$license_info = substr( $license_info, 0, strrpos( substr( $license_info, 0, 200 ), ' ' ) ) . '...';
+					}
+				}
+
+				// Build the font credits string
+				$font_credits = "
+
+{$font_name} Font
+{$copyright} {$license_info} {$license_url} {$font_source}
+{$end_credits_note}
+";
+
+				// Add font credits to the end of readme.txt
+				file_put_contents(
+					$readme_file,
+					$font_credits,
+					FILE_APPEND
+				);
+			}
+		}
+
+		// If file_name is set to 'remove', then remove font license from readme.txt
+		if ( 'remove' === $file_name ) {
+			// Check if font credits are in readme.txt
+			if ( false !== stripos( $readme_file_contents, $font_name ) ) {
+				// Calculate the start and end positions of the font credits
+				$font_name_strlength   = strlen( $font_name . ' Font' ) + 1;
+				$end_credits_strlength = strlen( $end_credits_note ) + 1;
+				$font_start            = stripos( $readme_file_contents, "\n" . $font_name . ' Font' ) + $font_name_strlength;
+				$font_end              = stripos( $readme_file_contents, $end_credits_note, $font_start );
+
+				// Check if the start and end positions are valid
+				if ( false === $font_start || false === $font_end ) {
+					return;
+				}
+
+				// Remove the font credits from readme.txt
+				$removed_font_credits = substr_replace( $readme_file_contents, '', $font_start - $font_name_strlength, $font_end + $end_credits_strlength - $font_start + $font_name_strlength );
+				file_put_contents( $readme_file, $removed_font_credits );
+			}
+		}
 	}
 }
 

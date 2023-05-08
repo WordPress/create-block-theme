@@ -3,6 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { SelectControl, Spinner, Button } from '@wordpress/components';
+import { Font } from 'lib-font';
 
 import FontsSidebar from '../fonts-sidebar';
 import FontVariant from './font-variant';
@@ -35,6 +36,7 @@ const EMPTY_SELECTION_DATA = {};
 function GoogleFonts() {
 	const [ googleFontsData, setGoogleFontsData ] = useState( {} );
 	const [ selectedFont, setSelectedFont ] = useState( null );
+	const [ selectedFontCredits, setSelectedFontCredits ] = useState( null );
 	const [ selectionData, setSelectionData ] =
 		useState( EMPTY_SELECTION_DATA );
 
@@ -152,8 +154,33 @@ function GoogleFonts() {
 		return select( coreDataStore ).getCurrentTheme();
 	}, null );
 
+	const getFontCredits = ( selectedFontObj ) => {
+		const fontObj = new Font( selectedFontObj.family );
+
+		// Load font file
+		fontObj.src = Object.values( selectedFontObj.files )[ 0 ];
+		// eslint-disable-next-line no-console
+		fontObj.onerror = ( event ) => console.error( event );
+		fontObj.onload = ( event ) => getFontData( event );
+
+		function getFontData( event ) {
+			const font = event.detail.font;
+			const nameTable = font.opentype.tables.name;
+
+			const fontCredits = {
+				copyright: nameTable.get( 0 ),
+				source: nameTable.get( 11 ),
+				license: nameTable.get( 13 ),
+				licenseURL: nameTable.get( 14 ),
+			};
+
+			setSelectedFontCredits( fontCredits );
+		}
+	};
+
 	const handleSelectChange = ( value ) => {
 		setSelectedFont( googleFontsData.items[ value ] );
+		getFontCredits( googleFontsData.items[ value ] );
 	};
 
 	let selectedFontFamilyId = '';
@@ -334,6 +361,11 @@ function GoogleFonts() {
 									Object.values( selectionData )
 								) }
 							/>
+							<input
+								type="hidden"
+								name="font-credits"
+								value={ JSON.stringify( selectedFontCredits ) }
+							/>
 							<Button
 								variant="primary"
 								type="submit"
@@ -342,7 +374,7 @@ function GoogleFonts() {
 								}
 							>
 								{ __(
-									'Add google fonts to your theme',
+									'Add Google fonts to your theme',
 									'create-block-theme'
 								) }
 							</Button>
