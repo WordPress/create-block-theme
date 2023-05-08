@@ -34,6 +34,10 @@ Make changes to your site styles and templates using the Site Editor. You can al
 = Step 3 – Export =
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
 
+== Frequently Asked Questions ==
+
+If you run into an issue, you should check the [Support forum](https://wordpress.org/support/plugin/create-block-theme/) first. The forum is a great place to get help. If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
+
 == Changelog ==
 
 = 1.8.2 =
