@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.8.2
+Stable tag: 1.9.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -44,6 +44,14 @@ If you run into an issue, you should check the [Support forum](https://wordpress
 If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
 
 == Changelog ==
+
+= 1.9.0 =
+* Merge branch 'trunk' into add/handle-google-font-credits
+* Update Google Fonts JSON data from API
+* Fix console error in `prepareThemeNameValidation` function
+* Add FAQ section to readme.txt
+* Automatically add font license info for Google fonts
+* Removing donate link
 
 = 1.8.2 =
 * Merge branch 'trunk' into update/tested-up-wp-version-62
