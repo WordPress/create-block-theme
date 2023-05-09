@@ -24,7 +24,7 @@ class Theme_Readme {
 
 		return "=== {$name} ===
 Contributors: {$author}
-Requires at least: 5.8
+Requires at least: 6.0
 Tested up to: {$wp_version}
 Requires PHP: 5.7
 License: GPLv2 or later
