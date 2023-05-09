@@ -36,7 +36,7 @@ const EMPTY_SELECTION_DATA = {};
 function GoogleFonts() {
 	const [ googleFontsData, setGoogleFontsData ] = useState( {} );
 	const [ selectedFont, setSelectedFont ] = useState( null );
-	const [ selectedFontCredits, setSelectedFontCredits ] = useState( null );
+	const [ selectedFontCredits, setSelectedFontCredits ] = useState( {} );
 	const [ selectionData, setSelectionData ] =
 		useState( EMPTY_SELECTION_DATA );
 
