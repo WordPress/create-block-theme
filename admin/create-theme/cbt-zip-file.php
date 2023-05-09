@@ -5,7 +5,7 @@ if ( class_exists( 'ZipArchive' ) ) {
 	// This Class extends the ZipArchive class to add the theme slug as a base folder for all the files
 	class CbtZipArchive extends ZipArchive {
 
-		public string $theme_slug;
+		private string $theme_slug;
 
 		function __construct( $theme_slug ) {
 			$this->theme_slug = $theme_slug;
