@@ -325,14 +325,14 @@ class Manage_Fonts_Admin {
 			return;
 		}
 
-		// If file_name exists, then add font license to readme.txt
-		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) ) {
+		// If file_name and font-credits exist, then add font license to readme.txt
+		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) && isset( $_POST['font-credits'] ) ) {
 			// Check that the font is not already credited in readme.txt
 			if ( false === stripos( $readme_file_contents, $font_name ) ) {
 				// Get font credits from font file metadata
 				$font_credits = json_decode( stripslashes( $_POST['font-credits'] ), true );
 
-				if ( ! $font_credits ) {
+				if ( ! is_array( $font_credits ) ) {
 					return;
 				}
 
