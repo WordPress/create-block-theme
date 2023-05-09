@@ -24,7 +24,7 @@ Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 5.8
+Requires at least: 6.0
 Tested up to: {$wp_version}
 Requires PHP: 5.7
 Version: 0.0.1
