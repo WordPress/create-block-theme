@@ -332,6 +332,10 @@ class Manage_Fonts_Admin {
 				// Get font credits from font file metadata
 				$font_credits = json_decode( stripslashes( $_POST['font-credits'] ), true );
 
+				if ( ! $font_credits ) {
+					return;
+				}
+
 				// Assign font credits to variables
 				$copyright    = array_key_exists( 'copyright', $font_credits ) ? trim( $font_credits['copyright'] ) : '';
 				$license_info = array_key_exists( 'license', $font_credits ) ? "\n" . trim( $font_credits['license'] ) : '';
