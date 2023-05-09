@@ -4,13 +4,20 @@ require_once( __DIR__ . '/theme-media.php' );
 require_once( __DIR__ . '/theme-blocks.php' );
 require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
+require_once( __DIR__ . '/cbt-zip-file.php' );
 
 class Theme_Zip {
 	public static function create_zip( $filename ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );
 		}
-		$zip = new ZipArchive();
+
+		$theme_slug = get_stylesheet();
+		if ( ! empty( $_POST['theme']['name'] ) ) {
+			$theme_slug = Theme_Utils::get_theme_slug( $_POST['theme']['name'] );
+		}
+
+		$zip = new CbtZipArchive( $theme_slug );
 		$zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE );
 		return $zip;
 	}
