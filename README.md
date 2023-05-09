@@ -13,7 +13,10 @@ This plugin allows you to:
 -   Embed Google Fonts locally in your theme
 -   Embed local font assets in your theme
 
-Learn more about [how to use the plugin](#how-to-use-the-plugin) or [how to contribute](#how-to-contribute).
+Learn more about Create Block Theme:
+- [How to use the plugin](#how-to-use-the-plugin)
+- [How to contribute](#how-to-contribute)
+- [User FAQs](https://wordpress.org/plugins/create-block-theme/)
 
 ## User Support
 

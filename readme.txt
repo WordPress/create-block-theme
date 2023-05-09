@@ -43,6 +43,22 @@ If you run into an issue, you should check the [Support forum](https://wordpress
 
 If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
 
+== General Troobleshooting ==
+
+If you are having problems, please try the following:
+- Make sure you have the latest version of WordPress installed.
+- Make sure you have the latest version of the plugin installed.
+- Deactivate all plugins and see if this resolves the problem. If this works, re-activate the plugins one by one until you find the problematic plugin(s).
+- Switch the theme to the default theme to rule out any theme-related problems.
+- Check the [Support forum](https://wordpress.org/support/plugin/create-block-theme/) for similar issues.
+
+== I'm getting a corrupt zip file when I export my theme ==
+
+- First follow the general troubleshooting steps above.
+- Please make sure you `WP_DEBUG` setting in your `wp-config.php` file is set to `false` like this: `define( 'WP_DEBUG', false );`.
+- If your theme includes PHP files, ensure those files do **not** use PHP closing tags `?>` at the end of the file. If they do, remove them.
+
+
 == Changelog ==
 
 = 1.9.0 =
