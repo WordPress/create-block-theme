@@ -56,7 +56,7 @@ If you are having problems, please try the following:
 
 - First follow the general troubleshooting steps above.
 - Please make sure you `WP_DEBUG` setting in your `wp-config.php` file is set to `false` like this: `define( 'WP_DEBUG', false );`.
-- If you have PHP files added to your theme check they are not including PHP close tags `?>` at the end of the file. If they are, remove them.
+- If your theme includes PHP files, ensure those files do **not** use PHP closing tags `?>` at the end of the file. If they do, remove them.
 
 
 == Changelog ==
