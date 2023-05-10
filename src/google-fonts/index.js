@@ -158,8 +158,14 @@ function GoogleFonts() {
 		const fontObj = new Font( selectedFontObj.family );
 		let fontError = false;
 
+		// Force font file to be https
+		let fontFile = Object.values( selectedFontObj.files )[ 0 ];
+		if ( fontFile.includes( 'http://' ) ) {
+			fontFile = fontFile.replace( 'http://', 'https://' );
+		}
+
 		// Load font file
-		fontObj.src = Object.values( selectedFontObj.files )[ 0 ];
+		fontObj.src = fontFile;
 		fontObj.onerror = ( event ) => {
 			// eslint-disable-next-line no-console
 			console.error( event );
