@@ -265,8 +265,7 @@ class Create_Block_Theme_Admin {
 
 		wp_mkdir_p( get_theme_root() . '/' . $new_theme_subfolder );
 		rename( $source, $destination );
-
-		//TODO: Activate the newly moved theme
+		switch_theme( $new_theme_subfolder . '/' . $theme_dir );
 	}
 
 	public function register_theme_api() {
