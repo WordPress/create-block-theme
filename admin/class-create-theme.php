@@ -30,7 +30,7 @@ class Create_Block_Theme_Admin {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'blockbase_save_theme' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ) );
-		add_action( 'rest_api_init', array( $this, 'register_theme_export' ) );
+		add_action( 'rest_api_init', array( $this, 'register_theme_api' ) );
 	}
 
 	function create_block_theme_enqueue() {
@@ -230,13 +230,63 @@ class Create_Block_Theme_Admin {
 		$this->clone_theme( $theme, null );
 	}
 
-	public function register_theme_export() {
+	function rest_update_theme( $request ) {
+		$theme = $request->get_params();
+
+		// TODO: Update the metadata of the theme in the style.css file
+		// $this->update_theme_metadata( $theme );
+
+		// Relocate the theme to a new folder
+		$this->relocate_theme( $theme['subfolder']);
+
+
+	}
+
+	function update_theme_metadata( $theme ) {
+		//TODO: Update theme metadata in style.css (and reactivate the theme?)
+	}
+
+	function relocate_theme( $new_theme_subfolder ) {
+
+		$current_theme_subfolder = '';
+		$theme_dir = get_stylesheet();
+
+		if (str_contains(get_stylesheet(), '/')) {
+			$current_theme_subfolder = substr( get_stylesheet(), 0, strrpos( get_stylesheet(), '/' ) );
+			$theme_dir = substr( get_stylesheet(), strrpos( get_stylesheet(), '/' ) + 1 );
+		}
+
+		if ( $current_theme_subfolder === $new_theme_subfolder ) {
+			return;
+		}
+
+		$source = get_theme_root() . '/' . $current_theme_subfolder . '/' . $theme_dir;
+		$destination = get_theme_root() . '/' . $new_theme_subfolder . '/' . $theme_dir;
+
+		wp_mkdir_p( get_theme_root() . '/' . $new_theme_subfolder );
+		rename( $source, $destination );
+
+		//TODO: Activate the newly moved theme
+	}
+
+	public function register_theme_api() {
 		register_rest_route(
 			'create-block-theme/v1',
 			'/export',
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_export_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/update',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_update_theme' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
