@@ -86,6 +86,12 @@ function UploadFontForm( {
 							{}
 					  )
 					: {};
+				const fontCredits = {
+					copyright: name.get( 0 ),
+					source: name.get( 11 ),
+					license: name.get( 13 ),
+					licenseURL: name.get( 14 ),
+				};
 
 				setFormData( {
 					file,
@@ -93,6 +99,7 @@ function UploadFontForm( {
 					style: isItalic ? 'italic' : 'normal',
 					weight: !! weightAxis ? weightRange : fontWeight,
 					variable: isVariable,
+					fontCredits,
 				} );
 				setAxes( axes );
 			};
@@ -191,6 +198,12 @@ function UploadFontForm( {
 						value={ fontVariationSettings }
 					/>
 				) }
+
+				<input
+					type="hidden"
+					name="font-credits"
+					value={ JSON.stringify( formData.fontCredits ) }
+				/>
 			</form>
 
 			<Button
