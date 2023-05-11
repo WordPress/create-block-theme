@@ -68,8 +68,6 @@ export const UpdateThemePanel = () => {
 	};
 
 	const handleUpdateClick = () => {
-		console.log('update theme', theme);
-
 		const fetchOptions = {
 			path: '/create-block-theme/v1/update',
 			method: 'POST',

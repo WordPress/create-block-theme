@@ -234,7 +234,7 @@ class Create_Block_Theme_Admin {
 		$theme = $request->get_params();
 
 		// TODO: Update the metadata of the theme in the style.css file
-		// $this->update_theme_metadata( $theme );
+		$this->update_theme_metadata( $theme );
 
 		// Relocate the theme to a new folder
 		$this->relocate_theme( $theme['subfolder']);
@@ -252,11 +252,23 @@ class Create_Block_Theme_Admin {
 		Theme_Templates::clear_user_templates_customizations();
 	}
 
-	function update_theme_metadata( $theme ) {
-		//TODO: Update theme metadata in style.css (and reactivate the theme?)
+	function rest_clone_theme ( $request ) {
+		$theme = $request->get_params();
+		$new_theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+
+		$this->relocate_theme( $theme['subfolder'], $new_theme_slug );
+		$this->update_theme_metadata( $theme );
 	}
 
-	function relocate_theme( $new_theme_subfolder ) {
+	function update_theme_metadata( $theme ) {
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
+		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
+		$css_contents = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
+		$style_css = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
+	}
+
+	function relocate_theme( $new_theme_subfolder, $new_theme_slug = null ) {
 
 		$current_theme_subfolder = '';
 		$theme_dir = get_stylesheet();
@@ -271,10 +283,16 @@ class Create_Block_Theme_Admin {
 		}
 
 		$source = get_theme_root() . '/' . $current_theme_subfolder . '/' . $theme_dir;
-		$destination = get_theme_root() . '/' . $new_theme_subfolder . '/' . $theme_dir;
 
 		wp_mkdir_p( get_theme_root() . '/' . $new_theme_subfolder );
-		rename( $source, $destination );
+
+		if ( null == $new_theme_slug ) {
+			$destination = get_theme_root() . '/' . $new_theme_subfolder . '/' . $theme_dir;
+			rename( $source, $destination );
+		} else {
+			$destination = get_theme_root() . '/' . $new_theme_subfolder . '/' . $new_theme_slug;
+			copy( $source, $destination );
+		}
 		switch_theme( $new_theme_subfolder . '/' . $theme_dir );
 	}
 
@@ -307,6 +325,17 @@ class Create_Block_Theme_Admin {
 			array(
 				'methods'	     => 'POST',
 				'callback'	     => array( $this, 'rest_save_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/clone',
+			array(
+				'methods'	     => 'POST',
+				'callback'	     => array( $this, 'rest_clone_theme' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
