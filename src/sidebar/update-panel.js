@@ -45,6 +45,26 @@ export const UpdateThemePanel = () => {
 
 	const handleSaveClick = () => {
 		console.log('save theme', theme);
+		const fetchOptions = {
+			path: '/create-block-theme/v1/save',
+			method: 'POST',
+		};
+
+		async function saveTheme() {
+			try {
+				await apiFetch( fetchOptions );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __(
+								'An error occurred while attempting to save the theme.'
+						  );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+
+		saveTheme();
 	};
 
 	const handleUpdateClick = () => {
@@ -62,8 +82,7 @@ export const UpdateThemePanel = () => {
 
 		async function updateTheme() {
 			try {
-				const response = await apiFetch( fetchOptions );
-				console.log('response', response);
+				await apiFetch( fetchOptions );
 			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'

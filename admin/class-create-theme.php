@@ -242,6 +242,16 @@ class Create_Block_Theme_Admin {
 
 	}
 
+	function rest_save_theme ( $request ) {
+		if ( is_child_theme() ) {
+			$this->save_theme_locally( 'current' );
+		} else {
+			$this->save_theme_locally( 'all' );
+		}
+		Theme_Styles::clear_user_styles_customizations();
+		Theme_Templates::clear_user_templates_customizations();
+	}
+
 	function update_theme_metadata( $theme ) {
 		//TODO: Update theme metadata in style.css (and reactivate the theme?)
 	}
@@ -291,6 +301,17 @@ class Create_Block_Theme_Admin {
 				},
 			)
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/save',
+			array(
+				'methods'	     => 'POST',
+				'callback'	     => array( $this, 'rest_save_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -305,8 +326,6 @@ class Create_Block_Theme_Admin {
 		$theme['name']        = sanitize_text_field( $theme['name'] );
 		$theme['description'] = sanitize_text_field( $theme['description'] );
 		$theme['uri']         = sanitize_text_field( $theme['uri'] );
-		$theme['author']      = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
 
 		$theme['text_domain'] = $child_theme_slug;
