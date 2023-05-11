@@ -177,13 +177,13 @@ function GoogleFonts() {
 
 			function getFontData( event ) {
 				const font = event.detail.font;
-				const nameTable = font.opentype.tables.name;
+				const { name } = font.opentype.tables;
 
 				const fontCredits = {
-					copyright: nameTable.get( 0 ),
-					source: nameTable.get( 11 ),
-					license: nameTable.get( 13 ),
-					licenseURL: nameTable.get( 14 ),
+					copyright: name.get( 0 ),
+					source: name.get( 11 ),
+					license: name.get( 13 ),
+					licenseURL: name.get( 14 ),
 				};
 
 				setSelectedFontCredits( fontCredits );
