@@ -68,7 +68,7 @@ class Create_Block_Theme_API {
 		$this->update_theme_metadata( $theme );
 
 		// Relocate the theme to a new folder
-		// $this->relocate_theme( $theme['subfolder']);
+		$this->relocate_theme( $theme['subfolder'] );
 
 	}
 
@@ -78,6 +78,29 @@ class Create_Block_Theme_API {
 		$css_contents  = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
 		$style_css     = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
+	}
+
+	function relocate_theme( $new_theme_subfolder ) {
+
+		$current_theme_subfolder = '';
+		$theme_dir               = get_stylesheet();
+
+		if ( str_contains( get_stylesheet(), '/' ) ) {
+			$current_theme_subfolder = substr( get_stylesheet(), 0, strrpos( get_stylesheet(), '/' ) );
+			$theme_dir               = substr( get_stylesheet(), strrpos( get_stylesheet(), '/' ) + 1 );
+		}
+
+		if ( $current_theme_subfolder === $new_theme_subfolder ) {
+			return;
+		}
+
+		$source      = get_theme_root() . '/' . $current_theme_subfolder . '/' . $theme_dir;
+		$destination = get_theme_root() . '/' . $new_theme_subfolder . '/' . $theme_dir;
+
+		wp_mkdir_p( get_theme_root() . '/' . $new_theme_subfolder );
+		rename( $source, $destination );
+
+		switch_theme( $new_theme_subfolder . '/' . $theme_dir );
 	}
 
 }
