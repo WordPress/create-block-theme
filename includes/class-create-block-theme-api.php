@@ -42,6 +42,17 @@ class Create_Block_Theme_API {
 				},
 			)
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/save',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_save_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -79,6 +90,21 @@ class Create_Block_Theme_API {
 		// Relocate the theme to a new folder
 		$this->relocate_theme( $theme['subfolder'] );
 
+	}
+
+	/**
+	 * Save the user changes to the theme and clear user changes.
+	 */
+	function rest_save_theme( $request ) {
+		if ( is_child_theme() ) {
+			Theme_Templates::add_templates_to_local( 'current' );
+			Theme_Json::add_theme_json_to_local( 'current' );
+		} else {
+			Theme_Templates::add_templates_to_local( 'current' );
+			Theme_Json::add_theme_json_to_local( 'current' );
+		}
+		Theme_Styles::clear_user_styles_customizations();
+		Theme_Templates::clear_user_templates_customizations();
 	}
 
 	/**

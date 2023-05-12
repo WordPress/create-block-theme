@@ -17,7 +17,8 @@ import {
 
 import { ExportThemePanel } from './editor-sidebar/export-panel';
 import { UpdateThemePanel } from './editor-sidebar/update-panel';
-import { tool, copy, cog } from '@wordpress/icons';
+import { SaveThemePanel } from './editor-sidebar/save-panel';
+import { tool, copy, cog, edit } from '@wordpress/icons';
 
 const CreateBlockThemePlugin = () => {
 	return (
@@ -37,6 +38,9 @@ const CreateBlockThemePlugin = () => {
 					<NavigatorScreen path="/">
 						<PanelBody>
 							<VStack>
+								<NavigatorButton path="/save" icon={ edit }>
+									{ __( 'Save Changes…' ) }
+								</NavigatorButton>
 								<NavigatorButton path="/update" icon={ cog }>
 									{ __( 'Edit Info…' ) }
 								</NavigatorButton>
@@ -45,6 +49,10 @@ const CreateBlockThemePlugin = () => {
 								</NavigatorButton>
 							</VStack>
 						</PanelBody>
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/save">
+						<SaveThemePanel />
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/export">
