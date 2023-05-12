@@ -16,6 +16,9 @@ class Create_Block_Theme_API {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 	}
 
+	/**
+	 * Register the REST routes.
+	 */
 	public function register_rest_routes() {
 		register_rest_route(
 			'create-block-theme/v1',
@@ -41,6 +44,9 @@ class Create_Block_Theme_API {
 		);
 	}
 
+	/**
+	 * Export the theme as a ZIP file.
+	 */
 	function rest_export_theme( $request ) {
 		$theme_slug = wp_get_theme()->get( 'TextDomain' );
 
@@ -61,6 +67,9 @@ class Create_Block_Theme_API {
 		echo readfile( $filename );
 	}
 
+	/**
+	 * Update the theme metadata and relocate the theme.
+	 */
 	function rest_update_theme( $request ) {
 		$theme = $request->get_params();
 
@@ -72,6 +81,9 @@ class Create_Block_Theme_API {
 
 	}
 
+	/**
+	 * Update the theme metadata in the style.css file.
+	 */
 	function update_theme_metadata( $theme ) {
 		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
 		$style_css     = file_get_contents( get_stylesheet_directory() . '/style.css' );
@@ -80,6 +92,9 @@ class Create_Block_Theme_API {
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
 	}
 
+	/**
+	 * Relocate the theme to a new folder and activate the newly relocated theme.
+	 */
 	function relocate_theme( $new_theme_subfolder ) {
 
 		$current_theme_subfolder = '';
