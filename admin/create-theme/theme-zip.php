@@ -6,6 +6,7 @@ require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 
 class Theme_Zip {
+
 	public static function create_zip( $filename ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );

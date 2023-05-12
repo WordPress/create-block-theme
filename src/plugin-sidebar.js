@@ -16,7 +16,8 @@ import {
 } from '@wordpress/components';
 
 import { ExportThemePanel } from './editor-sidebar/export-panel';
-import { tool, copy } from '@wordpress/icons';
+import { UpdateThemePanel } from './editor-sidebar/update-panel';
+import { tool, copy, cog } from '@wordpress/icons';
 
 const CreateBlockThemePlugin = () => {
 	return (
@@ -36,16 +37,22 @@ const CreateBlockThemePlugin = () => {
 					<NavigatorScreen path="/">
 						<PanelBody>
 							<VStack>
-								<NavigatorButton path="/export" icon={ copy }>
-									{ __( 'Export…' ) }
+								<NavigatorButton path="/update" icon={ cog }>
+									{ __( 'Edit Info…' ) }
 								</NavigatorButton>
-								<Spacer />
+								<NavigatorButton path="/export" icon={ copy }>
+									{ __( 'Export Zip…' ) }
+								</NavigatorButton>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/export">
 						<ExportThemePanel />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/update">
+						<UpdateThemePanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>

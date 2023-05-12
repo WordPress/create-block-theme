@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * The api functionality of the plugin leveraged by the site editor UI.
+ *
+ * @package    Create_Block_Theme
+ * @subpackage Create_Block_Theme/admin
+ * @author     WordPress.org
+ */
+class Create_Block_Theme_API {
+
+	/**
+	 * Initialize the class and set its properties.
+	 */
+	public function __construct() {
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+	}
+
+	public function register_rest_routes() {
+		register_rest_route(
+			'create-block-theme/v1',
+			'/export',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_export_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/update',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_update_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+	}
+
+	function rest_export_theme( $request ) {
+		$theme_slug = wp_get_theme()->get( 'TextDomain' );
+
+		// Create ZIP file in the temporary directory.
+		$filename = tempnam( get_temp_dir(), $theme_slug );
+		$zip      = Theme_Zip::create_zip( $filename );
+
+		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
+		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
+		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
+
+		$zip->close();
+
+		header( 'Content-Type: application/zip' );
+		header( 'Content-Disposition: attachment; filename=' . $theme_slug . '.zip' );
+		header( 'Content-Length: ' . filesize( $filename ) );
+		flush();
+		echo readfile( $filename );
+	}
+
+	function rest_update_theme( $request ) {
+		$theme = $request->get_params();
+
+		// Update the metadata of the theme in the style.css file
+		$this->update_theme_metadata( $theme );
+
+		// Relocate the theme to a new folder
+		// $this->relocate_theme( $theme['subfolder']);
+
+	}
+
+	function update_theme_metadata( $theme ) {
+		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
+		$style_css     = file_get_contents( get_stylesheet_directory() . '/style.css' );
+		$css_contents  = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
+		$style_css     = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
+	}
+
+}
