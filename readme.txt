@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.9.0
+Stable tag: 1.10.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -60,6 +60,14 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 1.10.0 =
+* Update Google Fonts JSON data from API
+* Adding troubleshooting FAQs
+* Updating "Requires at least" field of generated themes
+* Improve handling of font license errors
+* Fix `tabIndex` prop
+* Automatically add font license info for local fonts
 
 = 1.9.0 =
 * Merge branch 'trunk' into add/handle-google-font-credits
