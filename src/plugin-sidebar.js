@@ -18,7 +18,8 @@ import {
 import { ExportThemePanel } from './editor-sidebar/export-panel';
 import { UpdateThemePanel } from './editor-sidebar/update-panel';
 import { SaveThemePanel } from './editor-sidebar/save-panel';
-import { tool, copy, cog, edit } from '@wordpress/icons';
+import { CreateThemePanel } from './editor-sidebar/create-panel';
+import { tool, copy, cog, edit, addCard } from '@wordpress/icons';
 
 const CreateBlockThemePlugin = () => {
 	return (
@@ -47,6 +48,12 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton path="/export" icon={ copy }>
 									{ __( 'Export Zip…' ) }
 								</NavigatorButton>
+								<NavigatorButton
+									path="/create"
+									icon={ addCard }
+								>
+									{ __( 'Create New…' ) }
+								</NavigatorButton>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
@@ -61,6 +68,10 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/update">
 						<UpdateThemePanel />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/create">
+						<CreateThemePanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
