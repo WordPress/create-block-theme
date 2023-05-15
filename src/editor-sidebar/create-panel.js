@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
+import { downloadFile } from '../utils';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line
@@ -59,11 +60,13 @@ export const CreateThemePanel = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
+			parse: false,
 		};
 
 		async function exportCloneTheme() {
 			try {
-				await apiFetch( fetchOptions );
+				const response = await apiFetch( fetchOptions );
+				downloadFile( response );
 			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'

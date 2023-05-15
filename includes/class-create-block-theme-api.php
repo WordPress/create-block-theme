@@ -243,9 +243,7 @@ class Create_Block_Theme_API {
 		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
-		readfile( $filename );
-		unlink( $filename );
-		exit;
+		echo readfile( $filename );
 	}
 
 	/**
