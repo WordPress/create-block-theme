@@ -51,9 +51,65 @@ export const CreateThemePanel = () => {
 		} );
 	}, [] );
 
-	const handleExportClick = () => {};
+	const handleExportClick = () => {
+		const fetchOptions = {
+			path: '/create-block-theme/v1/export-clone',
+			method: 'POST',
+			data: theme,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		};
 
-	const handleCreateBlankClick = () => {};
+		async function exportCloneTheme() {
+			try {
+				await apiFetch( fetchOptions );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __(
+								'An error occurred while attempting to export the theme.'
+						  );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+
+		exportCloneTheme();
+	};
+
+	const handleCreateBlankClick = () => {
+		apiFetch( {
+			path: '/create-block-theme/v1/create-blank',
+			method: 'POST',
+			data: theme,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		} )
+			.then( () => {
+				createInfoNotice(
+					__(
+						'Theme created successfully. The editor will now reload.',
+						'create-block-theme'
+					),
+					{
+						onDismiss: () => {
+							window.location.reload();
+						},
+					}
+				);
+			} )
+			.catch( ( error ) => {
+				const errorMessage =
+					error.message ||
+					__(
+						'An error occurred while attempting to create the theme.',
+						'create-block-theme'
+					);
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			} );
+	};
 
 	const handleCloneClick = () => {
 		const fetchOptions = {
@@ -63,7 +119,6 @@ export const CreateThemePanel = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			parse: false,
 		};
 
 		async function cloneTheme() {
