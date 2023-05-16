@@ -355,11 +355,15 @@ class Manage_Fonts_Admin {
 
 				// Build the font credits string
 				$font_credits = "
-
 {$font_name} Font
 {$copyright} {$license_info} {$license_url} {$font_source}
 {$end_credits_note}
 ";
+
+				// Check if readme.txt ends with a new line
+				if ( "\n" !== $readme_file_contents[ strlen( $readme_file_contents ) - 1 ] ) {
+					$font_credits = "\n" . $font_credits;
+				}
 
 				// Add font credits to the end of readme.txt
 				file_put_contents(
