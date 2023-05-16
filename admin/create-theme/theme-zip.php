@@ -4,6 +4,7 @@ require_once( __DIR__ . '/theme-media.php' );
 require_once( __DIR__ . '/theme-blocks.php' );
 require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
+require_once( __DIR__ . '/theme-utils.php' );
 
 class Theme_Zip {
 
@@ -67,7 +68,7 @@ class Theme_Zip {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = self::replace_namespace( $contents, $new_slug, $new_name );
+						$contents = Theme_Utils::replace_namespace( $contents, $new_slug, $new_name );
 					}
 
 					// Add current file to archive
@@ -181,17 +182,4 @@ class Theme_Zip {
 		}
 	}
 
-	static function replace_namespace( $content, $new_slug, $new_name ) {
-
-		$old_slug            = wp_get_theme()->get( 'TextDomain' );
-		$new_slug_underscore = str_replace( '-', '_', $new_slug );
-		$old_slug_underscore = str_replace( '-', '_', $old_slug );
-		$old_name            = wp_get_theme()->get( 'Name' );
-
-		$content = str_replace( $old_slug, $new_slug, $content );
-		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
-		$content = str_replace( $old_name, $new_name, $content );
-
-		return $content;
-	}
 }

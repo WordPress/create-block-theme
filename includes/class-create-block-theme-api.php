@@ -89,7 +89,56 @@ class Create_Block_Theme_API {
 	}
 
 	function rest_clone_theme( $request ) {
+		$theme = $request->get_params();
 
+		//TODO: Handle uploading a screenshot somehow...
+		$screenshot = null;
+
+		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+
+		// Sanitize inputs.
+		$theme['name']        = sanitize_text_field( $theme['name'] );
+		$theme['description'] = sanitize_text_field( $theme['description'] );
+		$theme['uri']         = sanitize_text_field( $theme['uri'] );
+		$theme['author']      = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
+		$theme['template']    = '';
+		$theme['slug']        = $theme_slug;
+		$theme['text_domain'] = $theme_slug;
+
+		// Create theme directory.
+		$source         = get_stylesheet_directory();
+		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
+
+		if ( $theme['subfolder'] ) {
+			$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
+		}
+
+		if ( file_exists( $new_theme_path ) ) {
+			return new \WP_Error( 'theme_exists', __( 'Theme already exists.', 'create-block-theme' ) );
+		}
+
+		wp_mkdir_p( $new_theme_path );
+
+		// Copy theme files.
+		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
+		Theme_Utils::add_templates_to_folder( $new_theme_path, 'all', null );
+
+		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
+
+		if ( $theme['subfolder'] ) {
+			switch_theme( $theme['subfolder'] . '/' . $theme_slug );
+		} else {
+			switch_theme( $theme_dir );
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Blank Theme Created.', 'create-block-theme' ),
+			)
+		);
 	}
 
 	function rest_create_blank_theme( $request ) {

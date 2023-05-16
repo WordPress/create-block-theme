@@ -115,42 +115,36 @@ export const CreateThemePanel = () => {
 	};
 
 	const handleCloneClick = () => {
-		const fetchOptions = {
+		apiFetch( {
 			path: '/create-block-theme/v1/clone',
 			method: 'POST',
 			data: theme,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		};
-
-		async function cloneTheme() {
-			try {
-				await apiFetch( fetchOptions );
-			} catch ( error ) {
+		} )
+			.then( () => {
+				createInfoNotice(
+					__(
+						'Theme cloned successfully. The editor will now reload.',
+						'create-block-theme'
+					),
+					{
+						onDismiss: () => {
+							window.location.reload();
+						},
+					}
+				);
+			} )
+			.catch( ( error ) => {
 				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __(
-								'An error occurred while attempting to update the theme.'
-						  );
+					error.message ||
+					__(
+						'An error occurred while attempting to create the theme.',
+						'create-block-theme'
+					);
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		cloneTheme().then( () => {
-			createInfoNotice(
-				__(
-					'Theme cloned successfully. The editor will now reload.',
-					'create-block-theme'
-				),
-				{
-					onDismiss: () => {
-						window.location.reload();
-					},
-				}
-			);
-		} );
+			} );
 	};
 
 	return (
