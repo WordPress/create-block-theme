@@ -50,50 +50,49 @@ class Theme_Utils {
 
 		// Create recursive directory iterator
 		/** @var SplFileInfo[] $files */
-		$files = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator( $theme_path ),
-			RecursiveIteratorIterator::LEAVES_ONLY
+		$files = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $theme_path, \RecursiveDirectoryIterator::SKIP_DOTS ),
+			\RecursiveIteratorIterator::SELF_FIRST
 		);
 
 		// Add all the files (except for templates)
 		foreach ( $files as $name => $file ) {
 
-			// Skip directories (they would be added automatically)
-			if ( ! $file->isDir() ) {
+			// Get real and relative path for current file
+			$file_path     = wp_normalize_path( $file );
+			$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
 
-				// Get real and relative path for current file
-				$file_path = wp_normalize_path( $file );
+			// Create Directories
+			if ( $file->isDir() ) {
+				wp_mkdir_p( $location . DIRECTORY_SEPARATOR . $files->getSubPathname() );
+			}
 
-				// If the path is for templates/parts ignore it
-				if (
-					strpos( $file_path, 'block-template-parts/' ) ||
-					strpos( $file_path, 'block-templates/' ) ||
-					strpos( $file_path, 'templates/' ) ||
-					strpos( $file_path, 'parts/' )
-				) {
-					continue;
-				}
+			// If the path is for templates/parts ignore it
+			if (
+				strpos( $file_path, 'block-template-parts/' ) ||
+				strpos( $file_path, 'block-templates/' ) ||
+				strpos( $file_path, 'templates/' ) ||
+				strpos( $file_path, 'parts/' )
+			) {
+				continue;
+			}
 
-				$relative_path = substr( $file_path, strlen( $theme_path ) + 1 );
+			// Replace only text files, skip png's and other stuff.
+			$contents               = file_get_contents( $file_path );
+			$valid_extensions       = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
+			$valid_extensions_regex = implode( '|', $valid_extensions );
 
-				// Replace only text files, skip png's and other stuff.
-				$valid_extensions       = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
-				$valid_extensions_regex = implode( '|', $valid_extensions );
-				if ( ! preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
-					copy( $file_path, $location . DIRECTORY_SEPARATOR . $relative_path );
-				} else {
-					$contents = file_get_contents( $file_path );
-
-					// Replace namespace values if provided
-					if ( $new_slug ) {
-						$contents = self::replace_namespace( $contents, $new_slug, $new_name );
-					}
-
-					// Add current file to archive
-					file_put_contents( $location . DIRECTORY_SEPARATOR . $relative_path, $contents );
+			if ( preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
+				// Replace namespace values if provided
+				if ( $new_slug ) {
+					$contents = self::replace_namespace( $contents, $new_slug, $new_name );
 				}
 			}
+
+			// Add current file to target
+			file_put_contents( $location . DIRECTORY_SEPARATOR . $relative_path, $contents );
 		}
+
 	}
 
 	public static function add_templates_to_folder( $location, $export_type, $new_slug ) {
