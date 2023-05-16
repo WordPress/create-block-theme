@@ -340,11 +340,18 @@ class Create_Block_Theme_API {
 			Theme_Templates::add_templates_to_local( 'current' );
 			Theme_Json::add_theme_json_to_local( 'current' );
 		} else {
-			Theme_Templates::add_templates_to_local( 'current' );
-			Theme_Json::add_theme_json_to_local( 'current' );
+			Theme_Templates::add_templates_to_local( 'all' );
+			Theme_Json::add_theme_json_to_local( 'all' );
 		}
 		Theme_Styles::clear_user_styles_customizations();
 		Theme_Templates::clear_user_templates_customizations();
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Theme Saved.', 'create-block-theme' ),
+			)
+		);
 	}
 
 	/**

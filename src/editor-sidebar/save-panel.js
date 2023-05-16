@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
-import { downloadFile } from '../utils';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line
@@ -20,46 +19,38 @@ import {
 import { chevronLeft } from '@wordpress/icons';
 
 export const SaveThemePanel = () => {
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 
 	const handleSaveClick = () => {
-		const fetchOptions = {
+		apiFetch( {
 			path: '/create-block-theme/v1/save',
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			parse: false,
-		};
-
-		async function saveTheme() {
-			try {
-				const response = await apiFetch( fetchOptions );
-				downloadFile( response );
-			} catch ( error ) {
+		} )
+			.then( () => {
+				createInfoNotice(
+					__(
+						'Theme saved successfully. The editor will now reload.',
+						'create-block-theme'
+					),
+					{
+						onDismiss: () => {
+							window.location.reload();
+						},
+					}
+				);
+			} )
+			.catch( ( error ) => {
 				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __(
-								'An error occurred while attempting to save the theme.'
-						  );
+					error.message ||
+					__(
+						'An error occurred while attempting to save the theme.',
+						'create-block-theme'
+					);
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		saveTheme().then( () => {
-			createInfoNotice(
-				__(
-					'Theme saved successfully. The editor will now reload.',
-					'create-block-theme'
-				),
-				{
-					onDismiss: () => {
-						window.location.reload();
-					},
-				}
-			);
-		} );
+			} );
 	};
 
 	return (
