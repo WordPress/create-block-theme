@@ -44,7 +44,7 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 					id={ fontId }
 					value={ variant }
 					checked={ isSelected }
-					onClick={ handleToggle }
+					onChange={ handleToggle }
 				/>
 			</td>
 			<td className="">

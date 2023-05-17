@@ -283,7 +283,7 @@ function GoogleFonts() {
 											<input
 												type="checkbox"
 												id={ `select-all-${ selectedFontFamilyId }` }
-												onClick={ () =>
+												onChange={ () =>
 													handleToggleAllVariants(
 														selectedFont.family
 													)
