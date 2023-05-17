@@ -107,54 +107,54 @@ class Theme_Utils {
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
-			$template_data = Theme_Blocks::make_template_images_local( $template );
-			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
+			$template = Theme_Blocks::make_template_images_local( $template );
+			$template = Theme_Templates::replace_template_namespace( $template, $new_slug );
 
 			// If there are images in the template, add it as a pattern
-			if ( count( $template_data->media ) > 0 ) {
-				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
+			if ( count( $template->media ) > 0 ) {
+				$pattern                 = Theme_Patterns::pattern_from_template( $template, $new_slug );
 				$pattern_link_attributes = array(
 					'slug' => $pattern['slug'],
 				);
-				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
+				$template->content       = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to folder
-				$pattern_path = $location . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php';
+				$pattern_path = $location . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template->slug . '.php';
 				file_put_contents( $pattern_path, $pattern['content'] );
 
 				// Add media assets to folder
-				self::add_media_to_folder( $location, $template_data->media );
+				self::add_media_to_folder( $location, $template->media );
 			}
 
 			// Add template to folder
-			$template_path = $location . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $template_data->slug . '.html';
-			file_put_contents( $template_path, $template_data->content );
+			$template_path = $location . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $template->slug . '.html';
+			file_put_contents( $template_path, $template->content );
 
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
-			$template_data = Theme_Blocks::make_template_images_local( $template_part );
-			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
+			$template_part = Theme_Blocks::make_template_images_local( $template_part );
+			$template_part = Theme_Templates::replace_template_namespace( $template_part, $new_slug );
 
 			// If there are images in the template, add it as a pattern
-			if ( count( $template_data->media ) > 0 ) {
-				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
+			if ( count( $template_part->media ) > 0 ) {
+				$pattern                 = Theme_Patterns::pattern_from_template( $template_part, $new_slug );
 				$pattern_link_attributes = array(
 					'slug' => $pattern['slug'],
 				);
-				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
+				$template_part->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to folder
-				$pattern_path = $location . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php';
+				$pattern_path = $location . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_part->slug . '.php';
 				file_put_contents( $pattern_path, $pattern['content'] );
 
 				// Add media assets to folder
-				self::add_media_to_folder( $location, $template_data->media );
+				self::add_media_to_folder( $location, $template_part->media );
 			}
 
 			// Add template part to folder
-			$template_path = $location . DIRECTORY_SEPARATOR . 'parts' . DIRECTORY_SEPARATOR . $template_data->slug . '.html';
-			file_put_contents( $template_path, $template_data->content );
+			$template_path = $location . DIRECTORY_SEPARATOR . 'parts' . DIRECTORY_SEPARATOR . $template_part->slug . '.html';
+			file_put_contents( $template_path, $template_part->content );
 		}
 	}
 

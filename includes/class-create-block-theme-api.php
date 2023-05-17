@@ -123,7 +123,7 @@ class Create_Block_Theme_API {
 
 		// Copy theme files.
 		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
-		Theme_Utils::add_templates_to_folder( $new_theme_path, 'all', null );
+		Theme_Utils::add_templates_to_folder( $new_theme_path, 'all', $theme['slug'] );
 
 		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 
