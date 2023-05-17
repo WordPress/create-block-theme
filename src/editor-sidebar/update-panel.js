@@ -52,43 +52,36 @@ export const UpdateThemePanel = () => {
 	}, [] );
 
 	const handleUpdateClick = () => {
-		const fetchOptions = {
+		apiFetch( {
 			path: '/create-block-theme/v1/update',
 			method: 'POST',
 			data: theme,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			parse: false,
-		};
-
-		async function updateTheme() {
-			try {
-				await apiFetch( fetchOptions );
-			} catch ( error ) {
+		} )
+			.then( () => {
+				createInfoNotice(
+					__(
+						'Theme updated successfully. The editor will now reload.',
+						'create-block-theme'
+					),
+					{
+						onDismiss: () => {
+							window.location.reload();
+						},
+					}
+				);
+			} )
+			.catch( ( error ) => {
 				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __(
-								'An error occurred while attempting to update the theme.'
-						  );
+					error.message ||
+					__(
+						'An error occurred while attempting to update the theme.',
+						'create-block-theme'
+					);
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		updateTheme().then( () => {
-			createInfoNotice(
-				__(
-					'Theme updated successfully. The editor will now reload.',
-					'create-block-theme'
-				),
-				{
-					onDismiss: () => {
-						window.location.reload();
-					},
-				}
-			);
-		} );
+			} );
 	};
 
 	return (

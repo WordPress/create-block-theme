@@ -325,11 +325,25 @@ class Create_Block_Theme_API {
 		$theme = $request->get_params();
 
 		// Update the metadata of the theme in the style.css file
-		$this->update_theme_metadata( $theme );
+		$response = $this->update_theme_metadata( $theme );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
 
 		// Relocate the theme to a new folder
-		$this->relocate_theme( $theme['subfolder'] );
+		$response = $this->relocate_theme( $theme['subfolder'] );
 
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Theme Updated.', 'create-block-theme' ),
+			)
+		);
 	}
 
 	/**
@@ -373,20 +387,36 @@ class Create_Block_Theme_API {
 		$current_theme_subfolder = '';
 		$theme_dir               = get_stylesheet();
 
+		$source      = get_theme_root() . DIRECTORY_SEPARATOR . $theme_dir;
+		$destination = get_theme_root() . DIRECTORY_SEPARATOR . $theme_dir;
+
 		if ( str_contains( get_stylesheet(), '/' ) ) {
 			$current_theme_subfolder = substr( get_stylesheet(), 0, strrpos( get_stylesheet(), '/' ) );
 			$theme_dir               = substr( get_stylesheet(), strrpos( get_stylesheet(), '/' ) + 1 );
+			$source                  = get_theme_root() . DIRECTORY_SEPARATOR . $current_theme_subfolder . DIRECTORY_SEPARATOR . $theme_dir;
+			$destination             = get_theme_root() . DIRECTORY_SEPARATOR . $theme_dir;
 		}
 
-		if ( $current_theme_subfolder === $new_theme_subfolder ) {
+		if ( $new_theme_subfolder ) {
+			$destination = get_theme_root() . DIRECTORY_SEPARATOR . $new_theme_subfolder . DIRECTORY_SEPARATOR . $theme_dir;
+			wp_mkdir_p( get_theme_root() . DIRECTORY_SEPARATOR . $new_theme_subfolder );
+		}
+
+		if ( $source === $destination ) {
 			return;
 		}
 
-		$source      = get_theme_root() . DIRECTORY_SEPARATOR . $current_theme_subfolder . DIRECTORY_SEPARATOR . $theme_dir;
-		$destination = get_theme_root() . DIRECTORY_SEPARATOR . $new_theme_subfolder . DIRECTORY_SEPARATOR . $theme_dir;
+		global $wp_filesystem;
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
 
-		wp_mkdir_p( get_theme_root() . DIRECTORY_SEPARATOR . $new_theme_subfolder );
-		rename( $source, $destination );
+		$success = move_dir( $source, $destination, false );
+
+		if ( ! $success ) {
+			return new \WP_Error( 'problem_moving', __( 'There was a problem moving the theme', 'create-block-theme' ) );
+		}
 
 		if ( $new_theme_subfolder ) {
 			switch_theme( $new_theme_subfolder . '/' . $theme_dir );
