@@ -130,13 +130,13 @@ class Create_Block_Theme_API {
 		if ( $theme['subfolder'] ) {
 			switch_theme( $theme['subfolder'] . '/' . $theme_slug );
 		} else {
-			switch_theme( $theme_dir );
+			switch_theme( $theme_slug );
 		}
 
 		return new WP_REST_Response(
 			array(
 				'status'  => 'SUCCESS',
-				'message' => __( 'Blank Theme Created.', 'create-block-theme' ),
+				'message' => __( 'Cloned Theme Created.', 'create-block-theme' ),
 			)
 		);
 	}
@@ -222,7 +222,7 @@ class Create_Block_Theme_API {
 		if ( $theme['subfolder'] ) {
 			switch_theme( $theme['subfolder'] . '/' . $theme_slug );
 		} else {
-			switch_theme( $theme_dir );
+			switch_theme( $theme_slug );
 		}
 
 		return new WP_REST_Response(
