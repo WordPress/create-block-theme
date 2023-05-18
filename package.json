@@ -15,8 +15,8 @@
 		"url": "https://wordpress.org/support/plugin/create-block-theme/"
 	},
 	"engines": {
-		"node": ">=16.9.1",
-		"npm": ">=7 <8"
+		"node": ">=18",
+		"npm": ">=9"
 	},
 	"main": "build/index.js",
 	"dependencies": {
