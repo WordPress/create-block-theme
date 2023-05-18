@@ -58,7 +58,8 @@ class Theme_Patterns {
 
 	static function escape_text_for_pattern( $text ) {
 		if ( $text && trim( $text ) !== '' ) {
-			return "<?php echo esc_attr_e( '" . $text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
+			$escaped_text = addslashes( $text );
+			return "<?php echo esc_attr_e( '" . $escaped_text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
 		}
 	}
 
