@@ -20,22 +20,22 @@
 	},
 	"main": "build/index.js",
 	"dependencies": {
-		"@wordpress/icons": "^9.17.0",
+		"@wordpress/icons": "^9.24.0",
 		"lib-font": "^2.4.0"
 	},
 	"devDependencies": {
 		"@actions/core": "^1.10.0",
-		"@emotion/babel-plugin": "^11.10.5",
-		"@wordpress/browserslist-config": "^5.8.0",
-		"@wordpress/element": "^5.2.0",
-		"@wordpress/prettier-config": "^2.9.0",
-		"@wordpress/scripts": "^25.2.0",
-		"@wordpress/stylelint-config": "^21.9.0",
+		"@emotion/babel-plugin": "^11.11.0",
+		"@wordpress/browserslist-config": "^5.16.0",
+		"@wordpress/element": "^5.10.0",
+		"@wordpress/prettier-config": "^2.16.0",
+		"@wordpress/scripts": "^26.4.0",
+		"@wordpress/stylelint-config": "^21.16.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
 		"husky": "^8.0.3",
-		"lint-staged": "^13.1.0",
+		"lint-staged": "^13.2.2",
 		"prettier": "npm:wp-prettier@2.6.2",
-		"simple-git": "^3.14.1"
+		"simple-git": "^3.18.0"
 	},
 	"scripts": {
 		"build": "wp-scripts build src/index.js src/plugin-sidebar.js src/wp-org-theme-directory.js",
