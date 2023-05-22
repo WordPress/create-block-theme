@@ -92,7 +92,7 @@ export const UpdateThemePanel = () => {
 			<VStack>
 				<Text>
 					{ __(
-						'Edit properties of the current theme.',
+						'Edit Metadata properties of the current theme.',
 						'create-block-theme'
 					) }
 				</Text>

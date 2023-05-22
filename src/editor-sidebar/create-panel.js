@@ -150,7 +150,7 @@ export const CreateThemePanel = () => {
 			</Heading>
 
 			<VStack>
-				<Text variant="muted">
+				<Text>
 					{ __(
 						'Enter Metadata properties of the new theme.',
 						'create-block-theme'
