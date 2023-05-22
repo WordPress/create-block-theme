@@ -19,7 +19,7 @@ import {
 import { chevronLeft } from '@wordpress/icons';
 
 export const SaveThemePanel = () => {
-	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const handleSaveClick = () => {
 		apiFetch( {
@@ -30,17 +30,14 @@ export const SaveThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				createInfoNotice(
+				// eslint-disable-next-line
+				alert(
 					__(
 						'Theme saved successfully. The editor will now reload.',
 						'create-block-theme'
-					),
-					{
-						onDismiss: () => {
-							window.location.reload();
-						},
-					}
+					)
 				);
+				window.location.reload();
 			} )
 			.catch( ( error ) => {
 				const errorMessage =

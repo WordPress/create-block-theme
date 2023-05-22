@@ -22,7 +22,7 @@ import {
 import { chevronLeft } from '@wordpress/icons';
 
 export const UpdateThemePanel = () => {
-	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -61,17 +61,14 @@ export const UpdateThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				createInfoNotice(
+				// eslint-disable-next-line
+				alert(
 					__(
 						'Theme updated successfully. The editor will now reload.',
 						'create-block-theme'
-					),
-					{
-						onDismiss: () => {
-							window.location.reload();
-						},
-					}
+					)
 				);
+				window.location.reload();
 			} )
 			.catch( ( error ) => {
 				const errorMessage =

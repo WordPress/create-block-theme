@@ -23,7 +23,7 @@ import {
 import { chevronLeft } from '@wordpress/icons';
 
 export const CreateThemePanel = () => {
-	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -91,17 +91,14 @@ export const CreateThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				createInfoNotice(
+				// eslint-disable-next-line
+				alert(
 					__(
 						'Theme created successfully. The editor will now reload.',
 						'create-block-theme'
-					),
-					{
-						onDismiss: () => {
-							window.location.reload();
-						},
-					}
+					)
 				);
+				window.location.reload();
 			} )
 			.catch( ( error ) => {
 				const errorMessage =
@@ -124,17 +121,14 @@ export const CreateThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				createInfoNotice(
+				// eslint-disable-next-line
+				alert(
 					__(
 						'Theme cloned successfully. The editor will now reload.',
 						'create-block-theme'
-					),
-					{
-						onDismiss: () => {
-							window.location.reload();
-						},
-					}
+					)
 				);
+				window.location.reload();
 			} )
 			.catch( ( error ) => {
 				const errorMessage =
