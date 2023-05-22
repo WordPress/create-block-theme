@@ -20,7 +20,7 @@ import {
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { chevronLeft } from '@wordpress/icons';
+import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
 
 export const CreateThemePanel = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -144,15 +144,15 @@ export const CreateThemePanel = () => {
 	return (
 		<PanelBody>
 			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft } isSmall>
-					{ __( 'Back', 'create-block-theme' ) }
+				<NavigatorToParentButton icon={ chevronLeft }>
+					{ __( 'Create Theme', 'create-block-theme' ) }
 				</NavigatorToParentButton>
 			</Heading>
 
 			<VStack>
 				<Text variant="muted">
 					{ __(
-						'Enter properties of the new theme.',
+						'Enter Metadata properties of the new theme.',
 						'create-block-theme'
 					) }
 				</Text>
@@ -217,15 +217,30 @@ export const CreateThemePanel = () => {
 				/>
 			</VStack>
 			<Spacer />
+			<hr></hr>
+			<Spacer />
+			<Button
+				icon={ copy }
+				variant="secondary"
+				onClick={ handleCloneClick }
+			>
+				{ __( 'Clone Theme', 'create-block-theme' ) }
+			</Button>
+			<Spacer />
 			<Text variant="muted">
 				{ __(
 					'Create a copy of this theme on the server and activate it. The user changes will be preserved in the new theme.',
 					'create-block-theme'
 				) }
 			</Text>
+			<hr></hr>
 			<Spacer />
-			<Button variant="secondary" onClick={ handleCloneClick }>
-				{ __( 'Clone Theme', 'create-block-theme' ) }
+			<Button
+				icon={ download }
+				variant="secondary"
+				onClick={ handleExportClick }
+			>
+				{ __( 'Export Theme', 'create-block-theme' ) }
 			</Button>
 			<Spacer />
 			<Text variant="muted">
@@ -234,9 +249,14 @@ export const CreateThemePanel = () => {
 					'create-block-theme'
 				) }
 			</Text>
+			<hr></hr>
 			<Spacer />
-			<Button variant="secondary" onClick={ handleExportClick }>
-				{ __( 'Export Theme', 'create-block-theme' ) }
+			<Button
+				icon={ addCard }
+				variant="secondary"
+				onClick={ handleCreateBlankClick }
+			>
+				{ __( 'Create Blank Theme', 'create-block-theme' ) }
 			</Button>
 			<Spacer />
 			<Text variant="muted">
@@ -246,9 +266,6 @@ export const CreateThemePanel = () => {
 				) }
 			</Text>
 			<Spacer />
-			<Button variant="secondary" onClick={ handleCreateBlankClick }>
-				{ __( 'Create Blank Theme', 'create-block-theme' ) }
-			</Button>
 		</PanelBody>
 	);
 };

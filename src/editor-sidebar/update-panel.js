@@ -84,15 +84,15 @@ export const UpdateThemePanel = () => {
 	return (
 		<PanelBody>
 			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft } isSmall>
-					{ __( 'Back', 'create-block-theme' ) }
+				<NavigatorToParentButton icon={ chevronLeft }>
+					{ __( 'Theme Info', 'create-block-theme' ) }
 				</NavigatorToParentButton>
 			</Heading>
 
 			<VStack>
-				<Text variant="muted">
+				<Text>
 					{ __(
-						'Change properties of the theme.',
+						'Edit properties of the current theme.',
 						'create-block-theme'
 					) }
 				</Text>
