@@ -104,15 +104,16 @@ class Create_Block_Theme_Admin {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']        = sanitize_text_field( $theme['name'] );
-		$theme['description'] = sanitize_text_field( $theme['description'] );
-		$theme['uri']         = sanitize_text_field( $theme['uri'] );
-		$theme['author']      = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug']        = $theme_slug;
-		$theme['template']    = wp_get_theme()->get( 'Template' );
-		$theme['text_domain'] = $theme_slug;
+		$theme['name']          = sanitize_text_field( $theme['name'] );
+		$theme['description']   = sanitize_text_field( $theme['description'] );
+		$theme['uri']           = sanitize_text_field( $theme['uri'] );
+		$theme['author']        = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']    = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']   = sanitize_text_field( $theme['tags_custom'] );
+		$theme['image_credits'] = sanitize_textarea_field( $theme['image_credits'] );
+		$theme['slug']          = $theme_slug;
+		$theme['template']      = wp_get_theme()->get( 'Template' );
+		$theme['text_domain']   = $theme_slug;
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
@@ -170,6 +171,7 @@ class Create_Block_Theme_Admin {
 		$theme['author']         = sanitize_text_field( $theme['author'] );
 		$theme['author_uri']     = sanitize_text_field( $theme['author_uri'] );
 		$theme['tags_custom']    = sanitize_text_field( $theme['tags_custom'] );
+		$theme['image_credits']  = sanitize_textarea_field( $theme['image_credits'] );
 		$theme['slug']           = $theme_slug;
 		$theme['template']       = '';
 		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
@@ -253,12 +255,13 @@ class Create_Block_Theme_Admin {
 		$child_theme_slug  = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']        = sanitize_text_field( $theme['name'] );
-		$theme['description'] = sanitize_text_field( $theme['description'] );
-		$theme['uri']         = sanitize_text_field( $theme['uri'] );
-		$theme['author']      = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
+		$theme['name']          = sanitize_text_field( $theme['name'] );
+		$theme['description']   = sanitize_text_field( $theme['description'] );
+		$theme['uri']           = sanitize_text_field( $theme['uri'] );
+		$theme['author']        = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']    = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']   = sanitize_text_field( $theme['tags_custom'] );
+		$theme['image_credits'] = sanitize_textarea_field( $theme['image_credits'] );
 
 		$theme['text_domain'] = $child_theme_slug;
 		$theme['template']    = $parent_theme_slug;
@@ -329,15 +332,16 @@ class Create_Block_Theme_Admin {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']        = sanitize_text_field( $theme['name'] );
-		$theme['description'] = sanitize_text_field( $theme['description'] );
-		$theme['uri']         = sanitize_text_field( $theme['uri'] );
-		$theme['author']      = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['template']    = '';
-		$theme['slug']        = $theme_slug;
-		$theme['text_domain'] = $theme_slug;
+		$theme['name']          = sanitize_text_field( $theme['name'] );
+		$theme['description']   = sanitize_text_field( $theme['description'] );
+		$theme['uri']           = sanitize_text_field( $theme['uri'] );
+		$theme['author']        = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']    = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']   = sanitize_text_field( $theme['tags_custom'] );
+		$theme['image_credits'] = sanitize_textarea_field( $theme['image_credits'] );
+		$theme['template']      = '';
+		$theme['slug']          = $theme_slug;
+		$theme['text_domain']   = $theme_slug;
 
 		// Create theme directory.
 		$source           = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';

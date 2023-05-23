@@ -31,6 +31,7 @@ const ExportTheme = () => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
+		image_credits: '',
 	} );
 
 	useSelect( ( select ) => {
