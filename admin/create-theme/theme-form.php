@@ -166,6 +166,21 @@ class Theme_Form {
 								<div>
 									<?php Theme_Tags::theme_tags_section(); ?>
 								</div>
+								<br /><br />
+								<label>
+								<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
+									<small><?php _e( 'List the credits for each image you have included in the theme. Include the image name, license type, and source URL.', 'create-block-theme' ); ?></small><br />
+									<textarea placeholder="
+									<?php
+									_e(
+										'Image Title
+License Type
+Source: https://source-url.com',
+										'create-block-theme'
+									);
+									?>
+															" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
+								</label>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
 							<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
