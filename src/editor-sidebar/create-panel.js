@@ -39,9 +39,9 @@ export const CreateThemePanel = () => {
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
+			uri: themeData.theme_uri.raw,
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
-			theme_uri: themeData.theme_uri.raw,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(

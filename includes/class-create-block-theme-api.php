@@ -372,10 +372,8 @@ class Create_Block_Theme_API {
 	 * Update the theme metadata in the style.css file.
 	 */
 	function update_theme_metadata( $theme ) {
-		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
-		$style_css     = file_get_contents( get_stylesheet_directory() . '/style.css' );
-		$css_contents  = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
-		$style_css     = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
+		$style_css = Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
 	}
 

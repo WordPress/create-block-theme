@@ -28,6 +28,7 @@ export const UpdateThemePanel = () => {
 		name: '',
 		description: '',
 		uri: '',
+		version: '',
 		author: '',
 		author_uri: '',
 		tags_custom: '',
@@ -38,9 +39,11 @@ export const UpdateThemePanel = () => {
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
+			uri: themeData.theme_uri.raw,
+			version: themeData.version,
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
-			theme_uri: themeData.theme_uri.raw,
+			tags_custom: themeData.tags.rendered,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
@@ -143,6 +146,28 @@ export const UpdateThemePanel = () => {
 					}
 					placeholder={ __(
 						'https://wordpress.org/',
+						'create-block-theme'
+					) }
+				/>
+				<TextControl
+					label={ __( 'Version', 'create-block-theme' ) }
+					value={ theme.version }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, version: value } )
+					}
+					placeholder={ __(
+						'Version of the theme',
+						'create-block-theme'
+					) }
+				/>
+				<TextareaControl
+					label={ __( 'Theme tags', 'create-block-theme' ) }
+					value={ theme.tags_custom }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, tags_custom: value } )
+					}
+					placeholder={ __(
+						'A comma-separated collection of tags',
 						'create-block-theme'
 					) }
 				/>
