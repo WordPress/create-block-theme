@@ -170,16 +170,15 @@ class Theme_Form {
 								<label>
 								<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'List the credits for each image you have included in the theme. Include the image name, license type, and source URL.', 'create-block-theme' ); ?></small><br />
-									<textarea placeholder="
 									<?php
-									_e(
+									$image_credits_placeholder = __(
 										'Image Title
 License Type
 Source: https://source-url.com',
 										'create-block-theme'
 									);
 									?>
-															" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
+									<textarea placeholder="<?php echo $image_credits_placeholder; ?>" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
 								</label>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
