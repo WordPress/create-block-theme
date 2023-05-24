@@ -24,7 +24,7 @@ class Theme_Readme {
 
 		if ( $image_credits ) {
 			// Add new lines around the image credits
-			$image_credits = "\n" . $image_credits . "\n";
+			$image_credits = "\n" . 'This theme bundles the following third-party images:' . "\n\n" . $image_credits;
 		}
 
 		return "=== {$name} ===
