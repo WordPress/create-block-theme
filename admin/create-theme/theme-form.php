@@ -164,8 +164,17 @@ class Theme_Form {
 								</label>
 								<br /><br />
 								<label>
-								<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
+									<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'List the credits for each image you have included in the theme. Include the image name, license type, and source URL.', 'create-block-theme' ); ?></small><br />
+									<small>
+										<?php
+										printf(
+											/* Translators: Bundled resources licenses link. */
+											esc_html__( 'All bundled resources must have GPL-compatible licenses (%s).', 'create-block-theme' ),
+											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources', 'create-block-theme' ) ) . '">read more</a>'
+										);
+										?>
+									</small><br />
 									<?php
 									$image_credits_placeholder = __(
 										'Image Title
