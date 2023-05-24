@@ -163,10 +163,6 @@ class Theme_Form {
 									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
 								</label>
 								<br /><br />
-								<div>
-									<?php Theme_Tags::theme_tags_section(); ?>
-								</div>
-								<br /><br />
 								<label>
 								<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'List the credits for each image you have included in the theme. Include the image name, license type, and source URL.', 'create-block-theme' ); ?></small><br />
@@ -174,12 +170,16 @@ class Theme_Form {
 									$image_credits_placeholder = __(
 										'Image Title
 License Type
-Source: https://source-url.com',
+Source: https://example.com/source-url',
 										'create-block-theme'
 									);
 									?>
 									<textarea placeholder="<?php echo $image_credits_placeholder; ?>" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
 								</label>
+								<br /><br />
+								<div>
+									<?php Theme_Tags::theme_tags_section(); ?>
+								</div>
 							</div>
 							<input type="hidden" name="page" value="create-block-theme" />
 							<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
