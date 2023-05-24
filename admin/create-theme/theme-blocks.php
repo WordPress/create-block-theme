@@ -185,6 +185,7 @@ class Theme_Blocks {
 		$markup = str_replace( '%20', ' ', $markup );
 		$markup = str_replace( '\u003c', '<', $markup );
 		$markup = str_replace( '\u003e', '>', $markup );
+		$markup = str_replace( '\u002d', '-', $markup );
 		$markup = html_entity_decode( $markup, ENT_QUOTES | ENT_XML1, 'UTF-8' );
 		return $markup;
 	}
