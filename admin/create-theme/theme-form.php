@@ -171,7 +171,7 @@ class Theme_Form {
 										printf(
 											/* Translators: Bundled resources licenses link. */
 											esc_html__( 'All bundled resources must have GPL-compatible licenses (%s).', 'create-block-theme' ),
-											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources', 'create-block-theme' ) ) . '">read more</a>'
+											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources', 'create-block-theme' ) ) . '" target="_blank">read more</a>'
 										);
 										?>
 									</small><br />

@@ -38,7 +38,7 @@ class Theme_Tags {
 		printf(
 			/* Translators: Theme Tags link. */
 			esc_html__( 'Add theme tags to help categorize the theme (%s).', 'create-block-theme' ),
-			'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/theme-tags/', 'create-block-theme' ) ) . '">read more</a>'
+			'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/theme-tags/', 'create-block-theme' ) ) . '" target="_blank">read more</a>'
 		);
 		echo '</small><br />';
 		echo '</div>';
