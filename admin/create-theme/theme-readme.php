@@ -141,8 +141,8 @@ GNU General Public License for more details.
 
 		// Copy font credits from current theme readme.txt
 		if ( str_contains( $current_readme_content, $font_credits_intro ) ) {
-			$index        = strpos( $current_readme_content, $font_credits_intro );
-			$font_credits = substr( $current_readme_content, $index );
+			$font_credits_start = strpos( $current_readme_content, $font_credits_intro );
+			$font_credits       = substr( $current_readme_content, $font_credits_start );
 		}
 
 		return $font_credits;
