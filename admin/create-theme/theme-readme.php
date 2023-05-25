@@ -14,7 +14,6 @@ class Theme_Readme {
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
 		$image_credits          = $theme['image_credits'] ?? '';
-		$font_credits           = self::font_credits();
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
@@ -25,8 +24,10 @@ class Theme_Readme {
 
 		if ( $image_credits ) {
 			// Add new lines around the image credits
-			$image_credits = 'This theme bundles the following third-party images:' . "\n\n" . $image_credits;
+			$image_credits = "\n" . $image_credits;
 		}
+
+		$copyright_section = self::copyright_section( $original_theme_credits, $image_credits );
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -45,23 +46,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 = 0.0.1 =
 * Initial release
 
-== Copyright ==
-
-{$name} WordPress Theme, (C) {$copy_year} {$author}
-{$name} is distributed under the terms of the GNU GPL.
-{$original_theme_credits}
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-{$font_credits}
-{$image_credits}
+{$copyright_section}
 ";
 	}
 
@@ -122,14 +107,14 @@ GNU General Public License for more details.
 	}
 
 	/**
-	 * Build string for font credits.
+	 * Build copyright section.
 	 * Used in readme.txt of cloned themes.
 	 *
 	 * @return string
 	 */
-	static function font_credits() {
-		$font_credits       = '';
-		$font_credits_intro = 'This theme bundles the following third-party fonts:' . "\n";
+	static function copyright_section( $original_theme_credits, $image_credits ) {
+		$copyright_section       = '';
+		$copyright_section_intro = '== Copyright ==';
 
 		// Get current theme readme.txt
 		$current_readme         = get_stylesheet_directory() . '/readme.txt' ?? '';
@@ -139,12 +124,21 @@ GNU General Public License for more details.
 			return;
 		}
 
-		// Copy font credits from current theme readme.txt
-		if ( str_contains( $current_readme_content, $font_credits_intro ) ) {
-			$font_credits_start = strpos( $current_readme_content, $font_credits_intro );
-			$font_credits       = substr( $current_readme_content, $font_credits_start );
+		// Copy copyright section from current theme readme.txt
+		if ( str_contains( $current_readme_content, $copyright_section_intro ) ) {
+			$copyright_section_start = strpos( $current_readme_content, $copyright_section_intro );
+			$copyright_section       = substr( $current_readme_content, $copyright_section_start );
+
+			if ( $original_theme_credits ) {
+				$new_copyright_section = str_replace( $copyright_section_intro . "\n", '', $copyright_section );
+				$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . $new_copyright_section;
+			}
+
+			if ( $image_credits ) {
+				$copyright_section = $copyright_section . $image_credits;
+			}
 		}
 
-		return $font_credits;
+		return $copyright_section;
 	}
 }
