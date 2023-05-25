@@ -182,26 +182,6 @@ class Theme_Zip {
 		}
 	}
 
-	static function add_readme_to_zip( $zip, $theme ) {
-		$new_readme = Theme_Readme::build_readme_txt( $theme );
-
-		// Add font credits to new readme.txt
-		$theme_path         = get_stylesheet_directory();
-		$theme_readme       = file_get_contents( $theme_path . '/readme.txt' );
-		$font_credits_intro = 'This theme bundles the following third-party fonts:' . "\n";
-		$font_credits       = '';
-
-		// Check if font credits are in current readme.txt
-		if ( false !== strpos( $theme_readme, $font_credits_intro ) ) {
-			$index        = strpos( $theme_readme, $font_credits_intro );
-			$font_credits = substr( $theme_readme, $index );
-			file_put_contents( $new_readme, $font_credits );
-		}
-
-		$zip->addFromString( 'readme.txt', $new_readme );
-		return $zip;
-	}
-
 	static function replace_namespace( $content, $new_slug, $new_name ) {
 
 		$old_slug            = wp_get_theme()->get( 'TextDomain' );
