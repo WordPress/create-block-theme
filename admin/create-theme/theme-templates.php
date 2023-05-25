@@ -69,6 +69,10 @@ class Theme_Templates {
 		// This replaces that with dashes again. We should consider decoding the entire string but that is proving difficult.
 		$template->content = str_replace( '\u002d', '-', $template->content );
 
+		// NOTE: Templates that reference template parts are exported with the 'theme' attribute.
+		// This is undesirable and should be removed.
+		$template->content = str_replace( ',"theme":"' . get_stylesheet() . '"', '', $template->content );
+
 		return $template;
 	}
 
