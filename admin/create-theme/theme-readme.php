@@ -4,7 +4,7 @@ class Theme_Readme {
 	/**
 	* Build a readme.txt file for CHILD/GRANDCHILD themes.
 	*/
-	public static function build_readme_txt( $theme, $has_bundled_fonts = false ) {
+	public static function build_readme_txt( $theme ) {
 		$slug                   = $theme['slug'];
 		$name                   = $theme['name'];
 		$description            = $theme['description'];
@@ -14,7 +14,7 @@ class Theme_Readme {
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
 		$image_credits          = $theme['image_credits'] ?? '';
-		$font_credits           = $has_bundled_fonts ? self::font_credits() : '';
+		$font_credits           = self::font_credits();
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
@@ -59,6 +59,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
+
 {$font_credits}
 {$image_credits}
 ";
@@ -130,18 +131,18 @@ GNU General Public License for more details.
 		$font_credits       = '';
 		$font_credits_intro = 'This theme bundles the following third-party fonts:' . "\n";
 
-		// Get font credits from original theme readme.txt
-		$original_readme = get_stylesheet_directory() . '/readme.txt' ?? '';
-		$readme_content  = file_exists( $original_readme ) ? file_get_contents( $original_readme ) : '';
+		// Get current theme readme.txt
+		$current_readme         = get_stylesheet_directory() . '/readme.txt' ?? '';
+		$current_readme_content = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
 
-		if ( ! $readme_content ) {
+		if ( ! $current_readme_content ) {
 			return;
 		}
 
-		if ( str_contains( $readme_content, $font_credits_intro ) ) {
-			$starts       = strpos( $readme_content, $font_credits_intro ) + strlen( $font_credits_intro );
-			$ends         = strpos( $readme_content, '== Changelog ==', $starts );
-			$font_credits = trim( substr( $readme_content, $starts, $ends - $starts ) );
+		// Copy font credits from current theme readme.txt
+		if ( str_contains( $current_readme_content, $font_credits_intro ) ) {
+			$index        = strpos( $current_readme_content, $font_credits_intro );
+			$font_credits = substr( $current_readme_content, $index );
 		}
 
 		return $font_credits;
