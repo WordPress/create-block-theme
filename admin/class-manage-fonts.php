@@ -325,6 +325,8 @@ class Manage_Fonts_Admin {
 			return;
 		}
 
+		$font_credits_intro = 'This theme bundles the following third-party fonts:' . "\n";
+
 		// If file_name and font-credits exist, then add font license to readme.txt
 		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) && isset( $_POST['font-credits'] ) ) {
 			// Check that the font is not already credited in readme.txt
@@ -359,6 +361,12 @@ class Manage_Fonts_Admin {
 {$copyright} {$license_info} {$license_url} {$font_source}
 {$end_credits_note}
 ";
+
+				// Check if readme.txt contains font credits intro text
+				if ( false === stripos( $readme_file_contents, $font_credits_intro ) ) {
+					// Add font credits intro text to the beginning of font credits
+					$font_credits = $font_credits_intro . $font_credits;
+				}
 
 				// Check if readme.txt ends with a new line
 				if ( "\n" !== $readme_file_contents[ strlen( $readme_file_contents ) - 1 ] ) {
