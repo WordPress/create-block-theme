@@ -325,7 +325,7 @@ class Manage_Fonts_Admin {
 			return;
 		}
 
-		$font_credits_intro = 'This theme bundles the following third-party fonts:' . "\n";
+		$font_credits_intro = "\n" . 'This theme bundles the following third-party fonts:' . "\n";
 
 		// If file_name and font-credits exist, then add font license to readme.txt
 		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) && isset( $_POST['font-credits'] ) ) {
