@@ -191,7 +191,10 @@ class Create_Block_Theme_Admin {
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
 
 		// Add readme.txt.
-		$zip = Theme_Zip::add_readme_to_zip( $zip, $theme );
+		$zip->addFromString(
+			'readme.txt',
+			Theme_Readme::build_readme_txt( $theme )
+		);
 
 		// Augment style.css
 		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
