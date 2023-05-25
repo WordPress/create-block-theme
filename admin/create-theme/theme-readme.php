@@ -16,18 +16,7 @@ class Theme_Readme {
 		$image_credits          = $theme['image_credits'] ?? '';
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
-
-		if ( $original_theme_credits ) {
-			// Add a new line to the original theme credits
-			$original_theme_credits = $original_theme_credits . "\n";
-		}
-
-		if ( $image_credits ) {
-			// Add new lines around the image credits
-			$image_credits = "\n" . $image_credits;
-		}
-
-		$copyright_section = self::copyright_section( $original_theme_credits, $image_credits );
+		$copyright_section      = self::copyright_section( $original_theme_credits, $image_credits );
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -131,11 +120,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 			if ( $original_theme_credits ) {
 				$new_copyright_section = str_replace( $copyright_section_intro . "\n", '', $copyright_section );
-				$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . $new_copyright_section;
+				$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . "\n" . $new_copyright_section;
 			}
 
 			if ( $image_credits ) {
-				$copyright_section = $copyright_section . $image_credits;
+				$copyright_section = $copyright_section . "\n" . $image_credits;
+
 			}
 		}
 
