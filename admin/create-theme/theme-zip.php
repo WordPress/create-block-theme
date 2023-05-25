@@ -181,18 +181,4 @@ class Theme_Zip {
 			}
 		}
 	}
-
-	static function replace_namespace( $content, $new_slug, $new_name ) {
-
-		$old_slug            = wp_get_theme()->get( 'TextDomain' );
-		$new_slug_underscore = str_replace( '-', '_', $new_slug );
-		$old_slug_underscore = str_replace( '-', '_', $old_slug );
-		$old_name            = wp_get_theme()->get( 'Name' );
-
-		$content = str_replace( $old_slug, $new_slug, $content );
-		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
-		$content = str_replace( $old_name, $new_name, $content );
-
-		return $content;
-	}
 }
