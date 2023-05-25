@@ -67,7 +67,7 @@ Tags: {$tags}
 		$version     = '0.0.1';
 		$tags        = Theme_Tags::theme_tags_list( $theme );
 
-		if ( $theme['version'] ) {
+		if ( isset( $theme['version'] ) ) {
 			$version = $theme['version'];
 		}
 
