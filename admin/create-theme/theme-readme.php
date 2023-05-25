@@ -13,13 +13,18 @@ class Theme_Readme {
 		$author_uri             = $theme['author_uri'];
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
+		$image_credits          = $theme['image_credits'] ?? '';
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
 		if ( $original_theme_credits ) {
 			// Add a new line to the original theme credits
-			$original_theme_credits = "{$original_theme_credits}
-";
+			$original_theme_credits = $original_theme_credits . "\n";
+		}
+
+		if ( $image_credits ) {
+			// Add new lines around the image credits
+			$image_credits = "\n" . 'This theme bundles the following third-party images:' . "\n\n" . $image_credits;
 		}
 
 		return "=== {$name} ===
@@ -53,6 +58,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
+{$image_credits}
 ";
 	}
 
