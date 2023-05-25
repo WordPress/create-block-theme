@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.10.0
+Stable tag: 1.11.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,14 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 1.11.0 =
+* Update Google Fonts JSON data from API
+* Add linebreaks before hyphen lists in readme to fix plugin repository display
+* Prevent additional white space in font credits in readme.txt
+* Google fonts: Change onClick handlers to onChange
+* Merge pull request #374 from WordPress/fix/escape-template-text
+* Update required node version and update dependencies
 
 = 1.10.0 =
 * Update Google Fonts JSON data from API

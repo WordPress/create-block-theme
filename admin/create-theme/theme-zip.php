@@ -4,8 +4,10 @@ require_once( __DIR__ . '/theme-media.php' );
 require_once( __DIR__ . '/theme-blocks.php' );
 require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
+require_once( __DIR__ . '/theme-utils.php' );
 
 class Theme_Zip {
+
 	public static function create_zip( $filename ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );
@@ -66,7 +68,7 @@ class Theme_Zip {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = self::replace_namespace( $contents, $new_slug, $new_name );
+						$contents = Theme_Utils::replace_namespace( $contents, $new_slug, $new_name );
 					}
 
 					// Add current file to archive
