@@ -4,7 +4,7 @@ class Theme_Readme {
 	/**
 	* Build a readme.txt file for CHILD/GRANDCHILD themes.
 	*/
-	public static function build_readme_txt( $theme ) {
+	public static function build_readme_txt( $theme, $has_bundled_fonts = false ) {
 		$slug                   = $theme['slug'];
 		$name                   = $theme['name'];
 		$description            = $theme['description'];
@@ -13,6 +13,7 @@ class Theme_Readme {
 		$author_uri             = $theme['author_uri'];
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
+		$font_credits           = $has_bundled_fonts ? self::font_credits() : '';
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
 
@@ -53,6 +54,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
+{$font_credits}
 ";
 	}
 
@@ -110,5 +112,32 @@ GNU General Public License for more details.
 		);
 
 		return $theme_credit_content;
+	}
+
+	/**
+	 * Build string for font credits.
+	 * Used in readme.txt of cloned themes.
+	 *
+	 * @return string
+	 */
+	static function font_credits() {
+		$font_credits       = '';
+		$font_credits_intro = 'This theme bundles the following third-party fonts:' . "\n";
+
+		// Get font credits from original theme readme.txt
+		$original_readme = get_stylesheet_directory() . '/readme.txt' ?? '';
+		$readme_content  = file_exists( $original_readme ) ? file_get_contents( $original_readme ) : '';
+
+		if ( ! $readme_content ) {
+			return;
+		}
+
+		if ( str_contains( $readme_content, $font_credits_intro ) ) {
+			$starts       = strpos( $readme_content, $font_credits_intro ) + strlen( $font_credits_intro );
+			$ends         = strpos( $readme_content, '== Changelog ==', $starts );
+			$font_credits = trim( substr( $readme_content, $starts, $ends - $starts ) );
+		}
+
+		return $font_credits;
 	}
 }
