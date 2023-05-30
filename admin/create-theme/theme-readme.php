@@ -16,7 +16,23 @@ class Theme_Readme {
 		$image_credits          = $theme['image_credits'] ?? '';
 		$original_theme         = $theme['original_theme'] ?? '';
 		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
-		$copyright_section      = self::copyright_section( $original_theme_credits, $image_credits );
+
+		$default_copyright_section = "== Copyright ==
+
+{$name} WordPress Theme, (C) {$copy_year} {$author}
+{$name} is distributed under the terms of the GNU GPL.
+{$original_theme_credits}
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.";
+
+		$copyright_section = $original_theme ? self::copyright_section( $original_theme_credits, $image_credits ) : $default_copyright_section;
 
 		return "=== {$name} ===
 Contributors: {$author}
