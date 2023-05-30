@@ -264,7 +264,7 @@ class Create_Block_Theme_API {
 		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
 
 		// Add readme.txt.
-		$zip->addFromString(
+		$zip->addFromStringToTheme(
 			'readme.txt',
 			Theme_Readme::build_readme_txt( $theme )
 		);
@@ -273,14 +273,14 @@ class Create_Block_Theme_API {
 		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
-		$zip->addFromString(
+		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
 		);
 
 		// Add / replace screenshot.
 		if ( $this->is_valid_screenshot( $screenshot ) ) {
-			$zip->addFile(
+			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
 			);
