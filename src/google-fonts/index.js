@@ -36,7 +36,7 @@ const EMPTY_SELECTION_DATA = {};
 function GoogleFonts() {
 	const [ googleFontsData, setGoogleFontsData ] = useState( {} );
 	const [ selectedFont, setSelectedFont ] = useState( null );
-	const [ selectedFontCredits, setSelectedFontCredits ] = useState( null );
+	const [ selectedFontCredits, setSelectedFontCredits ] = useState( {} );
 	const [ selectionData, setSelectionData ] =
 		useState( EMPTY_SELECTION_DATA );
 
@@ -156,25 +156,38 @@ function GoogleFonts() {
 
 	const getFontCredits = ( selectedFontObj ) => {
 		const fontObj = new Font( selectedFontObj.family );
+		let fontError = false;
+
+		// Force font file to be https
+		let fontFile = Object.values( selectedFontObj.files )[ 0 ];
+		if ( fontFile.includes( 'http://' ) ) {
+			fontFile = fontFile.replace( 'http://', 'https://' );
+		}
 
 		// Load font file
-		fontObj.src = Object.values( selectedFontObj.files )[ 0 ];
-		// eslint-disable-next-line no-console
-		fontObj.onerror = ( event ) => console.error( event );
-		fontObj.onload = ( event ) => getFontData( event );
+		fontObj.src = fontFile;
+		fontObj.onerror = ( event ) => {
+			// eslint-disable-next-line no-console
+			console.error( event );
+			fontError = true;
+		};
 
-		function getFontData( event ) {
-			const font = event.detail.font;
-			const nameTable = font.opentype.tables.name;
+		if ( ! fontError ) {
+			fontObj.onload = ( event ) => getFontData( event );
 
-			const fontCredits = {
-				copyright: nameTable.get( 0 ),
-				source: nameTable.get( 11 ),
-				license: nameTable.get( 13 ),
-				licenseURL: nameTable.get( 14 ),
-			};
+			function getFontData( event ) {
+				const font = event.detail.font;
+				const { name } = font.opentype.tables;
 
-			setSelectedFontCredits( fontCredits );
+				const fontCredits = {
+					copyright: name.get( 0 ),
+					source: name.get( 11 ),
+					license: name.get( 13 ),
+					licenseURL: name.get( 14 ),
+				};
+
+				setSelectedFontCredits( fontCredits );
+			}
 		}
 	};
 
@@ -270,7 +283,7 @@ function GoogleFonts() {
 											<input
 												type="checkbox"
 												id={ `select-all-${ selectedFontFamilyId }` }
-												onClick={ () =>
+												onChange={ () =>
 													handleToggleAllVariants(
 														selectedFont.family
 													)

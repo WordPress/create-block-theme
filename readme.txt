@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.9.0
+Stable tag: 1.12.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,6 +13,7 @@ A WordPress plugin to create block themes.
 == Description ==
 
 This plugin allows you to:
+
 - Create a new theme, blank theme, child theme or style variation.
 - List and preview font families and font faces embeded in your theme.
 - Embed Google Fonts in your theme.
@@ -24,6 +25,7 @@ The plugin is development only — not intended for use on production websites, 
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
 In the WordPress Admin Dashboard, under Appearance there will be three new pages called:
+
 - Create Block Theme
 - Manage fonts
 
@@ -43,7 +45,48 @@ If you run into an issue, you should check the [Support forum](https://wordpress
 
 If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
 
+== General Troobleshooting ==
+
+If you are having problems, please try the following:
+
+- Make sure you have the latest version of WordPress installed.
+- Make sure you have the latest version of the plugin installed.
+- Deactivate all plugins and see if this resolves the problem. If this works, re-activate the plugins one by one until you find the problematic plugin(s).
+- Switch the theme to the default theme to rule out any theme-related problems.
+- Check the [Support forum](https://wordpress.org/support/plugin/create-block-theme/) for similar issues.
+
+== I'm getting a corrupt zip file when I export my theme ==
+
+- First follow the general troubleshooting steps above.
+- Please make sure you `WP_DEBUG` setting in your `wp-config.php` file is set to `false` like this: `define( 'WP_DEBUG', false );`.
+- If your theme includes PHP files, ensure those files do **not** use PHP closing tags `?>` at the end of the file. If they do, remove them.
+
+
 == Changelog ==
+
+= 1.12.0 =
+* # Conflicts:
+#	src/plugin-sidebar.js
+
+* Add image credits input
+* Update theme `version` logic to use isset()
+* Update Google Fonts JSON data from API
+
+= 1.11.0 =
+* Update Google Fonts JSON data from API
+* Add linebreaks before hyphen lists in readme to fix plugin repository display
+* Prevent additional white space in font credits in readme.txt
+* Google fonts: Change onClick handlers to onChange
+* Merge pull request #374 from WordPress/fix/escape-template-text
+* Update required node version and update dependencies
+
+= 1.10.0 =
+* Update Google Fonts JSON data from API
+* Adding troubleshooting FAQs
+* Updating "Requires at least" field of generated themes
+* Improve handling of font license errors
+* Fix `tabIndex` prop
+* Automatically add font license info for local fonts
 
 = 1.9.0 =
 * Merge branch 'trunk' into add/handle-google-font-credits

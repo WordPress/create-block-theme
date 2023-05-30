@@ -325,12 +325,16 @@ class Manage_Fonts_Admin {
 			return;
 		}
 
-		// If file_name exists, then add font license to readme.txt
-		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) ) {
+		// If file_name and font-credits exist, then add font license to readme.txt
+		if ( 'remove' !== $file_name && is_string( $file_name ) && ! empty( $_POST['font-credits'] ) && isset( $_POST['font-credits'] ) ) {
 			// Check that the font is not already credited in readme.txt
 			if ( false === stripos( $readme_file_contents, $font_name ) ) {
 				// Get font credits from font file metadata
 				$font_credits = json_decode( stripslashes( $_POST['font-credits'] ), true );
+
+				if ( ! is_array( $font_credits ) ) {
+					return;
+				}
 
 				// Assign font credits to variables
 				$copyright    = array_key_exists( 'copyright', $font_credits ) ? trim( $font_credits['copyright'] ) : '';
@@ -351,11 +355,15 @@ class Manage_Fonts_Admin {
 
 				// Build the font credits string
 				$font_credits = "
-
 {$font_name} Font
 {$copyright} {$license_info} {$license_url} {$font_source}
 {$end_credits_note}
 ";
+
+				// Check if readme.txt ends with a new line
+				if ( "\n" !== $readme_file_contents[ strlen( $readme_file_contents ) - 1 ] ) {
+					$font_credits = "\n" . $font_credits;
+				}
 
 				// Add font credits to the end of readme.txt
 				file_put_contents(

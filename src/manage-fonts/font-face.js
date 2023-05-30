@@ -31,7 +31,7 @@ function FontFace( { face, deleteFont, shouldBeRemoved, isFamilyOpen } ) {
 					<Button
 						variant="tertiary"
 						onClick={ deleteFont }
-						tabindex={ isFamilyOpen ? 0 : -1 }
+						tabIndex={ isFamilyOpen ? 0 : -1 }
 					>
 						{ __( 'Remove', 'create-block-theme' ) }
 					</Button>
