@@ -21,7 +21,7 @@ class Theme_Readme {
 
 {$name} WordPress Theme, (C) {$copy_year} {$author}
 {$name} is distributed under the terms of the GNU GPL.
-{$original_theme_credits}
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or
