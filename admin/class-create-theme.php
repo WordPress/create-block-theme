@@ -22,6 +22,7 @@ require_once __DIR__ . '/create-theme/form-messages.php';
  * @author     WordPress.org
  */
 class Create_Block_Theme_Admin {
+	public $theme;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -30,6 +31,8 @@ class Create_Block_Theme_Admin {
 		add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'blockbase_save_theme' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_enqueue' ) );
+
+		$this->theme = wp_get_theme();
 	}
 
 	function create_block_theme_enqueue() {
@@ -200,7 +203,7 @@ class Create_Block_Theme_Admin {
 
 		// Use previous theme's tags if custom tags are empty.
 		if ( empty( $theme['tags_custom'] ) ) {
-			$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
+			$theme['tags_custom'] = implode( ', ', $this->theme->get( 'Tags' ) );
 		}
 
 		// Create ZIP file in the temporary directory.
@@ -252,7 +255,7 @@ class Create_Block_Theme_Admin {
 	 * Create a child theme of the activated theme
 	 */
 	function create_child_theme( $theme, $screenshot ) {
-		$parent_theme_slug = Theme_Utils::get_theme_slug( wp_get_theme()->get( 'Name' ) );
+		$parent_theme_slug = Theme_Utils::get_theme_slug( $this->theme->get( 'Name' ) );
 		$child_theme_slug  = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
@@ -310,7 +313,7 @@ class Create_Block_Theme_Admin {
 	 * Export activated parent theme
 	 */
 	function export_theme( $theme ) {
-		$theme['slug'] = wp_get_theme()->get( 'TextDomain' );
+		$theme['slug'] = $this->theme->get( 'TextDomain' );
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );

@@ -6,6 +6,7 @@ class Theme_Utils {
 	}
 
 	public static function get_theme_slug( $new_theme_name ) {
+		$theme = wp_get_theme();
 
 		// If the source theme has a single-word slug but the new theme has a multi-word slug
 		// then function will look like: function apple-bumpkin_support() and that won't work.
@@ -13,7 +14,7 @@ class Theme_Utils {
 		// Due to the complexity of this situation (compared to the simplicity of the others)
 		// this will enforce the usage of a singleword slug for those themes.
 
-		$old_slug = wp_get_theme()->get( 'TextDomain' );
+		$old_slug = $theme->get( 'TextDomain' );
 		$new_slug = sanitize_title( $new_theme_name );
 		$new_slug = preg_replace( '/\s+/', '', $new_slug ); // Remove spaces
 
@@ -30,10 +31,11 @@ class Theme_Utils {
 	}
 
 	public static function replace_namespace( $content, $new_slug, $new_name ) {
-		$old_slug            = wp_get_theme()->get( 'TextDomain' );
+		$theme               = wp_get_theme();
+		$old_slug            = $theme->get( 'TextDomain' );
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
-		$old_name            = wp_get_theme()->get( 'Name' );
+		$old_name            = $theme->get( 'Name' );
 
 		// Generate placeholders
 		$placeholder_slug            = md5( $old_slug );
@@ -102,7 +104,6 @@ class Theme_Utils {
 			// Add current file to target
 			file_put_contents( $location . DIRECTORY_SEPARATOR . $relative_path, $contents );
 		}
-
 	}
 
 	public static function add_templates_to_folder( $location, $export_type, $new_slug ) {
@@ -139,7 +140,6 @@ class Theme_Utils {
 			// Add template to folder
 			$template_path = $location . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $template->slug . '.html';
 			file_put_contents( $template_path, $template->content );
-
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
@@ -200,7 +200,6 @@ class Theme_Utils {
 		$readme_file_details['recommendedPlugins'] = $matches[1][0] ?? '';
 
 		return $readme_file_details;
-
 	}
 
 }
