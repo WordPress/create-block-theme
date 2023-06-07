@@ -28,7 +28,7 @@ class Create_Block_Theme_AdminTest extends WP_UnitTestCase {
 		->setMethods( array( 'download_file' ) )
 			->getMock();
 
-		// Configure the stub.
+		// Stub download_file method to avoid sending headers.
 		$create_block_theme_admin->method( 'download_file' )
 		->willReturn( true );
 
