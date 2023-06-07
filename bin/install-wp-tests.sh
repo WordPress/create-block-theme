@@ -16,6 +16,7 @@ TMPDIR=${TMPDIR-/tmp}
 TMPDIR=$(echo $TMPDIR | sed -e "s/\/$//")
 WP_TESTS_DIR=${WP_TESTS_DIR-$TMPDIR/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
+WP_CLI_CMD=$WP_CORE_DIR/wp-cli.phar
 
 download() {
     if [ `which curl` ]; then
@@ -93,6 +94,8 @@ install_wp() {
 	fi
 
 	download https://raw.github.com/markoheijnen/wp-mysqli/master/db.php $WP_CORE_DIR/wp-content/db.php
+	download https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar $WP_CORE_DIR/wp-cli.phar
+	chmod +x $WP_CORE_DIR/wp-cli.phar
 }
 
 install_test_suite() {
@@ -176,6 +179,27 @@ install_db() {
 	fi
 }
 
+
+# downloads and imports theme unit test data
+# from https://github.com/WPTT/theme-test-data/blob/master/themeunittestdata.wordpress.xml
+import_theme_data() {
+	# download theme unit test data if it doesn't exist
+	if [ ! -f $WP_CORE_DIR/wp-content/themes/themeunittestdata.wordpress.xml ]; then
+		download https://raw.githubusercontent.com/WPTT/theme-test-data/master/themeunittestdata.wordpress.xml $WP_CORE_DIR/wp-content/themes/themeunittestdata.wordpress.xml
+	fi
+	WP_ADMIN_EMAIL='themeshaperwp+demos@gmail.com'
+	# install site
+	$WP_CLI_CMD core install --url=$WP_URL --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_EMAIL --path=$WP_CORE_DIR
+	# create wp-config file
+	if [ ! -f $WP_CORE_DIR/wp-config.php ]; then
+		$WP_CLI_CMD core config --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASS --dbhost=$DB_HOST --path=$WP_CORE_DIR
+	fi
+	# use wp cli to import the theme unit test data
+	$WP_CLI_CMD plugin install wordpress-importer --activate --path=$WP_CORE_DIR
+	$WP_CLI_CMD import $WP_CORE_DIR/wp-content/themes/themeunittestdata.wordpress.xml --authors=create --path=$WP_CORE_DIR
+}
+
 install_wp
 install_test_suite
 install_db
+import_theme_data
