@@ -32,3 +32,6 @@ build/
 
 # Ignore local override files
 .wp-env.override.json
+
+# phpunit
+*.result.*
