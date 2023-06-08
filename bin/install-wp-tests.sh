@@ -187,7 +187,9 @@ import_theme_data() {
 	if [ ! -f $WP_CORE_DIR/wp-content/themes/themeunittestdata.wordpress.xml ]; then
 		download https://raw.githubusercontent.com/WPTT/theme-test-data/master/themeunittestdata.wordpress.xml $WP_CORE_DIR/wp-content/themes/themeunittestdata.wordpress.xml
 	fi
-	WP_ADMIN_EMAIL='themeshaperwp+demos@gmail.com'
+	WP_ADMIN_USER=admin
+	WP_ADMIN_PASSWORD=password
+	WP_ADMIN_EMAIL='example@make.wordpress.org'
 	# install site
 	$WP_CLI_CMD core install --url=$WP_URL --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_EMAIL --path=$WP_CORE_DIR
 	# create wp-config file
