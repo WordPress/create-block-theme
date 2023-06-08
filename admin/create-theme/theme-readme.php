@@ -14,8 +14,10 @@ class Theme_Readme {
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
 		$image_credits          = $theme['image_credits'] ?? '';
+		$is_parent_theme        = $theme['is_parent_theme'] ?? false;
 		$original_theme         = $theme['original_theme'] ?? '';
-		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
+		$new_copyright_section  = $is_parent_theme || $original_theme ? true : false;
+		$original_theme_credits = $new_copyright_section ? self::original_theme_credits( $name, $is_parent_theme ) : '';
 
 		$default_copyright_section = "== Copyright ==
 
@@ -32,7 +34,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.";
 
-		$copyright_section = $original_theme ? self::copyright_section( $original_theme_credits, $image_credits ) : $default_copyright_section;
+		$copyright_section = $new_copyright_section ? self::copyright_section( $original_theme_credits, $image_credits ) : $default_copyright_section;
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -62,7 +64,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 	 * @param string $new_name New theme name.
 	 * @return string
 	 */
-	static function original_theme_credits( $new_name ) {
+	static function original_theme_credits( $new_name, $is_parent_theme ) {
 		if ( ! $new_name ) {
 			return;
 		}
@@ -107,6 +109,19 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 			$original_license,
 			$original_license_uri
 		);
+
+		if ( $is_parent_theme ) {
+			$theme_credit_content = sprintf(
+				/* translators: 1: New Theme name, 2: Parent Theme Name. 3. Parent Theme URI. 4. Parent Theme Author. 5. Parent Theme License. 6. Parent Theme License URI. */
+				__( '%1$s is a child theme of %2$s (%3$s), (C) %4$s, [%5$s](%6$s)', 'create-block-theme' ),
+				$new_name,
+				$original_name,
+				$original_uri,
+				$original_author,
+				$original_license,
+				$original_license_uri
+			);
+		}
 
 		return $theme_credit_content;
 	}
