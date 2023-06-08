@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c001e795bc05b617adbcea7ec0f62317",
+    "content-hash": "1b8a9bfcb142b2c176eecabf022a9154",
     "packages": [
         {
             "name": "composer/installers",
@@ -2611,6 +2611,44 @@
                 }
             ],
             "time": "2020-09-28T06:39:44+00:00"
+        },
+        {
+            "name": "sempro/phpunit-pretty-print",
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/s360digital/phpunit-pretty-print.git",
+                "reference": "fa623aa8a17aece4a2b69e54b07a5e37572d1f1d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/s360digital/phpunit-pretty-print/zipball/fa623aa8a17aece4a2b69e54b07a5e37572d1f1d",
+                "reference": "fa623aa8a17aece4a2b69e54b07a5e37572d1f1d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0",
+                "phpunit/phpunit": "^7 || ^8 || ^9"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sempro\\PHPUnitPrettyPrinter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Prettify PHPUnit output",
+            "support": {
+                "issues": "https://github.com/s360digital/phpunit-pretty-print/issues",
+                "source": "https://github.com/s360digital/phpunit-pretty-print/tree/1.4.0"
+            },
+            "time": "2021-01-04T13:25:10+00:00"
         },
         {
             "name": "sirbrillig/phpcs-variable-analysis",

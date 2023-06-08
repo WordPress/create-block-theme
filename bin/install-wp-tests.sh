@@ -1,14 +1,35 @@
 #!/usr/bin/env bash
 
-if [ $# -lt 3 ]; then
-	echo "usage: $0 <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"
-	exit 1
+# Function to display usage instructions
+display_usage() {
+    echo "Usage: $0 [options] <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"
+    echo "Options:"
+    echo "  --recreate-db   Recreate the database"
+}
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --recreate-db)
+            recreate_db=1
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+# Check if required arguments are provided
+if [[ $# -lt 3 ]]; then
+    display_usage
+    exit 1
 fi
 
 DB_NAME=$1
 DB_USER=$2
 DB_PASS=$3
-DB_HOST=${4-localhost}
+DB_HOST=${4-127.0.0.1}
 WP_VERSION=${5-latest}
 SKIP_DB_CREATE=${6-false}
 
@@ -17,6 +38,13 @@ TMPDIR=$(echo $TMPDIR | sed -e "s/\/$//")
 WP_TESTS_DIR=${WP_TESTS_DIR-$TMPDIR/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
 WP_CLI_CMD=$WP_CORE_DIR/wp-cli.phar
+
+RECREATE_DB=0
+
+# Check for --recreate-db flag
+if [[ $recreate_db ]]; then
+    RECREATE_DB=1
+fi
 
 download() {
     if [ `which curl` ]; then
@@ -171,8 +199,13 @@ install_db() {
 	# create database
 	if [ $(mysql --user="$DB_USER" --password="$DB_PASS"$EXTRA --execute='show databases;' | grep ^$DB_NAME$) ]
 	then
-		echo "Reinstalling will delete the existing test database ($DB_NAME)"
-		read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
+		if [[ "$RECREATE_DB" -eq 1 ]]
+		then
+			DELETE_EXISTING_DB='y'
+		else
+			echo "Reinstalling will delete the existing test database ($DB_NAME)"
+			read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
+		fi
 		recreate_db $DELETE_EXISTING_DB
 	else
 		create_db
@@ -190,12 +223,12 @@ import_theme_data() {
 	WP_ADMIN_USER=admin
 	WP_ADMIN_PASSWORD=password
 	WP_ADMIN_EMAIL='example@make.wordpress.org'
-	# install site
-	$WP_CLI_CMD core install --url=$WP_URL --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_EMAIL --path=$WP_CORE_DIR
 	# create wp-config file
 	if [ ! -f $WP_CORE_DIR/wp-config.php ]; then
-		$WP_CLI_CMD core config --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASS --dbhost=$DB_HOST --path=$WP_CORE_DIR
+		$WP_CLI_CMD config create --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASS --dbhost=$DB_HOST --path=$WP_CORE_DIR --skip-check
 	fi
+	# install site
+	$WP_CLI_CMD core install --url=$WP_URL --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_EMAIL --path=$WP_CORE_DIR
 	# use wp cli to import the theme unit test data
 	$WP_CLI_CMD plugin install wordpress-importer --activate --path=$WP_CORE_DIR
 	$WP_CLI_CMD import $WP_CORE_DIR/wp-content/themes/themeunittestdata.wordpress.xml --authors=create --path=$WP_CORE_DIR

@@ -6,6 +6,7 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
 	>
 	<testsuites>
 		<testsuite name="testing">
@@ -13,4 +14,7 @@
 			<exclude>./tests/test-sample.php</exclude>
 		</testsuite>
 	</testsuites>
+	<php>
+		<env name="PHPUNIT_PRETTY_PRINT_PROGRESS" value="true" />
+	</php>
 </phpunit>
