@@ -64,7 +64,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 	 * @param string $new_name New theme name.
 	 * @return string
 	 */
-	static function original_theme_credits( $new_name, $is_parent_theme ) {
+	static function original_theme_credits( $new_name, $is_parent_theme = false ) {
 		if ( ! $new_name ) {
 			return;
 		}
