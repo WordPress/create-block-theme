@@ -5,6 +5,12 @@ const { __ } = wp.i18n;
 function toggleForm( element ) {
 	if ( ! element?.value ) return;
 	const themeType = element.value;
+
+	const imageCreditsInput = document.getElementById( 'image_credits_input' );
+	if ( imageCreditsInput ) {
+		imageCreditsInput.toggleAttribute( 'hidden', false );
+	}
+
 	hideAllForms();
 
 	switch ( themeType ) {
@@ -16,12 +22,26 @@ function toggleForm( element ) {
 
 		case 'child':
 		case 'clone':
-		case 'blank':
 		case 'sibling':
 			// Show New Theme form
 			document
 				.getElementById( 'new_theme_metadata_form' )
 				.toggleAttribute( 'hidden', false );
+
+			resetThemeTags( element.value );
+			validateThemeTags( 'subject' );
+			break;
+
+		case 'blank':
+			// Show New Theme form
+			// and hide image credits input
+			document
+				.getElementById( 'new_theme_metadata_form' )
+				.toggleAttribute( 'hidden', false );
+
+			if ( imageCreditsInput ) {
+				imageCreditsInput.toggleAttribute( 'hidden', true );
+			}
 
 			resetThemeTags( element.value );
 			validateThemeTags( 'subject' );

@@ -235,17 +235,17 @@ class Create_Block_Theme_Admin {
 		$child_theme_slug  = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']          = sanitize_text_field( $theme['name'] );
-		$theme['description']   = sanitize_text_field( $theme['description'] );
-		$theme['uri']           = sanitize_text_field( $theme['uri'] );
-		$theme['author']        = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']    = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom']   = sanitize_text_field( $theme['tags_custom'] );
-		$theme['image_credits'] = sanitize_textarea_field( $theme['image_credits'] );
-
-		$theme['text_domain'] = $child_theme_slug;
-		$theme['template']    = $parent_theme_slug;
-		$theme['slug']        = $child_theme_slug;
+		$theme['name']            = sanitize_text_field( $theme['name'] );
+		$theme['description']     = sanitize_text_field( $theme['description'] );
+		$theme['uri']             = sanitize_text_field( $theme['uri'] );
+		$theme['author']          = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']      = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']     = sanitize_text_field( $theme['tags_custom'] );
+		$theme['image_credits']   = sanitize_textarea_field( $theme['image_credits'] );
+		$theme['is_parent_theme'] = true;
+		$theme['text_domain']     = $child_theme_slug;
+		$theme['template']        = $parent_theme_slug;
+		$theme['slug']            = $child_theme_slug;
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
