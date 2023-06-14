@@ -18,6 +18,11 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Include download_url() if it doesn't exist.
+if ( ! function_exists( 'download_url' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+}
+
 /**
  * The core plugin class.
  */
