@@ -169,10 +169,6 @@ class Theme_Utils {
 	}
 
 	public static function add_media_to_folder( $location, $media ) {
-		if ( ! function_exists( 'download_url' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
-
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
 			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
