@@ -128,7 +128,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 	/**
 	 * Build copyright section.
-	 * Used in readme.txt of cloned themes.
+	 * Used in readme.txt of cloned themes or child themes.
 	 *
 	 * @return string
 	 */
