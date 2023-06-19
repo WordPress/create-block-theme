@@ -14,18 +14,27 @@ class Theme_Readme {
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
 		$image_credits          = $theme['image_credits'] ?? '';
+		$is_parent_theme        = $theme['is_parent_theme'] ?? false;
 		$original_theme         = $theme['original_theme'] ?? '';
-		$original_theme_credits = $original_theme ? self::original_theme_credits( $name ) : '';
+		$new_copyright_section  = $is_parent_theme || $original_theme ? true : false;
+		$original_theme_credits = $new_copyright_section ? self::original_theme_credits( $name, $is_parent_theme ) : '';
 
-		if ( $original_theme_credits ) {
-			// Add a new line to the original theme credits
-			$original_theme_credits = $original_theme_credits . "\n";
-		}
+		$default_copyright_section = "== Copyright ==
 
-		if ( $image_credits ) {
-			// Add new lines around the image credits
-			$image_credits = "\n" . 'This theme bundles the following third-party images:' . "\n\n" . $image_credits;
-		}
+{$name} WordPress Theme, (C) {$copy_year} {$author}
+{$name} is distributed under the terms of the GNU GPL.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.";
+
+		$copyright_section = $new_copyright_section ? self::copyright_section( $original_theme_credits, $image_credits ) : $default_copyright_section;
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -44,21 +53,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 = 0.0.1 =
 * Initial release
 
-== Copyright ==
-
-{$name} WordPress Theme, (C) {$copy_year} {$author}
-{$name} is distributed under the terms of the GNU GPL.
-{$original_theme_credits}
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-{$image_credits}
+{$copyright_section}
 ";
 	}
 
@@ -69,7 +64,7 @@ GNU General Public License for more details.
 	 * @param string $new_name New theme name.
 	 * @return string
 	 */
-	static function original_theme_credits( $new_name ) {
+	static function original_theme_credits( $new_name, $is_parent_theme = false ) {
 		if ( ! $new_name ) {
 			return;
 		}
@@ -115,6 +110,56 @@ GNU General Public License for more details.
 			$original_license_uri
 		);
 
+		if ( $is_parent_theme ) {
+			$theme_credit_content = sprintf(
+				/* translators: 1: New Theme name, 2: Parent Theme Name. 3. Parent Theme URI. 4. Parent Theme Author. 5. Parent Theme License. 6. Parent Theme License URI. */
+				__( '%1$s is a child theme of %2$s (%3$s), (C) %4$s, [%5$s](%6$s)', 'create-block-theme' ),
+				$new_name,
+				$original_name,
+				$original_uri,
+				$original_author,
+				$original_license,
+				$original_license_uri
+			);
+		}
+
 		return $theme_credit_content;
+	}
+
+	/**
+	 * Build copyright section.
+	 * Used in readme.txt of cloned themes or child themes.
+	 *
+	 * @return string
+	 */
+	static function copyright_section( $original_theme_credits, $image_credits ) {
+		$copyright_section       = '';
+		$copyright_section_intro = '== Copyright ==';
+
+		// Get current theme readme.txt
+		$current_readme         = get_stylesheet_directory() . '/readme.txt' ?? '';
+		$current_readme_content = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
+
+		if ( ! $current_readme_content ) {
+			return;
+		}
+
+		// Copy copyright section from current theme readme.txt
+		if ( str_contains( $current_readme_content, $copyright_section_intro ) ) {
+			$copyright_section_start = strpos( $current_readme_content, $copyright_section_intro );
+			$copyright_section       = substr( $current_readme_content, $copyright_section_start );
+
+			if ( $original_theme_credits ) {
+				$new_copyright_section = str_replace( $copyright_section_intro . "\n", '', $copyright_section );
+				$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . "\n" . $new_copyright_section;
+			}
+
+			if ( $image_credits ) {
+				$copyright_section = $copyright_section . "\n" . $image_credits;
+
+			}
+		}
+
+		return $copyright_section;
 	}
 }

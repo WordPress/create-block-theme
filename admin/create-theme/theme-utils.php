@@ -30,15 +30,25 @@ class Theme_Utils {
 	}
 
 	public static function replace_namespace( $content, $new_slug, $new_name ) {
-
 		$old_slug            = wp_get_theme()->get( 'TextDomain' );
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
 		$old_name            = wp_get_theme()->get( 'Name' );
 
-		$content = str_replace( $old_slug, $new_slug, $content );
-		$content = str_replace( $old_slug_underscore, $new_slug_underscore, $content );
-		$content = str_replace( $old_name, $new_name, $content );
+		// Generate placeholders
+		$placeholder_slug            = md5( $old_slug );
+		$placeholder_slug_underscore = md5( $old_slug_underscore );
+		$placeholder_name            = md5( $old_name );
+
+		// Replace old values with placeholders
+		$content = str_replace( $old_slug, $placeholder_slug, $content );
+		$content = str_replace( $old_slug_underscore, $placeholder_slug_underscore, $content );
+		$content = str_replace( $old_name, $placeholder_name, $content );
+
+		// Replace placeholders with new values
+		$content = str_replace( $placeholder_slug, $new_slug, $content );
+		$content = str_replace( $placeholder_slug_underscore, $new_slug_underscore, $content );
+		$content = str_replace( $placeholder_name, $new_name, $content );
 
 		return $content;
 	}
@@ -159,10 +169,6 @@ class Theme_Utils {
 	}
 
 	public static function add_media_to_folder( $location, $media ) {
-		if ( ! function_exists( 'download_url' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
-
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
 			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );

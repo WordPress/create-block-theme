@@ -163,7 +163,7 @@ class Theme_Form {
 									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
 								</label>
 								<br /><br />
-								<label>
+								<label id="image_credits_input">
 									<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'List the credits for each image you have included in the theme. Include the image name, license type, and source URL.', 'create-block-theme' ); ?></small><br />
 									<small>
@@ -184,8 +184,8 @@ Source: https://example.com/source-url',
 									);
 									?>
 									<textarea placeholder="<?php echo $image_credits_placeholder; ?>" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
+									<br /><br />
 								</label>
-								<br /><br />
 								<div>
 									<?php Theme_Tags::theme_tags_section(); ?>
 								</div>

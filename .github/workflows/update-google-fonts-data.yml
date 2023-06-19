@@ -13,6 +13,7 @@ on:
 jobs:
     # This workflow contains a single job called "update-google-fonts-json"
     update-google-fonts-json:
+        if: github.repository_owner == 'WordPress'
         # The type of runner that the job will run on
         runs-on: ubuntu-latest
 

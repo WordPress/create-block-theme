@@ -160,7 +160,7 @@ class Manage_Fonts_Admin {
 			) {
 				$font_slug      = sanitize_title( $_POST['font-name'] );
 				$file_extension = pathinfo( $_FILES['font-file']['name'], PATHINFO_EXTENSION );
-				$file_name      = $font_slug . '_' . $_POST['font-style'] . '_' . $_POST['font-weight'] . '.' . $file_extension;
+				$file_name      = sanitize_title( $font_slug . '_' . $_POST['font-style'] . '_' . $_POST['font-weight'] ) . '.' . $file_extension;
 
 				move_uploaded_file( $_FILES['font-file']['tmp_name'], get_stylesheet_directory() . '/assets/fonts/' . $file_name );
 
@@ -216,7 +216,7 @@ class Manage_Fonts_Admin {
 				foreach ( $variants as $variant ) {
 					// variant name is $variant_and_url[0] and font asset url is $variant_and_url[1]
 					$file_extension = pathinfo( $variant['src'], PATHINFO_EXTENSION );
-					$file_name      = $font_slug . '_' . $variant['style'] . '_' . $variant['weight'] . '.' . $file_extension;
+					$file_name      = sanitize_title( $font_slug . '_' . $variant['style'] . '_' . $variant['weight'] ) . '.' . $file_extension;
 
 					// Download font asset in temp folder
 					$temp_file = download_url( $variant['src'] );
