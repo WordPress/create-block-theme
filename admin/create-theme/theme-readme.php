@@ -14,10 +14,19 @@ class Theme_Readme {
 		$copy_year              = gmdate( 'Y' );
 		$wp_version             = get_bloginfo( 'version' );
 		$image_credits          = $theme['image_credits'] ?? '';
+		$recommended_plugins    = $theme['recommended_plugins'] ?? '';
 		$is_parent_theme        = $theme['is_parent_theme'] ?? false;
 		$original_theme         = $theme['original_theme'] ?? '';
 		$new_copyright_section  = $is_parent_theme || $original_theme ? true : false;
 		$original_theme_credits = $new_copyright_section ? self::original_theme_credits( $name, $is_parent_theme ) : '';
+
+		$recommended_plugins_section = $recommended_plugins ? "
+== Recommended Plugins ==
+
+The following plugins are recommended for use with this theme:
+
+{$recommended_plugins}
+" : '';
 
 		$default_copyright_section = "== Copyright ==
 
@@ -52,7 +61,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 = 0.0.1 =
 * Initial release
-
+{$recommended_plugins_section}
 {$copyright_section}
 ";
 	}
