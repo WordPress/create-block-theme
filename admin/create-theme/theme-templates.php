@@ -8,7 +8,7 @@ class Theme_Templates {
 	/*
 	 * Build a collection of templates and template-parts that should be exported (and modified) based on the given export_type and new slug
 	 */
-	public static function get_theme_templates( $export_type ) {
+	public static function get_theme_templates( $export_type, $zip = null ) {
 		$templates          = get_block_templates();
 		$template_parts     = get_block_templates( array(), 'wp_template_part' );
 		$exported_templates = array();
@@ -23,18 +23,21 @@ class Theme_Templates {
 			$template = self::filter_theme_template(
 				$template,
 				$export_type,
-				$templates_path
+				$templates_path,
+				$zip
 			);
 			if ( $template ) {
 				$exported_templates[] = $template;
 			}
 		}
 
+		// NOTE: This is being saved and is not being exported as a zip file so, nullify the 4th paramater for later conditional check
 		foreach ( $template_parts as $template ) {
 			$template = self::filter_theme_template(
 				$template,
 				$export_type,
-				$parts_path
+				$parts_path,
+				null // This is not an exported zip
 			);
 			if ( $template ) {
 				$exported_parts[] = $template;
@@ -53,7 +56,7 @@ class Theme_Templates {
 	 * Templates not filtered out are modified based on the slug information provided and cleaned up
 	 * to have the expected exported value.
 	 */
-	static function filter_theme_template( $template, $export_type, $path ) {
+	static function filter_theme_template( $template, $export_type, $path, $zip ) {
 		if ( 'theme' === $template->source && 'user' === $export_type ) {
 			return false;
 		}
@@ -71,7 +74,9 @@ class Theme_Templates {
 
 		// NOTE: Templates that reference template parts are exported with the 'theme' attribute.
 		// This is undesirable and should be removed.
-		$template->content = str_replace( ',"theme":"' . get_stylesheet() . '"', '', $template->content );
+		if ( ! empty( $zip ) ) {
+			$template->content = str_replace( ',"theme":"' . get_stylesheet() . '"', '', $template->content );
+		}
 
 		return $template;
 	}
