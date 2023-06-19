@@ -186,6 +186,21 @@ Source: https://example.com/source-url',
 									<textarea placeholder="<?php echo $image_credits_placeholder; ?>" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
 									<br /><br />
 								</label>
+								<br /><br />
+								<label id="recommended_plugins_input">
+									<?php _e( 'Recommended Plugins:', 'create-block-theme' ); ?><br />
+									<small>
+										<?php
+										printf(
+											/* Translators: Recommended plugins link. */
+											esc_html__( 'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository (%s).', 'create-block-theme' ),
+											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources', 'create-block-theme' ) ) . '" target="_blank">read more</a>'
+										);
+										?>
+									</small><br />
+									<textarea rows="4" cols="50" name="theme[recommended_plugins]" class="large-text"></textarea>
+									<br /><br />
+								</label>
 								<div>
 									<?php Theme_Tags::theme_tags_section(); ?>
 								</div>

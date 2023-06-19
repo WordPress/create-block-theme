@@ -18,6 +18,7 @@ import {
 	Button,
 	TextControl,
 	TextareaControl,
+	ExternalLink,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
 
@@ -32,6 +33,7 @@ export const UpdateThemePanel = () => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
+		recommended_plugins: '',
 	} );
 
 	useSelect( ( select ) => {
@@ -170,6 +172,24 @@ export const UpdateThemePanel = () => {
 						'A comma-separated collection of tags',
 						'create-block-theme'
 					) }
+				/>
+				<TextareaControl
+					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
+					help={
+						<>
+							{ __(
+								'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository.'
+							) }
+							<br />
+							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources">
+								{ __( 'Read more.' ) }
+							</ExternalLink>
+						</>
+					}
+					value={ theme.recommended_plugins }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, recommended_plugins: value } )
+					}
 				/>
 				<TextControl
 					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
