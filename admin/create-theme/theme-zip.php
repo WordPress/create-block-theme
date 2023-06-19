@@ -4,7 +4,7 @@ require_once( __DIR__ . '/theme-media.php' );
 require_once( __DIR__ . '/theme-blocks.php' );
 require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
-require_once( __DIR__ . '/theme-utils.php' );
+require_once( __DIR__ . '/cbt-zip-archive.php' );
 
 class Theme_Zip {
 
@@ -12,13 +12,19 @@ class Theme_Zip {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );
 		}
-		$zip = new ZipArchive();
+
+		$theme_slug = get_stylesheet();
+		if ( ! empty( $_POST['theme']['name'] ) ) {
+			$theme_slug = Theme_Utils::get_theme_slug( $_POST['theme']['name'] );
+		}
+
+		$zip = new CbtZipArchive( $theme_slug );
 		$zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE );
 		return $zip;
 	}
 
 	public static function add_theme_json_to_zip( $zip, $export_type ) {
-		$zip->addFromString(
+		$zip->addFromStringToTheme(
 			'theme.json',
 			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
@@ -62,7 +68,7 @@ class Theme_Zip {
 				$valid_extensions       = array( 'php', 'css', 'scss', 'js', 'txt', 'html' );
 				$valid_extensions_regex = implode( '|', $valid_extensions );
 				if ( ! preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
-					$zip->addFile( $file_path, $relative_path );
+					$zip->addFileToTheme( $file_path, $relative_path );
 				} else {
 					$contents = file_get_contents( $file_path );
 
@@ -72,7 +78,7 @@ class Theme_Zip {
 					}
 
 					// Add current file to archive
-					$zip->addFromString( $relative_path, $contents );
+					$zip->addFromStringToTheme( $relative_path, $contents );
 				}
 			}
 		}
@@ -94,11 +100,11 @@ class Theme_Zip {
 		$theme_templates = Theme_Templates::get_theme_templates( $export_type );
 
 		if ( $theme_templates->templates ) {
-			$zip->addEmptyDir( 'templates' );
+			$zip->addThemeDir( 'templates' );
 		}
 
 		if ( $theme_templates->parts ) {
-			$zip->addEmptyDir( 'parts' );
+			$zip->addThemeDir( 'parts' );
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
@@ -114,7 +120,7 @@ class Theme_Zip {
 				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to zip
-				$zip->addFromString(
+				$zip->addFromStringToTheme(
 					'patterns/' . $template_data->slug . '.php',
 					$pattern['content']
 				);
@@ -124,7 +130,7 @@ class Theme_Zip {
 			}
 
 			// Add template to zip
-			$zip->addFromString(
+			$zip->addFromStringToTheme(
 				'templates/' . $template_data->slug . '.html',
 				$template_data->content
 			);
@@ -144,7 +150,7 @@ class Theme_Zip {
 				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 
 				// Add pattern to zip
-				$zip->addFromString(
+				$zip->addFromStringToTheme(
 					'patterns/' . $template_data->slug . '.php',
 					$pattern['content']
 				);
@@ -154,7 +160,7 @@ class Theme_Zip {
 			}
 
 			// Add template to zip
-			$zip->addFromString(
+			$zip->addFromStringToTheme(
 				'parts/' . $template_data->slug . '.html',
 				$template_data->content
 			);
@@ -173,7 +179,7 @@ class Theme_Zip {
 			if ( ! is_wp_error( $download_file ) ) {
 				$content_array  = file( $download_file );
 				$file_as_string = implode( '', $content_array );
-				$zip->addFromString( $folder_path . basename( $url ), $file_as_string );
+				$zip->addFromStringToTheme( $folder_path . basename( $url ), $file_as_string );
 			}
 		}
 	}
