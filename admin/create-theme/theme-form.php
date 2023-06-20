@@ -193,7 +193,7 @@ Source: https://example.com/source-url',
 										printf(
 											/* Translators: Recommended plugins link. */
 											esc_html__( 'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository (%s).', 'create-block-theme' ),
-											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources', 'create-block-theme' ) ) . '" target="_blank">read more</a>'
+											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/#6-plugins', 'create-block-theme' ) ) . '" target="_blank">read more</a>'
 										);
 										?>
 									</small><br />

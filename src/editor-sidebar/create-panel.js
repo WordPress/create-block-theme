@@ -218,7 +218,7 @@ export const CreateThemePanel = () => {
 								'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository.'
 							) }
 							<br />
-							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/resources/#licenses-bundled-resources">
+							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#6-plugins">
 								{ __( 'Read more.' ) }
 							</ExternalLink>
 						</>
