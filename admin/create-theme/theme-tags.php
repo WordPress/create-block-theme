@@ -7,7 +7,7 @@
 
 class Theme_Tags {
 	/**
-	 * Build theme tags list for readme.txt.
+	 * Build theme tags list for style.css.
 	 *
 	 * @param array $theme Theme data.
 	 * @return string
