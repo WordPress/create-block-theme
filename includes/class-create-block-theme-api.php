@@ -97,15 +97,16 @@ class Create_Block_Theme_API {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']        = sanitize_text_field( $theme['name'] );
-		$theme['description'] = sanitize_text_field( $theme['description'] );
-		$theme['uri']         = sanitize_text_field( $theme['uri'] );
-		$theme['author']      = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['template']    = '';
-		$theme['slug']        = $theme_slug;
-		$theme['text_domain'] = $theme_slug;
+		$theme['name']                = sanitize_text_field( $theme['name'] );
+		$theme['description']         = sanitize_text_field( $theme['description'] );
+		$theme['uri']                 = sanitize_text_field( $theme['uri'] );
+		$theme['author']              = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']          = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
+		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['template']            = '';
+		$theme['slug']                = $theme_slug;
+		$theme['text_domain']         = $theme_slug;
 
 		// Create theme directory.
 		$source         = get_stylesheet_directory();
@@ -239,16 +240,17 @@ class Create_Block_Theme_API {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']           = sanitize_text_field( $theme['name'] );
-		$theme['description']    = sanitize_text_field( $theme['description'] );
-		$theme['uri']            = sanitize_text_field( $theme['uri'] );
-		$theme['author']         = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']     = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom']    = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug']           = $theme_slug;
-		$theme['template']       = '';
-		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
-		$theme['text_domain']    = $theme_slug;
+		$theme['name']                = sanitize_text_field( $theme['name'] );
+		$theme['description']         = sanitize_text_field( $theme['description'] );
+		$theme['uri']                 = sanitize_text_field( $theme['uri'] );
+		$theme['author']              = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']          = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
+		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['slug']                = $theme_slug;
+		$theme['template']            = '';
+		$theme['original_theme']      = wp_get_theme()->get( 'Name' );
+		$theme['text_domain']         = $theme_slug;
 
 		// Use previous theme's tags if custom tags are empty.
 		if ( empty( $theme['tags_custom'] ) ) {
