@@ -46,6 +46,7 @@ export const UpdateThemePanel = () => {
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
+			recommended_plugins: '',
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
