@@ -170,7 +170,7 @@ GNU General Public License for more details.";
 		}
 
 		if ( $image_credits ) {
-			$copyright_section = $copyright_section . "\n\n" . $image_credits;
+			$copyright_section = $copyright_section . "\n" . $image_credits;
 		}
 
 		return $copyright_section;
@@ -192,7 +192,7 @@ GNU General Public License for more details.";
 == Recommended Plugins ==
 
 The following plugins are recommended for use with this theme:';
-		$section_end   = '(End of Recommended Plugins)';
+		$section_end   = "(End of Recommended Plugins)\n";
 
 		// Remove existing Recommended Plugins section.
 		if ( $updated_readme && str_contains( $updated_readme, $section_start ) ) {
@@ -228,12 +228,12 @@ The following plugins are recommended for use with this theme:';
 
 		$updated_readme = $readme_content;
 
-		if ( $image_credits ) {
-			$updated_readme = $updated_readme . "\n\n" . $image_credits;
-		}
-
 		if ( $recommended_plugins ) {
 			$updated_readme = self::recommended_plugins_section( $recommended_plugins, $updated_readme );
+		}
+
+		if ( $image_credits ) {
+			$updated_readme = $updated_readme . "\n\n" . $image_credits;
 		}
 
 		return $updated_readme;
