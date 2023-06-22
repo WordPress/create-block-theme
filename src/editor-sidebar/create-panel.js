@@ -19,7 +19,6 @@ import {
 	Button,
 	TextControl,
 	TextareaControl,
-	ExternalLink,
 } from '@wordpress/components';
 import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
 
@@ -33,7 +32,6 @@ export const CreateThemePanel = () => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
-		recommended_plugins: '',
 	} );
 
 	useSelect( ( select ) => {
@@ -209,24 +207,6 @@ export const CreateThemePanel = () => {
 						'https://wordpress.org/',
 						'create-block-theme'
 					) }
-				/>
-				<TextareaControl
-					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
-					help={
-						<>
-							{ __(
-								'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository.'
-							) }
-							<br />
-							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#6-plugins">
-								{ __( 'Read more.' ) }
-							</ExternalLink>
-						</>
-					}
-					value={ theme.recommended_plugins }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, recommended_plugins: value } )
-					}
 				/>
 				<TextControl
 					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
