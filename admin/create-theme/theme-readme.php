@@ -170,7 +170,7 @@ GNU General Public License for more details.";
 		}
 
 		if ( $image_credits ) {
-			$copyright_section = $copyright_section . "\n" . $image_credits;
+			$copyright_section = $copyright_section . "\n\n" . $image_credits;
 		}
 
 		return $copyright_section;
@@ -229,7 +229,7 @@ The following plugins are recommended for use with this theme:';
 		$updated_readme = $readme_content;
 
 		if ( $image_credits ) {
-			$updated_readme = $updated_readme . "\n" . $image_credits;
+			$updated_readme = $updated_readme . "\n\n" . $image_credits;
 		}
 
 		if ( $recommended_plugins ) {
