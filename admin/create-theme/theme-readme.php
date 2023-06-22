@@ -24,7 +24,9 @@ class Theme_Readme {
 		$copyright_section      = self::copyright_section( $new_copyright_section, $original_theme_credits, $name, $copy_year, $author, $image_credits );
 
 		// Handle recommended plugins section.
-		$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins );
+		if ( $recommended_plugins ) {
+			$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins );
+		}
 
 		// Handle updating current theme.
 		if ( $update_current_theme ) {
