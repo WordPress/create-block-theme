@@ -4,7 +4,7 @@ class Theme_Readme {
 	/**
 	* Build a readme.txt file for CHILD/GRANDCHILD themes.
 	*/
-	public static function build_readme_txt( $theme ) {
+	public static function build_readme_txt( $theme, $update_current_theme = false ) {
 		$slug                = $theme['slug'];
 		$name                = $theme['name'];
 		$description         = $theme['description'];
@@ -25,6 +25,12 @@ class Theme_Readme {
 
 		// Handle recommended plugins section.
 		$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins );
+
+		// Handle updating current theme.
+		if ( $update_current_theme ) {
+			$updated_readme = self::update_readme( $image_credits, $recommended_plugins );
+			return $updated_readme;
+		}
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -160,35 +166,76 @@ GNU General Public License for more details.";
 					$new_copyright_section = str_replace( $copyright_section_intro . "\n", '', $copyright_section );
 					$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . "\n" . $new_copyright_section;
 				}
-
-				if ( $image_credits ) {
-					$copyright_section = $copyright_section . "\n" . $image_credits;
-				}
 			}
-
-			return $copyright_section;
 		}
+
+		if ( $image_credits ) {
+			$copyright_section = $copyright_section . "\n" . $image_credits;
+		}
+
+		return $copyright_section;
 	}
 
-		/**
+	/**
 	 * Build Recommended Plugins section.
 	 *
 	 * @return string
 	 */
-	static function recommended_plugins_section( $recommended_plugins ) {
+	static function recommended_plugins_section( $recommended_plugins, $updated_readme = '' ) {
 		$recommended_plugins_section = '';
 
 		if ( ! $recommended_plugins ) {
+			return '';
+		}
+
+		$section_start = '
+== Recommended Plugins ==
+
+The following plugins are recommended for use with this theme:';
+		$section_end   = '(End of Recommended Plugins)';
+
+		// Remove existing Recommended Plugins section.
+		if ( $updated_readme && str_contains( $updated_readme, $section_start ) ) {
+			$pattern = '/(' . preg_quote( $section_start, '/' ) . ')(.*?)((' . preg_quote( $section_end, '/' ) . ')|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_section = $matches[0][0];
+			$updated_readme  = str_replace( $current_section, '', $updated_readme );
+		}
+
+		$recommended_plugins_section = $section_start . "\n\n" . $recommended_plugins . "\n\n" . $section_end;
+
+		if ( $updated_readme ) {
+			return $updated_readme . $recommended_plugins_section;
+		}
+
+		return $recommended_plugins_section;
+	}
+
+	/**
+	 * Update current readme.txt file, rather than building a new one.
+	 *
+	 * @return string
+	 */
+	static function update_readme( $image_credits, $recommended_plugins ) {
+		$updated_readme = '';
+
+		$current_readme = get_stylesheet_directory() . '/readme.txt' ?? '';
+		$readme_content = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
+
+		if ( ! $readme_content ) {
 			return;
 		}
 
-		$recommended_plugins_section = "
-== Recommended Plugins ==
+		$updated_readme = $readme_content;
 
-The following plugins are recommended for use with this theme:
+		if ( $image_credits ) {
+			$updated_readme = $updated_readme . "\n" . $image_credits;
+		}
 
-{$recommended_plugins}
-";
-		return $recommended_plugins_section;
+		if ( $recommended_plugins ) {
+			$updated_readme = self::recommended_plugins_section( $recommended_plugins, $updated_readme );
+		}
+
+		return $updated_readme;
 	}
 }
