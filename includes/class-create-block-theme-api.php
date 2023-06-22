@@ -371,12 +371,16 @@ class Create_Block_Theme_API {
 	}
 
 	/**
-	 * Update the theme metadata in the style.css file.
+	 * Update the theme metadata in the style.css and readme.txt files.
 	 */
 	function update_theme_metadata( $theme ) {
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$style_css = Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
+		file_put_contents(
+			get_stylesheet_directory() . '/readme.txt',
+			Theme_Readme::build_readme_txt( $theme, true )
+		);
 	}
 
 	/**
