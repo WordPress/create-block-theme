@@ -86,6 +86,37 @@ class Create_Block_Theme_API {
 				},
 			)
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/get-readme-data',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'rest_get_readme_data' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+	}
+
+	function rest_get_readme_data( $request ) {
+		try {
+			$readme_data = Theme_Utils::get_readme_data();
+			return new WP_REST_Response(
+				array(
+					'status'  => 'SUCCESS',
+					'message' => __( 'Readme file data retrieved.', 'create-block-theme' ),
+					'data'    => $readme_data,
+				)
+			);
+		} catch ( Exception $error ) {
+			return new WP_REST_Response(
+				array(
+					'status'  => 'FAILURE',
+					'message' => $error->getMessage(),
+				)
+			);
+		}
 	}
 
 	function rest_clone_theme( $request ) {
@@ -97,15 +128,16 @@ class Create_Block_Theme_API {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']        = sanitize_text_field( $theme['name'] );
-		$theme['description'] = sanitize_text_field( $theme['description'] );
-		$theme['uri']         = sanitize_text_field( $theme['uri'] );
-		$theme['author']      = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']  = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom'] = sanitize_text_field( $theme['tags_custom'] );
-		$theme['template']    = '';
-		$theme['slug']        = $theme_slug;
-		$theme['text_domain'] = $theme_slug;
+		$theme['name']                = sanitize_text_field( $theme['name'] );
+		$theme['description']         = sanitize_text_field( $theme['description'] );
+		$theme['uri']                 = sanitize_text_field( $theme['uri'] );
+		$theme['author']              = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']          = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
+		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['template']            = '';
+		$theme['slug']                = $theme_slug;
+		$theme['text_domain']         = $theme_slug;
 
 		// Create theme directory.
 		$source         = get_stylesheet_directory();
@@ -239,16 +271,17 @@ class Create_Block_Theme_API {
 		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
-		$theme['name']           = sanitize_text_field( $theme['name'] );
-		$theme['description']    = sanitize_text_field( $theme['description'] );
-		$theme['uri']            = sanitize_text_field( $theme['uri'] );
-		$theme['author']         = sanitize_text_field( $theme['author'] );
-		$theme['author_uri']     = sanitize_text_field( $theme['author_uri'] );
-		$theme['tags_custom']    = sanitize_text_field( $theme['tags_custom'] );
-		$theme['slug']           = $theme_slug;
-		$theme['template']       = '';
-		$theme['original_theme'] = wp_get_theme()->get( 'Name' );
-		$theme['text_domain']    = $theme_slug;
+		$theme['name']                = sanitize_text_field( $theme['name'] );
+		$theme['description']         = sanitize_text_field( $theme['description'] );
+		$theme['uri']                 = sanitize_text_field( $theme['uri'] );
+		$theme['author']              = sanitize_text_field( $theme['author'] );
+		$theme['author_uri']          = sanitize_text_field( $theme['author_uri'] );
+		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
+		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['slug']                = $theme_slug;
+		$theme['template']            = '';
+		$theme['original_theme']      = wp_get_theme()->get( 'Name' );
+		$theme['text_domain']         = $theme_slug;
 
 		// Use previous theme's tags if custom tags are empty.
 		if ( empty( $theme['tags_custom'] ) ) {
@@ -369,12 +402,16 @@ class Create_Block_Theme_API {
 	}
 
 	/**
-	 * Update the theme metadata in the style.css file.
+	 * Update the theme metadata in the style.css and readme.txt files.
 	 */
 	function update_theme_metadata( $theme ) {
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$style_css = Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
+		file_put_contents(
+			get_stylesheet_directory() . '/readme.txt',
+			Theme_Readme::update_readme_txt( $theme )
+		);
 	}
 
 	/**

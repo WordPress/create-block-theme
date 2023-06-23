@@ -163,7 +163,7 @@ class Theme_Form {
 									<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload"/>
 								</label>
 								<br /><br />
-								<label id="image_credits_input">
+								<label class="hide-on-blank-theme">
 									<?php _e( 'Image Credits:', 'create-block-theme' ); ?><br />
 									<small><?php _e( 'List the credits for each image you have included in the theme. Include the image name, license type, and source URL.', 'create-block-theme' ); ?></small><br />
 									<small>
@@ -184,6 +184,28 @@ Source: https://example.com/source-url',
 									);
 									?>
 									<textarea placeholder="<?php echo $image_credits_placeholder; ?>" rows="4" cols="50" name="theme[image_credits]" class="large-text"></textarea>
+									<br /><br />
+								</label>
+								<label class="hide-on-blank-theme">
+									<?php _e( 'Recommended Plugins:', 'create-block-theme' ); ?><br />
+									<small>
+										<?php
+										printf(
+											/* Translators: Recommended plugins link. */
+											esc_html__( 'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository (%s).', 'create-block-theme' ),
+											'<a href="' . esc_url( __( 'https://make.wordpress.org/themes/handbook/review/required/#6-plugins', 'create-block-theme' ) ) . '" target="_blank">read more</a>'
+										);
+										?>
+									</small><br />
+									<?php
+									$recommended_plugins_placeholder = __(
+										'Plugin Name
+https://wordpress.org/plugins/plugin-name/
+Plugin Description',
+										'create-block-theme'
+									);
+									?>
+									<textarea placeholder="<?php echo $recommended_plugins_placeholder; ?>" rows="4" cols="50" name="theme[recommended_plugins]" class="large-text"></textarea>
 									<br /><br />
 								</label>
 								<div>

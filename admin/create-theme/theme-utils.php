@@ -183,5 +183,24 @@ class Theme_Utils {
 		}
 	}
 
+	public static function get_readme_data() {
+		$readme_location = get_template_directory() . '/readme.txt';
+
+		if ( ! file_exists( $readme_location ) ) {
+			throw new Exception( 'No readme file found' );
+		}
+
+		$readme_file_contents = file_get_contents( $readme_location );
+
+		$readme_file_details = array();
+
+		// Handle Recommended Plugins.
+		$pattern = '/== Recommended Plugins ==\s+(.*?)(\s+==|$)/s';
+		preg_match_all( $pattern, $readme_file_contents, $matches );
+		$readme_file_details['recommendedPlugins'] = $matches[1][0] ?? '';
+
+		return $readme_file_details;
+
+	}
 
 }

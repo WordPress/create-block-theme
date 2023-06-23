@@ -5,36 +5,28 @@ class Theme_Readme {
 	* Build a readme.txt file for CHILD/GRANDCHILD themes.
 	*/
 	public static function build_readme_txt( $theme ) {
-		$slug                   = $theme['slug'];
-		$name                   = $theme['name'];
-		$description            = $theme['description'];
-		$uri                    = $theme['uri'];
-		$author                 = $theme['author'];
-		$author_uri             = $theme['author_uri'];
-		$copy_year              = gmdate( 'Y' );
-		$wp_version             = get_bloginfo( 'version' );
-		$image_credits          = $theme['image_credits'] ?? '';
-		$is_parent_theme        = $theme['is_parent_theme'] ?? false;
-		$original_theme         = $theme['original_theme'] ?? '';
+		$slug                = $theme['slug'];
+		$name                = $theme['name'];
+		$description         = $theme['description'];
+		$uri                 = $theme['uri'];
+		$author              = $theme['author'];
+		$author_uri          = $theme['author_uri'];
+		$copy_year           = gmdate( 'Y' );
+		$wp_version          = get_bloginfo( 'version' );
+		$image_credits       = $theme['image_credits'] ?? '';
+		$recommended_plugins = $theme['recommended_plugins'] ?? '';
+		$is_parent_theme     = $theme['is_parent_theme'] ?? false;
+		$original_theme      = $theme['original_theme'] ?? '';
+
+		// Handle copyright section.
 		$new_copyright_section  = $is_parent_theme || $original_theme ? true : false;
 		$original_theme_credits = $new_copyright_section ? self::original_theme_credits( $name, $is_parent_theme ) : '';
+		$copyright_section      = self::copyright_section( $new_copyright_section, $original_theme_credits, $name, $copy_year, $author, $image_credits );
 
-		$default_copyright_section = "== Copyright ==
-
-{$name} WordPress Theme, (C) {$copy_year} {$author}
-{$name} is distributed under the terms of the GNU GPL.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.";
-
-		$copyright_section = $new_copyright_section ? self::copyright_section( $original_theme_credits, $image_credits ) : $default_copyright_section;
+		// Handle recommended plugins section.
+		if ( $recommended_plugins ) {
+			$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins );
+		}
 
 		return "=== {$name} ===
 Contributors: {$author}
@@ -52,7 +44,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 = 0.0.1 =
 * Initial release
-
+{$recommended_plugins_section}
 {$copyright_section}
 ";
 	}
@@ -132,34 +124,138 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 	 *
 	 * @return string
 	 */
-	static function copyright_section( $original_theme_credits, $image_credits ) {
-		$copyright_section       = '';
-		$copyright_section_intro = '== Copyright ==';
+	static function copyright_section( $new_copyright_section, $original_theme_credits, $name, $copy_year, $author, $image_credits ) {
+		// Default copyright section.
+		$copyright_section = "== Copyright ==
 
-		// Get current theme readme.txt
-		$current_readme         = get_stylesheet_directory() . '/readme.txt' ?? '';
-		$current_readme_content = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
+{$name} WordPress Theme, (C) {$copy_year} {$author}
+{$name} is distributed under the terms of the GNU GPL.
 
-		if ( ! $current_readme_content ) {
-			return;
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.";
+
+		// If a new copyright section is required, then build ones based on the current theme.
+		if ( $new_copyright_section ) {
+			$copyright_section_intro = '== Copyright ==';
+
+			// Get current theme readme.txt
+			$current_readme         = get_stylesheet_directory() . '/readme.txt' ?? '';
+			$current_readme_content = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
+
+			if ( ! $current_readme_content ) {
+				return;
+			}
+
+			// Copy copyright section from current theme readme.txt
+			if ( str_contains( $current_readme_content, $copyright_section_intro ) ) {
+				$copyright_section_start = strpos( $current_readme_content, $copyright_section_intro );
+				$copyright_section       = substr( $current_readme_content, $copyright_section_start );
+
+				if ( $original_theme_credits ) {
+					$new_copyright_section = str_replace( $copyright_section_intro . "\n", '', $copyright_section );
+					$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . "\n" . $new_copyright_section;
+				}
+			}
 		}
 
-		// Copy copyright section from current theme readme.txt
-		if ( str_contains( $current_readme_content, $copyright_section_intro ) ) {
-			$copyright_section_start = strpos( $current_readme_content, $copyright_section_intro );
-			$copyright_section       = substr( $current_readme_content, $copyright_section_start );
-
-			if ( $original_theme_credits ) {
-				$new_copyright_section = str_replace( $copyright_section_intro . "\n", '', $copyright_section );
-				$copyright_section     = $copyright_section_intro . "\n\n" . $original_theme_credits . "\n" . $new_copyright_section;
-			}
-
-			if ( $image_credits ) {
-				$copyright_section = $copyright_section . "\n" . $image_credits;
-
-			}
+		if ( $image_credits ) {
+			$copyright_section = $copyright_section . "\n" . $image_credits;
 		}
 
 		return $copyright_section;
+	}
+
+	/**
+	 * Build Recommended Plugins section.
+	 *
+	 * @return string
+	 */
+	static function recommended_plugins_section( $recommended_plugins, $updated_readme = '' ) {
+		$recommended_plugins_section = '';
+
+		if ( ! $recommended_plugins ) {
+			return '';
+		}
+
+		$section_start = "\n== Recommended Plugins ==\n";
+
+		// Remove existing Recommended Plugins section.
+		if ( $updated_readme && str_contains( $updated_readme, $section_start ) ) {
+			$pattern = '/\s+== Recommended Plugins ==\s+(.*?)(?=(\n\=\=)|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_section = $matches[0][0];
+			$updated_readme  = str_replace( $current_section, '', $updated_readme );
+		}
+
+		$recommended_plugins_section = $section_start . "\n" . $recommended_plugins . "\n";
+
+		if ( $updated_readme ) {
+			return $updated_readme . $recommended_plugins_section;
+		}
+
+		return $recommended_plugins_section;
+	}
+
+	/**
+	 * Update current readme.txt file, rather than building a new one.
+	 *
+	 * @return string
+	 */
+	public static function update_readme_txt( $theme ) {
+		$description         = $theme['description'];
+		$author              = $theme['author'];
+		$wp_version          = get_bloginfo( 'version' );
+		$image_credits       = $theme['image_credits'] ?? '';
+		$recommended_plugins = $theme['recommended_plugins'] ?? '';
+		$updated_readme      = '';
+		$current_readme      = get_stylesheet_directory() . '/readme.txt' ?? '';
+		$readme_content      = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
+
+		if ( ! $readme_content ) {
+			return;
+		}
+
+		$updated_readme = $readme_content;
+
+		// Update description.
+		if ( $description ) {
+			$pattern = '/(== Description ==)(.*?)(\n\n=|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_description = $matches[0][0];
+			$updated_readme      = str_replace( $current_description, "== Description ==\n\n{$description}\n\n=", $updated_readme );
+		}
+
+		// Update Author/Contributors.
+		if ( $author ) {
+			$pattern = '/(Contributors:)(.*?)(\n|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_uri    = $matches[0][0];
+			$updated_readme = str_replace( $current_uri, "Contributors: {$author}\n", $updated_readme );
+		}
+
+		// Update "Tested up to" version.
+		if ( $wp_version ) {
+			$pattern = '/(Tested up to:)(.*?)(\n|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_uri    = $matches[0][0];
+			$updated_readme = str_replace( $current_uri, "Tested up to: {$wp_version}\n", $updated_readme );
+		}
+
+		if ( $recommended_plugins ) {
+			$updated_readme = self::recommended_plugins_section( $recommended_plugins, $updated_readme );
+		}
+
+		if ( $image_credits ) {
+			$updated_readme = $updated_readme . "\n\n" . $image_credits;
+		}
+
+		return $updated_readme;
 	}
 }

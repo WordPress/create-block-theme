@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
@@ -18,6 +18,7 @@ import {
 	Button,
 	TextControl,
 	TextareaControl,
+	ExternalLink,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
 
@@ -32,9 +33,32 @@ export const UpdateThemePanel = () => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
+		recommended_plugins: '',
 	} );
 
-	useSelect( ( select ) => {
+	useEffect( () => {
+		const getThemeReadmeData = async () => {
+			return apiFetch( {
+				path: '/create-block-theme/v1/get-readme-data',
+				method: 'GET',
+			} ).then( ( response ) => {
+				if ( response.status === 'SUCCESS' ) {
+					return response.data;
+				}
+				return {};
+			} );
+		};
+		const setThemeReadmeData = async () => {
+			const themeReadmeData = await getThemeReadmeData();
+			setTheme( ( prevTheme ) => ( {
+				...prevTheme,
+				recommended_plugins: themeReadmeData.recommendedPlugins,
+			} ) );
+		};
+		setThemeReadmeData();
+	}, [] );
+
+	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
 		setTheme( {
 			name: themeData.name.raw,
@@ -170,6 +194,28 @@ export const UpdateThemePanel = () => {
 						'A comma-separated collection of tags',
 						'create-block-theme'
 					) }
+				/>
+				<TextareaControl
+					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
+					help={
+						<>
+							{ __(
+								'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository.'
+							) }
+							<br />
+							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#6-plugins">
+								{ __( 'Read more.' ) }
+							</ExternalLink>
+						</>
+					}
+					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+					placeholder={ __( `Plugin Name
+https://wordpress.org/plugins/plugin-name/
+Plugin Description` ) }
+					value={ theme.recommended_plugins }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, recommended_plugins: value } )
+					}
 				/>
 				<TextControl
 					label={ __( 'Theme Subfolder', 'create-block-theme' ) }

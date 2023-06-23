@@ -6,11 +6,7 @@ function toggleForm( element ) {
 	if ( ! element?.value ) return;
 	const themeType = element.value;
 
-	const imageCreditsInput = document.getElementById( 'image_credits_input' );
-	if ( imageCreditsInput ) {
-		imageCreditsInput.toggleAttribute( 'hidden', false );
-	}
-
+	toggleInputsOnBlankTheme();
 	hideAllForms();
 
 	switch ( themeType ) {
@@ -39,10 +35,7 @@ function toggleForm( element ) {
 				.getElementById( 'new_theme_metadata_form' )
 				.toggleAttribute( 'hidden', false );
 
-			if ( imageCreditsInput ) {
-				imageCreditsInput.toggleAttribute( 'hidden', true );
-			}
-
+			toggleInputsOnBlankTheme( true );
 			resetThemeTags( element.value );
 			validateThemeTags( 'subject' );
 			break;
@@ -56,6 +49,16 @@ function toggleForm( element ) {
 
 		default:
 			break;
+	}
+}
+
+function toggleInputsOnBlankTheme( isHidden = false ) {
+	const inputsHiddenOnBlankTheme = document.getElementsByClassName(
+		'hide-on-blank-theme'
+	);
+
+	for ( let i = 0; i < inputsHiddenOnBlankTheme.length; i++ ) {
+		inputsHiddenOnBlankTheme[ i ].toggleAttribute( 'hidden', isHidden );
 	}
 }
 
