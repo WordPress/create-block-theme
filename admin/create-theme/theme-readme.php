@@ -195,7 +195,7 @@ GNU General Public License for more details.";
 			$updated_readme  = str_replace( $current_section, '', $updated_readme );
 		}
 
-		$recommended_plugins_section = $section_start . "\n\n" . $recommended_plugins . "\n\n";
+		$recommended_plugins_section = $section_start . "\n" . $recommended_plugins . "\n";
 
 		if ( $updated_readme ) {
 			return $updated_readme . $recommended_plugins_section;
