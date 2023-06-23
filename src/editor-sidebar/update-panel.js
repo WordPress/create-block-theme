@@ -45,9 +45,7 @@ export const UpdateThemePanel = () => {
 				if ( response.status === 'SUCCESS' ) {
 					return response.data;
 				}
-				return {
-					recommendedPlugins: '',
-				};
+				return {};
 			} );
 		};
 		const setThemeReadmeData = async () => {
