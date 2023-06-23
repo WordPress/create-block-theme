@@ -213,6 +213,9 @@ The following plugins are recommended for use with this theme:';
 	 * @return string
 	 */
 	public static function update_readme_txt( $theme ) {
+		$description         = $theme['description'];
+		$author              = $theme['author'];
+		$wp_version          = get_bloginfo( 'version' );
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 		$updated_readme      = '';
@@ -224,6 +227,30 @@ The following plugins are recommended for use with this theme:';
 		}
 
 		$updated_readme = $readme_content;
+
+		// Update description.
+		if ( $description ) {
+			$pattern = '/(== Description ==)(.*?)(\n\n=|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_description = $matches[0][0];
+			$updated_readme      = str_replace( $current_description, "== Description ==\n\n{$description}\n\n=", $updated_readme );
+		}
+
+		// Update Author/Contributors.
+		if ( $author ) {
+			$pattern = '/(Contributors:)(.*?)(\n|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_uri    = $matches[0][0];
+			$updated_readme = str_replace( $current_uri, "Contributors: {$author}\n", $updated_readme );
+		}
+
+		// Update "Tested up to" version.
+		if ( $wp_version ) {
+			$pattern = '/(Tested up to:)(.*?)(\n|$)/s';
+			preg_match_all( $pattern, $updated_readme, $matches );
+			$current_uri    = $matches[0][0];
+			$updated_readme = str_replace( $current_uri, "Tested up to: {$wp_version}\n", $updated_readme );
+		}
 
 		if ( $recommended_plugins ) {
 			$updated_readme = self::recommended_plugins_section( $recommended_plugins, $updated_readme );
