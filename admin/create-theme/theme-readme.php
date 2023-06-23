@@ -188,7 +188,7 @@ GNU General Public License for more details.";
 
 		// Remove existing Recommended Plugins section.
 		if ( $updated_readme && str_contains( $updated_readme, $section_start ) ) {
-			$pattern = '/\s+== Recommended Plugins ==\s+(.*?)(\s+==|$)/s';
+			$pattern = '/\s+== Recommended Plugins ==\s+(.*?)(?=(\n\=\=)|$)/s';
 			preg_match_all( $pattern, $updated_readme, $matches );
 			$current_section = $matches[0][0];
 			$updated_readme  = str_replace( $current_section, '', $updated_readme );
