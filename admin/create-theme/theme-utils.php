@@ -194,6 +194,7 @@ class Theme_Utils {
 
 		$readme_file_details = array();
 
+		// Handle Recommended Plugins.
 		$pattern = '/== Recommended Plugins ==\s+(.*?)(\s+==|$)/s';
 		preg_match_all( $pattern, $readme_file_contents, $matches );
 		$readme_file_details['recommendedPlugins'] = $matches[1][0] ?? '';
