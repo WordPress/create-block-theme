@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
@@ -36,23 +36,32 @@ export const UpdateThemePanel = () => {
 		recommended_plugins: '',
 	} );
 
-	async function getThemeReadmeData() {
-		return apiFetch( {
-			path: '/create-block-theme/v1/get-readme-data',
-			method: 'GET',
-		} ).then( ( response ) => {
-			if ( response.status === 'SUCCESS' ) {
-				return response.data;
-			}
-			return {
-				recommendedPlugins: '',
-			};
-		} );
-	}
+	useEffect( () => {
+		const getThemeReadmeData = async () => {
+			return apiFetch( {
+				path: '/create-block-theme/v1/get-readme-data',
+				method: 'GET',
+			} ).then( ( response ) => {
+				if ( response.status === 'SUCCESS' ) {
+					return response.data;
+				}
+				return {
+					recommendedPlugins: '',
+				};
+			} );
+		};
+		const setThemeReadmeData = async () => {
+			const themeReadmeData = await getThemeReadmeData();
+			setTheme( ( prevTheme ) => ( {
+				...prevTheme,
+				recommended_plugins: themeReadmeData.recommendedPlugins,
+			} ) );
+		};
+		setThemeReadmeData();
+	}, [] );
 
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
-		const themeReadmeData = await getThemeReadmeData();
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
@@ -61,7 +70,6 @@ export const UpdateThemePanel = () => {
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
-			recommended_plugins: themeReadmeData.recommendedPlugins,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
