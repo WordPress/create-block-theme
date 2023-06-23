@@ -36,8 +36,23 @@ export const UpdateThemePanel = () => {
 		recommended_plugins: '',
 	} );
 
-	useSelect( ( select ) => {
+	async function getThemeReadmeData() {
+		return apiFetch( {
+			path: '/create-block-theme/v1/get-readme-data',
+			method: 'GET',
+		} ).then( ( response ) => {
+			if ( response.status === 'SUCCESS' ) {
+				return response.data;
+			}
+			return {
+				recommendedPlugins: '',
+			};
+		} );
+	}
+
+	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
+		const themeReadmeData = await getThemeReadmeData();
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
@@ -46,7 +61,7 @@ export const UpdateThemePanel = () => {
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
-			recommended_plugins: '',
+			recommended_plugins: themeReadmeData.recommendedPlugins,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(

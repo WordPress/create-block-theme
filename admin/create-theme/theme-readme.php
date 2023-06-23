@@ -186,19 +186,16 @@ GNU General Public License for more details.";
 
 		$section_start = '
 == Recommended Plugins ==
-
-The following plugins are recommended for use with this theme:';
-		$section_end   = "(End of Recommended Plugins)\n";
-
+';
 		// Remove existing Recommended Plugins section.
 		if ( $updated_readme && str_contains( $updated_readme, $section_start ) ) {
-			$pattern = '/(' . preg_quote( $section_start, '/' ) . ')(.*?)((' . preg_quote( $section_end, '/' ) . ')|$)/s';
+			$pattern = '/== Recommended Plugins ==\s+(.*?)(\s+==|$)/s';
 			preg_match_all( $pattern, $updated_readme, $matches );
 			$current_section = $matches[0][0];
 			$updated_readme  = str_replace( $current_section, '', $updated_readme );
 		}
 
-		$recommended_plugins_section = $section_start . "\n\n" . $recommended_plugins . "\n\n" . $section_end;
+		$recommended_plugins_section = $section_start . "\n\n" . $recommended_plugins . "\n\n";
 
 		if ( $updated_readme ) {
 			return $updated_readme . $recommended_plugins_section;

@@ -86,6 +86,37 @@ class Create_Block_Theme_API {
 				},
 			)
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/get-readme-data',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'rest_get_readme_data' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+	}
+
+	function rest_get_readme_data( $request ) {
+		try {
+			$readme_data = Theme_Utils::get_readme_data();
+			return new WP_REST_Response(
+				array(
+					'status'  => 'SUCCESS',
+					'message' => __( 'Cloned Theme Created.', 'create-block-theme' ),
+					'data'    => $readme_data,
+				)
+			);
+		} catch ( Exception $error ) {
+			return new WP_REST_Response(
+				array(
+					'status'  => 'FAILURE',
+					'message' => __( 'No Readme File', 'create-block-theme' ),
+				)
+			);
+		}
 	}
 
 	function rest_clone_theme( $request ) {
