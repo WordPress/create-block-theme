@@ -113,7 +113,7 @@ class Create_Block_Theme_API {
 			return new WP_REST_Response(
 				array(
 					'status'  => 'FAILURE',
-					'message' => __( 'No Readme File', 'create-block-theme' ),
+					'message' => $error->getMessage(),
 				)
 			);
 		}
