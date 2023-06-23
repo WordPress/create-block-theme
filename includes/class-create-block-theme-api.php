@@ -105,7 +105,7 @@ class Create_Block_Theme_API {
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
-					'message' => __( 'Cloned Theme Created.', 'create-block-theme' ),
+					'message' => __( 'Readme file data retrieved.', 'create-block-theme' ),
 					'data'    => $readme_data,
 				)
 			);
