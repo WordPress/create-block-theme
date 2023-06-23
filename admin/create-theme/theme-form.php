@@ -197,7 +197,15 @@ Source: https://example.com/source-url',
 										);
 										?>
 									</small><br />
-									<textarea rows="4" cols="50" name="theme[recommended_plugins]" class="large-text"></textarea>
+									<?php
+									$recommended_plugins_placeholder = __(
+										'Plugin Name
+https://wordpress.org/plugins/plugin-name/
+Plugin Description',
+										'create-block-theme'
+									);
+									?>
+									<textarea placeholder="<?php echo $recommended_plugins_placeholder; ?>" rows="4" cols="50" name="theme[recommended_plugins]" class="large-text"></textarea>
 									<br /><br />
 								</label>
 								<div>
