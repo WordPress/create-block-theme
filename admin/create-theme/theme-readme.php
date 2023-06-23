@@ -4,7 +4,7 @@ class Theme_Readme {
 	/**
 	* Build a readme.txt file for CHILD/GRANDCHILD themes.
 	*/
-	public static function build_readme_txt( $theme, $update_current_theme = false ) {
+	public static function build_readme_txt( $theme ) {
 		$slug                = $theme['slug'];
 		$name                = $theme['name'];
 		$description         = $theme['description'];
@@ -26,12 +26,6 @@ class Theme_Readme {
 		// Handle recommended plugins section.
 		if ( $recommended_plugins ) {
 			$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins );
-		}
-
-		// Handle updating current theme.
-		if ( $update_current_theme ) {
-			$updated_readme = self::update_readme( $image_credits, $recommended_plugins );
-			return $updated_readme;
 		}
 
 		return "=== {$name} ===
@@ -218,11 +212,12 @@ The following plugins are recommended for use with this theme:';
 	 *
 	 * @return string
 	 */
-	static function update_readme( $image_credits, $recommended_plugins ) {
-		$updated_readme = '';
-
-		$current_readme = get_stylesheet_directory() . '/readme.txt' ?? '';
-		$readme_content = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
+	public static function update_readme_txt( $theme ) {
+		$image_credits       = $theme['image_credits'] ?? '';
+		$recommended_plugins = $theme['recommended_plugins'] ?? '';
+		$updated_readme      = '';
+		$current_readme      = get_stylesheet_directory() . '/readme.txt' ?? '';
+		$readme_content      = file_exists( $current_readme ) ? file_get_contents( $current_readme ) : '';
 
 		if ( ! $readme_content ) {
 			return;

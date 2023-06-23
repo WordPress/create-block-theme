@@ -379,7 +379,7 @@ class Create_Block_Theme_API {
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
 		file_put_contents(
 			get_stylesheet_directory() . '/readme.txt',
-			Theme_Readme::build_readme_txt( $theme, true )
+			Theme_Readme::update_readme_txt( $theme )
 		);
 	}
 
