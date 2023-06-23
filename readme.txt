@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.12.1
+Stable tag: 1.13.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,21 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 1.13.0 =
+* # Conflicts:
+#	admin/create-theme/theme-readme.php
+#	admin/create-theme/theme-zip.php
+
+* Merge branch 'trunk' into fix/resources-credits-on-save
+* Merge branch 'trunk' into add/subfolder-to-zip
+* Persist copyright info on new theme creation
+* Update Google Fonts JSON data from API
+* Move check for `download_url` higher up
+* Avoid white spaces or other weird characters on font asset paths.
+* Merge branch 'trunk' into add/subfolder-to-zip
+* Adding files to zip subfolder called as theme slug
+* Update Google Fonts JSON data from API
 
 = 1.12.1 =
 * Fix double replacement in replace_namespace
