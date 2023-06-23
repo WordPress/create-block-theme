@@ -196,7 +196,7 @@ class Theme_Utils {
 
 		$pattern = '/== Recommended Plugins ==\s+(.*?)(\s+==|$)/s';
 		preg_match_all( $pattern, $readme_file_contents, $matches );
-		$readme_file_details['recommendedPlugins'] = $matches[1][0];
+		$readme_file_details['recommendedPlugins'] = $matches[1][0] ?? '';
 
 		return $readme_file_details;
 
