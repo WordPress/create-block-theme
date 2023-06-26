@@ -24,9 +24,7 @@ class Theme_Readme {
 		$copyright_section      = self::copyright_section( $new_copyright_section, $original_theme_credits, $name, $copy_year, $author, $image_credits );
 
 		// Handle recommended plugins section.
-		if ( $recommended_plugins ) {
-			$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins );
-		}
+		$recommended_plugins_section = self::recommended_plugins_section( $recommended_plugins ) ?? '';
 
 		return "=== {$name} ===
 Contributors: {$author}
