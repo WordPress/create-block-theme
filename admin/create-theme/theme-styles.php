@@ -64,7 +64,7 @@ Tags: {$tags}
 		$wp_version  = get_bloginfo( 'version' );
 		$template    = $theme['template'];
 		$text_domain = $theme['text_domain'];
-		$version     = '0.0.1';
+		$version     = '1.0.0';
 		$tags        = Theme_Tags::theme_tags_list( $theme );
 
 		if ( isset( $theme['version'] ) ) {

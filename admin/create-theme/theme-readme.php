@@ -40,7 +40,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Changelog ==
 
-= 0.0.1 =
+= 1.0.0 =
 * Initial release
 {$recommended_plugins_section}
 {$copyright_section}
