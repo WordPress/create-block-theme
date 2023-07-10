@@ -118,6 +118,14 @@ class Theme_Templates {
 
 			// If there are images in the template, add it as a pattern
 			if ( ! empty( $template_data->media ) ) {
+
+				// get all template parts to create template links
+				$template_parts = get_block_templates( array(), 'wp_template_part' );
+				$template_links = self::create_template_links( $template_parts );
+
+				// remove template strings from template data content
+				$template_data->content = str_replace( array_values( $template_links ), '', $template_data->content );
+
 				// If there is no templates folder, create it.
 				if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' ) ) {
 					wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
@@ -135,6 +143,9 @@ class Theme_Templates {
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template_data->slug . '.php',
 					$pattern['content']
 				);
+
+				// Set the template structure to ensure the header and footer parts are included correctly
+				$template_data = self::restructure_template_links( $template_data, $template_parts, $template_links );
 			}
 
 			// Write the template content
@@ -186,5 +197,50 @@ class Theme_Templates {
 			// Write the media assets
 			Theme_Media::add_media_to_local( $template_data->media );
 		}
+	}
+
+	/**
+	 * An array of strings that represent the template parts
+	 *
+	 * @param array $template_parts
+	 * @return array $template_links
+	 *
+	 * @author Elliott Richmond <elliott@squareonemd.co.uk>
+	 */
+	public static function create_template_links( $template_parts ) {
+		$template_links = array();
+		foreach ( $template_parts as $template_part ) {
+			$template_link_attributes = array(
+				'slug' => $template_part->slug,
+			);
+			$attributes_json          = json_encode( $template_link_attributes, JSON_UNESCAPED_SLASHES );
+			$template_links[]         = '<!-- wp:template-part ' . $attributes_json . ' /-->';
+		}
+		return $template_links;
+	}
+
+	/**
+	 * Restructured template data content to include the template parts from the root folder
+	 *
+	 * @param object $template_data
+	 * @param array $template_parts
+	 * @param array $template_links
+	 * @return object $template_data
+	 *
+	 * @author Elliott Richmond <elliott@squareonemd.co.uk>
+	 */
+	public static function restructure_template_links( $template_data, $template_parts, $template_links ) {
+		foreach ( $template_parts as $k => $template_part ) {
+			switch ( $template_part->slug ) {
+				case 'header':
+					$prepend = $template_links[ $k ];
+					break;
+				case 'footer':
+					$append = $template_links[ $k ];
+					break;
+			}
+		}
+		$template_data->content = $prepend . $template_data->content . $append;
+		return $template_data;
 	}
 }
