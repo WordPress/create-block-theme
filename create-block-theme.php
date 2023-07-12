@@ -44,3 +44,21 @@ function run_create_block_theme() {
 
 }
 run_create_block_theme();
+
+
+function create_block_theme_activated() {
+
+}
+
+function create_block_theme_deactivated() {
+
+}
+
+function create_block_theme_uninstalled() {
+
+}
+
+// may be some clean up required ???
+register_activation_hook( __FILE__, 'create_block_theme_activated' );
+register_deactivation_hook( __FILE__, 'create_block_theme_deactivated' );
+register_uninstall_hook( __FILE__, 'create_block_theme_uninstalled' );

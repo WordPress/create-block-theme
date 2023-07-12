@@ -29,3 +29,5 @@ vendor/
 
 # plugin build folder
 build/
+
+.git-repo
