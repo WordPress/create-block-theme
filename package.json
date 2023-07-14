@@ -28,6 +28,7 @@
 		"@emotion/babel-plugin": "^11.11.0",
 		"@wordpress/browserslist-config": "^5.16.0",
 		"@wordpress/element": "^5.10.0",
+		"@wordpress/env": "^8.3.0",
 		"@wordpress/prettier-config": "^2.16.0",
 		"@wordpress/scripts": "^26.4.0",
 		"@wordpress/stylelint-config": "^21.16.0",
@@ -49,7 +50,8 @@
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start src/index.js src/plugin-sidebar.js src/wp-org-theme-directory.js",
 		"update-version": "node update-version-and-changelog.js",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"wp-env": "wp-env"
 	},
 	"lint-staged": {
 		"*.{js,json,yml}": [
