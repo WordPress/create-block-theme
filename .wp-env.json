@@ -1,4 +1,8 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ]
+	"plugins": [ "." ],
+	"config": {
+		"WP_UPLOAD_MAX_FILESIZE": "128M",
+		"WP_MEMORY_LIMIT": "256M"
+	}
 }
