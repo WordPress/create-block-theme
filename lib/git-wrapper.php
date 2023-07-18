@@ -9,10 +9,7 @@ class Git_Wrapper {
 	}
 
 	// singleton
-	public static function getGit($repo_dir='') {
-		if (empty($repo_dir)) {
-			$repo_dir = CREATE_BLOCK_THEME_GIT_DIR;
-		}
+	public static function get_git($repo_dir) {
 		if (empty($repo_dir)) {
 			return null;
 		}

@@ -1,12 +1,12 @@
 <?php
 
-require_once( __DIR__ . '/git-wrapper.php' );
+require_once( dirname(dirname(__DIR__)) . '/lib/git-wrapper.php' );
 
 class Git_Themes {
     private static $git;
 
 	public static function create_admin_page() {
-        self::$git = Git_Wrapper::getGit();
+        self::$git = Git_Wrapper::getGit(CREATE_BLOCK_THEME_GIT_DIR);
         WP_Filesystem();
 
         ?>
