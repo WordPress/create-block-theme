@@ -17,9 +17,11 @@ import {
 } from '@wordpress/icons';
 import { GitIntegrationForm } from './git-config';
 import { GitNotInstalledError } from './git-errors';
+import { GitChanges } from './git-changes';
 
 export const GitIntegrationPanel = function() {
     const [gitConfig, setGitConfig] = useState({});
+    const [changes, setChanges] = useState([]);
 
     useEffect(() => {
         apiFetch( {
@@ -30,7 +32,39 @@ export const GitIntegrationPanel = function() {
         }).catch(() => {
             setGitConfig({});
         });
-    });
+    }, []);
+
+    useEffect(() => {
+        if (!gitConfig.git_configured) {
+            return
+        }
+
+        apiFetch( {
+			path: '/create-block-theme/v1/get-git-changes',
+			method: 'POST',
+            headers: {
+				'Content-Type': 'application/json',
+			},
+		} ).then( ( response ) => {
+            setChanges(response);
+        }).catch(() => {
+            setChanges([]);
+        });
+    }, [gitConfig.git_configured]);
+
+    function handleConfigChange(git_configured) {
+        setGitConfig({
+            ...gitConfig,
+            git_configured,
+        })
+    }
+
+    function handleCommit(commit_status) {
+        setGitConfig({
+            ...gitConfig,
+            git_configured: true,
+        })
+    }
 
     return <PanelBody>
         <Heading>
@@ -41,8 +75,8 @@ export const GitIntegrationPanel = function() {
         <VStack>
             {
                 !gitConfig.version ? <GitNotInstalledError /> : (
-                    !gitConfig.git_configured ? <GitIntegrationForm /> :
-                        <div>Git connected.</div>
+                    !gitConfig.git_configured ? <GitIntegrationForm onChange={handleConfigChange} /> :
+                        <GitChanges changes={changes} onCommit={handleCommit} />
                 )
             }
         </VStack>

@@ -114,6 +114,42 @@ class Create_Block_Theme_API {
 				},
 			)
 		);
+
+		register_rest_route(
+			'create-block-theme/v1',
+			'/connect-git',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this -> git_api, 'connect_git_repo' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'create-block-theme/v1',
+			'/get-git-changes',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this -> git_api, 'get_git_changes' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'create-block-theme/v1',
+			'/commit-changes',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this -> git_api, 'commit_changes' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
 	}
 
 	function rest_get_readme_data( $request ) {

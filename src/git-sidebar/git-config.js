@@ -5,15 +5,37 @@ import {
 	// eslint-disable-next-line
 	__experimentalText as Text,
 	TextControl,
+    Button,
 } from '@wordpress/components';
 import { useState } from "@wordpress/element";
+import apiFetch from '@wordpress/api-fetch';
+import { store as noticesStore } from '@wordpress/notices';
 
-export const GitIntegrationForm = function() {
+export const GitIntegrationForm = function({onChange}) {
+    // const { createErrorNotice } = useDispatch( noticesStore );
     const [ repository, setRepository ] = useState( {
-		url: '',
+		remote_url: '',
 		author_name: '',
 		author_email: '',
 	} );
+
+    function handleConnectClick() {
+        apiFetch( {
+			path: '/create-block-theme/v1/connect-git',
+			method: 'POST',
+			data: repository,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		} )
+			.then( (response) => {
+                console.log({response})
+                onChange(true);
+			} )
+			.catch( ( error ) => {
+				// console.log({error})
+			} );
+    }
 
     return <>
         <Text>
@@ -25,9 +47,9 @@ export const GitIntegrationForm = function() {
         <Spacer />
         <TextControl
             label={ __( 'Repository URL', 'create-block-theme' ) }
-            value={ repository.url }
+            value={ repository.remote_url }
             onChange={ ( value ) =>
-                setRepository( { ...repository, url: value } )
+                setRepository( { ...repository, remote_url: value } )
             }
         />
         <TextControl
@@ -44,5 +66,9 @@ export const GitIntegrationForm = function() {
                 setRepository( { ...repository, author_email: value } )
             }
         />
+        <Spacer />
+        <Button variant="secondary" onClick={ handleConnectClick }>
+            { __( 'Connect', 'create-block-theme' ) }
+        </Button>
     </>
 }

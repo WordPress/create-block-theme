@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/git-constants.php';
+
 class Git_Wrapper {
 	private static $obj;
 	private $last_error = '';
