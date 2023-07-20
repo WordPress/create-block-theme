@@ -3,6 +3,7 @@ import ManageFonts from './manage-fonts';
 import GoogleFonts from './google-fonts';
 import LocalFonts from './local-fonts';
 import { ManageFontsProvider } from './fonts-context';
+import './index.scss';
 
 function App() {
 	const params = new URLSearchParams( document.location.search );
