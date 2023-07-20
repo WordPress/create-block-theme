@@ -28,6 +28,7 @@ import {
 
 import { UpdateThemePanel } from './editor-sidebar/update-panel';
 import { CreateThemePanel } from './editor-sidebar/create-panel';
+import { StyleVariationsPanel } from './editor-sidebar/style-variations-panel';
 import {
 	tool,
 	copy,
@@ -170,6 +171,22 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
+								<hr />
+								<NavigatorButton
+									path="/style-variations"
+									icon={ copy }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Create Style Variation',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
@@ -180,6 +197,10 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/create">
 						<CreateThemePanel />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/style-variations">
+						<StyleVariationsPanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
