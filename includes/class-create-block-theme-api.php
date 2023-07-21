@@ -126,7 +126,7 @@ class Create_Block_Theme_API {
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
-					'message' => __( 'Readme file data retrieved . ', 'create-block-theme' ),
+					'message' => __( 'Readme file data retrieved.', 'create-block-theme' ),
 					'data'    => $readme_data,
 				)
 			);
@@ -169,7 +169,7 @@ class Create_Block_Theme_API {
 		}
 
 		if ( file_exists( $new_theme_path ) ) {
-			return new \WP_Error( 'theme_exists', __( 'Theme already exists . ', 'create-block-theme' ) );
+			return new \WP_Error( 'theme_exists', __( 'Theme already exists.', 'create-block-theme' ) );
 		}
 
 		wp_mkdir_p( $new_theme_path );
@@ -178,10 +178,10 @@ class Create_Block_Theme_API {
 		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
 		Theme_Utils::add_templates_to_folder( $new_theme_path, 'all', $theme['slug'] );
 
-		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme . json', MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
+		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 
 		if ( $theme['subfolder'] ) {
-			switch_theme( $theme['subfolder'] . ' / ' . $theme_slug );
+			switch_theme( $theme['subfolder'] . '/' . $theme_slug );
 		} else {
 			switch_theme( $theme_slug );
 		}
@@ -189,7 +189,7 @@ class Create_Block_Theme_API {
 		return new WP_REST_Response(
 			array(
 				'status'  => 'SUCCESS',
-				'message' => __( 'Cloned Theme Created . ', 'create-block-theme' ),
+				'message' => __( 'Cloned Theme Created.', 'create-block-theme' ),
 			)
 		);
 	}
@@ -215,18 +215,18 @@ class Create_Block_Theme_API {
 		$theme['text_domain'] = $theme_slug;
 
 		// Create theme directory.
-		$source           = plugin_dir_path( __DIR__ ) . 'assets / boilerplate';
+		$source           = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
 		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
 
 		if ( file_exists( $blank_theme_path ) ) {
-			return new \WP_Error( 'theme_exists', __( 'Theme already exists . ', 'create-block-theme' ) );
+			return new \WP_Error( 'theme_exists', __( 'Theme already exists.', 'create-block-theme' ) );
 		}
 
 		wp_mkdir_p( $blank_theme_path );
 
 		// Add readme.txt.
 		file_put_contents(
-			$blank_theme_path . DIRECTORY_SEPARATOR . 'readme . txt',
+			$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
 			Theme_Readme::build_readme_txt( $theme )
 		);
 
@@ -235,7 +235,7 @@ class Create_Block_Theme_API {
 
 		// Add style.css.
 		file_put_contents(
-			$blank_theme_path . DIRECTORY_SEPARATOR . 'style . css',
+			$blank_theme_path . DIRECTORY_SEPARATOR . 'style.css',
 			$css_contents
 		);
 
@@ -257,23 +257,23 @@ class Create_Block_Theme_API {
 		// Overwrite default screenshot if one is provided.
 		if ( $this->is_valid_screenshot( $screenshot ) ) {
 			file_put_contents(
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot . png',
+				$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
 				file_get_contents( $screenshot['tmp_name'] )
 			);
 		}
 
 		if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) ) {
 			global $wp_version;
-			$theme_json_version = 'wp / ' . substr( $wp_version, 0, 3 );
+			$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
 				$schema         = '"$schema": "https://schemas.wp.org/' . $theme_json_version . '/theme.json"';
-			$theme_json_path    = $blank_theme_path . DIRECTORY_SEPARATOR . 'theme . json';
+			$theme_json_path    = $blank_theme_path . DIRECTORY_SEPARATOR . 'theme.json';
 			$theme_json_string  = file_get_contents( $theme_json_path );
 			$theme_json_string  = str_replace( '"$schema": "https://schemas.wp.org/trunk/theme.json"', $schema, $theme_json_string );
 			file_put_contents( $theme_json_path, $theme_json_string );
 		}
 
 		if ( $theme['subfolder'] ) {
-			switch_theme( $theme['subfolder'] . ' / ' . $theme_slug );
+			switch_theme( $theme['subfolder'] . '/' . $theme_slug );
 		} else {
 			switch_theme( $theme_slug );
 		}
@@ -281,7 +281,7 @@ class Create_Block_Theme_API {
 		return new WP_REST_Response(
 			array(
 				'status'  => 'SUCCESS',
-				'message' => __( 'Blank Theme Created . ', 'create-block-theme' ),
+				'message' => __( 'Blank Theme Created.', 'create-block-theme' ),
 			)
 		);
 	}
@@ -332,7 +332,7 @@ class Create_Block_Theme_API {
 			$css_contents
 		);
 
-		// Add / replace screenshot.
+		// Add/replace screenshot.
 		if ( $this->is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
