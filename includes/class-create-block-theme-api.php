@@ -97,6 +97,27 @@ class Create_Block_Theme_API {
 				},
 			)
 		);
+
+		register_rest_route(
+			'create-block-theme/v1',
+			'/variation/(?P<variation>[a-z0-9-]++)',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_create_variation' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+				'args'                => array(
+					'variation' => array(
+						'validate_callback' => function( $param, $request, $key ) {
+							;
+							return is_string( $param );
+						},
+					),
+				),
+			)
+		);
+
 	}
 
 	function rest_get_readme_data( $request ) {
@@ -283,7 +304,7 @@ class Create_Block_Theme_API {
 		$theme['original_theme']      = wp_get_theme()->get( 'Name' );
 		$theme['text_domain']         = $theme_slug;
 
-		// Use previous theme's tags if custom tags are empty.
+		// Use previous theme's tags if custom tags are empty .
 		if ( empty( $theme['tags_custom'] ) ) {
 			$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
 		}
@@ -311,7 +332,7 @@ class Create_Block_Theme_API {
 			$css_contents
 		);
 
-		// Add / replace screenshot.
+		// Add/replace screenshot.
 		if ( $this->is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
@@ -400,6 +421,22 @@ class Create_Block_Theme_API {
 			)
 		);
 	}
+
+	function rest_create_variation( $data ) {
+		$plugin_admin = new Create_Block_Theme_Admin();
+		if ( is_child_theme() ) {
+			$plugin_admin->save_variation( 'current', $data );
+		} else {
+			$plugin_admin->save_variation( 'all', $data );
+		}
+
+		$result            = new stdClass();
+		$result->variation = $data['variation'];
+		$res               = new WP_REST_Response( $result );
+		$res->set_status( 200 );
+		return array( 'req' => $res );
+	}
+
 
 	/**
 	 * Update the theme metadata in the style.css and readme.txt files.
