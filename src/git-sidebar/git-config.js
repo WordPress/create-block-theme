@@ -6,20 +6,31 @@ import {
 	__experimentalText as Text,
 	TextControl,
     Button,
+    RadioControl,
 } from '@wordpress/components';
 import { useState } from "@wordpress/element";
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 
 export const GitIntegrationForm = function({onChange}) {
-    // const { createErrorNotice } = useDispatch( noticesStore );
+    const connectOptions = [
+        { label: __( 'with all themes' ), value: 'all_themes' },
+        {
+            label: __( 'only with the current theme' ),
+            value: 'current_theme',
+        },
+    ];
     const [ repository, setRepository ] = useState( {
 		remote_url: '',
 		author_name: '',
 		author_email: '',
+        connection_type: {},
 	} );
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('Failed to connect repository. Unknown error happened.');
 
     function handleConnectClick() {
+        setIsLoading(true);
         apiFetch( {
 			path: '/create-block-theme/v1/connect-git',
 			method: 'POST',
@@ -31,13 +42,19 @@ export const GitIntegrationForm = function({onChange}) {
 			.then( (response) => {
                 console.log({response})
                 onChange(true);
+                setIsLoading(false);
 			} )
 			.catch( ( error ) => {
-				// console.log({error})
+				console.log({error})
+                setError('Failed to connect repository. Unknown error happened.')
+                setIsLoading(false);
 			} );
     }
 
     return <>
+        {
+            error && <><Text color='red'>{ error }</Text><Spacer /></>
+        }
         <Text>
             { __(
                 'Enter a repository Url to connect with current theme.',
@@ -51,6 +68,7 @@ export const GitIntegrationForm = function({onChange}) {
             onChange={ ( value ) =>
                 setRepository( { ...repository, remote_url: value } )
             }
+            help={"https://personal-access-token@github.com/username/reponame.git"}
         />
         <TextControl
             label={ __( 'Author Name', 'create-block-theme' ) }
@@ -66,9 +84,20 @@ export const GitIntegrationForm = function({onChange}) {
                 setRepository( { ...repository, author_email: value } )
             }
         />
+        <RadioControl
+            label={ __( 'Connect repository' ) }
+            selected={ repository.connection_type }
+            options={ connectOptions }
+            onChange={ ( value ) => {
+                setRepository({...repository, connection_type: value})
+            } }
+        />
         <Spacer />
-        <Button variant="secondary" onClick={ handleConnectClick }>
-            { __( 'Connect', 'create-block-theme' ) }
+        <Button variant="secondary" onClick={ handleConnectClick } disabled={isLoading}>
+            { 
+                isLoading ? __( 'Connecting repository...', 'create-block-theme' ) :
+                __( 'Connect', 'create-block-theme' ) 
+            }
         </Button>
     </>
 }

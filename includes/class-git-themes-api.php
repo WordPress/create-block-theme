@@ -32,6 +32,13 @@ class Git_Themes_API {
             $remote_url = $repository['remote_url'];
             $author_name = $repository['author_name'];
             $author_email = $repository['author_email'];
+            $connection_type = $repository['connection_type'];
+
+            if ($connection_type && $connection_type['value'] === 'current_theme') {
+                // create a sub directory with current theme slug and clone repo
+            } else {
+                // create a general sub directory and clone
+            }
 
             $this -> git -> init($author_name, $author_email);
             $this -> git -> add_remote_url( $remote_url );
