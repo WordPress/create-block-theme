@@ -15,9 +15,11 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	chevronLeft,
 } from '@wordpress/icons';
-import { GitIntegrationForm } from './git-config';
+import { GitIntegrationForm, ShowGitConfig } from './git-repo';
 import { GitNotInstalledError } from './git-errors';
 import { GitChanges } from './git-changes';
+import ScreenHeader from '../components/screen-header';
+import { GitBranchConfig } from './git-branch';
 
 export const GitIntegrationPanel = function() {
     const [gitConfig, setGitConfig] = useState({});
@@ -35,7 +37,7 @@ export const GitIntegrationPanel = function() {
     }, []);
 
     useEffect(() => {
-        if (!gitConfig.git_configured) {
+        if (!gitConfig.is_git_initialized) {
             return
         }
 
@@ -50,35 +52,39 @@ export const GitIntegrationPanel = function() {
         }).catch(() => {
             setChanges([]);
         });
-    }, [gitConfig.git_configured]);
+    }, [gitConfig.is_git_initialized]);
 
-    function handleConfigChange(git_configured) {
+    function handleConfigChange(config_status) {
+        if (config_status !== 'success' ) {
+            return;
+        }
+
         setGitConfig({
             ...gitConfig,
-            git_configured,
+            is_git_initialized: true,
         })
     }
 
     function handleCommit(commit_status) {
         setGitConfig({
             ...gitConfig,
-            git_configured: true,
+            is_git_initialized: true,
         })
     }
 
-    return <PanelBody>
-        <Heading>
-            <NavigatorToParentButton icon={ chevronLeft }>
-                { __( 'Git Integration', 'create-block-theme' ) }
-            </NavigatorToParentButton>
-        </Heading>
+    return <>
+        <ScreenHeader title={ __( 'Git Integration', 'create-block-theme' ) } description={''} />
         <VStack>
             {
                 !gitConfig.version ? <GitNotInstalledError /> : (
-                    !gitConfig.git_configured ? <GitIntegrationForm onChange={handleConfigChange} /> :
-                        <GitChanges changes={changes} onCommit={handleCommit} />
+                    !gitConfig.is_git_initialized ? <GitIntegrationForm onChange={handleConfigChange} /> :
+                        <>
+                            <ShowGitConfig config={gitConfig} />
+                            <GitBranchConfig config={gitConfig} />
+                            <GitChanges config={gitConfig} changes={changes} onCommit={handleCommit} />
+                        </>
                 )
             }
         </VStack>
-    </PanelBody>;
+    </>;
 }

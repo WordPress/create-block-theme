@@ -4,9 +4,19 @@ require_once( dirname(__DIR__) . '/lib/git-wrapper.php' );
 
 class Git_Themes_API {
     private $git;
+    private $active_theme;
+    private $theme_slug;
+    private $all_themes_repo_prefix = 'all-themes';
+    // radio values set in frontend
+    private $connection_types = array(
+        "ALL_THEMES" => 'all_themes',
+        "CURRENT_THEME" => 'current_theme'
+    );
 
     public function __construct() {
         $this -> git = Git_Wrapper::get_git(CREATE_BLOCK_THEME_GIT_DIR);
+        $this -> active_theme = wp_get_theme();
+        $this -> theme_slug = $this -> active_theme -> get('TextDomain');
         WP_Filesystem();
     }
 
@@ -16,11 +26,24 @@ class Git_Themes_API {
             return array( 'version' => $git_version );
         }
 
-        list($git_configured, $remote_url) = $this -> is_git_initialized();
+        $repo_config = $this -> fetch_repo_config();
+        $branch = '';
+        if ($repo_config['is_git_initialized']) {
+            $branch = $this -> git -> get_local_branch();
+        }
+
+        // TODO: capture target path from user and save it to database.
+        $theme = wp_get_theme();
+        $path_prefix = "/".$theme->get('TextDomain'); // using theme slug as target directory for testing
+
         return array(
             'version' => $git_version,
-            'git_configured' => $git_configured,
-            'remote_url' => $remote_url // TODO: mask access token
+            'is_git_initialized' => $repo_config['is_git_initialized'],
+            'connection_type' => $repo_config['connection_type'],
+            'remote_url' => $repo_config['remote_url'], // TODO: mask access token
+            'active_theme_name' => $this -> active_theme -> get('Name'),
+            'current_branch' => $branch,
+            'commit_path_prefix' => $path_prefix,
         );
     }
 
@@ -28,43 +51,51 @@ class Git_Themes_API {
         $repository = $request->get_params();
 
         try {
-            wp_mkdir_p(CREATE_BLOCK_THEME_GIT_DIR);
             $remote_url = $repository['remote_url'];
             $author_name = $repository['author_name'];
             $author_email = $repository['author_email'];
             $connection_type = $repository['connection_type'];
+            // TODO: escape and validate the above fields
 
-            if ($connection_type && $connection_type['value'] === 'current_theme') {
-                // create a sub directory with current theme slug and clone repo
+            $repo_dir = CREATE_BLOCK_THEME_GIT_DIR;
+
+            if ($connection_type === 'current_theme') {
+                // create a sub directory with current theme slug
+                $repo_dir .= "/".$this->theme_slug;
             } else {
-                // create a general sub directory and clone
+                $repo_dir .= "/".$this->all_themes_repo_prefix;
             }
+
+            wp_mkdir_p($repo_dir);
+            $this -> git -> set_git_directory($repo_dir);
 
             $this -> git -> init($author_name, $author_email);
             $this -> git -> add_remote_url( $remote_url );
-            // TODO: it is taking long time sometimes resulting timeouts.
-            // May be make it a background process??
             $this -> git -> fetch_ref();
 
             return array("status" => "success");
         } catch (\Throwable $th) {
-            return array("status" => "fail");
+            return array("status" => "failed");
         }
     }
 
     public function disconnect_git_repo($request) {
+        $repository = $request->get_params();
 
     }
 
     public function get_git_changes() {
-        // TODO: capture target path from user and save it to database.
-        $theme = wp_get_theme();
-        $target_path = $theme->get('TextDomain'); // using theme slug as target directory for testing
+        $repo_config = $this -> fetch_repo_config();
+        if (!$repo_config['is_git_initialized']) {
+            return array();
+        }
+
         $source_path = get_template_directory(); // current theme directory
+        $destination_path = $repo_config['repo_path'].$repo_config['commit_path_prefix'];
 
         // copy theme into target path.
-        wp_mkdir_p(CREATE_BLOCK_THEME_GIT_DIR."/$target_path");
-        copy_dir($source_path, CREATE_BLOCK_THEME_GIT_DIR."/$target_path");
+        wp_mkdir_p($destination_path);
+        copy_dir($source_path, $destination_path);
 
         // add the changes to staging
         $this -> git -> add(".");
@@ -96,13 +127,47 @@ class Git_Themes_API {
         }
     }
 
-    private function is_git_initialized() {
+    private function fetch_repo_config() {
         global $wp_filesystem;
-        $git_initialized = $wp_filesystem -> exists(CREATE_BLOCK_THEME_GIT_DIR.'/.git');
-        $remote_url = $this -> git -> get_remote_url();
-        if (empty($remote_url)) {
-            $git_initialized = false;
+
+        // check if there exists a repo linked to current theme
+        $repo_path = CREATE_BLOCK_THEME_GIT_DIR . "/$this->theme_slug";
+        $git_initialized = $wp_filesystem -> exists("$repo_path/.git");
+        if ($git_initialized) {
+            $this -> git -> set_git_directory($repo_path);
+            $remote_url = $this -> git -> get_remote_url();
+            $connection_type = $this->connection_types['CURRENT_THEME'];
+            if (!empty($remote_url)) {
+                return array(
+                    "is_git_initialized" => $git_initialized, 
+                    "remote_url" => $remote_url,
+                    "connection_type" => $connection_type,
+                    "repo_path" => $repo_path,
+                );
+            }
         }
-        return array($git_initialized, $remote_url);
+
+        // check if there exists a repo linked to all themes
+        $repo_path = CREATE_BLOCK_THEME_GIT_DIR . "/$this->all_themes_repo_prefix";
+        $git_initialized = $wp_filesystem -> exists("$repo_path/.git");
+        if ($git_initialized) {
+            $this -> git -> set_git_directory($repo_path);
+            $remote_url = $this -> git -> get_remote_url();
+            $connection_type = $this->connection_types['ALL_THEMES'];
+            if (!empty($remote_url)) {
+                return array(
+                    "is_git_initialized" => $git_initialized, 
+                    "remote_url" => $remote_url,
+                    "connection_type" => $connection_type,
+                    "repo_path" => $repo_path,
+                );
+            }
+        }
+
+        return array(
+            "is_git_initialized" => false, 
+            "remote_url" => '',
+            "connection_type" => ''
+        );
     }
 }

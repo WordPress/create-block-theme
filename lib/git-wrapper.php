@@ -5,9 +5,10 @@ require_once __DIR__ . '/git-constants.php';
 class Git_Wrapper {
 	private static $obj;
 	private $last_error = '';
+	private $repo_dir;
 
 	function __construct( $repo_dir ) {
-		$this->repo_dir = $repo_dir;
+		$this -> repo_dir = $repo_dir;
 	}
 
 	// singleton
@@ -21,6 +22,10 @@ class Git_Wrapper {
         }
         return self::$obj;
     }
+
+	public function set_git_directory($repo_dir) {
+		$this -> repo_dir = $repo_dir;
+	}
 
 	protected function _execute(...$args) {
 		$args     = join( ' ', array_map( 'escapeshellarg', $args ) );

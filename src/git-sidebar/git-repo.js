@@ -4,13 +4,17 @@ import {
 	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line
 	__experimentalText as Text,
+    // eslint-disable-next-line
+	__experimentalHeading as Heading,
+    __experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	TextControl,
     Button,
     RadioControl,
+    PanelBody,
 } from '@wordpress/components';
 import { useState } from "@wordpress/element";
 import apiFetch from '@wordpress/api-fetch';
-import { store as noticesStore } from '@wordpress/notices';
 
 export const GitIntegrationForm = function({onChange}) {
     const connectOptions = [
@@ -24,10 +28,10 @@ export const GitIntegrationForm = function({onChange}) {
 		remote_url: '',
 		author_name: '',
 		author_email: '',
-        connection_type: {},
+        connection_type: 'all_themes',
 	} );
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('Failed to connect repository. Unknown error happened.');
+    const [error, setError] = useState('');
 
     function handleConnectClick() {
         setIsLoading(true);
@@ -41,17 +45,21 @@ export const GitIntegrationForm = function({onChange}) {
 		} )
 			.then( (response) => {
                 console.log({response})
-                onChange(true);
+                console.log({status: response.status});
+                if (response.status !== 'success') {
+                    throw 'error'
+                }
+                onChange(response.status);
                 setIsLoading(false);
 			} )
 			.catch( ( error ) => {
-				console.log({error})
+                console.log({error});
                 setError('Failed to connect repository. Unknown error happened.')
                 setIsLoading(false);
 			} );
     }
 
-    return <>
+    return <PanelBody>
         {
             error && <><Text color='red'>{ error }</Text><Spacer /></>
         }
@@ -99,5 +107,26 @@ export const GitIntegrationForm = function({onChange}) {
                 __( 'Connect', 'create-block-theme' ) 
             }
         </Button>
+    </PanelBody>
+}
+
+export const ShowGitConfig = function({config}) {
+    return <>
+        <PanelBody title={ __( 'Repository config' ) }>
+            <div style={{display: 'grid', gridTemplateColumns: '3fr 5fr', gap: '1rem'}}>
+                <div>{ __( 'Repository' ) }</div>
+                <div style={{wordBreak: 'break-word'}}>{config.remote_url}</div>
+                <div>{ __( 'Connected to' ) }</div>
+                <div style={{wordBreak: 'break-word'}}>
+                    {config.connection_type === 'current_theme' ? `${config.active_theme_name} Theme` : 'All Themes'}
+                </div>
+                {
+                    config.connection_type === 'current_theme' ? <div style={{gridColumn: 'span 2'}}><a href='#'>{ __( 'Disconnect repository with: ' ) }{config.active_theme_name}</a></div> : <>
+                        <div style={{gridColumn: 'span 2'}}><a href='#'>{ __( 'Disconnect repository' ) }</a></div>
+                        {/* <div style={{gridColumn: 'span 2'}}><a href='#'>{ __( 'Connect another repository only with current theme' ) }</a></div> */}
+                    </>
+                }
+            </div>
+        </PanelBody>
     </>
 }

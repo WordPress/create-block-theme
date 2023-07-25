@@ -3,16 +3,13 @@ import {
 	__experimentalSpacer as Spacer,
     TextareaControl,
     Button,
+    PanelBody,
 } from '@wordpress/components';
 import { useState } from "@wordpress/element";
 import apiFetch from '@wordpress/api-fetch';
 
-export function GitChanges({changes, onCommit}) {
+export function GitChanges({config, changes, onCommit}) {
     const [message, setMessage] = useState('');
-
-    if (!Array.isArray(changes) || !changes.length) {
-        return <div>No changes to commit.</div>
-    }
 
     function handleCommitClick() {
         apiFetch( {
@@ -32,27 +29,32 @@ export function GitChanges({changes, onCommit}) {
 			} );
     }
 
-    return <div>
-        {
-            changes.map((change, i) => <div key={i}>
-                {change.modifier} - {change.file}
-            </div>)
-        }
-        <Spacer />
-        <TextareaControl
-            label={ __( 'Commit message', 'create-block-theme' ) }
-            value={ message }
-            onChange={ ( value ) =>
-                setMessage(value)
+    return <PanelBody title={ __( 'Theme changes' ) }>
+        { !Array.isArray(changes) || !changes.length ?
+        <div>No changes to commit.</div> :
+        <div>
+            {
+                changes.map((change, i) => <div key={i}>
+                    {change.modifier} - {change.file}
+                </div>)
             }
-            placeholder={ __(
-                'A short description of the changes',
-                'create-block-theme'
-            ) }
-        />
-        <Spacer />
-        <Button variant="secondary" onClick={ handleCommitClick }>
-            { __( 'Commit', 'create-block-theme' ) }
-        </Button>
-    </div>;
+            <Spacer />
+            <TextareaControl
+                label={ __( 'Commit message', 'create-block-theme' ) }
+                value={ message }
+                onChange={ ( value ) =>
+                    setMessage(value)
+                }
+                placeholder={ __(
+                    'A short description of the changes',
+                    'create-block-theme'
+                ) }
+            />
+            <Spacer />
+            <Button variant="secondary" onClick={ handleCommitClick }>
+                { __( 'Commit', 'create-block-theme' ) }
+            </Button>
+        </div>
+    }
+    </PanelBody>;
 }
