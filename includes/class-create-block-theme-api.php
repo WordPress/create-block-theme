@@ -129,6 +129,18 @@ class Create_Block_Theme_API {
 
 		register_rest_route(
 			'create-block-theme/v1',
+			'/disconnect-git',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this -> git_api, 'disconnect_git_repo' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'create-block-theme/v1',
 			'/get-git-changes',
 			array(
 				'methods'             => 'POST',

@@ -57,14 +57,7 @@ class Git_Themes_API {
             $connection_type = $repository['connection_type'];
             // TODO: escape and validate the above fields
 
-            $repo_dir = CREATE_BLOCK_THEME_GIT_DIR;
-
-            if ($connection_type === 'current_theme') {
-                // create a sub directory with current theme slug
-                $repo_dir .= "/".$this->theme_slug;
-            } else {
-                $repo_dir .= "/".$this->all_themes_repo_prefix;
-            }
+            $repo_dir = $this -> get_repo_dir($connection_type);
 
             wp_mkdir_p($repo_dir);
             $this -> git -> set_git_directory($repo_dir);
@@ -80,8 +73,16 @@ class Git_Themes_API {
     }
 
     public function disconnect_git_repo($request) {
-        $repository = $request->get_params();
+        try {
+            $repository = $request->get_params();
 
+            $connection_type = $repository['connection_type'];
+            $repo_dir = $this -> get_repo_dir($connection_type);
+            $this -> delete_directory($repo_dir);
+            return array("status" => "success", "repo"=>$repo_dir);
+        } catch (\Throwable $th) {
+            return array("status" => $th -> __toString());
+        }
     }
 
     public function get_git_changes() {
@@ -124,6 +125,38 @@ class Git_Themes_API {
             return array("status" => "success");
         } catch (\Throwable $th) {
             return array("status" => "fail");
+        }
+    }
+
+    private function get_repo_dir($connection_type) {
+        return $connection_type === 'current_theme' ?
+            CREATE_BLOCK_THEME_GIT_DIR."/".$this->theme_slug : 
+            CREATE_BLOCK_THEME_GIT_DIR."/".$this->all_themes_repo_prefix;
+    }
+
+    private function delete_directory($dir) {
+        if (!file_exists($dir)) {
+            return;
+        }
+    
+        // Check if $dir is a directory
+        if (is_dir($dir)) {
+            $files = scandir($dir);
+            foreach ($files as $file) {
+                if ($file !== '.' && $file !== '..') {
+                    $path = $dir . '/' . $file;
+    
+                    if (is_dir($path)) {
+                        // Recursively delete subdirectories and their contents
+                        $this -> delete_directory($path);
+                    } else {
+                        // Delete files inside the directory
+                        unlink($path);
+                    }
+                }
+            }
+            // Delete the empty directory
+            rmdir($dir);
         }
     }
 

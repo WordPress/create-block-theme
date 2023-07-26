@@ -26,6 +26,37 @@ export const GitIntegrationPanel = function() {
     const [changes, setChanges] = useState([]);
 
     useEffect(() => {
+        fetchGitConfig();
+    }, []);
+
+    useEffect(() => {
+        if (!gitConfig.is_git_initialized) {
+            return
+        }
+
+        fetchGitChanges();
+    }, [gitConfig.is_git_initialized]);
+
+    function handleConfigChange(config_status) {
+        if (config_status !== 'success' ) {
+            return;
+        }
+
+        fetchGitConfig();
+    }
+
+    function handleRepoDisconnect() {
+        fetchGitConfig();
+    }
+
+    function handleCommit(commit_status) {
+        setGitConfig({
+            ...gitConfig,
+            is_git_initialized: true,
+        })
+    }
+
+    function fetchGitConfig() {
         apiFetch( {
 			path: '/create-block-theme/v1/get-git-config',
 			method: 'GET',
@@ -34,13 +65,9 @@ export const GitIntegrationPanel = function() {
         }).catch(() => {
             setGitConfig({});
         });
-    }, []);
+    }
 
-    useEffect(() => {
-        if (!gitConfig.is_git_initialized) {
-            return
-        }
-
+    function fetchGitChanges() {
         apiFetch( {
 			path: '/create-block-theme/v1/get-git-changes',
 			method: 'POST',
@@ -52,24 +79,6 @@ export const GitIntegrationPanel = function() {
         }).catch(() => {
             setChanges([]);
         });
-    }, [gitConfig.is_git_initialized]);
-
-    function handleConfigChange(config_status) {
-        if (config_status !== 'success' ) {
-            return;
-        }
-
-        setGitConfig({
-            ...gitConfig,
-            is_git_initialized: true,
-        })
-    }
-
-    function handleCommit(commit_status) {
-        setGitConfig({
-            ...gitConfig,
-            is_git_initialized: true,
-        })
     }
 
     return <>
@@ -79,7 +88,7 @@ export const GitIntegrationPanel = function() {
                 !gitConfig.version ? <GitNotInstalledError /> : (
                     !gitConfig.is_git_initialized ? <GitIntegrationForm onChange={handleConfigChange} /> :
                         <>
-                            <ShowGitConfig config={gitConfig} />
+                            <ShowGitConfig config={gitConfig} onDisconnect={handleRepoDisconnect} />
                             <GitBranchConfig config={gitConfig} />
                             <GitChanges config={gitConfig} changes={changes} onCommit={handleCommit} />
                         </>

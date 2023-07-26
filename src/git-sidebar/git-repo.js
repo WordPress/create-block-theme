@@ -110,7 +110,31 @@ export const GitIntegrationForm = function({onChange}) {
     </PanelBody>
 }
 
-export const ShowGitConfig = function({config}) {
+export const ShowGitConfig = function({config, onDisconnect}) {
+    function handleDisconnect(event) {
+        event.preventDefault();
+        
+        apiFetch( {
+			path: '/create-block-theme/v1/disconnect-git',
+			method: 'POST',
+			data: { connection_type: config.connection_type },
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		} )
+			.then( (response) => {
+                console.log({response})
+                console.log({status: response.status});
+                if (response.status !== 'success') {
+                    throw 'error'
+                }
+                onDisconnect && onDisconnect()
+			} )
+			.catch( ( error ) => {
+                console.log({error});
+			} );
+    }
+
     return <>
         <PanelBody title={ __( 'Repository config' ) }>
             <div style={{display: 'grid', gridTemplateColumns: '3fr 5fr', gap: '1rem'}}>
@@ -121,8 +145,8 @@ export const ShowGitConfig = function({config}) {
                     {config.connection_type === 'current_theme' ? `${config.active_theme_name} Theme` : 'All Themes'}
                 </div>
                 {
-                    config.connection_type === 'current_theme' ? <div style={{gridColumn: 'span 2'}}><a href='#'>{ __( 'Disconnect repository with: ' ) }{config.active_theme_name}</a></div> : <>
-                        <div style={{gridColumn: 'span 2'}}><a href='#'>{ __( 'Disconnect repository' ) }</a></div>
+                    config.connection_type === 'current_theme' ? <div style={{gridColumn: 'span 2'}}><a href='#' onClick={handleDisconnect}>{ __( 'Disconnect repository with: ' ) }{config.active_theme_name}</a></div> : <>
+                        <div style={{gridColumn: 'span 2'}}><a href='#' onClick={handleDisconnect}>{ __( 'Disconnect repository' ) }</a></div>
                         {/* <div style={{gridColumn: 'span 2'}}><a href='#'>{ __( 'Connect another repository only with current theme' ) }</a></div> */}
                     </>
                 }
