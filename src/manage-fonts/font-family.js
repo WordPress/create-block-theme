@@ -2,8 +2,8 @@ import { useContext } from '@wordpress/element';
 import { Button, Icon } from '@wordpress/components';
 import FontFace from './font-face';
 import { ManageFontsContext } from '../fonts-context';
+import { __, _n } from '@wordpress/i18n';
 
-const { __, _n } = wp.i18n;
 function FontFamily( { fontFamily, deleteFont } ) {
 	const { familiesOpen, handleToggleFamily } =
 		useContext( ManageFontsContext );
