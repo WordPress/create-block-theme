@@ -88,23 +88,31 @@ function FontsSidebar( {
 																key
 															].faces.length && (
 																<>
-																	({ ' ' }
-																	{
-																		fontsOutline[
-																			key
-																		].faces
-																			.length
-																	}{ ' ' }
-																	{ _n(
-																		'Variant',
-																		'Variants',
-																		fontsOutline[
-																			key
-																		].faces
-																			.length,
-																		'create-block-theme'
-																	) }{ ' ' }
-																	)
+																	{ sprintf(
+																		// translators: %s: Variants information.
+																		__(
+																			'( %s )',
+																			'create-block-theme'
+																		),
+																		sprintf(
+																			// translators: %d: Number of variants.
+																			_n(
+																				'%d Variant',
+																				'%d Variants',
+																				fontsOutline[
+																					key
+																				]
+																					.faces
+																					.length,
+																				'create-block-theme'
+																			),
+																			fontsOutline[
+																				key
+																			]
+																				.faces
+																				.length
+																		)
+																	) }
 																</>
 															) }
 														</span>
@@ -171,12 +179,15 @@ function FontsSidebar( {
 
 					<div className="variants-total">
 						<div className="variant">
-							{ variantsCount }{ ' ' }
-							{ _n(
-								'Variant',
-								'Variants',
-								variantsCount,
-								'create-block-theme'
+							{ sprintf(
+								// translators: %d: Number of variants.
+								_n(
+									'%d Variant',
+									'%d Variants',
+									variantsCount,
+									'create-block-theme'
+								),
+								variantsCount
 							) }
 						</div>
 						<div className="size">{ totalSize }</div>
