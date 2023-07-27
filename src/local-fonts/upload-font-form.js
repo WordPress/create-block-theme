@@ -180,7 +180,7 @@ function UploadFontForm( {
 						name="font-weight"
 						id="font-weight"
 						placeholder={ __(
-							'Font weight:',
+							'Font weight',
 							'create-block-theme'
 						) }
 						value={ formData.weight || '' }
