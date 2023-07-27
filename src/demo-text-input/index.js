@@ -45,7 +45,7 @@ function DemoTextInput( { axes, setAxes, resetAxes } ) {
 						</SelectControl>
 
 						<InputControl
-							label="Demo text"
+							label={ __( 'Demo text', 'create-block-theme' ) }
 							value={ demoText }
 							onChange={ handleDemoTextChange }
 						/>
