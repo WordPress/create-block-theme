@@ -18,7 +18,7 @@ class React_App {
 		array_push( $asset_file['dependencies'], 'wp-i18n' );
 		wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/index.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
 
-		// Sets translated strings for the script.
+		// Enable localization in the app.
 		wp_set_script_translations( 'create-block-theme-app', 'create-block-theme' );
 
 		// Set google fonts json file url.
