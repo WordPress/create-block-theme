@@ -7,6 +7,7 @@ import {
 import { Font } from 'lib-font';
 import { __ } from '@wordpress/i18n';
 import { variableAxesToCss } from '../demo-text-input/utils';
+import { getFontStyleLocalized } from '../utils';
 
 function UploadFontForm( {
 	formData,
@@ -168,8 +169,12 @@ function UploadFontForm( {
 							setFormData( { ...formData, style: val } )
 						}
 					>
-						<option value="normal">Normal</option>
-						<option value="italic">Italic</option>
+						<option value="normal">
+							{ getFontStyleLocalized( 'normal' ) }
+						</option>
+						<option value="italic">
+							{ getFontStyleLocalized( 'italic' ) }
+						</option>
 					</SelectControl>
 				</div>
 

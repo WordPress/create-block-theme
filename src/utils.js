@@ -1,3 +1,5 @@
+import { __, _x } from '@wordpress/i18n';
+
 export function getStyleFromGoogleVariant( variant ) {
 	return variant.includes( 'italic' ) ? 'italic' : 'normal';
 }
@@ -19,6 +21,14 @@ export function getGoogleVariantFromStyleAndWeight( style, weight ) {
 		return weight;
 	}
 	return weight + style;
+}
+
+export function getFontStyleLocalized( style ) {
+	const styles = {
+		normal: _x( 'Normal', 'Font style', 'create-block-theme' ),
+		italic: _x( 'Italic', 'Font style', 'create-block-theme' ),
+	};
+	return styles[ style ] !== undefined ? styles[ style ] : style;
 }
 
 export function forceHttps( url ) {

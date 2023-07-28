@@ -4,6 +4,7 @@ import { bytesToSize } from '../utils';
 import './fonts-sidebar.css';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
+import { getFontStyleLocalized } from '../utils';
 
 function FontsSidebar( {
 	title,
@@ -138,7 +139,9 @@ function FontsSidebar( {
 														>
 															<div className="variant">
 																{ face.weight }{ ' ' }
-																{ face.style }
+																{ getFontStyleLocalized(
+																	face.style
+																) }
 															</div>
 															<div className="size">
 																{ getFileSize(
