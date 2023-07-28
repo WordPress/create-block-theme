@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components';
 import Demo from '../demo-text-input/demo';
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
 function FontFace( { face, deleteFont, shouldBeRemoved, isFamilyOpen } ) {
 	const demoStyles = {
