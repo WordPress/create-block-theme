@@ -1,6 +1,6 @@
 import { _n } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { bytesToSize, locallizeFontStyles } from '../utils';
+import { bytesToSize, localizeFontStyle } from '../utils';
 import './fonts-sidebar.css';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
@@ -138,7 +138,7 @@ function FontsSidebar( {
 														>
 															<div className="variant">
 																{ face.weight }{ ' ' }
-																{ locallizeFontStyles(
+																{ localizeFontStyle(
 																	face.style
 																) }
 															</div>

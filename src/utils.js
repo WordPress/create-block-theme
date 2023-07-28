@@ -23,7 +23,7 @@ export function getGoogleVariantFromStyleAndWeight( style, weight ) {
 	return weight + style;
 }
 
-export function locallizeFontStyles( style ) {
+export function localizeFontStyle( style ) {
 	const styles = {
 		normal: _x( 'Normal', 'Font style', 'create-block-theme' ),
 		italic: _x( 'Italic', 'Font style', 'create-block-theme' ),
