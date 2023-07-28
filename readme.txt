@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.2
-Stable tag: 1.13.1
+Stable tag: 1.13.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,13 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 1.13.2 =
+* Update Google Fonts JSON data from API
+* Set the initial version to 1.0.0 insted of 0.0.1
+* Fix: react render warning
+* Update Google Fonts JSON data from API
+* Update Google Fonts JSON data from API
 
 = 1.13.1 =
 
