@@ -1,6 +1,7 @@
 import { Button } from '@wordpress/components';
 import Demo from '../demo-text-input/demo';
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
+import { localizeFontStyle } from '../utils';
 
 function FontFace( { face, deleteFont, shouldBeRemoved, isFamilyOpen } ) {
 	const demoStyles = {
@@ -21,7 +22,7 @@ function FontFace( { face, deleteFont, shouldBeRemoved, isFamilyOpen } ) {
 
 	return (
 		<tr className="font-face">
-			<td>{ face.fontStyle }</td>
+			<td>{ localizeFontStyle( face.fontStyle ) }</td>
 			<td>{ face.fontWeight }</td>
 			<td className="demo-cell">
 				<Demo style={ demoStyles } />

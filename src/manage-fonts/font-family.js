@@ -2,8 +2,8 @@ import { useContext } from '@wordpress/element';
 import { Button, Icon } from '@wordpress/components';
 import FontFace from './font-face';
 import { ManageFontsContext } from '../fonts-context';
+import { __, _n } from '@wordpress/i18n';
 
-const { __, _n } = wp.i18n;
 function FontFamily( { fontFamily, deleteFont } ) {
 	const { familiesOpen, handleToggleFamily } =
 		useContext( ManageFontsContext );
@@ -36,14 +36,20 @@ function FontFamily( { fontFamily, deleteFont } ) {
 							{ hasFontFaces && (
 								<span className="variants-count">
 									{ ' ' }
-									( { fontFamily.fontFace.length }{ ' ' }
-									{ _n(
-										'Variant',
-										'Variants',
-										fontFamily.fontFace.length,
-										'create-block-theme'
-									) }{ ' ' }
-									)
+									{ sprintf(
+										// translators: %s: Variants information.
+										__( '( %s )', 'create-block-theme' ),
+										sprintf(
+											// translators: %d: Number of variants.
+											_n(
+												'%d Variant',
+												'%d Variants',
+												fontFamily.fontFace.length,
+												'create-block-theme'
+											),
+											fontFamily.fontFace.length
+										)
+									) }
 								</span>
 							) }
 						</div>

@@ -1,6 +1,6 @@
 import { _n } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { bytesToSize } from '../utils';
+import { bytesToSize, localizeFontStyle } from '../utils';
 import './fonts-sidebar.css';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
@@ -88,23 +88,31 @@ function FontsSidebar( {
 																key
 															].faces.length && (
 																<>
-																	({ ' ' }
-																	{
-																		fontsOutline[
-																			key
-																		].faces
-																			.length
-																	}{ ' ' }
-																	{ _n(
-																		'Variant',
-																		'Variants',
-																		fontsOutline[
-																			key
-																		].faces
-																			.length,
-																		'create-block-theme'
-																	) }{ ' ' }
-																	)
+																	{ sprintf(
+																		// translators: %s: Variants information.
+																		__(
+																			'( %s )',
+																			'create-block-theme'
+																		),
+																		sprintf(
+																			// translators: %d: Number of variants.
+																			_n(
+																				'%d Variant',
+																				'%d Variants',
+																				fontsOutline[
+																					key
+																				]
+																					.faces
+																					.length,
+																				'create-block-theme'
+																			),
+																			fontsOutline[
+																				key
+																			]
+																				.faces
+																				.length
+																		)
+																	) }
 																</>
 															) }
 														</span>
@@ -130,7 +138,9 @@ function FontsSidebar( {
 														>
 															<div className="variant">
 																{ face.weight }{ ' ' }
-																{ face.style }
+																{ localizeFontStyle(
+																	face.style
+																) }
 															</div>
 															<div className="size">
 																{ getFileSize(
@@ -171,12 +181,15 @@ function FontsSidebar( {
 
 					<div className="variants-total">
 						<div className="variant">
-							{ variantsCount }{ ' ' }
-							{ _n(
-								'Variant',
-								'Variants',
-								variantsCount,
-								'create-block-theme'
+							{ sprintf(
+								// translators: %d: Number of variants.
+								_n(
+									'%d Variant',
+									'%d Variants',
+									variantsCount,
+									'create-block-theme'
+								),
+								variantsCount
 							) }
 						</div>
 						<div className="size">{ totalSize }</div>

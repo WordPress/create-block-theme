@@ -50,6 +50,9 @@ class Create_Block_Theme_Admin {
 		wp_enqueue_script(
 			'create-block-theme-slot-fill',
 		);
+
+		// Enable localization in the plugin sidebar.
+		wp_set_script_translations( 'create-block-theme-slot-fill', 'create-block-theme' );
 	}
 
 	function create_admin_menu() {

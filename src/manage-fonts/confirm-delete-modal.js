@@ -3,6 +3,7 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { localizeFontStyle } from '../utils';
 
 function ConfirmDeleteModal( { isOpen, onConfirm, onCancel, fontToDelete } ) {
 	const deleteFontFaceMessage = sprintf(
@@ -12,7 +13,7 @@ function ConfirmDeleteModal( { isOpen, onConfirm, onCancel, fontToDelete } ) {
 			'create-block-theme'
 		),
 		fontToDelete?.weight,
-		fontToDelete?.style,
+		localizeFontStyle( fontToDelete?.style ),
 		fontToDelete?.fontFamily
 	);
 

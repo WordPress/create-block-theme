@@ -1,3 +1,5 @@
+import { __, _x } from '@wordpress/i18n';
+
 export function getStyleFromGoogleVariant( variant ) {
 	return variant.includes( 'italic' ) ? 'italic' : 'normal';
 }
@@ -21,13 +23,21 @@ export function getGoogleVariantFromStyleAndWeight( style, weight ) {
 	return weight + style;
 }
 
+export function localizeFontStyle( style ) {
+	const styles = {
+		normal: _x( 'Normal', 'Font style', 'create-block-theme' ),
+		italic: _x( 'Italic', 'Font style', 'create-block-theme' ),
+	};
+	return styles[ style ] !== undefined ? styles[ style ] : style;
+}
+
 export function forceHttps( url ) {
 	return url.replace( 'http://', 'https://' );
 }
 
 export function bytesToSize( bytes ) {
 	const sizes = [ 'Bytes', 'KB', 'MB', 'GB', 'TB' ];
-	if ( bytes === 0 ) return 'n/a';
+	if ( bytes === 0 ) return __( 'n/a', 'create-block-theme' );
 	const i = parseInt( Math.floor( Math.log( bytes ) / Math.log( 1024 ) ) );
 	if ( i === 0 ) return bytes + ' ' + sizes[ i ];
 	return ( bytes / Math.pow( 1024, i ) ).toFixed( 1 ) + ' ' + sizes[ i ];

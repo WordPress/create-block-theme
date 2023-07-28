@@ -1,6 +1,6 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { downloadFile } from './utils';
 import { useDispatch } from '@wordpress/data';
@@ -88,7 +88,8 @@ const CreateBlockThemePlugin = () => {
 					error.message && error.code !== 'unknown_error'
 						? error.message
 						: __(
-								'An error occurred while attempting to export the theme.'
+								'An error occurred while attempting to export the theme.',
+								'create-block-theme'
 						  );
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			}
@@ -102,12 +103,20 @@ const CreateBlockThemePlugin = () => {
 				target="create-block-theme-sidebar"
 				icon={ tool }
 			>
-				{ __( 'Create Block Theme' ) }
+				{ _x(
+					'Create Block Theme',
+					'UI String',
+					'create-block-theme'
+				) }
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
 				name="create-block-theme-sidebar"
 				icon={ tool }
-				title={ __( 'Create Block Theme' ) }
+				title={ _x(
+					'Create Block Theme',
+					'UI String',
+					'create-block-theme'
+				) }
 			>
 				<NavigatorProvider initialPath="/">
 					<NavigatorScreen path="/">
@@ -117,7 +126,10 @@ const CreateBlockThemePlugin = () => {
 									icon={ archive }
 									onClick={ handleSaveClick }
 								>
-									{ __( 'Save Changes' ) }
+									{ __(
+										'Save Changes',
+										'create-block-theme'
+									) }
 								</Button>
 								<Text variant="muted">
 									{ __(
@@ -130,7 +142,7 @@ const CreateBlockThemePlugin = () => {
 									icon={ download }
 									onClick={ handleExportClick }
 								>
-									{ __( 'Export Zip' ) }
+									{ __( 'Export Zip', 'create-block-theme' ) }
 								</Button>
 								<Text variant="muted">
 									{ __(
@@ -143,7 +155,10 @@ const CreateBlockThemePlugin = () => {
 									<Spacer />
 									<HStack justify="space-between">
 										<FlexItem>
-											{ __( 'Theme Info' ) }
+											{ __(
+												'Theme Info',
+												'create-block-theme'
+											) }
 										</FlexItem>
 										<Icon icon={ chevronRight } />
 									</HStack>
@@ -159,7 +174,10 @@ const CreateBlockThemePlugin = () => {
 									<Spacer />
 									<HStack>
 										<FlexItem>
-											{ __( 'Create Theme' ) }
+											{ __(
+												'Create Theme',
+												'create-block-theme'
+											) }
 										</FlexItem>
 										<Icon icon={ chevronRight } />
 									</HStack>

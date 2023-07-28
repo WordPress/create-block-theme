@@ -1,5 +1,6 @@
 import { useEffect } from '@wordpress/element';
 import Demo from '../demo-text-input/demo';
+import { localizeFontStyle } from '../utils';
 
 function FontVariant( { font, variant, isSelected, handleToggle } ) {
 	const style = variant.includes( 'italic' ) ? 'italic' : 'normal';
@@ -51,7 +52,7 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 				<label htmlFor={ fontId }>{ weight }</label>
 			</td>
 			<td className="">
-				<label htmlFor={ fontId }>{ style }</label>
+				<label htmlFor={ fontId }>{ localizeFontStyle( style ) }</label>
 			</td>
 			<td className="demo-cell">
 				<label htmlFor={ fontId }>
