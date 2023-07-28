@@ -204,7 +204,7 @@ export const UpdateThemePanel = () => {
 							) }
 							<br />
 							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#6-plugins">
-								{ __( 'Read more.' ) }
+								{ __( 'Read more.', 'create-block-theme' ) }
 							</ExternalLink>
 						</>
 					}
