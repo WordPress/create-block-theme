@@ -1,10 +1,9 @@
 import { _n } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { bytesToSize } from '../utils';
+import { bytesToSize, getFontStyleLocalized } from '../utils';
 import './fonts-sidebar.css';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
-import { getFontStyleLocalized } from '../utils';
 
 function FontsSidebar( {
 	title,
