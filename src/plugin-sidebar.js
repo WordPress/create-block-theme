@@ -36,6 +36,8 @@ import {
 	chevronRight,
 	archive,
 } from '@wordpress/icons';
+import { GitIcon } from './icons/git';
+import { GitIntegrationPanel } from './git-sidebar/git-integration-panel';
 
 const CreateBlockThemePlugin = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -137,7 +139,7 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Separator />
 								<Button
 									icon={ download }
 									onClick={ handleExportClick }
@@ -150,7 +152,23 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Separator />
+								<NavigatorButton path="/git-integration" icon={ GitIcon }>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __( 'Git Integration' ) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+								<Text variant="muted">
+									{ __(
+										'Connect a git repository and commit current theme changes.',
+										'create-block-theme'
+									) }
+								</Text>
+								<Separator />
 								<NavigatorButton path="/update" icon={ edit }>
 									<Spacer />
 									<HStack justify="space-between">
@@ -169,7 +187,7 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Separator />
 								<NavigatorButton path="/create" icon={ copy }>
 									<Spacer />
 									<HStack>
@@ -199,12 +217,21 @@ const CreateBlockThemePlugin = () => {
 					<NavigatorScreen path="/create">
 						<CreateThemePanel />
 					</NavigatorScreen>
+
+					<NavigatorScreen path="/git-integration">
+						<GitIntegrationPanel />
+					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
 		</>
 	);
 };
 
+function Separator() {
+	return <hr style={{margin: '0.5rem 0'}} />;
+}
+
 registerPlugin( 'cbt-plugin-sidebar', {
 	render: CreateBlockThemePlugin,
 } );
+
