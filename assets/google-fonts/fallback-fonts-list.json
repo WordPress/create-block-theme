@@ -12479,14 +12479,14 @@
         "latin",
         "latin-ext"
       ],
-      "version": "v8",
-      "lastModified": "2023-05-31",
+      "version": "v9",
+      "lastModified": "2023-08-03",
       "files": {
-        "regular": "http://fonts.gstatic.com/s/gulzar/v8/Wnz6HAc9eB3HB2ILYTwZqg_MPQ.ttf"
+        "regular": "http://fonts.gstatic.com/s/gulzar/v9/Wnz6HAc9eB3HB2ILYTwZqg_MPQ.ttf"
       },
       "category": "serif",
       "kind": "webfonts#webfont",
-      "menu": "http://fonts.gstatic.com/s/gulzar/v8/Wnz6HAc9eB3HB2I7YDYd.ttf"
+      "menu": "http://fonts.gstatic.com/s/gulzar/v9/Wnz6HAc9eB3HB2I7YDYd.ttf"
     },
     {
       "family": "Gupter",
