@@ -26,7 +26,8 @@ if ( ! function_exists( 'download_url' ) ) {
 /**
  * The core plugin class.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-create-block-theme.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-create-block-theme.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-create-block-theme-settings.php';
 
 /**
  * Begins execution of the plugin.
@@ -44,3 +45,21 @@ function run_create_block_theme() {
 
 }
 run_create_block_theme();
+
+function create_block_theme_activated() {
+	// none
+}
+
+function create_block_theme_deactivated() {
+	// none
+}
+
+function create_block_theme_uninstalled() {
+	$plugin_settings = new Create_Block_Theme_Settings();
+	$plugin_settings->delete_settings();
+}
+
+// may be some clean up required ???
+register_activation_hook( __FILE__, 'create_block_theme_activated' );
+register_deactivation_hook( __FILE__, 'create_block_theme_deactivated' );
+register_uninstall_hook( __FILE__, 'create_block_theme_uninstalled' );
