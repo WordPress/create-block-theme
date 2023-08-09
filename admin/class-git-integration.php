@@ -22,7 +22,6 @@ class Git_Integration_Admin {
 	public function git_settings_page() {
 		// Add your settings page content here
 		$git_url_format = 'https://github.com/username/repository';
-		$page_title     = _x( 'Create Block Theme: Git Utilities', 'UI String', 'create-block-theme' );
 
 		if ( isset( $_POST['delete_git_config'] ) ) {
 			$this->delete_settings();
@@ -38,9 +37,9 @@ class Git_Integration_Admin {
 		?>
 
 		<div class="wrap">
-		<h2><?php echo __( 'Create Block Theme: Git Utilities.', 'create-block-theme' ); ?></h2>
-		<p style="max-width: 500px;">
-			<?php echo __( 'This plugin allows you to connect your WordPress themes with a Git repository, enabling you to pull and/or commit theme changes.', 'create-block-theme' ); ?>
+		<h2><?php echo __( 'Create Block Theme: Git Utilities', 'create-block-theme' ); ?></h2>
+		<p style="max-width: 400px;">
+			<?php echo __( 'Connect your WordPress site themes with a Git repository. You can pull and commit theme changes to the repository.', 'create-block-theme' ); ?>
 		</p>
 		<div class="theme-form">
 			<form action="" method="POST">
@@ -48,7 +47,7 @@ class Git_Integration_Admin {
 
 				<?php
 				if ( ! empty( $repository_url ) ) {
-					echo '<p><h3>' . __( 'Your WordPress site is connected to the git repository.', 'create-block-theme' ) . '✅</h3></p>';
+					echo '<p><h3>' . __( 'Your WordPress site is connected to the git repository.', 'create-block-theme' ) . ' ✅</h3></p>';
 					echo "<p style='display:grid;grid-template-columns:minmax(100px,120px) auto'>
                         <strong>" . __( 'Repository URL', 'create-block-theme' ) . ": </strong>
                         <span>$repository_url</span>
@@ -78,8 +77,8 @@ class Git_Integration_Admin {
 
 				if ( empty( $repository_url ) ) {
 					?>
-				<p style="max-width: 500px;">
-					<?php echo __( 'Following options are required if the repository is private or if you want to commit the theme changes to git repository.', 'create-block-theme' ); ?>
+				<p style="max-width: 400px;">
+					<?php echo __( 'Following options are required if the repository is private or to commit the theme changes to git repository.', 'create-block-theme' ); ?>
 				<br/>
 				</p>
 				<?php } ?>
