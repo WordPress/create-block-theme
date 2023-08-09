@@ -29,3 +29,6 @@ vendor/
 
 # plugin build folder
 build/
+
+# Ignore local override files
+.wp-env.override.json
