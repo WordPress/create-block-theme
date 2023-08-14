@@ -21,15 +21,25 @@ class React_App {
 		// Enable localization in the app.
 		wp_set_script_translations( 'create-block-theme-app', 'create-block-theme' );
 
-		// Set google fonts json file url.
-		wp_localize_script(
+		// Define the global variable that will be used to pass data from PHP to JS.
+		$script_content = <<<EOT
+		window.createBlockTheme = {
+			googleFontsDataUrl: '%s',
+			adminUrl: '%s',
+			themeUrl: '%s',
+		};
+		EOT;
+
+		// Pass the data to the JS.
+		wp_add_inline_script(
 			'create-block-theme-app',
-			'createBlockTheme',
-			array(
-				'googleFontsDataUrl' => plugins_url( 'assets/google-fonts/fallback-fonts-list.json', __DIR__ ),
-				'adminUrl'           => admin_url(),
-				'themeUrl'           => get_stylesheet_directory_uri(),
-			)
+			sprintf(
+				$script_content,
+				esc_url( plugins_url( 'assets/google-fonts/fallback-fonts-list.json', __DIR__ ) ),
+				esc_url( admin_url() ),
+				esc_url( get_template_directory_uri() )
+			),
+			'before'
 		);
 	}
 }
