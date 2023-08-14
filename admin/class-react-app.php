@@ -38,7 +38,8 @@ class React_App {
 				esc_url( plugins_url( 'assets/google-fonts/fallback-fonts-list.json', __DIR__ ) ),
 				esc_url( admin_url() ),
 				esc_url( get_template_directory_uri() )
-			)
+			),
+			'before'
 		);
 	}
 }
