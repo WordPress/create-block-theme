@@ -1,0 +1,57 @@
+.pageLayout {
+	padding: 1rem 2rem;
+	padding-bottom: 0;
+	height: calc(100% - 2rem);
+	display: flex;
+	flex-direction: column;
+}
+.pageHeader {
+	border-bottom: 1px solid #e2e2e2;
+	margin-bottom: 0.5rem;
+}
+.pageContainer {
+	flex-grow: 1;
+}
+.repoForm {
+	max-width: 400px;
+}
+.notice {
+	margin: 0;
+}
+.connectionDetails {
+	display: grid;
+	grid-template-columns: 140px auto;
+}
+
+.sectionHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.repoTable {
+	width: 100%;
+	margin-top: 0.5rem;
+	display: grid;
+	grid-template-columns: 60px 5fr 1.5fr 1.5fr 2fr 1.5fr;
+	border-left: 1px solid #c3c4c7;
+	border-top: 1px solid #c3c4c7;
+}
+.connectedRepoHeader {
+	background-color: #f6f7f7;
+	padding: 1rem;
+	border-right: 1px solid #c3c4c7;
+	border-bottom: 1px solid #c3c4c7;
+	color: #2c3338;
+	font-weight: 700;
+}
+.connectedRepoItem {
+	padding: 0.5rem 1rem;
+	border-right: 1px solid #c3c4c7;
+	border-bottom: 1px solid #c3c4c7;
+}
+.editLink {
+	cursor: pointer;
+}
+.editLink:hover {
+	text-decoration: underline;
+}
