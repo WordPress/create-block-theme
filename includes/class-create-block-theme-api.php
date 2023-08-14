@@ -1,5 +1,7 @@
 <?php
 
+require_once( __DIR__ . '/class-themes-git-api.php' );
+
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
  *
@@ -8,12 +10,14 @@
  * @author     WordPress.org
  */
 class Create_Block_Theme_API {
+	private $git_api;
 
 	/**
 	 * Initialize the class and set its properties.
 	 */
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		$this->git_api = new Themes_Git_API();
 	}
 
 	/**
@@ -92,6 +96,31 @@ class Create_Block_Theme_API {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'rest_get_readme_data' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+
+		// GIT Integration routes
+		register_rest_route(
+			'create-block-theme/v1',
+			'/settings',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this->git_api, 'get_settings' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'create-block-theme/v1',
+			'/update-git-connection',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this->git_api, 'update_git_repo' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},

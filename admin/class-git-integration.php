@@ -1,5 +1,6 @@
 <?php
 
+require_once( __DIR__ . '/class-react-app.php' );
 require_once( dirname( __DIR__ ) . '/includes/class-create-block-theme-settings.php' );
 
 class Git_Integration_Admin {
@@ -16,7 +17,17 @@ class Git_Integration_Admin {
 		}
 		$menu_title = _x( 'Create Block Theme: Git Utilities', 'UI String', 'create-block-theme' );
 		$page_title = $menu_title;
-		add_menu_page( $page_title, $menu_title, 'edit_theme_options', 'themes-git-integration', array( $this, 'git_settings_page' ) );
+		add_menu_page( $page_title, $menu_title, 'edit_theme_options', 'themes-git-integration', array( $this, 'git_settings_page_react' ) );
+	}
+
+	public function git_settings_page_react() {
+		React_App::bootstrap();
+
+		$nonce = wp_create_nonce( 'create_block_theme' );
+		?>
+		<input id="create-block-theme-app-nonce" type="hidden" value="<?php echo $nonce; ?>" />
+		<div id="create-block-theme-app"></div>
+		<?php
 	}
 
 	public function git_settings_page() {
