@@ -27,29 +27,35 @@ async function updateFiles() {
 	}
 
 	if ( newData.items ) {
-		const newDataString = JSON.stringify( newData, null, 2 );
-
-		const oldFileData = fs.readFileSync(
-			'./assets/google-fonts/fallback-fonts-list.json',
-			'utf8'
-		);
-		const oldData = JSON.parse( oldFileData );
-		const oldDataString = JSON.stringify( oldData, null, 2 );
-
-		if (
-			calculateHash( newDataString ) !== calculateHash( oldDataString )
-		) {
-			fs.writeFileSync(
+		try {
+			const newDataString = JSON.stringify( newData, null, 2 );
+			const oldFileData = fs.readFileSync(
 				'./assets/google-fonts/fallback-fonts-list.json',
-				newDataString
+				'utf8'
 			);
-			// TODO: show in UI and remove console statement
+			const oldData = JSON.parse( oldFileData );
+			const oldDataString = JSON.stringify( oldData, null, 2 );
+
+			if (
+				calculateHash( newDataString ) !==
+				calculateHash( oldDataString )
+			) {
+				fs.writeFileSync(
+					'./assets/google-fonts/fallback-fonts-list.json',
+					newDataString
+				);
+				// TODO: show in UI and remove console statement
+				// eslint-disable-next-line
+				console.info( '✅  Google Fonts JSON file updated' );
+			} else {
+				// TODO: show in UI and remove console statement
+				// eslint-disable-next-line
+				console.info( 'ℹ️  Google Fonts JSON file is up to date' );
+			}
+		} catch ( error ) {
 			// eslint-disable-next-line
-			console.info( '✅  Google Fonts JSON file updated' );
-		} else {
-			// TODO: show in UI and remove console statement
-			// eslint-disable-next-line
-			console.info( 'ℹ️  Google Fonts JSON file is up to date' );
+			console.error( '❎  Error stringifying the new JSON data:', error );
+			process.exit( 1 );
 		}
 	} else {
 		// TODO: show in UI and remove console statement
