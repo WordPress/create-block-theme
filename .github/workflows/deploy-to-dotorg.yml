@@ -15,7 +15,7 @@ on:
                     - patch
 jobs:
     update-google-fonts-json:
-        ## if: github.repository_owner == 'WordPress'
+        if: github.repository_owner == 'WordPress'
         # The type of runner that the job will run on
         runs-on: ubuntu-latest
 
