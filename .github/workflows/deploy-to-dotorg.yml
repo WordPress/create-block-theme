@@ -50,7 +50,7 @@ jobs:
                     git commit -m "Update Google Fonts file" --no-verify && \
                     git push && \
                     gh pr create -B trunk -H ${{ env.BRANCH_NAME }} --title "Update Google Fonts JSON data from API" --body "Created by Update Google Fonts JSON Github action" && \
-                    gh pr merge ${{ env.BRANCH_NAME }} \
+                    gh pr merge --squash ${{ env.BRANCH_NAME }} \
                   )
     tag:
         name: Checkout repo
