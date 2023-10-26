@@ -5,7 +5,6 @@ require_once( __DIR__ . '/manage-fonts/fonts-page.php' );
 require_once( __DIR__ . '/manage-fonts/google-fonts-page.php' );
 require_once( __DIR__ . '/manage-fonts/local-fonts-page.php' );
 require_once( __DIR__ . '/manage-fonts/font-form-messages.php' );
-
 class Manage_Fonts_Admin {
 
 	public function __construct() {
@@ -36,13 +35,21 @@ class Manage_Fonts_Admin {
 		$manage_fonts_menu_title = $manage_fonts_page_title;
 		add_theme_page( $manage_fonts_page_title, $manage_fonts_menu_title, 'edit_theme_options', 'manage-fonts', array( 'Fonts_Page', 'manage_fonts_admin_page' ) );
 
+		// Check if the admin page title is set, and if not, set one.
+		// This is needed to avoid a warning in the admin menu, due to the admin page title not being set in
+		// the add_submenu_page() function for the Google Fonts and Local Fonts pages.
+		global $title;
+		if ( ! isset( $title ) ) {
+			$title = $manage_fonts_page_title;
+		}
+
 		$google_fonts_page_title = _x( 'Embed Google font in the active theme', 'UI String', 'create-block-theme' );
 		$google_fonts_menu_title = $google_fonts_page_title;
-		add_submenu_page( null, $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', array( 'Google_Fonts', 'google_fonts_admin_page' ) );
+		add_submenu_page( '', $google_fonts_page_title, $google_fonts_menu_title, 'edit_theme_options', 'add-google-font-to-theme-json', array( 'Google_Fonts', 'google_fonts_admin_page' ) );
 
 		$local_fonts_page_title = _x( 'Embed local font in the active theme', 'UI String', 'create-block-theme' );
 		$local_fonts_menu_title = $local_fonts_page_title;
-		add_submenu_page( null, $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', array( 'Local_Fonts', 'local_fonts_admin_page' ) );
+		add_submenu_page( '', $local_fonts_page_title, $local_fonts_menu_title, 'edit_theme_options', 'add-local-font-to-theme-json', array( 'Local_Fonts', 'local_fonts_admin_page' ) );
 	}
 
 	function has_file_and_user_permissions() {
