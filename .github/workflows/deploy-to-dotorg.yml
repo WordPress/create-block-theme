@@ -14,6 +14,40 @@ on:
                     - minor
                     - patch
 jobs:
+    update-google-fonts-json:
+        if: github.repository_owner == 'WordPress'
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+
+        # Steps represent a sequence of tasks that will be executed as part of the job
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+
+            # Runs a single command using the runners shell
+            # This script fetchs the Goolgle Fonts API data and creates a PR if new data is available
+            - name: Update Google Fonts JSON file
+              env:
+                  GOOGLE_FONTS_API_KEY: ${{ secrets.GOOGLE_FONTS_API_KEY }}
+              run: |
+                  echo "Updating Google fonts JSON file"
+                  node ./update-google-fonts-json-file.js
+            - name: Commit Changes
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email 'github-actions[bot]@users.noreply.github.com'
+                  git config --global --add --bool push.autoSetupRemote true
+
+                  git diff-index --quiet HEAD -- || \
+                  ( git add assets/google-fonts/fallback-fonts-list.json && \
+                    git checkout trunk && \
+                    git commit -m "Automation: update Google Fonts data file" --no-verify && \
+                    git push
+                  )
     tag:
         name: Checkout repo
         runs-on: ubuntu-latest
