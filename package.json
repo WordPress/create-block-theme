@@ -56,7 +56,7 @@
 	},
 	"lint-staged": {
 		"*.{js,json,yml}": [
-			"wp-scripts format"
+			"npx wp-scripts format"
 		],
 		"*.js": [
 			"npm run lint:js"
@@ -68,7 +68,7 @@
 			"npm run lint:php"
 		],
 		"package.json": [
-			"wp-scripts lint-pkg-json"
+			"npx wp-scripts lint-pkg-json"
 		]
 	}
 }

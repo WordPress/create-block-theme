@@ -1,3 +1,16 @@
+h2 {
+	margin-bottom: 0;
+}
+
+.submit {
+	clear: both;
+}
+
+#col-left label,
+.theme-form label {
+	font-weight: 600;
+}
+
 /* Theme Tag Checkboxes */
 .theme-tags {
 	display: flex;
