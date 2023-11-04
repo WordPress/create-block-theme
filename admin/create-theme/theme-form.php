@@ -123,10 +123,12 @@ class Theme_Form {
 						<?php _e( 'Generate a boilerplate "empty" theme inside of this site\'s themes directory.', 'create-block-theme' ); ?>
 					</p>
 
-					<label>
-						<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="variation-description" />
-						<?php _e( 'Create a style variation', 'create-block-theme' ); ?>
-					</label>
+					<p>
+						<label>
+							<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="variation-description" />
+							<?php _e( 'Create a style variation', 'create-block-theme' ); ?>
+						</label>
+					</p>
 					<p id="variation-description" class="description">
 						<?php
 						printf(
@@ -165,7 +167,10 @@ class Theme_Form {
 							<label for="theme-description">
 								<?php _e( 'Theme Description', 'create-block-theme' ); ?>
 							</label>
-							<textarea id="theme-description" placeholder="<?php _e( 'A short description of the theme.', 'create-block-theme' ); ?>" rows="4" cols="50" name="theme[description]" class="large-text"></textarea>
+							<textarea id="theme-description" placeholder="<?php _e( 'Theme Description', 'create-block-theme' ); ?>" rows="4" cols="50" name="theme[description]" class="large-text" aria-describedby="theme-description-description"></textarea>
+						</p>
+						<p id="theme-description-description" class="description">
+							<?php _e( 'A short description of the theme.', 'create-block-theme' ); ?>
 						</p>
 
 						<p>
