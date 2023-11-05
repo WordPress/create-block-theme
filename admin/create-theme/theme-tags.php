@@ -50,60 +50,24 @@ class Theme_Tags {
 		</p>
 
 		<div class="theme-tags">
-
-		<?php $theme_tags = get_theme_feature_list(); // Generate a list of theme tags ?>
-
-		<?php if ( is_array( $theme_tags ) ) : ?>
-			<?php krsort( $theme_tags ); // Sort tags by relevance ?>
-			<?php foreach ( $theme_tags as $category => $tags ) : ?>
-				<?php if ( 'Features' !== $category ) : ?>
-			<fieldset id="<?php echo esc_attr( strtolower( $category ) ); ?>_tags">
-					<?php if ( 'Subject' === $category ) : ?>
-			<legend class="large-text"><?php echo esc_html( $category ); ?>&nbsp;<?php _e( '(max 3 tags)', 'create-block-theme' ); ?></legend>
-				<?php else : ?>
-			<legend class="large-text"><?php echo esc_html( $category ); ?></legend>
-				<?php endif; ?>
-
-					<?php foreach ( $tags as $tag => $pretty_tag ) : ?>
-						<?php self::tag_checkbox_input( $category, $tag, $pretty_tag ); ?>
-				<?php endforeach; ?>
-
-			</fieldset>
-			<?php endif; ?>
-				<?php if ( 'Features' === $category ) : ?>
-					<?php
-					// Split features array in half to display in two columns
-					$half         = ceil( count( $tags ) / 2 );
-					$features_one = array_slice( $tags, 0, $half );
-					$features_two = array_slice( $tags, $half );
-					?>
-
-			<fieldset id="features-tags-1">
-				<legend class="large-text"><?php echo esc_html( $category ); ?></legend>
-					<?php
-					foreach ( $features_one as $tag => $pretty_tag ) {
-						self::tag_checkbox_input( $category, $tag, $pretty_tag );
-					}
-					?>
-			</fieldset>
-
-			<fieldset id="features-tags-2">
-					<?php
-					foreach ( $features_two as $tag => $pretty_tag ) {
-						self::tag_checkbox_input( $category, $tag, $pretty_tag );
-					}
-					?>
-			</fieldset>
-
-			<?php endif; ?>
-		<?php endforeach; ?>
-		<?php endif; ?>
+			<?php
+			// Generate a list of theme tags
+			$theme_tags = get_theme_feature_list();
+			if ( is_array( $theme_tags ) ) {
+				// Sort tags by relevance
+				krsort( $theme_tags );
+				foreach ( $theme_tags as $category => $tags ) {
+					self::theme_tags_category( $category, $tags );
+				}
+			}
+			?>
 		</div>
 
-		<label>
+		<p>
+			<label for="theme-custom-tags"><?php _e( 'Custom Tags', 'create-block-theme' ); ?></label>
 			<?php // Regex for pattern attribute ensures only single words or words with hyphens are used, separated by commas ?>
-			<input placeholder="' . __( 'custom, tags, custom-tags', 'create-block-theme' ) . '" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z\-]+)*$" aria-describedby="custom-tags-description" />
-		</label>
+			<input id="theme-custom-tags" placeholder="<?php _e( 'custom, tags, custom-tags', 'create-block-theme' ); ?>" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z\-]+)*$" aria-describedby="custom-tags-description" />
+		</p>
 		<p id="custom-tags-description" class="description" >
 			<?php _e( 'Add custom tags (single or hyphenated words, separated by commas)', 'create-block-theme' ); ?>
 		</p>
@@ -114,11 +78,30 @@ class Theme_Tags {
 	}
 
 	/**
+	 * Output theme tags fieldset.
+	 */
+	protected static function theme_tags_category( $category, $tags ) {
+		?>
+		<fieldset id="<?php echo esc_attr( strtolower( $category ) ); ?>-tags">
+			<?php if ( 'Subject' === $category ) : ?>
+				<legend class="large-text"><?php echo esc_html( $category ); ?>&nbsp;<?php _e( '(max 3 tags)', 'create-block-theme' ); ?></legend>
+			<?php else : ?>
+				<legend class="large-text"><?php echo esc_html( $category ); ?></legend>
+			<?php endif; ?>
+
+			<?php foreach ( $tags as $tag => $pretty_tag ) : ?>
+				<?php self::tag_checkbox_input( $category, $tag, $pretty_tag ); ?>
+			<?php endforeach; ?>
+		</fieldset>
+		<?php
+	}
+
+	/**
 	 * Lists default tags.
 	 *
 	 * @return array
 	 */
-	public static function list_default_tags() {
+	protected static function list_default_tags() {
 		$default_tags = array( 'full-site-editing' );
 		return $default_tags;
 	}
@@ -129,7 +112,7 @@ class Theme_Tags {
 	 * @param string $tag
 	 * @return boolean
 	 */
-	public static function is_default_tag( $tag ) {
+	protected static function is_default_tag( $tag ) {
 		if ( ! is_string( $tag ) ) {
 			return null;
 		}
@@ -146,7 +129,7 @@ class Theme_Tags {
 	 * @param string $tag
 	 * @return boolean
 	 */
-	public static function is_active_theme_tag( $tag ) {
+	protected static function is_active_theme_tag( $tag ) {
 		if ( ! is_string( $tag ) ) {
 			return null;
 		}
@@ -167,7 +150,7 @@ class Theme_Tags {
 	 * @param string $pretty_tag
 	 * @return void
 	 */
-	public static function tag_checkbox_input( $category, $tag, $pretty_tag ) {
+	protected static function tag_checkbox_input( $category, $tag, $pretty_tag ) {
 		$class   = '';
 		$checked = '';
 
@@ -179,10 +162,10 @@ class Theme_Tags {
 			$checked = ' checked';
 		}
 		?>
-<p>
+<div class="theme-tag-form-control">
 	<input type="checkbox" id="theme-tag-<?php echo esc_attr( $tag ); ?>" name="theme[tags-<?php echo esc_attr( strtolower( $category ) ); ?>][]" value="<?php echo esc_attr( $tag ); ?>" class="<?php echo esc_attr( $class ); ?>" <?php echo esc_html( $checked ); ?>>
 	<label for="theme-tag-<?php echo esc_attr( $tag ); ?>"><?php echo esc_html( $pretty_tag ); ?></label>
-</p>
+</div>
 		<?php
 	}
 
