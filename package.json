@@ -1,6 +1,6 @@
 {
 	"name": "create-block-theme",
-	"version": "1.13.2",
+	"version": "1.13.3",
 	"private": true,
 	"description": "Create a block-based theme",
 	"author": "The WordPress Contributors",
@@ -56,7 +56,7 @@
 	},
 	"lint-staged": {
 		"*.{js,json,yml}": [
-			"npx wp-scripts format"
+			"wp-scripts format"
 		],
 		"*.js": [
 			"npm run lint:js"
@@ -68,7 +68,7 @@
 			"npm run lint:php"
 		],
 		"package.json": [
-			"npx wp-scripts lint-pkg-json"
+			"wp-scripts lint-pkg-json"
 		]
 	}
 }
