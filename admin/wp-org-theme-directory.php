@@ -28,7 +28,11 @@ class WP_Theme_Directory {
 	}
 
 	public static function get_theme_names() {
-		$html = wp_remote_get( self::THEME_NAMES_ENDPOINT );
+		$html = wp_safe_remote_get( self::THEME_NAMES_ENDPOINT );
+
+		if ( is_wp_error( $html ) ) {
+			return $html;
+		}
 
 		// parse the html response extracting all the a inside li elements
 		$pattern = '/<li><a href=".*?">(.*?)<\/a><\/li>/';
@@ -71,5 +75,3 @@ class WP_Theme_Directory {
 	}
 
 }
-
-
