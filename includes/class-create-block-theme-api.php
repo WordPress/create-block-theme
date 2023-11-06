@@ -339,8 +339,14 @@ class Create_Block_Theme_API {
 		$zip      = Theme_Zip::create_zip( $filename );
 
 		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
-		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
+
+		if ( is_child_theme() ) {
+			$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme_slug );
+			$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
+		} else {
+			$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
+			$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
+		}
 
 		$zip->close();
 
