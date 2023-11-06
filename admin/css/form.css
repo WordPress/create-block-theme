@@ -16,6 +16,10 @@ p.description {
 	font-weight: 600;
 }
 
+.theme-tag-form-control label {
+	font-weight: 400;
+}
+
 .theme-form label {
 	display: block;
 	margin-bottom: 0.25rem;
