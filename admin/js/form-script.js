@@ -202,7 +202,7 @@ function isThemeNameValid( themeName ) {
 	// Check if the theme name is available
 	const isNameAvailable = () => {
 		// default to empty array if the unavailable theme names are not loaded yet from the API
-		const notAvailableSlugs = wpOrgThemeDirectory.themeSlugs || [];
+		const notAvailableSlugs = window.wpOrgThemeDirectory.themeSlugs || [];
 
 		// Compare the theme name to the list of unavailable theme names using several different slug formats
 		return ! notAvailableSlugs.some(
