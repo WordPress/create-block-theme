@@ -2,7 +2,7 @@
 Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu, egregor
 Tags: themes, theme, block-theme
 Requires at least: 6.0
-Tested up to: 6.3
+Tested up to: 6.4
 Stable tag: 1.13.3
 Requires PHP: 7.4
 License: GPLv2 or later
