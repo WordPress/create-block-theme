@@ -262,7 +262,7 @@ class Theme_Form {
 							<?php Theme_Tags::theme_tags_section(); ?>
 						</div>
 					</div>
-					<input type="hidden" name="page" value="create-block-theme"
+					<input type="hidden" name="page" value="create-block-theme">
 					<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>">
 				</div>
 			</div>
