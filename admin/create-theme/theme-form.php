@@ -29,7 +29,7 @@ class Theme_Form {
 				<div class="col-wrap">
 					<p>
 						<label>
-							<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="export-description" />
+							<input checked value="export" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="export-description">
 							<?php
 								printf(
 									/* translators: %s: Theme Name. */
@@ -47,7 +47,7 @@ class Theme_Form {
 
 						<p>
 							<label>
-								<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="sibling-description" />
+								<input value="sibling" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="sibling-description">
 								<?php
 								printf(
 									/* translators: %s: Theme Name. */
@@ -65,7 +65,7 @@ class Theme_Form {
 
 						<p>
 							<label>
-								<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="child-description" />
+								<input value="child" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="child-description">
 								<?php
 								printf(
 									/* translators: %s: Theme Name. */
@@ -81,7 +81,7 @@ class Theme_Form {
 
 						<p>
 							<label>
-								<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="clone-description" />
+								<input value="clone" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="clone-description">
 								<?php
 									printf(
 										/* translators: %s: Theme Name. */
@@ -99,7 +99,7 @@ class Theme_Form {
 
 					<p>
 						<label>
-							<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="save-description" />
+							<input value="save" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="save-description">
 							<?php
 								printf(
 									/* translators: %s: Theme Name. */
@@ -115,7 +115,7 @@ class Theme_Form {
 
 					<p>
 						<label>
-							<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="blank-description" />
+							<input value="blank" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="blank-description">
 							<?php _e( 'Create blank theme', 'create-block-theme' ); ?>
 						</label>
 					</p>
@@ -125,7 +125,7 @@ class Theme_Form {
 
 					<p>
 						<label>
-							<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="variation-description" />
+							<input value="variation" type="radio" name="theme[type]" class="regular-text code" onchange="toggleForm( this );" aria-describedby="variation-description">
 							<?php _e( 'Create a style variation', 'create-block-theme' ); ?>
 						</label>
 					</p>
@@ -149,7 +149,7 @@ class Theme_Form {
 							<label for="variation-name">
 								<?php _e( 'Variation Name (*)', 'create-block-theme' ); ?>
 							</label>
-							<input id="variation-name" placeholder="<?php _e( 'Variation Name', 'create-block-theme' ); ?>" type="text" name="theme[variation]" class="large-text" />
+							<input id="variation-name" placeholder="<?php _e( 'Variation Name', 'create-block-theme' ); ?>" type="text" name="theme[variation]" class="large-text">
 						</p>
 					</div>
 
@@ -160,7 +160,7 @@ class Theme_Form {
 							<label for="theme-name">
 								<?php _e( 'Theme Name (*)', 'create-block-theme' ); ?>
 							</label>
-							<input id="theme-name" placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" id="theme-name" autocomplete="off" />
+							<input id="theme-name" placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" id="theme-name" autocomplete="off">
 						</p>
 
 						<p>
@@ -177,7 +177,7 @@ class Theme_Form {
 							<label for="theme-uri">
 								<?php _e( 'Theme URI', 'create-block-theme' ); ?>
 							</label>
-							<input id="theme-uri" placeholder="<?php echo esc_attr( 'https://github.com/wordpress/twentytwentythree/' ); ?>" type="text" name="theme[uri]" class="large-text code" aria-describedby="theme-uri-description" />
+							<input id="theme-uri" placeholder="<?php echo esc_attr( 'https://github.com/wordpress/twentytwentythree/' ); ?>" type="text" name="theme[uri]" class="large-text code" aria-describedby="theme-uri-description">
 						</p>
 						<p id="theme-uri-description" class="description">
 							<?php _e( 'The URL of a public web page where users can find more information about the theme.', 'create-block-theme' ); ?>
@@ -187,7 +187,7 @@ class Theme_Form {
 							<label for="theme-author">
 								<?php _e( 'Author', 'create-block-theme' ); ?>
 							</label>
-							<input id="theme-author" placeholder="<?php _e( 'the WordPress team', 'create-block-theme' ); ?>" type="text" name="theme[author]" class="large-text" aria-describedby="theme-author-description" />
+							<input id="theme-author" placeholder="<?php _e( 'the WordPress team', 'create-block-theme' ); ?>" type="text" name="theme[author]" class="large-text" aria-describedby="theme-author-description">
 						</p>
 						<p id="theme-author-description" class="description" >
 							<?php _e( 'The name of the individual or organization who developed the theme.', 'create-block-theme' ); ?>
@@ -197,7 +197,7 @@ class Theme_Form {
 							<label for="theme-author-uri">
 								<?php _e( 'Author URI', 'create-block-theme' ); ?>
 							</label>
-							<input id="theme-author-uri" placeholder="<?php echo esc_attr( 'https://wordpress.org/' ); ?>" type="text" name="theme[author_uri]" class="large-text code" aria-describedby="theme-author-uri-description"/>
+							<input id="theme-author-uri" placeholder="<?php echo esc_attr( 'https://wordpress.org/' ); ?>" type="text" name="theme[author_uri]" class="large-text code" aria-describedby="theme-author-uri-description">
 						</p>
 						<p id="theme-author-uri-description" class="description">
 							<?php _e( 'The URL of the authoring individual or organization.', 'create-block-theme' ); ?>
@@ -207,7 +207,7 @@ class Theme_Form {
 							<label for="screenshot">
 								<?php _e( 'Screenshot', 'create-block-theme' ); ?>
 							</label>
-							<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload" aria-describedby="screenshot-description" />
+							<input type="file" accept=".png"  name="screenshot" id="screenshot" class="upload" aria-describedby="screenshot-description">
 						</p>
 						<p id="screenshot-description" class="description">
 							<?php _e( 'Upload a new theme screenshot (2mb max | .png only | 1200x900 recommended)', 'create-block-theme' ); ?>
@@ -262,13 +262,13 @@ class Theme_Form {
 							<?php Theme_Tags::theme_tags_section(); ?>
 						</div>
 					</div>
-					<input type="hidden" name="page" value="create-block-theme" />
-					<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>" />
+					<input type="hidden" name="page" value="create-block-theme"
+					<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'create_block_theme' ); ?>">
 				</div>
 			</div>
 		</div>
 		<p class="submit">
-			<input type="submit" value="<?php _e( 'Generate', 'create-block-theme' ); ?>" class="button button-primary" />
+			<input type="submit" value="<?php _e( 'Generate', 'create-block-theme' ); ?>" class="button button-primary">
 		</p>
 	</form>
 </div>

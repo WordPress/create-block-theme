@@ -66,7 +66,7 @@ class Theme_Tags {
 		<p>
 			<label for="theme-custom-tags"><?php _e( 'Custom Tags', 'create-block-theme' ); ?></label>
 			<?php // Regex for pattern attribute ensures only single words or words with hyphens are used, separated by commas ?>
-			<input id="theme-custom-tags" placeholder="<?php _e( 'custom, tags, custom-tags', 'create-block-theme' ); ?>" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z\-]+)*$" aria-describedby="custom-tags-description" />
+			<input id="theme-custom-tags" placeholder="<?php _e( 'custom, tags, custom-tags', 'create-block-theme' ); ?>" type="text" name="theme[tags_custom]" class="large-text code" pattern="^[a-zA-Z\-]+(\s*,\s*[a-zA-Z\-]+)*$" aria-describedby="custom-tags-description">
 		</p>
 		<p id="custom-tags-description" class="description" >
 			<?php _e( 'Add custom tags (single or hyphenated words, separated by commas)', 'create-block-theme' ); ?>
