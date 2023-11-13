@@ -160,7 +160,7 @@ class Theme_Form {
 							<label for="theme-name">
 								<?php _e( 'Theme Name (*)', 'create-block-theme' ); ?>
 							</label>
-							<input id="theme-name" placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" id="theme-name" autocomplete="off">
+							<input id="theme-name" placeholder="<?php _e( 'Theme Name', 'create-block-theme' ); ?>" type="text" name="theme[name]" class="large-text" autocomplete="off">
 						</p>
 
 						<p>
