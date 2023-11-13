@@ -79,7 +79,13 @@ class Create_Block_Theme_Admin {
 	 * Export activated child theme
 	 */
 	function export_child_theme( $theme ) {
-		$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
+		if ( $theme['name'] ) {
+			// Used when CREATING a child theme
+			$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
+		} else {
+			// Used with EXPORTING a child theme
+			$theme['slug'] = wp_get_theme()->get( 'TextDomain' );
+		}
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
