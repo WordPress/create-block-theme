@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import UploadFontForm from './upload-font-form';
 import './local-fonts.css';
 import DemoTextInput from '../demo-text-input';
@@ -34,7 +34,7 @@ function LocalFonts() {
 		setAxes( newAxes );
 	};
 
-	const isFormValid = () => {
+	const isFormValid = useCallback( () => {
 		// Check if font name is present and is alphanumeric.
 		const alphanumericRegex = /^[a-z0-9 ]+$/i;
 
@@ -46,7 +46,7 @@ function LocalFonts() {
 		}
 
 		return formData.file && formData.weight && formData.style;
-	};
+	}, [ formData ] );
 
 	const demoStyle = () => {
 		if ( ! isFormValid() ) {
@@ -63,33 +63,32 @@ function LocalFonts() {
 		return style;
 	};
 
-	// load the local font in the browser to make the preview work
-	const onFormDataChange = async () => {
-		if ( ! isFormValid() ) {
-			return;
-		}
+	useEffect( () => {
+		// load the local font in the browser to make the preview work
+		const onFormDataChange = async () => {
+			if ( ! isFormValid() ) {
+				return;
+			}
 
-		const data = await formData.file.arrayBuffer();
-		const sanitizedFontFamily = addQuotesToName( formData.name );
-		const newFont = new FontFace( sanitizedFontFamily, data, {
-			style: formData.style,
-			weight: formData.weight,
-		} );
-		newFont
-			.load()
-			.then( function ( loadedFace ) {
+			const data = await formData.file.arrayBuffer();
+			const sanitizedFontFamily = addQuotesToName( formData.name );
+			const newFont = new FontFace( sanitizedFontFamily, data, {
+				style: formData.style,
+				weight: formData.weight,
+			} );
+
+			try {
+				const loadedFace = await newFont.load();
 				document.fonts.add( loadedFace );
-			} )
-			.catch( function ( error ) {
+			} catch ( error ) {
 				// TODO: show error in the UI
 				// eslint-disable-next-line
 				console.error( error );
-			} );
-	};
+			}
+		};
 
-	useEffect( () => {
 		onFormDataChange();
-	}, [ formData ] );
+	}, [ formData, isFormValid ] );
 
 	return (
 		<div className="layout">
