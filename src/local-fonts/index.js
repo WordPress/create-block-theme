@@ -53,7 +53,7 @@ function LocalFonts() {
 			return {};
 		}
 		const style = {
-			fontFamily: formData.name,
+			fontFamily: addQuotesToName( formData.name ),
 			fontWeight: formData.weight,
 			fontStyle: formData.style,
 		};
