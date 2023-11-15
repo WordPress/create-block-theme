@@ -35,9 +35,17 @@ function LocalFonts() {
 	};
 
 	const isFormValid = () => {
-		return (
-			formData.file && formData.name && formData.weight && formData.style
-		);
+		// Check if font name is present and is alphanumeric.
+		const alphanumericRegex = /^[a-z0-9 ]+$/i;
+
+		if (
+			! formData.name ||
+			( formData.name && ! alphanumericRegex.test( formData.name ) )
+		) {
+			return false;
+		}
+
+		return formData.file && formData.weight && formData.style;
 	};
 
 	const demoStyle = () => {
