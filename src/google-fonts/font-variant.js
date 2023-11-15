@@ -1,6 +1,6 @@
 import { useEffect } from '@wordpress/element';
 import Demo from '../demo-text-input/demo';
-import { localizeFontStyle } from '../utils';
+import { addQuotesToName, localizeFontStyle } from '../utils';
 
 function FontVariant( { font, variant, isSelected, handleToggle } ) {
 	const style = variant.includes( 'italic' ) ? 'italic' : 'normal';
@@ -17,21 +17,30 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 	};
 
 	useEffect( () => {
-		const newFont = new FontFace( font.family, `url( ${ variantUrl } )`, {
-			style,
-			weight,
-		} );
-		newFont
-			.load()
-			.then( function ( loadedFace ) {
+		const sanitizedFontFamily = addQuotesToName( font.family );
+
+		const newFont = new FontFace(
+			sanitizedFontFamily,
+			`url( ${ variantUrl } )`,
+			{
+				style,
+				weight,
+			}
+		);
+
+		const loadNewFont = async () => {
+			try {
+				const loadedFace = await newFont.load();
 				document.fonts.add( loadedFace );
-			} )
-			.catch( function ( error ) {
+			} catch ( error ) {
 				// TODO: show error in the UI
 				// eslint-disable-next-line
 				console.error( error );
-			} );
-	}, [ font, variant ] );
+			}
+		};
+
+		loadNewFont();
+	}, [ font, style, variant, variantUrl, weight ] );
 
 	const formattedFontFamily = font.family.toLowerCase().replace( ' ', '-' );
 	const fontId = `${ formattedFontFamily }-${ variant }`;
@@ -55,8 +64,10 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 				<label htmlFor={ fontId }>{ localizeFontStyle( style ) }</label>
 			</td>
 			<td className="demo-cell">
+				{ /* @TODO: associate label with control for accessibility */ }
+				{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
 				<label htmlFor={ fontId }>
-					<Demo style={ previewStyles } />
+					<Demo id={ fontId } style={ previewStyles } />
 				</label>
 			</td>
 		</tr>

@@ -76,3 +76,13 @@ export async function downloadFile( response ) {
 		}, 100 );
 	}
 }
+
+/*
+ * Add quotes to font name.
+ * @param {string} familyName The font family name.
+ * @return {string} The font family name with quotes.
+ */
+
+export function addQuotesToName( familyName ) {
+	return `'${ familyName }'`.trim();
+}

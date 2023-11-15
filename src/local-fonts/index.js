@@ -1,11 +1,12 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import UploadFontForm from './upload-font-form';
 import './local-fonts.css';
 import DemoTextInput from '../demo-text-input';
 import Demo from '../demo-text-input/demo';
 import { variableAxesToCss } from '../demo-text-input/utils';
 import BackButton from '../manage-fonts/back-button';
+import { addQuotesToName } from '../utils';
 
 const INITIAL_FORM_DATA = {
 	file: null,
@@ -33,18 +34,26 @@ function LocalFonts() {
 		setAxes( newAxes );
 	};
 
-	const isFormValid = () => {
-		return (
-			formData.file && formData.name && formData.weight && formData.style
-		);
-	};
+	const isFormValid = useCallback( () => {
+		// Check if font name is present and is alphanumeric.
+		const alphanumericRegex = /^[a-z0-9 ]+$/i;
+
+		if (
+			! formData.name ||
+			( formData.name && ! alphanumericRegex.test( formData.name ) )
+		) {
+			return false;
+		}
+
+		return formData.file && formData.weight && formData.style;
+	}, [ formData ] );
 
 	const demoStyle = () => {
 		if ( ! isFormValid() ) {
 			return {};
 		}
 		const style = {
-			fontFamily: formData.name,
+			fontFamily: addQuotesToName( formData.name ),
 			fontWeight: formData.weight,
 			fontStyle: formData.style,
 		};
@@ -54,32 +63,32 @@ function LocalFonts() {
 		return style;
 	};
 
-	// load the local font in the browser to make the preview work
-	const onFormDataChange = async () => {
-		if ( ! isFormValid() ) {
-			return;
-		}
+	useEffect( () => {
+		// load the local font in the browser to make the preview work
+		const onFormDataChange = async () => {
+			if ( ! isFormValid() ) {
+				return;
+			}
 
-		const data = await formData.file.arrayBuffer();
-		const newFont = new FontFace( formData.name, data, {
-			style: formData.style,
-			weight: formData.weight,
-		} );
-		newFont
-			.load()
-			.then( function ( loadedFace ) {
+			const data = await formData.file.arrayBuffer();
+			const sanitizedFontFamily = addQuotesToName( formData.name );
+			const newFont = new FontFace( sanitizedFontFamily, data, {
+				style: formData.style,
+				weight: formData.weight,
+			} );
+
+			try {
+				const loadedFace = await newFont.load();
 				document.fonts.add( loadedFace );
-			} )
-			.catch( function ( error ) {
+			} catch ( error ) {
 				// TODO: show error in the UI
 				// eslint-disable-next-line
 				console.error( error );
-			} );
-	};
+			}
+		};
 
-	useEffect( () => {
 		onFormDataChange();
-	}, [ formData ] );
+	}, [ formData, isFormValid ] );
 
 	return (
 		<div className="layout">
