@@ -64,8 +64,10 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 				<label htmlFor={ fontId }>{ localizeFontStyle( style ) }</label>
 			</td>
 			<td className="demo-cell">
+				{ /* @TODO: associate label with control for accessibility */ }
+				{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
 				<label htmlFor={ fontId }>
-					<Demo style={ previewStyles } />
+					<Demo id={ fontId } style={ previewStyles } />
 				</label>
 			</td>
 		</tr>
