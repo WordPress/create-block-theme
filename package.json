@@ -30,13 +30,14 @@
 		"@wordpress/browserslist-config": "^5.16.0",
 		"@wordpress/element": "^5.10.0",
 		"@wordpress/env": "^8.3.0",
-		"@wordpress/prettier-config": "^2.16.0",
-		"@wordpress/scripts": "^26.4.0",
+		"@wordpress/eslint-plugin": "^17.2.0",
+		"@wordpress/prettier-config": "^2.25.13",
+		"@wordpress/scripts": "^26.16.0",
 		"@wordpress/stylelint-config": "^21.16.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
 		"husky": "^8.0.3",
 		"lint-staged": "^13.2.2",
-		"prettier": "npm:wp-prettier@2.6.2",
+		"prettier": "npm:wp-prettier@3.0.3",
 		"simple-git": "^3.18.0"
 	},
 	"scripts": {
@@ -52,11 +53,12 @@
 		"start": "wp-scripts start src/index.js src/plugin-sidebar.js src/wp-org-theme-directory.js",
 		"update-version": "node update-version-and-changelog.js",
 		"prepare": "husky install",
-		"wp-env": "wp-env"
+		"wp-env": "wp-env",
+		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js"
 	},
 	"lint-staged": {
 		"*.{js,json,yml}": [
-			"npx wp-scripts format"
+			"wp-scripts format"
 		],
 		"*.js": [
 			"npm run lint:js"
@@ -68,7 +70,7 @@
 			"npm run lint:php"
 		],
 		"package.json": [
-			"npx wp-scripts lint-pkg-json"
+			"wp-scripts lint-pkg-json"
 		]
 	}
 }
