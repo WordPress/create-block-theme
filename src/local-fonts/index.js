@@ -6,6 +6,7 @@ import DemoTextInput from '../demo-text-input';
 import Demo from '../demo-text-input/demo';
 import { variableAxesToCss } from '../demo-text-input/utils';
 import BackButton from '../manage-fonts/back-button';
+import { addQuotesToName } from '../utils';
 
 const INITIAL_FORM_DATA = {
 	file: null,
@@ -61,7 +62,8 @@ function LocalFonts() {
 		}
 
 		const data = await formData.file.arrayBuffer();
-		const newFont = new FontFace( formData.name, data, {
+		const sanitizedFontFamily = addQuotesToName( formData.name );
+		const newFont = new FontFace( sanitizedFontFamily, data, {
 			style: formData.style,
 			weight: formData.weight,
 		} );

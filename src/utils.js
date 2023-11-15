@@ -76,3 +76,13 @@ export async function downloadFile( response ) {
 		}, 100 );
 	}
 }
+
+/*
+ * Add quotes to fon name if it ends with a number.
+ * @param {string} familyName The font family name.
+ * @return {string} The font family name with quotes if it ends with a number.
+ */
+
+export function addQuotesToName( familyName ) {
+	return familyName.match( /\d$/ ) ? `'${ familyName }'` : familyName;
+}

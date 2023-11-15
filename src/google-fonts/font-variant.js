@@ -1,6 +1,6 @@
 import { useEffect } from '@wordpress/element';
 import Demo from '../demo-text-input/demo';
-import { localizeFontStyle } from '../utils';
+import { addQuotesToName, localizeFontStyle } from '../utils';
 
 function FontVariant( { font, variant, isSelected, handleToggle } ) {
 	const style = variant.includes( 'italic' ) ? 'italic' : 'normal';
@@ -17,10 +17,7 @@ function FontVariant( { font, variant, isSelected, handleToggle } ) {
 	};
 
 	useEffect( () => {
-		// If font.family ends in number, add quotes
-		const sanitizedFontFamily = font.family.match( /\d$/ )
-			? `'${ font.family }'`
-			: font.family;
+		const sanitizedFontFamily = addQuotesToName( font.family );
 
 		const newFont = new FontFace(
 			sanitizedFontFamily,
