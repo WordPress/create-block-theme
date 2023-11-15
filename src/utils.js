@@ -78,20 +78,11 @@ export async function downloadFile( response ) {
 }
 
 /*
- * Trim a string.
- * @param {string} str The string to trim.
- * @return {string} The trimmed string.
- */
-export function trim( str ) {
-	str.trim();
-}
-
-/*
- * Add quotes to fon name if it ends with a number.
+ * Add quotes to font name.
  * @param {string} familyName The font family name.
- * @return {string} The font family name with quotes if it ends with a number.
+ * @return {string} The font family name with quotes.
  */
 
 export function addQuotesToName( familyName ) {
-	return trim( familyName.match( /\d$/ ) ? `'${ familyName }'` : familyName );
+	return `'${ familyName }'`.trim();
 }
