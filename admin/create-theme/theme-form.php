@@ -276,10 +276,12 @@ class Theme_Form {
 	}
 
 	public static function form_script() {
-		wp_enqueue_script( 'form-script', plugin_dir_url( dirname( __FILE__ ) ) . 'js/form-script.js' );
-		wp_enqueue_style( 'form-style', plugin_dir_url( dirname( __FILE__ ) ) . 'css/form.css' );
+		if ( ! empty( $_GET['page'] ) && 'create-block-theme' === $_GET['page'] ) {
+			wp_enqueue_script( 'form-script', plugin_dir_url( dirname( __FILE__ ) ) . 'js/form-script.js' );
+			wp_enqueue_style( 'form-style', plugin_dir_url( dirname( __FILE__ ) ) . 'css/form.css' );
 
-		// Enable localization in the form.
-		wp_set_script_translations( 'form-script', 'create-block-theme' );
+			// Enable localization in the form.
+			wp_set_script_translations( 'form-script', 'create-block-theme' );
+		}
 	}
 }
