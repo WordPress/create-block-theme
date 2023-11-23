@@ -1,12 +1,12 @@
-h2 {
+.appearance_page_create-block-theme h2 {
 	margin-bottom: 0;
 }
 
-p.description {
+.appearance_page_create-block-theme p.description {
 	margin-bottom: 1rem;
 }
 
-.submit {
+.appearance_page_create-block-theme .submit {
 	clear: both;
 }
 
