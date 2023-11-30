@@ -4,6 +4,8 @@ Welcome to Create Block Theme - a WordPress plugin to create block themes from w
 
 It works alongside features that are already available in the Site Editor to enhance the workflow for creating block themes. After being tested in this plugin, some of the features included here may be moved into the Site Editor itself.
 
+*Disclaimer:* Create Block Theme enables development features and thus is a tool that should be treated like as such; you can think of it as a Development Mode for WordPress, and you should keep in mind that changes made through this plugin could change your site and/or theme permanently.
+
 This plugin allows you to:
 
 - Export your existing theme with all customizations made in the Site Editor
