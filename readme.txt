@@ -1,5 +1,5 @@
 === Create Block Theme ===
-Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu, egregor, vcanales, jeffikus
+Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu, egregor, vcanales, jeffikus, cwhitmore
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.4
@@ -68,10 +68,16 @@ If you are having problems, please try the following:
 
 
 = 1.13.5 =
-
+* Make form files more specific to form page
+* Set page titles that set only within CBT
 
 = 1.13.4 =
-
+* Bump "tested up to" to 6.4
+* Update Google Fonts JSON data from API
+* Update theme form markup and styles
+* Fix/child export
+* Corrects malformed input tag
+* Add quotes to font family names
 
 = 1.13.3 =
 
@@ -84,13 +90,13 @@ If you are having problems, please try the following:
 
 = 1.13.2 =
 * Update Google Fonts JSON data from API
-* Set the initial version to 1.0.0 insted of 0.0.1
+* Set the initial version to 1.0.0 instead of 0.0.1
 * Fix: react render warning
-* Update Google Fonts JSON data from API
-* Update Google Fonts JSON data from API
+* Introduce basic wp-env environment
 
 = 1.13.1 =
-
+* Add default value for recommended plugins section
+* Update Google Fonts JSON data from API
 
 = 1.13.0 =
 * # Conflicts:
