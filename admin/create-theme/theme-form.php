@@ -276,7 +276,7 @@ class Theme_Form {
 	}
 
 	public static function form_script() {
-		if ( ! empty( $_GET['page'] ) && 'create-block-theme' === $_GET['page'] ) {
+		if ( ! empty( $_GET['page'] ) && 'manage-fonts' === $_GET['page'] ) {
 			wp_enqueue_script( 'form-script', plugin_dir_url( dirname( __FILE__ ) ) . 'js/form-script.js' );
 			wp_enqueue_style( 'form-style', plugin_dir_url( dirname( __FILE__ ) ) . 'css/form.css' );
 
