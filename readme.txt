@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.0
 Tested up to: 6.4
-Stable tag: 1.13.7
+Stable tag: 1.13.8
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,9 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 1.13.8 =
+
 
 = 1.13.7 =
 
