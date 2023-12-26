@@ -210,9 +210,12 @@ export const UpdateThemePanel = () => {
 						</>
 					}
 					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-					placeholder={ __( `Plugin Name
+					placeholder={ __(
+						`Plugin Name
 https://wordpress.org/plugins/plugin-name/
-Plugin Description`, 'create-block-theme' ) }
+Plugin Description`,
+						'create-block-theme'
+					) }
 					value={ theme.recommended_plugins }
 					onChange={ ( value ) =>
 						setTheme( { ...theme, recommended_plugins: value } )
