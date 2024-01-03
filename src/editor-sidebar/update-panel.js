@@ -200,7 +200,8 @@ export const UpdateThemePanel = () => {
 					help={
 						<>
 							{ __(
-								'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository.'
+								'List the recommended plugins for this theme. e.g. contact forms, social media. Plugins must be from the WordPress.org plugin repository.',
+								'create-block-theme'
 							) }
 							<br />
 							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#6-plugins">
@@ -209,9 +210,12 @@ export const UpdateThemePanel = () => {
 						</>
 					}
 					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-					placeholder={ __( `Plugin Name
+					placeholder={ __(
+						`Plugin Name
 https://wordpress.org/plugins/plugin-name/
-Plugin Description` ) }
+Plugin Description`,
+						'create-block-theme'
+					) }
 					value={ theme.recommended_plugins }
 					onChange={ ( value ) =>
 						setTheme( { ...theme, recommended_plugins: value } )

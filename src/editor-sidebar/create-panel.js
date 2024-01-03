@@ -72,7 +72,8 @@ export const CreateThemePanel = () => {
 					error.message && error.code !== 'unknown_error'
 						? error.message
 						: __(
-								'An error occurred while attempting to export the theme.'
+								'An error occurred while attempting to export the theme.',
+								'create-block-theme'
 						  );
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			}
