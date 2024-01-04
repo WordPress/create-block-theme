@@ -6,6 +6,7 @@ if ( class_exists( 'ZipArchive' ) ) {
 	class CbtZipArchive extends ZipArchive {
 
 		private string $theme_slug;
+		private string $theme_folder;
 
 		function __construct( $theme_slug ) {
 			// If the original theme is in a subfolder the theme slug will be the last part of the path
