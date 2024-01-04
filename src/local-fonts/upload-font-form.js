@@ -152,7 +152,7 @@ function UploadFontForm( {
 						name="font-name"
 						id="font-name"
 						placeholder={ __( 'Font name', 'create-block-theme' ) }
-						value={ formData.name }
+						value={ formData.name || '' }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, name: val } )
 						}
@@ -164,7 +164,7 @@ function UploadFontForm( {
 						label={ __( 'Font style:', 'create-block-theme' ) }
 						name="font-style"
 						id="font-style"
-						value={ formData.style }
+						value={ formData.style || 'normal' }
 						onChange={ ( val ) =>
 							setFormData( { ...formData, style: val } )
 						}
@@ -207,7 +207,11 @@ function UploadFontForm( {
 				<input
 					type="hidden"
 					name="font-credits"
-					value={ JSON.stringify( formData.fontCredits ) }
+					value={
+						formData.fontCredits
+							? JSON.stringify( formData.fontCredits )
+							: ''
+					}
 				/>
 			</form>
 
