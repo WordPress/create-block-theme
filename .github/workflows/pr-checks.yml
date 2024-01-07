@@ -33,3 +33,11 @@ jobs:
             - name: Run CSS Lint
               if: success() || failure()
               run: npm run lint:css
+
+            - name: Run Markdown Lint
+              if: success() || failure()
+              run: npm run lint:md-docs
+
+            - name: Run package.json Lint
+              if: success() || failure()
+              run: npm run lint:pkg-json

@@ -49,6 +49,8 @@
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:php": "composer run-script lint",
 		"lint:php:fix": "composer run-script format",
+		"lint:md-docs": "wp-scripts lint-md-docs",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start src/index.js src/plugin-sidebar.js src/wp-org-theme-directory.js",
 		"update-version": "node update-version-and-changelog.js",
@@ -69,8 +71,11 @@
 		"*.php": [
 			"npm run lint:php"
 		],
+		"*.md": [
+			"npm run lint:md-docs"
+		],
 		"package.json": [
-			"wp-scripts lint-pkg-json"
+			"npm run lint:pkg-json"
 		]
 	}
 }
