@@ -27,15 +27,15 @@ We recommend following the [Gutenberg code contribution guide](https://github.co
 
 [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the Create Block Theme repository, [clone it to your computer](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) and add the WordPress repository as [upstream](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/configuring-a-remote-repository-for-a-fork)
 
-```
-$ git clone https://github.com/YOUR_GITHUB_USERNAME/create-block-theme.git
-$ cd create-block-theme
-$ git remote add upstream https://github.com/WordPress/create-block-theme.git
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/create-block-theme.git
+cd create-block-theme
+git remote add upstream https://github.com/WordPress/create-block-theme.git
 ```
 
 Run the following commands to install the plugin dependencies:
 
-```
+```bash
 npm install
 composer install
 ```

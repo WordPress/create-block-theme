@@ -14,6 +14,7 @@ This plugin allows you to:
 -   Embed local font assets in your theme
 
 Learn more about Create Block Theme:
+
 - [How to use the plugin](#how-to-use-the-plugin)
 - [How to contribute](#how-to-contribute)
 - [User FAQs](https://wordpress.org/plugins/create-block-theme/)
