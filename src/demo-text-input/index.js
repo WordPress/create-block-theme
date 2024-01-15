@@ -82,7 +82,7 @@ function DemoTextInput( { axes, setAxes, resetAxes } ) {
 						onClick={ () => {
 							resetDefaults( 'sentence' );
 							handleDemoTypeChange( 'sentence' );
-							resetAxes();
+							resetAxes?.();
 						} }
 					>
 						{ __( 'Reset', 'create-block-theme' ) }
