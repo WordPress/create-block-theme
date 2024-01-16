@@ -5,7 +5,8 @@ on:
         branches:
             - trunk
 jobs:
-    Lint:
+    lint:
+        name: Lint
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -42,7 +43,8 @@ jobs:
               if: success() || failure()
               run: npm run lint:pkg-json
 
-    Unit-test-js:
+    unit-test-js:
+        name: JavaScript Unit Test
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
