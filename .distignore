@@ -1,11 +1,13 @@
 # Files to be ignored in the plugin release
 
 node_modules/
+vendor/
 .gitignore
 update-google-fonts-json-file.js
 update-version-and-changelog.js
 package.json
 src/
+test/
 .git
 .github
 .wordpress-org
@@ -20,6 +22,7 @@ src/
 .prettierrc.js
 .stylelintignore
 .stylelintrc.json
+.wp-env.json
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 README.md
