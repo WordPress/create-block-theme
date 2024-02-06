@@ -5,7 +5,8 @@ on:
         branches:
             - trunk
 jobs:
-    Lint:
+    lint:
+        name: Lint
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -41,3 +42,25 @@ jobs:
             - name: Run package.json Lint
               if: success() || failure()
               run: npm run lint:pkg-json
+
+    unit-test-js:
+        name: JavaScript Unit Test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install Dependencies
+              run: npm i
+
+            - name: Compile JavaScript App
+              run: npm run build
+
+            - name: Run JavaScript unit tests
+              run: npm run test:unit
