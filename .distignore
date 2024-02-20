@@ -23,7 +23,6 @@ test/
 .stylelintignore
 .stylelintrc.json
 .wp-env.json
-CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 README.md
 babel.config.js
