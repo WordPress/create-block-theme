@@ -45,7 +45,7 @@ jobs:
               if: success() || failure()
               run: npm run lint:pkg-json
 
-    unit-test-js:
+    tests:
         name: JavaScript Unit Test
         runs-on: ubuntu-latest
         steps:
@@ -58,31 +58,26 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Install Dependencies
+            - name: Install Composer
+              uses: php-actions/composer@v6
+              with:
+                  args: --ignore-platform-reqs
+
+            - name: Install Node Dependencies
               run: npm i
 
             - name: Compile JavaScript App
               run: npm run build
-
-            - name: Run JavaScript unit tests
-              run: npm run test:unit
-
-    integration-test-php:
-        name: PHP Integration Test
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v3
-            - name: Install dependencies
-              uses: php-actions/composer@v6
-              with:
-                  args: --ignore-platform-reqs
 
             - name: Setup MySQL
               if: success() || failure()
               uses: shogo82148/actions-setup-mysql@v1
               with:
                   mysql-version: '8.0'
+
+            - name: Run JavaScript unit tests
+              run: npm run test:unit
+
             - name: Run tests
               run: |
                   mysql -uroot -h127.0.0.1 -e 'SELECT version()' \
