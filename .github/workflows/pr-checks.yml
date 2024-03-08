@@ -46,7 +46,7 @@ jobs:
               run: npm run lint:pkg-json
 
     tests:
-        name: JavaScript Unit Test
+        name: Test Suite
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -78,8 +78,8 @@ jobs:
             - name: Run JavaScript unit tests
               run: npm run test:unit
 
-            - name: Run tests
+            - name: Run PHP tests
               run: |
                   mysql -uroot -h127.0.0.1 -e 'SELECT version()' \
                   && ./bin/install-wp-tests.sh --recreate-db wordpress_test root '' > /dev/null \
-                  && npm run test:php
+                  && composer run-script test
