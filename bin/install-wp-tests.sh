@@ -1,3 +1,4 @@
+# Forked from https://github.com/wp-cli/scaffold-command/blob/main/features/install-wp-tests.feature
 # Function to display usage instructions
 display_usage() {
     echo "Usage: $0 [options] <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"
