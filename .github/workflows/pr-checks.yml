@@ -18,8 +18,10 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Setup Composer
+            - name: Install dependencies
               uses: php-actions/composer@v6
+              with:
+                  args: --ignore-platform-reqs
 
             - name: Install Dependencies
               run: npm i
@@ -43,8 +45,8 @@ jobs:
               if: success() || failure()
               run: npm run lint:pkg-json
 
-    unit-test-js:
-        name: JavaScript Unit Test
+    tests:
+        name: Test Suite
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -56,11 +58,28 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Install Dependencies
+            - name: Install Composer
+              uses: php-actions/composer@v6
+              with:
+                  args: --ignore-platform-reqs
+
+            - name: Install Node Dependencies
               run: npm i
 
             - name: Compile JavaScript App
               run: npm run build
 
+            - name: Setup MySQL
+              if: success() || failure()
+              uses: shogo82148/actions-setup-mysql@v1
+              with:
+                  mysql-version: '8.0'
+
             - name: Run JavaScript unit tests
               run: npm run test:unit
+
+            - name: Run PHP tests
+              run: |
+                  mysql -uroot -h127.0.0.1 -e 'SELECT version()' \
+                  && ./bin/install-wp-tests.sh --recreate-db wordpress_test root '' > /dev/null \
+                  && composer run-script test

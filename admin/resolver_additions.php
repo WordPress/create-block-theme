@@ -21,16 +21,17 @@ function augment_resolver_with_utilities() {
 		 * 'variation' will include just the user custom styles and settings.
 		 */
 		public static function export_theme_data( $content, $extra_theme_data = null ) {
+			$current_theme = wp_get_theme();
 			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
 				$theme = new WP_Theme_JSON_Gutenberg();
 			} else {
 				$theme = new WP_Theme_JSON();
 			}
 
-			if ( 'all' === $content && wp_get_theme()->parent() ) {
+			if ( 'all' === $content && $current_theme->parent() ) {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
-				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme_json_data = static::translate( $parent_theme_json_data, $current_theme->parent()->get( 'TextDomain' ) );
 
 				// Get the schema from the parent JSON.
 				$schema = $parent_theme_json_data['$schema'];
