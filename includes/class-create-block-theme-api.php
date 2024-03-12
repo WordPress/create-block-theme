@@ -389,6 +389,9 @@ class Create_Block_Theme_API {
 	 * Save the user changes to the theme and clear user changes.
 	 */
 	function rest_save_theme( $request ) {
+
+		Theme_Fonts::persist_font_settings();
+
 		if ( is_child_theme() ) {
 			Theme_Templates::add_templates_to_local( 'current' );
 			Theme_Json::add_theme_json_to_local( 'current' );
@@ -471,6 +474,7 @@ class Create_Block_Theme_API {
 	);
 
 	function is_valid_screenshot( $file ) {
+		return 0;
 		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
 		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES, true ) && $file['size'] < 2097152 ) {
 			return 1;
