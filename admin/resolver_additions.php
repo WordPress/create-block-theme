@@ -97,6 +97,27 @@ function augment_resolver_with_utilities() {
 
 		}
 
+		public static function get_theme_file_contents() {
+			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+			return $theme_json_data;
+		}
+
+		public static function write_theme_file_contents( $theme_json_data ) {
+			$theme_json = wp_json_encode( $theme_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			file_put_contents( static::get_file_path_from_theme( 'theme.json' ), $theme_json );
+
+			//TODO: Clearing the cache should clear this too.
+			static::$theme_json_file_cache = array();
+		}
+
+		public static function write_user_settings( $user_settings ) {
+			$global_styles_id = static::get_user_global_styles_post_id();
+			$request          = new WP_REST_Request( 'POST', '/wp/v2/global-styles/' . $global_styles_id );
+			$request->set_param( 'settings', $user_settings );
+			rest_do_request( $request );
+			static::clean_cached_data();
+		}
+
 	}
 }
 
