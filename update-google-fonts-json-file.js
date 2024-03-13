@@ -1,7 +1,8 @@
 const fs = require( 'fs' );
 const crypto = require( 'crypto' );
 
-const API_URL = 'https://www.googleapis.com/webfonts/v1/webfonts?key=';
+const API_URL =
+	'https://www.googleapis.com/webfonts/v1/webfonts?capability=WOFF2&key=';
 const API_KEY = process.env.GOOGLE_FONTS_API_KEY;
 
 function calculateHash( somestring ) {
