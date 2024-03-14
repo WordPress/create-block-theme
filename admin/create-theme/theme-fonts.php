@@ -104,7 +104,7 @@ class Theme_Fonts {
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					$font_filename = basename( $font_face['src'] );
 					if ( file_exists( $theme_font_asset_location . $font_filename ) ) {
-						$response = unlink( $theme_font_asset_location . $font_filename );
+						unlink( $theme_font_asset_location . $font_filename );
 					}
 				}
 			}
@@ -120,6 +120,17 @@ class Theme_Fonts {
 			)
 		);
 		MY_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+
+		// Remove user preferences for theme font activation
+		unset( $user_settings['typography']['fontFamilies']['theme'] );
+		if ( empty( $user_settings['typography']['fontFamilies'] ) ) {
+			unset( $user_settings['typography']['fontFamilies'] );
+		}
+		if ( empty( $user_settings['typography'] ) ) {
+			unset( $user_settings['typography'] );
+		}
+
+		MY_Theme_JSON_Resolver::write_user_settings( $user_settings );
 	}
 
 }

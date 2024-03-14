@@ -36,7 +36,7 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$user_data_before  = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
 		$theme_data_before = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
 
-		Theme_Fonts::copy_activated_fonts_to_theme();
+		$this->save_theme();
 
 		$user_data_after  = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
 		$theme_data_after = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
@@ -59,11 +59,6 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 	}
 
-	private function uninstall_theme( $theme_slug ) {
-		MY_Theme_JSON_Resolver::write_user_settings( array() );
-		delete_theme( $theme_slug );
-	}
-
 	public function test_remove_deactivated_fonts_from_theme() {
 		wp_set_current_user( self::$admin_id );
 
@@ -76,7 +71,7 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$merged_data_before       = MY_Theme_JSON_Resolver::get_merged_data()->get_settings();
 		$theme_file_exists_before = file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' );
 
-		Theme_Fonts::remove_deactivated_fonts_from_theme();
+		$this->save_theme();
 
 		$user_data_after         = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
 		$theme_data_after        = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
@@ -94,7 +89,7 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		// ensure that the font was removed from the user settings and removed from the theme settings and therefore missing in merged settings
 		$this->assertCount( 1, $theme_data_after['typography']['fontFamilies']['theme'] );
 		$this->assertnotequals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
-		$this->assertCount( 1, $user_data_after['typography']['fontFamilies']['theme'] );
+		$this->assertarraynothaskey( 'typography', $user_data_after );
 		$this->assertnotequals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
 		$this->assertCount( 1, $merged_data_after['typography']['fontFamilies']['theme'] );
 		$this->assertnotequals( 'open-sans', $merged_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
@@ -104,6 +99,14 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertFalse( $theme_file_exists_after );
 
 		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	private function save_theme() {
+		Theme_Fonts::persist_font_settings();
+		// Theme_Templates::add_templates_to_local( 'all' );
+		// Theme_Json::add_theme_json_to_local( 'all' );
+		// Theme_Styles::clear_user_styles_customizations();
+		// Theme_Templates::clear_user_templates_customizations();
 	}
 
 	private function create_blank_theme() {
@@ -126,6 +129,11 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		MY_Theme_JSON_Resolver::clean_cached_data();
 
 		return $test_theme_slug;
+	}
+
+	private function uninstall_theme( $theme_slug ) {
+		MY_Theme_JSON_Resolver::write_user_settings( array() );
+		delete_theme( $theme_slug );
 	}
 
 	private function activate_user_font() {
