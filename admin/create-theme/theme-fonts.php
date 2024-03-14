@@ -79,6 +79,47 @@ class Theme_Fonts {
 
 	public static function remove_deactivated_fonts_from_theme() {
 
+		$user_settings = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$theme_json    = MY_Theme_JSON_Resolver::get_theme_file_contents();
+
+		// If there are no deactivated theme fonts, bounce out
+		if ( ! isset( $user_settings['typography']['fontFamilies']['theme'] ) ) {
+			return;
+		}
+
+		$font_families_to_not_remove = $user_settings['typography']['fontFamilies']['theme'];
+
+		// Remove font assets from theme
+		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
+		$font_families_to_remove   = array_values(
+			array_filter(
+				$theme_json['settings']['typography']['fontFamilies'],
+				function( $theme_font_family ) use ( $font_families_to_not_remove ) {
+					return ! in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
+				}
+			)
+		);
+		foreach ( $font_families_to_remove as $font_family ) {
+			if ( isset( $font_family['fontFace'] ) ) {
+				foreach ( $font_family['fontFace'] as $font_face ) {
+					$font_filename = basename( $font_face['src'] );
+					if ( file_exists( $theme_font_asset_location . $font_filename ) ) {
+						$response = unlink( $theme_font_asset_location . $font_filename );
+					}
+				}
+			}
+		}
+
+		// Remove user fonts from theme
+		$theme_json['settings']['typography']['fontFamilies'] = array_values(
+			array_filter(
+				$theme_json['settings']['typography']['fontFamilies'],
+				function( $theme_font_family ) use ( $font_families_to_not_remove ) {
+					return in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
+				}
+			)
+		);
+		MY_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
 	}
 
 }
