@@ -55,18 +55,16 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertEquals( 'file:./assets/fonts/open-sans-normal-400.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'] );
 		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' ) );
 
-		$this->remove_test_theme( $test_theme_slug );
-	}
-
-	private function remove_test_theme( $theme_slug ) {
-		//TODO: Activate the default theme
-		//Delete the test theme
+		delete_theme( $test_theme_slug );
 	}
 
 	private function create_blank_theme() {
 
-		$test_theme_slug = 'create-block-theme-test-blank-theme-' . rand();
-		$request         = new WP_REST_Request( 'POST', '/create-block-theme/v1/create-blank' );
+		$test_theme_slug = 'cbttesttheme';
+
+		delete_theme( $test_theme_slug );
+
+		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/create-blank' );
 		$request->set_param( 'name', $test_theme_slug );
 		$request->set_param( 'description', '' );
 		$request->set_param( 'uri', '' );
@@ -74,6 +72,7 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$request->set_param( 'author_uri', '' );
 		$request->set_param( 'tags_custom', '' );
 		$request->set_param( 'subfolder', '' );
+
 		rest_do_request( $request );
 
 		return $test_theme_slug;
@@ -86,6 +85,9 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$font_test_source      = __DIR__ . '/data/fonts/OpenSans-Regular.ttf';
 		$font_test_destination = $font_dir['path'] . '/open-sans-normal-400.ttf';
 
+		if ( ! file_exists( $font_dir['path'] ) ) {
+			mkdir( $font_dir['path'] );
+		}
 		copy( $font_test_source, $font_test_destination );
 
 		$settings = array();
