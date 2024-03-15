@@ -1,3 +1,4 @@
+import { useState } from '@wordpress/element';
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
 import { __, _x } from '@wordpress/i18n';
@@ -24,6 +25,7 @@ import {
 	Icon,
 	FlexItem,
 	PanelBody,
+	Modal,
 } from '@wordpress/components';
 
 import { UpdateThemePanel } from './editor-sidebar/update-panel';
@@ -36,8 +38,12 @@ import {
 	chevronRight,
 	archive,
 } from '@wordpress/icons';
+import CodeMirror from '@uiw/react-codemirror';
+import { json } from '@codemirror/lang-json';
 
 const CreateBlockThemePlugin = () => {
+	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
+	const [ themeData, setThemeData ] = useState( '' );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const handleSaveClick = () => {
@@ -97,6 +103,58 @@ const CreateBlockThemePlugin = () => {
 
 		exportTheme();
 	};
+
+	const toggleThemeJsonEditor = async () => {
+		const fetchOptions = {
+			path: '/create-block-theme/v1/get-theme-data',
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		};
+
+		try {
+			const response = await apiFetch( fetchOptions );
+			const data = JSON.stringify( response, null, 2 );
+			const themeJson = JSON.stringify(
+				JSON.parse( data )?.data,
+				null,
+				2
+			);
+			setThemeData( themeJson );
+		} catch ( e ) {
+			// @todo: handle error
+			setThemeData( '' );
+		}
+
+		setIsEditorOpen( ! isEditorOpen );
+	};
+
+	const Editor = ( { isOpen = true, value, onChange } ) => {
+		if ( ! isOpen ) {
+			return null;
+		}
+
+		return (
+			<Modal
+				title={
+					<>
+						<Icon icon={ 'info' } />{ ' ' }
+						{ __( 'Info', 'create-block-theme' ) }
+					</>
+				}
+				onRequestClose={ toggleThemeJsonEditor }
+			>
+				<CodeMirror
+					extensions={ [ json() ] }
+					value={ value }
+					onChange={ onChange }
+					width="65vw"
+				/>
+			</Modal>
+		);
+	};
+
 	return (
 		<>
 			<PluginSidebarMoreMenuItem
@@ -200,7 +258,19 @@ const CreateBlockThemePlugin = () => {
 						<CreateThemePanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
+				<Button
+					icon={ edit }
+					onClick={ toggleThemeJsonEditor }
+					isSecondary
+				>
+					{ __( 'Edit Theme JSON', 'create-block-theme' ) }
+				</Button>
 			</PluginSidebar>
+			<Editor
+				isOpen={ isEditorOpen }
+				value={ themeData }
+				onChange={ ( value ) => setThemeData( value ) }
+			/>
 		</>
 	);
 };
