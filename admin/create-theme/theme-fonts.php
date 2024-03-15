@@ -8,8 +8,8 @@ class Theme_Fonts {
 	 * Remove any DEACTIVATED fronts from the THEME configuration.
 	 */
 	public static function persist_font_settings() {
-		Theme_Fonts::copy_activated_fonts_to_theme();
-		Theme_Fonts::remove_deactivated_fonts_from_theme();
+		static::remove_deactivated_fonts_from_theme();
+		static::copy_activated_fonts_to_theme();
 	}
 
 	public static function copy_activated_fonts_to_theme() {
