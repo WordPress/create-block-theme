@@ -95,7 +95,6 @@ function augment_resolver_with_utilities() {
 			$data['$schema'] = $schema;
 			$theme_json      = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 			return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
-
 		}
 
 		public static function get_theme_file_contents() {
@@ -128,7 +127,6 @@ function augment_resolver_with_utilities() {
 			// Does this clear the Gutenberg equivalent?
 			static::$theme_json_file_cache = array();
 		}
-
 	}
 }
 
