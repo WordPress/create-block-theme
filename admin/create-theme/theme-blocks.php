@@ -97,88 +97,35 @@ class Theme_Blocks {
 			return $html;
 		}
 
-		// If the WP_HTML_Tag_Processor class exists, use it to parse the HTML.
-		// This API was recently in Gutenberg and not yet available in WordPress core. https://github.com/WordPress/gutenberg/pull/42485
-		// If it's not available, fallb ack to DOMDocument which can not be installed in all the systems and has some issues.
-		// When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove the DOMDocument fallback.
-		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			$html = new WP_HTML_Tag_Processor( $html );
-			while ( $html->next_tag( 'img' ) ) {
-				if ( Theme_Utils::is_absolute_url( $html->get_attribute( 'src' ) ) ) {
-					$html->set_attribute( 'src', Theme_Media::make_relative_media_url( $html->get_attribute( 'src' ) ) );
-				}
+		$html = new WP_HTML_Tag_Processor( $html );
+		while ( $html->next_tag( 'img' ) ) {
+			if ( Theme_Utils::is_absolute_url( $html->get_attribute( 'src' ) ) ) {
+				$html->set_attribute( 'src', Theme_Media::make_relative_media_url( $html->get_attribute( 'src' ) ) );
 			}
-			$html = new WP_HTML_Tag_Processor( $html->__toString() );
-			while ( $html->next_tag( 'video' ) ) {
-				if ( Theme_Utils::is_absolute_url( $html->get_attribute( 'src' ) ) ) {
-					$html->set_attribute( 'src', Theme_Media::make_relative_media_url( $html->get_attribute( 'src' ) ) );
-				}
-				if ( Theme_Utils::is_absolute_url( $html->get_attribute( 'poster' ) ) ) {
-					$html->set_attribute( 'poster', Theme_Media::make_relative_media_url( $html->get_attribute( 'poster' ) ) );
-				}
+		}
+		$html = new WP_HTML_Tag_Processor( $html->__toString() );
+		while ( $html->next_tag( 'video' ) ) {
+			if ( Theme_Utils::is_absolute_url( $html->get_attribute( 'src' ) ) ) {
+				$html->set_attribute( 'src', Theme_Media::make_relative_media_url( $html->get_attribute( 'src' ) ) );
 			}
-			$html = new WP_HTML_Tag_Processor( $html->__toString() );
-			while ( $html->next_tag( 'div' ) ) {
-				$style = $html->get_attribute( 'style' );
-				if ( $style ) {
-					preg_match_all( '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match );
-					$urls = $match[0];
-					foreach ( $urls as $url ) {
-						if ( Theme_Utils::is_absolute_url( $url ) ) {
-							$html->set_attribute( 'style', str_replace( $url, Theme_Media::make_relative_media_url( $url ), $style ) );
-						}
+			if ( Theme_Utils::is_absolute_url( $html->get_attribute( 'poster' ) ) ) {
+				$html->set_attribute( 'poster', Theme_Media::make_relative_media_url( $html->get_attribute( 'poster' ) ) );
+			}
+		}
+		$html = new WP_HTML_Tag_Processor( $html->__toString() );
+		while ( $html->next_tag( 'div' ) ) {
+			$style = $html->get_attribute( 'style' );
+			if ( $style ) {
+				preg_match_all( '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match );
+				$urls = $match[0];
+				foreach ( $urls as $url ) {
+					if ( Theme_Utils::is_absolute_url( $url ) ) {
+						$html->set_attribute( 'style', str_replace( $url, Theme_Media::make_relative_media_url( $url ), $style ) );
 					}
 				}
 			}
-			return $html->__toString();
 		}
-
-		// Fallback to DOMDocument.
-		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
-		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			$doc = new DOMDocument();
-			// TODO: do not silence errors, show in UI
-			// @codingStandardsIgnoreLine
-			@$doc->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-			// replace all images that have absolute urls
-			$img_tags = $doc->getElementsByTagName( 'img' );
-			foreach ( $img_tags as $tag ) {
-				$image_url = $tag->getAttribute( 'src' );
-				if ( Theme_Utils::is_absolute_url( $image_url ) ) {
-					$img_src = $tag->getAttribute( 'src' );
-					$html    = str_replace( $img_src, Theme_Media::make_relative_media_url( $img_src ), $html );
-				}
-			}
-			// replace all video that have absolute urls
-			$video_tags = $doc->getElementsByTagName( 'video' );
-			foreach ( $video_tags as $tag ) {
-				$video_url = $tag->getAttribute( 'src' );
-				if ( ! empty( $video_url ) && Theme_Utils::is_absolute_url( $video_url ) ) {
-					$video_src = $tag->getAttribute( 'src' );
-					$html      = str_replace( $video_src, Theme_Media::make_relative_media_url( $video_src ), $html );
-				}
-				$poster_url = $tag->getAttribute( 'poster' );
-				if ( ! empty( $poster_url ) && Theme_Utils::is_absolute_url( $poster_url ) ) {
-					$html = str_replace( $poster_url, Theme_Media::make_relative_media_url( $poster_url ), $html );
-				}
-			}
-			// also replace background images with absolute urls (used in cover blocks)
-			$div_tags = $doc->getElementsByTagName( 'div' );
-			foreach ( $div_tags as $tag ) {
-				$style = $tag->getAttribute( 'style' );
-				if ( $style ) {
-					preg_match_all( '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match );
-					$urls = $match[0];
-					foreach ( $urls as $url ) {
-						if ( Theme_Utils::is_absolute_url( $url ) ) {
-							$html = str_replace( $url, Theme_Media::make_relative_media_url( $url ), $html );
-						}
-					}
-				}
-			}
-			return $html;
-		}
-
+		return $html->__toString();
 	}
 
 	static function clean_serialized_markup( $markup ) {

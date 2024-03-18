@@ -26,34 +26,14 @@ class Theme_Patterns {
 			return $html;
 		}
 
-		// Use WP_HTML_Tag_Processor if available
-		// see: https://github.com/WordPress/gutenberg/pull/42485
-		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			$html = new WP_HTML_Tag_Processor( $html );
-			while ( $html->next_tag( 'img' ) ) {
-				$alt_attribute = $html->get_attribute( 'alt' );
-				if ( ! empty( $alt_attribute ) ) {
-					$html->set_attribute( 'alt', self::escape_text_for_pattern( $alt_attribute ) );
-				}
+		$html = new WP_HTML_Tag_Processor( $html );
+		while ( $html->next_tag( 'img' ) ) {
+			$alt_attribute = $html->get_attribute( 'alt' );
+			if ( ! empty( $alt_attribute ) ) {
+				$html->set_attribute( 'alt', self::escape_text_for_pattern( $alt_attribute ) );
 			}
-			return $html->__toString();
 		}
-
-		// Fallback to regex
-		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
-		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			preg_match( '@alt="([^"]+)"@', $html, $match );
-			if ( isset( $match[0] ) ) {
-				$alt_attribute = $match[0];
-				$alt_value     = $match[1];
-				$html          = str_replace(
-					$alt_attribute,
-					'alt="' . self::escape_text_for_pattern( $alt_value ) . '"',
-					$html
-				);
-			}
-			return $html;
-		}
+		return $html->__toString();
 	}
 
 	static function escape_text_for_pattern( $text ) {
