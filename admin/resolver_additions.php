@@ -64,6 +64,7 @@ function augment_resolver_with_utilities() {
 				$theme->merge( $theme_theme );
 			}
 
+			// Merge the User Data
 			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
 				$theme->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
 			} else {
@@ -118,7 +119,13 @@ function augment_resolver_with_utilities() {
 
 		public static function clean_cached_data() {
 			parent::clean_cached_data();
+
+			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+				WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			}
+
 			//TODO: Clearing the cache should clear this too.
+			// Does this clear the Gutenberg equivalent?
 			static::$theme_json_file_cache = array();
 		}
 
