@@ -190,7 +190,7 @@ class Create_Block_Theme_API {
 		);
 
 		// Add / replace screenshot.
-		if ( $this->is_valid_screenshot( $screenshot ) ) {
+		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'

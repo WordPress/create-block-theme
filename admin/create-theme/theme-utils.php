@@ -249,4 +249,16 @@ class Theme_Utils {
 		}
 	}
 
+	public static function is_valid_screenshot( $file ) {
+
+		$allowed_screenshot_types = array(
+			'png' => 'image/png',
+		);
+		$filetype                 = wp_check_filetype( $file['name'], $allowed_screenshot_types );
+		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], $allowed_screenshot_types, true ) && $file['size'] < 2097152 ) {
+			return 1;
+		}
+		return 0;
+	}
+
 }
