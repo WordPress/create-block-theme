@@ -118,7 +118,7 @@ class Theme_Utils {
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
-			$template = Theme_Blocks::make_template_images_local( $template );
+			$template = Theme_Media::make_template_images_local( $template );
 			$template = Theme_Templates::replace_template_namespace( $template, $new_slug );
 
 			// If there are images in the template, add it as a pattern
@@ -143,7 +143,7 @@ class Theme_Utils {
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
-			$template_part = Theme_Blocks::make_template_images_local( $template_part );
+			$template_part = Theme_Media::make_template_images_local( $template_part );
 			$template_part = Theme_Templates::replace_template_namespace( $template_part, $new_slug );
 
 			// If there are images in the template, add it as a pattern

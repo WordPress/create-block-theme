@@ -4,7 +4,6 @@ require_once __DIR__ . '/resolver_additions.php';
 require_once __DIR__ . '/create-theme/theme-tags.php';
 require_once __DIR__ . '/create-theme/theme-zip.php';
 require_once __DIR__ . '/create-theme/theme-media.php';
-require_once __DIR__ . '/create-theme/theme-blocks.php';
 require_once __DIR__ . '/create-theme/theme-patterns.php';
 require_once __DIR__ . '/create-theme/theme-templates.php';
 require_once __DIR__ . '/create-theme/theme-styles.php';

@@ -3,6 +3,7 @@
 require_once( __DIR__ . '/theme-utils.php' );
 
 class Theme_Media {
+
 	public static function get_media_folder_path_from_url( $url ) {
 		$extension        = strtolower( pathinfo( $url, PATHINFO_EXTENSION ) );
 		$folder_path      = '';
@@ -18,105 +19,55 @@ class Theme_Media {
 		return $folder_path;
 	}
 
-	public static function get_media_absolute_urls_from_blocks( $flatten_blocks ) {
+	/**
+	 * Get the absolute URLs of all media files for a template
+	 */
+	public static function get_media_absolute_urls_from_template( $template ) {
+
+		$template_blocks = parse_blocks( $template->content );
+		$blocks          = _flatten_blocks( $template_blocks );
+
 		$media = array();
 
-		// If WP_HTML_Tag_Processor is available, use it to get the absolute URLs of img and background images
-		// This class is available in core yet, but it will be available in the future (6.2)
-		// see https://github.com/WordPress/gutenberg/pull/42485
-		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			foreach ( $flatten_blocks as $block ) {
-				// Gets the absolute URLs of img in these blocks
-				if ( 'core/image' === $block['blockName'] ||
-					'core/video' === $block['blockName'] ||
-					'core/cover' === $block['blockName'] ||
-					'core/media-text' === $block['blockName']
-				) {
-					$html = new WP_HTML_Tag_Processor( $block['innerHTML'] );
-					while ( $html->next_tag( 'img' ) ) {
-						$url = $html->get_attribute( 'src' );
-						if ( Theme_Utils::is_absolute_url( $url ) ) {
-							$media[] = $url;
-						}
-					}
-					$html = new WP_HTML_Tag_Processor( $html->__toString() );
-					while ( $html->next_tag( 'video' ) ) {
-						$url = $html->get_attribute( 'src' );
-						if ( Theme_Utils::is_absolute_url( $url ) ) {
-							$media[] = $url;
-						}
-						$poster_url = $html->get_attribute( 'poster' );
-						if ( Theme_Utils::is_absolute_url( $poster_url ) ) {
-							$media[] = $poster_url;
-						}
+		foreach ( $blocks as $block ) {
+			// Gets the absolute URLs of img in these blocks
+			if ( 'core/image' === $block['blockName'] ||
+				'core/video' === $block['blockName'] ||
+				'core/cover' === $block['blockName'] ||
+				'core/media-text' === $block['blockName']
+			) {
+				$html = new WP_HTML_Tag_Processor( $block['innerHTML'] );
+				while ( $html->next_tag( 'img' ) ) {
+					$url = $html->get_attribute( 'src' );
+					if ( Theme_Utils::is_absolute_url( $url ) ) {
+						$media[] = $url;
 					}
 				}
-
-				// Gets the absolute URLs of background images in these blocks
-				if ( 'core/cover' === $block['blockName'] ) {
-					$html = new WP_HTML_Tag_Processor( $block['innerHTML'] );
-					while ( $html->next_tag( 'div' ) ) {
-						$style = $html->get_attribute( 'style' );
-						if ( $style ) {
-							$matches = array();
-							preg_match( '/background-image: url\((.*)\)/', $style, $matches );
-							if ( isset( $matches[1] ) ) {
-								$url = $matches[1];
-								if ( Theme_Utils::is_absolute_url( $url ) ) {
-									$media[] = $url;
-								}
-							}
-						}
+				$html = new WP_HTML_Tag_Processor( $html->__toString() );
+				while ( $html->next_tag( 'video' ) ) {
+					$url = $html->get_attribute( 'src' );
+					if ( Theme_Utils::is_absolute_url( $url ) ) {
+						$media[] = $url;
+					}
+					$poster_url = $html->get_attribute( 'poster' );
+					if ( Theme_Utils::is_absolute_url( $poster_url ) ) {
+						$media[] = $poster_url;
 					}
 				}
 			}
-		}
 
-		// Fallback to DOMDocument.
-		// TODO: When WP_HTML_Tag_Processor is availabe in core (6.2) we can remove this implementation entirely.
-		if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-			foreach ( $flatten_blocks as $block ) {
-				if ( 'core/image' === $block['blockName'] ||
-						'core/video' === $block['blockName'] ||
-						'core/cover' === $block['blockName'] ||
-						'core/media-text' === $block['blockName']
-					) {
-					$doc = new DOMDocument();
-					// TODO: do not silence errors, show in UI
-					// @codingStandardsIgnoreLine
-					@$doc->loadHTML( $block['innerHTML'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-
-					// Get the media urls from img tags
-					$tags = $doc->getElementsByTagName( 'img' );
-					foreach ( $tags as $tag ) {
-						$image_url = $tag->getAttribute( 'src' );
-						if ( Theme_Utils::is_absolute_url( $image_url ) ) {
-							$media[] = $tag->getAttribute( 'src' );
-						}
-					}
-					// Get the media urls from video tags
-					$tags = $doc->getElementsByTagName( 'video' );
-					foreach ( $tags as $tag ) {
-						$video_url = $tag->getAttribute( 'src' );
-						if ( Theme_Utils::is_absolute_url( $video_url ) ) {
-							$media[] = $tag->getAttribute( 'src' );
-						}
-						$poster_url = $tag->getAttribute( 'poster' );
-						if ( Theme_Utils::is_absolute_url( $poster_url ) ) {
-							$media[] = $tag->getAttribute( 'poster' );
-						}
-					}
-					// Get the media urls from div style tags (used in cover blocks)
-					$div_tags = $doc->getElementsByTagName( 'div' );
-					foreach ( $div_tags as $tag ) {
-						$style = $tag->getAttribute( 'style' );
-						if ( $style ) {
-							preg_match_all( '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $style, $match );
-							$urls = $match[0];
-							foreach ( $urls as $url ) {
-								if ( Theme_Utils::is_absolute_url( $url ) ) {
-									$media[] = $url;
-								}
+			// Gets the absolute URLs of background images in these blocks
+			if ( 'core/cover' === $block['blockName'] ) {
+				$html = new WP_HTML_Tag_Processor( $block['innerHTML'] );
+				while ( $html->next_tag( 'div' ) ) {
+					$style = $html->get_attribute( 'style' );
+					if ( $style ) {
+						$matches = array();
+						preg_match( '/background-image: url\((.*)\)/', $style, $matches );
+						if ( isset( $matches[1] ) ) {
+							$url = $matches[1];
+							if ( Theme_Utils::is_absolute_url( $url ) ) {
+								$media[] = $url;
 							}
 						}
 					}
@@ -127,6 +78,12 @@ class Theme_Media {
 		return $media;
 	}
 
+	/**
+	 * Create a relative URL based on the absolute URL of a media file
+	 *
+	 * @param string $absolute_url
+	 * @return string $relative_url
+	 */
 	public static function make_relative_media_url( $absolute_url ) {
 		if ( ! empty( $absolute_url ) && Theme_Utils::is_absolute_url( $absolute_url ) ) {
 			$folder_path = self::get_media_folder_path_from_url( $absolute_url );
@@ -135,9 +92,33 @@ class Theme_Media {
 		return $absolute_url;
 	}
 
+	/**
+	 * Add media files to the local theme
+	 */
 	public static function add_media_to_local( $media ) {
+
+		//TODO: Hack to allow http localhost (a common environment...)
+		function turn_off_reject_unsafe_urls( $args ) {
+			$args['reject_unsafe_urls'] = false;
+			$args['sslverify']          = false;
+			return $args;
+		}
+		add_filter( 'http_request_args', 'turn_off_reject_unsafe_urls' );
+
 		foreach ( $media as $url ) {
+
 			$download_file = download_url( $url );
+
+			if ( is_wp_error( $download_file ) ) {
+				//we're going to try again with a new URL
+				//see, we might be running this in a docker container
+				//and if that's the case let's try again on port 80
+				$parsed_url = parse_url( $url );
+				if ( $parsed_url['host'] == 'localhost' && $parsed_url['port'] !== '80' ) {
+					$download_file = download_url( str_replace( 'localhost:' . $parsed_url['port'], 'localhost:80', $url ) );
+				}
+			}
+
 			// TODO: implement a warning if the file is missing
 			if ( ! is_wp_error( $download_file ) ) {
 				$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
@@ -147,5 +128,22 @@ class Theme_Media {
 				rename( $download_file, $media_path . basename( $url ) );
 			}
 		}
+	}
+
+
+	/**
+	 * Replace the absolute URLs of media in a template with relative URLs
+	 */
+	public static function make_template_images_local( $template ) {
+
+		$template->media = self::get_media_absolute_urls_from_template( $template );
+
+		// Replace the absolute URLs with relative URLs in the templates
+		foreach ( $template->media as $media_url ) {
+			$local_media_url   = Theme_Media::make_relative_media_url( $media_url );
+			$template->content = str_replace( $media_url, $local_media_url, $template->content );
+		}
+
+		return $template;
 	}
 }

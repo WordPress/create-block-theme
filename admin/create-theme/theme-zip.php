@@ -1,7 +1,6 @@
 <?php
 
 require_once( __DIR__ . '/theme-media.php' );
-require_once( __DIR__ . '/theme-blocks.php' );
 require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 require_once( __DIR__ . '/cbt-zip-archive.php' );
@@ -108,7 +107,7 @@ class Theme_Zip {
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
-			$template_data = Theme_Blocks::make_template_images_local( $template );
+			$template_data = Theme_Media::make_template_images_local( $template );
 			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
@@ -138,7 +137,7 @@ class Theme_Zip {
 		}
 
 		foreach ( $theme_templates->parts as $template_part ) {
-			$template_data = Theme_Blocks::make_template_images_local( $template_part );
+			$template_data = Theme_Media::make_template_images_local( $template_part );
 			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
 			// If there are images in the template, add it as a pattern
