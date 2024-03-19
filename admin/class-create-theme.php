@@ -14,7 +14,7 @@ require_once __DIR__ . '/create-theme/theme-readme.php';
 require_once __DIR__ . '/create-theme/theme-form.php';
 require_once __DIR__ . '/create-theme/form-messages.php';
 require_once __DIR__ . '/create-theme/theme-fonts.php';
-
+require_once __DIR__ . '/create-theme/theme-create.php';
 /**
  * The admin-specific functionality of the plugin.
  *

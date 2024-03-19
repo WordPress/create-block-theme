@@ -202,4 +202,51 @@ class Theme_Utils {
 		return $readme_file_details;
 	}
 
+
+	/**
+	 * Relocate the theme to a new folder and activate the newly relocated theme.
+	 */
+	public static function relocate_theme( $new_theme_subfolder ) {
+
+		$current_theme_subfolder = '';
+		$theme_dir               = get_stylesheet();
+
+		$source      = get_theme_root() . DIRECTORY_SEPARATOR . $theme_dir;
+		$destination = get_theme_root() . DIRECTORY_SEPARATOR . $theme_dir;
+
+		if ( str_contains( get_stylesheet(), '/' ) ) {
+			$current_theme_subfolder = substr( get_stylesheet(), 0, strrpos( get_stylesheet(), '/' ) );
+			$theme_dir               = substr( get_stylesheet(), strrpos( get_stylesheet(), '/' ) + 1 );
+			$source                  = get_theme_root() . DIRECTORY_SEPARATOR . $current_theme_subfolder . DIRECTORY_SEPARATOR . $theme_dir;
+			$destination             = get_theme_root() . DIRECTORY_SEPARATOR . $theme_dir;
+		}
+
+		if ( $new_theme_subfolder ) {
+			$destination = get_theme_root() . DIRECTORY_SEPARATOR . $new_theme_subfolder . DIRECTORY_SEPARATOR . $theme_dir;
+			wp_mkdir_p( get_theme_root() . DIRECTORY_SEPARATOR . $new_theme_subfolder );
+		}
+
+		if ( $source === $destination ) {
+			return;
+		}
+
+		global $wp_filesystem;
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		$success = move_dir( $source, $destination, false );
+
+		if ( ! $success ) {
+			return new \WP_Error( 'problem_moving', __( 'There was a problem moving the theme', 'create-block-theme' ) );
+		}
+
+		if ( $new_theme_subfolder ) {
+			switch_theme( $new_theme_subfolder . '/' . $theme_dir );
+		} else {
+			switch_theme( $theme_dir );
+		}
+	}
+
 }
