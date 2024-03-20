@@ -157,7 +157,7 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		// Add new metadata
-		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
@@ -226,7 +226,7 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		// Add new metadata
-		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
@@ -288,7 +288,7 @@ class Create_Block_Theme_Admin {
 		// Add style.css.
 		$zip->addFromStringToTheme(
 			'style.css',
-			Theme_Styles::build_child_style_css( $theme )
+			Theme_Styles::build_style_css( $theme )
 		);
 
 		// Add / replace screenshot.
@@ -361,7 +361,7 @@ class Create_Block_Theme_Admin {
 			);
 
 			// Add new metadata.
-			$css_contents = Theme_Styles::build_child_style_css( $theme );
+			$css_contents = Theme_Styles::build_style_css( $theme );
 
 			// Add style.css.
 			file_put_contents(

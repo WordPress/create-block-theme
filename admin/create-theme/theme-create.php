@@ -23,8 +23,7 @@ class Theme_Create {
 
 		// Copy theme files.
 		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
-		Theme_Utils::add_templates_to_folder( $new_theme_path, 'all', $theme['slug'] );
-
+		Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'] );
 		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 
 		if ( $theme['subfolder'] ) {
@@ -53,7 +52,7 @@ class Theme_Create {
 		);
 
 		// Add new metadata.
-		$css_contents = Theme_Styles::build_child_style_css( $theme );
+		$css_contents = Theme_Styles::build_style_css( $theme );
 
 		// Add style.css.
 		file_put_contents(

@@ -144,12 +144,16 @@ class Theme_Templates {
 		return $template;
 	}
 
-	public static function prepare_template_for_export( $template ) {
+	public static function prepare_template_for_export( $template, $slug = null ) {
 
 		$template = Theme_Media::make_template_images_local( $template );
 		$template = self::escape_text_in_template( $template );
 		$template = self::eliminate_environment_specific_content( $template );
 		$template = self::paternize_template( $template );
+
+		if ( $slug ) {
+			$template = self::replace_template_namespace( $template, $slug );
+		}
 
 		return $template;
 	}
@@ -160,34 +164,41 @@ class Theme_Templates {
 	 * If patterns need to be created for media or localizations they will also be added.
 	 *
 	 * @param string $export_type The type of export to perform. 'all', 'current', or 'user'.
+	 * @param string $path The path to the theme folder. If null it is assumed to be the current theme.
+	 * @param string $slug The slug of the theme. If null it is assumed to be the current theme.
 	 */
-	public static function add_templates_to_local( $export_type ) {
+	public static function add_templates_to_local( $export_type, $path = null, $slug = null ) {
 
 		$theme_templates  = self::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
 
+		$base_dir          = $path ? $path : get_stylesheet_directory();
+		$template_dir      = $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'];
+		$template_part_dir = $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'];
+		$patterns_dir      = $base_dir . DIRECTORY_SEPARATOR . 'patterns';
+
 		// If there is no templates folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] );
+		if ( ! is_dir( $template_dir ) ) {
+			wp_mkdir_p( $template_dir );
 		}
 
 		// If there is no parts folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] );
+		if ( ! is_dir( $template_part_dir ) ) {
+			wp_mkdir_p( $template_part_dir );
 		}
 
 		// If there is no patterns folder, create it.
-		if ( ! is_dir( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' ) ) {
-			wp_mkdir_p( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' );
+		if ( ! is_dir( $patterns_dir ) ) {
+			wp_mkdir_p( $patterns_dir );
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = self::prepare_template_for_export( $template );
+			$template = self::prepare_template_for_export( $template, $slug );
 
 			// Write the template content
 			file_put_contents(
-				get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				$template_dir . DIRECTORY_SEPARATOR . $template->slug . '.html',
 				$template->content
 			);
 
@@ -199,7 +210,7 @@ class Theme_Templates {
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
 				file_put_contents(
-					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template->slug . '.php',
+					$patterns_dir . DIRECTORY_SEPARATOR . $template->slug . '.php',
 					$template->pattern
 				);
 			}
@@ -207,11 +218,11 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->parts as $template ) {
 
-			$template = self::prepare_template_for_export( $template );
+			$template = self::prepare_template_for_export( $template, $slug );
 
 			// Write the template content
 			file_put_contents(
-				get_stylesheet_directory() . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				$template_part_dir . DIRECTORY_SEPARATOR . $template->slug . '.html',
 				$template->content
 			);
 
@@ -223,7 +234,7 @@ class Theme_Templates {
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
 				file_put_contents(
-					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template->slug . '.php',
+					$patterns_dir . DIRECTORY_SEPARATOR . $template->slug . '.php',
 					$template->pattern
 				);
 			}

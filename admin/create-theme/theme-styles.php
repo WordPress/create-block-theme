@@ -55,7 +55,7 @@ Tags: {$tags}
 	/**
 	 * Build a style.css file for CHILD/GRANDCHILD themes.
 	 */
-	public static function build_child_style_css( $theme ) {
+	public static function build_style_css( $theme ) {
 		$name        = stripslashes( $theme['name'] );
 		$description = stripslashes( $theme['description'] );
 		$uri         = $theme['uri'];
@@ -63,7 +63,7 @@ Tags: {$tags}
 		$author_uri  = $theme['author_uri'];
 		$wp_version  = get_bloginfo( 'version' );
 		$template    = $theme['template'];
-		$text_domain = $theme['text_domain'];
+		$text_domain = Theme_Utils::get_theme_slug( $name );
 		$version     = '1.0.0';
 		$tags        = Theme_Tags::theme_tags_list( $theme );
 

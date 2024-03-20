@@ -183,7 +183,7 @@ class Create_Block_Theme_API {
 		// Build style.css with new theme metadata
 		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
-		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
