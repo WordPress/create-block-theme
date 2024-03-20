@@ -81,5 +81,5 @@ jobs:
             - name: Run PHP tests
               run: |
                   mysql -uroot -h127.0.0.1 -e 'SELECT version()' \
-                  && ./bin/install-wp-tests.sh --wp-version=6.5 --recreate-db wordpress_test root ''  > /dev/null \
+                  && ./bin/install-wp-tests.sh --wp-version=nighly --recreate-db wordpress_test root ''  > /dev/null \
                   && composer run-script test
