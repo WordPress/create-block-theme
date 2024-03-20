@@ -114,7 +114,7 @@ class Theme_Media {
 				//see, we might be running this in a docker container
 				//and if that's the case let's try again on port 80
 				$parsed_url = parse_url( $url );
-				if ( $parsed_url['host'] == 'localhost' && $parsed_url['port'] !== '80' ) {
+				if ( 'localhost' === $parsed_url['host'] && '80' !== $parsed_url['port'] ) {
 					$download_file = download_url( str_replace( 'localhost:' . $parsed_url['port'], 'localhost:80', $url ) );
 				}
 			}

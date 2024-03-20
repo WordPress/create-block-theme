@@ -261,6 +261,7 @@ class Theme_Templates {
 		$doc->loadHTML( $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 		$elements = $doc->getElementsByTagName( '*' );
 		foreach ( $elements as $element ) {
+			// phpcs:ignore
 			$element->nodeValue = self::escape_text( $element->nodeValue );
 		}
 		$block['innerContent'][0] = html_entity_decode( $doc->saveHTML() );
