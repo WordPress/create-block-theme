@@ -110,6 +110,7 @@ class Theme_Zip {
 		foreach ( $theme_templates->templates as $template ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template );
 			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
+			$template_data = Theme_Templates::remove_site_specific_attributes( $template_data );
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {
@@ -140,6 +141,7 @@ class Theme_Zip {
 		foreach ( $theme_templates->parts as $template_part ) {
 			$template_data = Theme_Blocks::make_template_images_local( $template_part );
 			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
+			$template_data = Theme_Templates::remove_site_specific_attributes( $template_data );
 
 			// If there are images in the template, add it as a pattern
 			if ( count( $template_data->media ) > 0 ) {

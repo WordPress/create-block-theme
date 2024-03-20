@@ -71,8 +71,51 @@ class Theme_Templates {
 
 		// NOTE: Templates that reference template parts are exported with the 'theme' attribute.
 		// This is undesirable and should be removed.
-		$template->content = str_replace( ',"theme":"' . get_stylesheet() . '"', '', $template->content );
+		// $template->content = str_replace( ',"theme":"' . get_stylesheet() . '"', '', $template->content );
 
+		return $template;
+	}
+
+	public static function remove_site_specific_attributes( $template ) {
+		$template_blocks = parse_blocks( $template->content );
+		$blocks          = _flatten_blocks( $template_blocks );
+
+		foreach ( $blocks as $key => $block ) {
+			// remove theme attribute from template parts
+			if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
+				unset( $blocks[ $key ]['attrs']['theme'] );
+			}
+
+			// remove ref attribute from blocks
+			// TODO: are there any other blocks that have refs?
+			if ( 'core/navigation' === $block['blockName'] && isset( $block['attrs']['ref'] ) ) {
+				unset( $blocks[ $key ]['attrs']['ref'] );
+			}
+
+			if ( in_array( $block['blockName'], array( 'core/image', 'core/cover' ), true ) ) {
+				// remove id attribute from image and cover blocks
+				// TODO: are there any other blocks that have ids?
+				if ( isset( $block['attrs']['id'] ) ) {
+					unset( $blocks[ $key ]['attrs']['id'] );
+				}
+
+				// remove wp-image-[id] class from image and cover blocks
+				if ( isset( $block['attrs']['className'] ) ) {
+					$blocks[ $key ]['attrs']['className'] = preg_replace( '/wp-image-\d+/', '', $block['attrs']['className'] );
+				}
+			}
+
+			// set taxQuery to null for query blocks
+			if ( 'core/query' === $block['blockName'] && isset( $block['attrs']['taxQuery'] ) ) {
+				$blocks[ $key ]['attrs']['taxQuery'] = null;
+			}
+		}
+
+		$new_content = '';
+		foreach ( $template_blocks as $block ) {
+			$new_content .= serialize_block( $block );
+		}
+		$template->content = $new_content;
 		return $template;
 	}
 
