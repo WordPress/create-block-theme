@@ -216,6 +216,6 @@ install_db() {
 	fi
 }
 
-install_wp
-install_test_suite
-install_db
+install_wp > /dev/null
+install_test_suite > /dev/null
+install_db > /dev/null
