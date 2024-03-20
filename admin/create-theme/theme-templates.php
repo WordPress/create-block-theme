@@ -144,6 +144,16 @@ class Theme_Templates {
 		return $template;
 	}
 
+	public static function prepare_template_for_export( $template ) {
+
+		$template = Theme_Media::make_template_images_local( $template );
+		$template = self::escape_text_in_template( $template );
+		$template = self::eliminate_environment_specific_content( $template );
+		$template = self::paternize_template( $template );
+
+		return $template;
+	}
+
 	/**
 	 * Copy the templates and template-parts (including user customizations)
 	 * as well as any media to the theme filesystem.
@@ -173,10 +183,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = Theme_Media::make_template_images_local( $template );
-			$template = self::escape_text_in_template( $template );
-			$template = self::eliminate_environment_specific_content( $template );
-			$template = self::paternize_template( $template );
+			$template = self::prepare_template_for_export( $template );
 
 			// Write the template content
 			file_put_contents(
@@ -190,7 +197,7 @@ class Theme_Templates {
 			}
 
 			// Write the pattern if it exists
-			if ( $template->pattern ) {
+			if ( isset( $template->pattern ) ) {
 				file_put_contents(
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template->slug . '.php',
 					$template->pattern
@@ -200,10 +207,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->parts as $template ) {
 
-			$template = Theme_Media::make_template_images_local( $template );
-			$template = Theme_Templates::escape_text_in_template( $template );
-			$template = self::eliminate_environment_specific_content( $template );
-			$template = self::paternize_template( $template );
+			$template = self::prepare_template_for_export( $template );
 
 			// Write the template content
 			file_put_contents(
@@ -217,7 +221,7 @@ class Theme_Templates {
 			}
 
 			// Write the pattern if it exists
-			if ( $template->pattern ) {
+			if ( isset( $template->pattern ) ) {
 				file_put_contents(
 					get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . $template->slug . '.php',
 					$template->pattern
