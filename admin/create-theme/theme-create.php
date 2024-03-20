@@ -37,7 +37,7 @@ class Theme_Create {
 	public static function create_blank_theme( $theme, $screenshot ) {
 
 		// Create theme directory.
-		$source           = plugin_dir_path( __DIR__ ) . 'assets/boilerplate';
+		$source           = plugin_dir_path( __DIR__ ) . '../assets/boilerplate';
 		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
 
 		if ( file_exists( $blank_theme_path ) ) {
