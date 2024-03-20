@@ -277,12 +277,51 @@ class Theme_Templates {
 
 	public static function eliminate_environment_specific_content( $template ) {
 
-		// Templates that reference template parts are exported with the 'theme' attribute.
-		// This is undesirable and should be removed.
-		$template->content = str_replace( ',"theme":"' . get_stylesheet() . '"', '', $template->content );
+		$template_blocks = parse_blocks( $template->content );
+		$blocks          = _flatten_blocks( $template_blocks );
 
-		// TODO: Remove things like id's and refs and other things that are environment specific
+		foreach ( $blocks as $key => $block ) {
 
+			// remove theme attribute from template parts
+			if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
+				unset( $blocks[ $key ]['attrs']['theme'] );
+			}
+
+			// remove ref attribute from blocks
+			// TODO: are there any other blocks that have refs?
+			if ( 'core/navigation' === $block['blockName'] && isset( $block['attrs']['ref'] ) ) {
+				unset( $blocks[ $key ]['attrs']['ref'] );
+			}
+
+			if ( in_array( $block['blockName'], array( 'core/image', 'core/cover' ), true ) ) {
+				// remove id attribute from image and cover blocks
+				// TODO: are there any other blocks that have ids?
+				if ( isset( $block['attrs']['id'] ) ) {
+					unset( $blocks[ $key ]['attrs']['id'] );
+				}
+
+				// remove wp-image-[id] class from image and cover blocks
+				if ( isset( $block['attrs']['className'] ) ) {
+					$blocks[ $key ]['attrs']['className'] = preg_replace( '/wp-image-\d+/', '', $block['attrs']['className'] );
+				}
+			}
+
+			// set taxQuery to null for query blocks
+			if ( 'core/query' === $block['blockName'] ) {
+				if ( isset( $block['attrs']['taxQuery'] ) ) {
+					unset( $blocks[ $key ]['attrs']['taxQuery'] );
+				}
+				if ( isset( $block['attrs']['queryId'] ) ) {
+					unset( $blocks[ $key ]['attrs']['queryId'] );
+				}
+			}
+		}
+
+		$new_content = '';
+		foreach ( $template_blocks as $block ) {
+			$new_content .= serialize_block( $block );
+		}
+		$template->content = $new_content;
 		return $template;
 	}
 }
