@@ -217,6 +217,6 @@ install_db() {
 }
 
 # Silence output
-install_wp > /dev/null 2>&1
-install_test_suite > /dev/null 2>&1
-install_db > /dev/null 2>&1
+install_wp
+install_test_suite
+install_db
