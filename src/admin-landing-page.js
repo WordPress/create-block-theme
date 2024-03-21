@@ -2,10 +2,7 @@ import { render, createRoot } from '@wordpress/element';
 import './index.scss';
 
 function App() {
-
-	return (
-		<>Landing Page Goes Here.</>
-	);
+	return <>Landing Page Goes Here.</>;
 }
 
 window.addEventListener(
