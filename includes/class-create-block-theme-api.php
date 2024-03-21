@@ -1,5 +1,15 @@
 <?php
 
+require_once __DIR__ . '/../admin/resolver_additions.php';
+require_once __DIR__ . '/../admin/create-theme/theme-zip.php';
+require_once __DIR__ . '/../admin/create-theme/theme-media.php';
+require_once __DIR__ . '/../admin/create-theme/theme-blocks.php';
+require_once __DIR__ . '/../admin/create-theme/theme-patterns.php';
+require_once __DIR__ . '/../admin/create-theme/theme-templates.php';
+require_once __DIR__ . '/../admin/create-theme/theme-styles.php';
+require_once __DIR__ . '/../admin/create-theme/theme-utils.php';
+require_once __DIR__ . '/../admin/create-theme/theme-readme.php';
+
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
  *
