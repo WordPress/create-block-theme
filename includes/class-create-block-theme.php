@@ -46,6 +46,7 @@ class Create_Block_Theme {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-api.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-editor-tools.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-admin-landing.php';
 
 		$this->loader = new Create_Block_Theme_Loader();
 
@@ -63,8 +64,9 @@ class Create_Block_Theme {
 		// $plugin_admin       = new Create_Block_Theme_Admin();
 		// $manage_fonts_admin = new Manage_Fonts_Admin();
 		// $wp_theme_directory = new WP_Theme_Directory();
-		$plugin_api   = new Create_Block_Theme_API();
-		$editor_tools = new Create_Block_Theme_Editor_Tools();
+		$plugin_api    = new Create_Block_Theme_API();
+		$editor_tools  = new Create_Block_Theme_Editor_Tools();
+		$admin_landing = new Create_Block_Theme_Admin_Landing();
 	}
 
 	/**
