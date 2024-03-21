@@ -40,10 +40,6 @@ class Create_Block_Theme {
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-create-theme.php';
-		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-manage-fonts.php';
-		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/wp-org-theme-directory.php';
-
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-api.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-editor-tools.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-admin-landing.php';
