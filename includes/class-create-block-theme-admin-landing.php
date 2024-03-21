@@ -19,7 +19,24 @@ class Create_Block_Theme_Admin_Landing {
 	}
 
 	public static function admin_menu_page() {
-		echo '<div id="create-block-theme-app">Landing Page to go Here</div>';
+
+		$asset_file = include plugin_dir_path( __DIR__ ) . 'build/admin-landing-page.asset.php';
+
+		// Enqueue CSS dependencies of the scripts included in the build.
+		foreach ( $asset_file['dependencies'] as $style ) {
+			wp_enqueue_style( $style );
+		}
+
+		// Enqueue CSS of the app
+		wp_enqueue_style( 'create-block-theme-app', plugins_url( 'build/admin-landing-page.css', __DIR__ ), array(), $asset_file['version'] );
+
+		// Load our app.js.
+		array_push( $asset_file['dependencies'], 'wp-i18n' );
+		wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/admin-landing-page.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
+
+		// Enable localization in the app.
+		wp_set_script_translations( 'create-block-theme-app', 'create-block-theme' );
+
+		echo '<div id="create-block-theme-app"></div>';
 	}
 }
-
