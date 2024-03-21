@@ -11,8 +11,8 @@ class Create_Block_Theme_Admin_Landing {
 			return;
 		}
 
-		$landing_page_slug     = 'create-block-theme-landing';
-		$landing_page_title = _x( 'Create Block Theme', 'UI String', 'create-block-theme' );
+		$landing_page_slug       = 'create-block-theme-landing';
+		$landing_page_title      = _x( 'Create Block Theme', 'UI String', 'create-block-theme' );
 		$landing_page_menu_title = $landing_page_title;
 		add_theme_page( $landing_page_title, $landing_page_menu_title, 'edit_theme_options', $landing_page_slug, array( 'Create_Block_Theme_Admin_Landing', 'admin_menu_page' ) );
 
