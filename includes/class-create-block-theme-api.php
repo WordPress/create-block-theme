@@ -66,6 +66,17 @@ class Create_Block_Theme_API {
 		);
 		register_rest_route(
 			'create-block-theme/v1',
+			'/create-variation',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_create_variation' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
 			'/create-blank',
 			array(
 				'methods'             => 'POST',
@@ -173,6 +184,22 @@ class Create_Block_Theme_API {
 			array(
 				'status'  => 'SUCCESS',
 				'message' => __( 'Child Theme Created.', 'create-block-theme' ),
+			)
+		);
+	}
+
+	function rest_create_variation( $request ) {
+
+		$response = Theme_Json::add_theme_json_variation_to_local( 'variation', $this->sanitize_theme_data( $request->get_params() ) );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Theme Variation Created.', 'create-block-theme' ),
 			)
 		);
 	}
