@@ -1,9 +1,10 @@
 # Forked from https://github.com/wp-cli/scaffold-command/blob/main/features/install-wp-tests.feature
 # Function to display usage instructions
 display_usage() {
-    echo "Usage: $0 [options] <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"
+    echo "Usage: $0 [options] <db-name> <db-user> <db-pass> [db-host] [skip-database-creation]"
     echo "Options:"
     echo "  --recreate-db   Recreate the database"
+		echo "  --wp-version    The WordPress version to install. Default is 'latest'."
 	echo "  --help          Displays this help message"
 }
 
@@ -13,6 +14,10 @@ RECREATE_DB=0
 for arg in "$@"
 do
 	case $arg in
+		--wp-version=*)
+			WP_VERSION="${arg#*=}"
+			shift
+			;;
 		--recreate-db)
 			RECREATE_DB=1
 			shift
@@ -40,7 +45,6 @@ DB_NAME=$1
 DB_USER=$2
 DB_PASS=$3
 DB_HOST=${4-127.0.0.1}
-WP_VERSION=${5-latest}
 SKIP_DB_CREATE=${6-false}
 
 TMPDIR=${TMPDIR-/tmp}
