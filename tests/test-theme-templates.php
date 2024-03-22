@@ -13,6 +13,23 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
 	}
 
+	public function test_avoid_escaping_php_syntax() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:cover {"url":"<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/80D07FF0-3F59-4E68-9E30-FCFA0EF12F63-scaled.jpg","id":7,"dimRatio":50,"customOverlayColor":"#85847b","isDark":false,"layout":{"type":"constrained"}} -->
+				<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#85847b"></span><img class="wp-block-cover__image-background wp-image-7" alt="" src="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/80D07FF0-3F59-4E68-9E30-FCFA0EF12F63-scaled.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+				<p class="has-text-align-center has-large-font-size">This is the "title"</p>
+				<!-- /wp:paragraph --></div></div>
+			<!-- /wp:cover -->
+		';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+
+		$this->assertStringContainsString( '<?php', $new_template->content );
+		$this->assertStringContainsString( '?>', $new_template->content );
+		$this->assertStringNotContainsString( '\u003c?', $new_template->content );
+		$this->assertStringNotContainsString( '?\u003e', $new_template->content );
+	}
+
 	public function test_paragraphs_in_groups_are_localized() {
 		$template          = new stdClass();
 		$template->content = '<!-- wp:group {"layout":{"type":"constrained"}} -->
