@@ -319,6 +319,11 @@ class Theme_Templates {
 				if ( isset( $block['attrs']['className'] ) ) {
 					$blocks[ $key ]['attrs']['className'] = preg_replace( '/wp-image-\d+/', '', $block['attrs']['className'] );
 				}
+
+				// remove wp-image-[id] class from inner content
+				foreach ( $blocks[ $key ]['innerContent'] as $inner_key => $inner_content ) {
+					$blocks[ $key ]['innerContent'][ $inner_key ] = preg_replace( '/wp-image-\d+/', '', $inner_content );
+				}
 			}
 
 			// set taxQuery to null for query blocks

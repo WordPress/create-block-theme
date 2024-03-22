@@ -69,19 +69,18 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<!-- wp:navigation /-->', $new_template->content );
 	}
 
-	// TODO: This one is failing.  The class on the <figure> element is not being removed.
-	// public function test_eliminate_id_from_image() {
-	// 	$template          = new stdClass();
-	// 	$template->content = '
-	// 		<!-- wp:image {"id":635} -->
-	// 		<figure class="wp-block-image size-large"><img src="http://example.com/file.jpg" alt="" class="wp-image-635"/></figure>
-	// 		<!-- /wp:image -->
-	// 	';
-	// 	$new_template      = Theme_Templates::eliminate_environment_specific_content( $template );
-	// 	$this->assertStringContainsString( '<!-- wp:image -->', $new_template->content );
-	// 	$this->assertStringNotContainsString( '<!-- wp:image {"id":635} -->', $new_template->content );
-	// 	$this->assertStringNotContainsString( 'wp-image-635', $new_template->content );
-	// }
+	public function test_eliminate_id_from_image() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image {"id":635} -->
+			<figure class="wp-block-image size-large"><img src="http://example.com/file.jpg" alt="" class="wp-image-635"/></figure>
+			<!-- /wp:image -->
+		';
+		$new_template      = Theme_Templates::eliminate_environment_specific_content( $template );
+		$this->assertStringContainsString( '<!-- wp:image -->', $new_template->content );
+		$this->assertStringNotContainsString( '<!-- wp:image {"id":635} -->', $new_template->content );
+		$this->assertStringNotContainsString( 'wp-image-635', $new_template->content );
+	}
 
 	// TODO: I'm not sure of the proper way to format this property for testing or now to cause it to be
 	// added via the Global Styles Panel.
