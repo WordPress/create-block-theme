@@ -43,6 +43,18 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<a class="wp-block-button__link wp-element-button">This is text to localize</a>', $new_template->content );
 	}
 
+	public function test_headings_are_localized() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:heading -->
+			<h2 class="wp-block-heading">This is a heading to localize.</h2>
+			<!-- /wp:heading -->
+		';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( 'This is a heading to localize.', $new_template->content );
+		$this->assertStringNotContainsString( '<h2 class="wp-block-heading">This is a heading to localize.</h2>', $new_template->content );
+	}
+
 	public function test_eliminate_theme_ref_from_template_part() {
 		$template          = new stdClass();
 		$template->content = '<!-- wp:template-part {"slug":"header","theme":"testtheme"} /-->';

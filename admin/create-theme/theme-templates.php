@@ -255,6 +255,7 @@ class Theme_Templates {
 		$blocks_to_escape = array(
 			'core/paragraph',
 			'core/button',
+			'core/heading',
 		);
 
 		if ( in_array( $block['blockName'], $blocks_to_escape, true ) ) {
