@@ -146,9 +146,9 @@ class Theme_Templates {
 
 	public static function prepare_template_for_export( $template, $slug = null ) {
 
-		$template = Theme_Media::make_template_images_local( $template );
 		$template = self::escape_text_in_template( $template );
 		$template = self::eliminate_environment_specific_content( $template );
+		$template = Theme_Media::make_template_images_local( $template );
 		$template = self::paternize_template( $template );
 
 		if ( $slug ) {
@@ -251,7 +251,6 @@ class Theme_Templates {
 	}
 
 	public static function escape_text_in_block( $block ) {
-
 		$blocks_to_escape = array(
 			'core/paragraph',
 			'core/button',
