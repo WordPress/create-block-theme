@@ -326,9 +326,6 @@ class Theme_Templates {
 				if ( isset( $block['attrs']['taxQuery'] ) ) {
 					unset( $blocks[ $key ]['attrs']['taxQuery'] );
 				}
-				if ( isset( $block['attrs']['queryId'] ) ) {
-					unset( $blocks[ $key ]['attrs']['queryId'] );
-				}
 			}
 		}
 
