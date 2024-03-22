@@ -2,7 +2,7 @@
 /**
  * @package Create_Block_Theme
  */
-class Create_Block_Theme_Templates extends WP_UnitTestCase {
+class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
 	public function test_paragraphs_are_localized() {
 		$template          = new stdClass();

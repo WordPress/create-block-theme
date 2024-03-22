@@ -2,7 +2,7 @@
 /**
  * @package Create_Block_Theme
  */
-class Create_Block_Theme_Media extends WP_UnitTestCase {
+class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 	public function test_make_images_block_local() {
 		$template          = new stdClass();

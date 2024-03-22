@@ -4,7 +4,7 @@
  *
  * @package Create_Block_Theme
  */
-class Create_Block_Theme_Fonts extends WP_UnitTestCase {
+class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 	protected static $admin_id;
 	protected static $editor_id;
