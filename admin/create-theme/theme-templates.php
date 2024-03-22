@@ -252,10 +252,21 @@ class Theme_Templates {
 
 	public static function escape_text_in_block( $block ) {
 
-		// TODO: More blocks besides just the paragraph block
-		// Can we make it generic?
-		if ( 'core/paragraph' === $block['blockName'] ) {
-			$block = self::escape_paragraph( $block );
+		$blocks_to_escape = array(
+			'core/paragraph',
+			'core/button',
+		);
+
+		if ( in_array( $block['blockName'], $blocks_to_escape, true ) ) {
+			$content = $block['innerContent'][0];
+			$doc     = new DOMDocument();
+			$doc->loadHTML( $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+			$elements = $doc->getElementsByTagName( '*' );
+			foreach ( $elements as $element ) {
+				// phpcs:ignore
+				$element->nodeValue = self::escape_text( $element->nodeValue );
+			}
+			$block['innerContent'][0] = html_entity_decode( $doc->saveHTML() );
 		}
 
 		if ( ! empty( $block['innerBlocks'] ) ) {
@@ -266,25 +277,12 @@ class Theme_Templates {
 		return $block;
 	}
 
-	/**
-	 * Escape the text in a paragraph block.
-	 */
-	public static function escape_paragraph( $block ) {
-		//TODO: This seems messy.  How can we make this more elegant?
-		$content = $block['innerContent'][0];
-		$doc     = new DOMDocument();
-		$doc->loadHTML( $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-		$elements = $doc->getElementsByTagName( '*' );
-		foreach ( $elements as $element ) {
-			// phpcs:ignore
-			$element->nodeValue = self::escape_text( $element->nodeValue );
-		}
-		$block['innerContent'][0] = html_entity_decode( $doc->saveHTML() );
-		return $block;
-	}
-
 	public static function escape_text( $text ) {
 		if ( ! $text ) {
+			return $text;
+		}
+		// if the text has html elements then don't escape it
+		if ( preg_match( '/<[^>]*>/', $text ) ) {
 			return $text;
 		}
 		return "<?php echo __('" . $text . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
