@@ -144,6 +144,15 @@ class Theme_Templates {
 		return $template;
 	}
 
+	/**
+	 * Prepare a template for export.
+	 * This will escape text in the template, eliminate environment specific content,
+	 * make template images local, and paternize the template.
+	 *
+	 * @param object $template The template to prepare for export.
+	 * @param string $slug The slug of the theme.
+	 * @return object The prepared template.
+	 */
 	public static function prepare_template_for_export( $template, $slug = null ) {
 
 		$template = self::escape_text_in_template( $template );
