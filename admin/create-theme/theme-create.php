@@ -101,6 +101,9 @@ class Theme_Create {
 	}
 
 	private static function is_valid_screenshot( $file ) {
+		if ( ! $file ) {
+			return 0;
+		}
 		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
 		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES, true ) && $file['size'] < 2097152 ) {
 			return 1;
