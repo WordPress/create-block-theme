@@ -63,7 +63,7 @@ Tags: {$tags}
 		$author_uri  = $theme['author_uri'];
 		$wp_version  = get_bloginfo( 'version' );
 		$template    = $theme['template'];
-		$text_domain = Theme_Utils::get_theme_slug( $name );
+		$text_domain = sanitize_title( $name );
 		$version     = '1.0.0';
 		$tags        = Theme_Tags::theme_tags_list( $theme );
 

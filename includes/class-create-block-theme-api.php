@@ -168,7 +168,7 @@ class Create_Block_Theme_API {
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
-		$zip      = Theme_Zip::create_zip( $filename );
+		$zip      = Theme_Zip::create_zip( $filename, $theme['slug'] );
 
 		$zip = Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
 		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', $theme['slug'] );
@@ -214,7 +214,7 @@ class Create_Block_Theme_API {
 
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme_slug );
-		$zip      = Theme_Zip::create_zip( $filename );
+		$zip      = Theme_Zip::create_zip( $filename, $theme_slug );
 
 		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
 
@@ -300,7 +300,7 @@ class Create_Block_Theme_API {
 		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
 		$sanitized_theme['template']            = '';
-		$sanitized_theme['slug']                = Theme_Utils::get_theme_slug( $theme['name'] );
+		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
 		return $sanitized_theme;
 	}

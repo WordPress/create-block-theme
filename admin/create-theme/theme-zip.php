@@ -7,14 +7,13 @@ require_once( __DIR__ . '/cbt-zip-archive.php' );
 
 class Theme_Zip {
 
-	public static function create_zip( $filename ) {
+	public static function create_zip( $filename, $theme_slug = null ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );
 		}
 
-		$theme_slug = get_stylesheet();
-		if ( ! empty( $_POST['theme']['name'] ) ) {
-			$theme_slug = Theme_Utils::get_theme_slug( $_POST['theme']['name'] );
+		if ( ! $theme_slug ) {
+			$theme_slug = get_stylesheet();
 		}
 
 		$zip = new CbtZipArchive( $theme_slug );
