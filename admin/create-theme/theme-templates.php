@@ -335,8 +335,8 @@ class Theme_Templates {
 
 			// set taxQuery to null for query blocks
 			if ( 'core/query' === $block['blockName'] ) {
-				if ( isset( $block['attrs']['taxQuery'] ) ) {
-					unset( $blocks[ $key ]['attrs']['taxQuery'] );
+				if ( isset( $block['attrs']['query']['taxQuery'] ) ) {
+					unset( $blocks[ $key ]['attrs']['query']['taxQuery'] );
 				}
 			}
 		}

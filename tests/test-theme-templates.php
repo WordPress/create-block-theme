@@ -93,22 +93,20 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'wp-image-635', $new_template->content );
 	}
 
-	// TODO: I'm not sure of the proper way to format this property for testing or now to cause it to be
-	// added via the Global Styles Panel.
-	// public function test_eliminate_taxQuery_from_query_loop() {
-	// 	$template          = new stdClass();
-	// 	$template->content = '
-	// 	<!-- wp:query {"queryId":43,"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true},"metadata":{"categories":["posts"]}} -->
-	// 	<div class="wp-block-query">
-	// 		<!-- wp:post-template -->
-	// 			<!-- wp:post-title {"isLink":true} /-->
-	// 			<!-- wp:post-excerpt /-->
-	// 		<!-- /wp:post-template -->
-	// 	</div>
-	// 	<!-- /wp:query -->
-	// 	';
-	// 	$new_template      = Theme_Templates::eliminate_environment_specific_content( $template );
-	// 	$this->assertStringContainsString( '<!-- wp:query', $new_template->content );
-	// 	$this->assertStringNotContainsString( '"queryId":43', $new_template->content );
-	// }
+	public function test_eliminate_taxQuery_from_query_loop() {
+		$template          = new stdClass();
+		$template->content = '
+		<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false,"taxQuery":{"post_tag":[9]}}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template -->
+				<!-- wp:post-title {"isLink":true} /-->
+				<!-- wp:post-excerpt /-->
+			<!-- /wp:post-template -->
+		</div>
+		<!-- /wp:query -->
+		';
+		$new_template      = Theme_Templates::eliminate_environment_specific_content( $template );
+		$this->assertStringContainsString( '<!-- wp:query', $new_template->content );
+		$this->assertStringNotContainsString( '"taxQuery":{"post_tag":[9]}', $new_template->content );
+	}
 }
