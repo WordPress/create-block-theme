@@ -297,55 +297,59 @@ class Theme_Templates {
 		return "<?php echo __('" . $text . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
+	private static function eliminate_environment_specific_content_from_block( $block ) {
+
+		// remove theme attribute from template parts
+		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
+			unset( $block['attrs']['theme'] );
+		}
+
+		// remove ref attribute from blocks
+		if ( 'core/navigation' === $block['blockName'] && isset( $block['attrs']['ref'] ) ) {
+			unset( $block['attrs']['ref'] );
+		}
+
+		// remove id attributes and classes from image and cover blocks
+		if ( in_array( $block['blockName'], array( 'core/image', 'core/cover' ), true ) ) {
+			// remove id attribute from image and cover blocks
+			if ( isset( $block['attrs']['id'] ) ) {
+				$image_id = $block['attrs']['id'];
+				unset( $block['attrs']['id'] );
+				// remove wp-image-[id] class from inner content
+				foreach ( $block['innerContent'] as $inner_key => $inner_content ) {
+					$block['innerContent'][ $inner_key ] = str_replace( 'wp-image-' . $image_id, '', $inner_content );
+				}
+			}
+		}
+
+		// remove taxQuery attribute from query blocks
+		if ( 'core/query' === $block['blockName'] ) {
+			if ( isset( $block['attrs']['query']['taxQuery'] ) ) {
+				unset( $block['attrs']['query']['taxQuery'] );
+			}
+		}
+
+		// process any inner blocks
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			foreach ( $block['innerBlocks'] as $inner_block_key => $inner_block ) {
+				$block['innerBlocks'][ $inner_block_key ] = static::eliminate_environment_specific_content_from_block( $inner_block );
+			}
+		}
+
+		return $block;
+	}
+
 	public static function eliminate_environment_specific_content( $template ) {
 
 		$template_blocks = parse_blocks( $template->content );
-		$blocks          = _flatten_blocks( $template_blocks );
+		$parsed_content  = '';
 
-		foreach ( $blocks as $key => $block ) {
-
-			// remove theme attribute from template parts
-			if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
-				unset( $blocks[ $key ]['attrs']['theme'] );
-			}
-
-			// remove ref attribute from blocks
-			// TODO: are there any other blocks that have refs?
-			if ( 'core/navigation' === $block['blockName'] && isset( $block['attrs']['ref'] ) ) {
-				unset( $blocks[ $key ]['attrs']['ref'] );
-			}
-
-			if ( in_array( $block['blockName'], array( 'core/image', 'core/cover' ), true ) ) {
-				// remove id attribute from image and cover blocks
-				// TODO: are there any other blocks that have ids?
-				if ( isset( $block['attrs']['id'] ) ) {
-					unset( $blocks[ $key ]['attrs']['id'] );
-				}
-
-				// remove wp-image-[id] class from image and cover blocks
-				if ( isset( $block['attrs']['className'] ) ) {
-					$blocks[ $key ]['attrs']['className'] = preg_replace( '/wp-image-\d+/', '', $block['attrs']['className'] );
-				}
-
-				// remove wp-image-[id] class from inner content
-				foreach ( $blocks[ $key ]['innerContent'] as $inner_key => $inner_content ) {
-					$blocks[ $key ]['innerContent'][ $inner_key ] = preg_replace( '/wp-image-\d+/', '', $inner_content );
-				}
-			}
-
-			// set taxQuery to null for query blocks
-			if ( 'core/query' === $block['blockName'] ) {
-				if ( isset( $block['attrs']['query']['taxQuery'] ) ) {
-					unset( $blocks[ $key ]['attrs']['query']['taxQuery'] );
-				}
-			}
-		}
-
-		$new_content = '';
 		foreach ( $template_blocks as $block ) {
-			$new_content .= serialize_block( $block );
+			$parsed_block    = static::eliminate_environment_specific_content_from_block( $block );
+			$parsed_content .= serialize_block( $parsed_block );
 		}
-		$template->content = $new_content;
+
+		$template->content = $parsed_content;
 		return $template;
 	}
 }
