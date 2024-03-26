@@ -109,4 +109,30 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<!-- wp:query', $new_template->content );
 		$this->assertStringNotContainsString( '"taxQuery":{"post_tag":[9]}', $new_template->content );
 	}
+
+	public function test_properly_encode_quotes_and_doublequotes() {
+		$block          = parse_blocks(
+			'<!-- wp:heading -->
+			<h3 class="wp-block-heading">"This" is a ' . "'test'" . '</h3>
+		<!-- /wp:heading -->'
+		)[0];
+		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
+		$escaped_markup = serialize_block( $escaped_block );
+
+		/* That looks like a mess, but what it should look like for REAL is <?php echo esc_attr_e( '"This" is a \'test\'', '' ); ?> */
+		$this->assertStringContainsString( '<?php echo __(\'"This" is a \\\'test\\\'\', \'\');?>', $escaped_markup );
+	}
+
+	public function test_properly_encode_lessthan_and_greaterthan() {
+		$block          = parse_blocks(
+			'<!-- wp:heading -->
+			<h3 class="wp-block-heading">&lt;This> is a &lt;test&gt;</h3>
+		<!-- /wp:heading -->'
+		)[0];
+		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
+		$escaped_markup = serialize_block( $escaped_block );
+
+		$this->assertStringContainsString( '<?php echo __(\'&lt;This&gt; is a &lt;test&gt;\', \'\');?>', $escaped_markup );
+	}
+
 }

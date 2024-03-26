@@ -155,8 +155,8 @@ class Theme_Templates {
 	 */
 	public static function prepare_template_for_export( $template, $slug = null ) {
 
-		$template = self::escape_text_in_template( $template );
 		$template = self::eliminate_environment_specific_content( $template );
+		$template = self::escape_text_in_template( $template );
 		$template = Theme_Media::make_template_images_local( $template );
 		$template = self::paternize_template( $template );
 
@@ -275,7 +275,11 @@ class Theme_Templates {
 				// phpcs:ignore
 				$element->nodeValue = self::escape_text( $element->nodeValue );
 			}
-			$block['innerContent'][0] = html_entity_decode( $doc->saveHTML() );
+			$html = $doc->saveHTML();
+			// The above encodes the PHP tags we just added, which we don't want, so put them back.
+			$html                     = str_replace( '&lt;?php', '<?php', $html );
+			$html                     = str_replace( '?&gt;', '?>', $html );
+			$block['innerContent'][0] = $html;
 		}
 
 		if ( ! empty( $block['innerBlocks'] ) ) {
@@ -290,10 +294,7 @@ class Theme_Templates {
 		if ( ! $text ) {
 			return $text;
 		}
-		// if the text has html elements then don't escape it
-		if ( preg_match( '/<[^>]*>/', $text ) ) {
-			return $text;
-		}
+		$text = addcslashes( $text, "'" );
 		return "<?php echo __('" . $text . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
