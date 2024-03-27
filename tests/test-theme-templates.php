@@ -199,4 +199,83 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringContainsString( "<?php echo __('This is my Quote', '');?>", $new_template->content );
 		$this->assertStringContainsString( "<?php echo __('Citation too', '');?>", $new_template->content );
 	}
+
+	public function test_localize_list() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:list -->
+			<ul>
+			<!-- wp:list-item -->
+			<li>Item One</li>
+			<!-- /wp:list-item -->
+
+			<!-- wp:list-item -->
+			<li>Item Two</li>
+			<!-- /wp:list-item -->
+			</ul>
+		<!-- /wp:list -->';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( "<li><?php echo __('Item One', '');?></li>", $new_template->content );
+	}
+
+	public function test_localize_verse() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:verse -->
+			<pre class="wp-block-verse">Here is some <strong>verse</strong> to localize</pre>
+		<!-- /wp:verse -->';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( "<?php echo __('Here is some <strong>verse</strong> to localize', '');?>", $new_template->content );
+	}
+
+	public function test_localize_table() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:table -->
+			<figure class="wp-block-table">
+			<table class="has-fixed-layout">
+				<thead><tr>
+					<th>Header One</th>
+					<th>Header Two</th>
+				</tr></thead>
+				<tbody>
+					<tr>
+						<td>Apples</td>
+						<td>Oranges</td>
+					</tr>
+					<tr>
+						<td>Pickles</td>
+						<td>Bananas</td>
+					</tr>
+				</tbody>
+				<tfoot><tr>
+					<td>Footer One</td>
+					<td>Footer Two</td>
+				</tr></tfoot>
+			</table>
+			<figcaption class="wp-element-caption">This is my caption</figcaption>
+			</figure>
+		<!-- /wp:table -->';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( "<td><?php echo __('Apples', '');?></td>", $new_template->content );
+		$this->assertStringContainsString( "<?php echo __('Header One', '');?>", $new_template->content );
+		$this->assertStringContainsString( "<?php echo __('Footer One', '');?>", $new_template->content );
+		$this->assertStringContainsString( "<?php echo __('This is my caption', '');?>", $new_template->content );
+	}
+
+	public function test_localize_media_text() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:media-text -->
+			<div class="wp-block-media-text is-stacked-on-mobile">
+			<figure class="wp-block-media-text__media">
+				<img src="http://example.com/file.jpg" alt="Alt Text Is Here" />
+			</figure>
+			<div class="wp-block-media-text__content">
+				<!-- wp:paragraph -->
+				<p>Content to Localize</p>
+				<!-- /wp:paragraph -->
+			</div>
+		</div>
+		<!-- /wp:media-text -->';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( "<?php echo __('Content to Localize', '');?>", $new_template->content );
+		$this->assertStringContainsString( "<?php echo __('Alt Text Is Here', '');?>", $new_template->content );
+	}
 }

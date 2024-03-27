@@ -274,7 +274,7 @@ class Theme_Templates {
 		$text_to_localize = array();
 
 		// Text Blocks (paragraphs and headings)
-		if ( in_array( $block['blockName'], array( 'core/paragraph', 'core/heading' ), true ) ) {
+		if ( in_array( $block['blockName'], array( 'core/paragraph', 'core/heading', 'core/list-item', 'core/verse' ), true ) ) {
 			$markup = $block['innerContent'][0];
 			// remove the tags from the beginning and end of the markup
 			$markup             = substr( $markup, strpos( $markup, '>' ) + 1 );
@@ -285,9 +285,11 @@ class Theme_Templates {
 		// Quote Blocks
 		if ( in_array( $block['blockName'], array( 'core/quote', 'core/pullquote' ), true ) ) {
 			$markup = serialize_blocks( array( $block ) );
+			// Grab paragraph tag content
 			if ( preg_match( '/<p[^>]*>(.*?)<\/p>/', $markup, $matches ) ) {
 				$text_to_localize[] = $matches[1];
 			}
+			// Grab cite tag content
 			if ( preg_match( '/<cite[^>]*>(.*?)<\/cite>/', $markup, $matches ) ) {
 				$text_to_localize[] = $matches[1];
 			}
@@ -302,13 +304,30 @@ class Theme_Templates {
 		}
 
 		// Alt text in Image and Cover Blocks
-		if ( in_array( $block['blockName'], array( 'core/image', 'core/cover' ), true ) ) {
+		if ( in_array( $block['blockName'], array( 'core/image', 'core/cover', 'core/media-text' ), true ) ) {
 			$markup = $block['innerContent'][0];
 			if ( preg_match( '/alt="(.*?)"/', $markup, $matches ) ) {
 				$text_to_localize[] = $matches[1];
 			}
 			if ( array_key_exists( 'alt', $block['attrs'] ) ) {
 				$text_to_localize[] = $block['attrs']['alt'];
+			}
+		}
+
+		// Table Blocks
+		if ( in_array( $block['blockName'], array( 'core/table' ), true ) ) {
+			$markup = serialize_blocks( array( $block ) );
+			// Grab table cell content
+			if ( preg_match_all( '/<td[^>]*>(.*?)<\/td>/', $markup, $matches ) ) {
+				$text_to_localize = array_merge( $text_to_localize, $matches[1] );
+			}
+			// Grab table header content
+			if ( preg_match_all( '/<th[^>]*>(.*?)<\/th>/', $markup, $matches ) ) {
+				$text_to_localize = array_merge( $text_to_localize, $matches[1] );
+			}
+			// Grab the caption
+			if ( preg_match_all( '/<figcaption[^>]*>(.*?)<\/figcaption>/', $markup, $matches ) ) {
+				$text_to_localize = array_merge( $text_to_localize, $matches[1] );
 			}
 		}
 
