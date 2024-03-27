@@ -142,6 +142,36 @@ export const CreateThemePanel = () => {
 			} );
 	};
 
+	const handleCreateChildClick = () => {
+		apiFetch( {
+			path: '/create-block-theme/v1/create-child',
+			method: 'POST',
+			data: theme,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		} )
+			.then( () => {
+				// eslint-disable-next-line
+				alert(
+					__(
+						'Child theme created successfully. The editor will now reload.',
+						'create-block-theme'
+					)
+				);
+				window.location.reload();
+			} )
+			.catch( ( error ) => {
+				const errorMessage =
+					error.message ||
+					__(
+						'An error occurred while attempting to create the theme.',
+						'create-block-theme'
+					);
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			} );
+	};
+
 	return (
 		<PanelBody>
 			<Heading>
@@ -234,6 +264,23 @@ export const CreateThemePanel = () => {
 					'create-block-theme'
 				) }
 			</Text>
+			<hr></hr>
+			<Spacer />
+			<Button
+				icon={ copy }
+				variant="secondary"
+				onClick={ handleCreateChildClick }
+			>
+				{ __( 'Create Child Theme', 'create-block-theme' ) }
+			</Button>
+			<Spacer />
+			<Text variant="muted">
+				{ __(
+					'Create a child theme on the server and activate it. The user changes will be preserved in the new theme.',
+					'create-block-theme'
+				) }
+			</Text>
+
 			<hr></hr>
 			<Spacer />
 			<Button
