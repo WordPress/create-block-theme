@@ -82,6 +82,36 @@ export const CreateThemePanel = () => {
 		exportCloneTheme();
 	};
 
+	const handleExportChildClick = () => {
+		const fetchOptions = {
+			path: '/create-block-theme/v1/export-child-clone',
+			method: 'POST',
+			data: theme,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			parse: false,
+		};
+
+		async function exportCloneTheme() {
+			try {
+				const response = await apiFetch( fetchOptions );
+				downloadFile( response );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __(
+								'An error occurred while attempting to export the child theme.',
+								'create-block-theme'
+						  );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+
+		exportCloneTheme();
+	};
+
 	const handleCreateBlankClick = () => {
 		apiFetch( {
 			path: '/create-block-theme/v1/create-blank',
@@ -294,6 +324,22 @@ export const CreateThemePanel = () => {
 			<Text variant="muted">
 				{ __(
 					'Export a copy of this theme as a .zip file. The user changes will be preserved in the new theme.',
+					'create-block-theme'
+				) }
+			</Text>
+			<hr></hr>
+			<Spacer />
+			<Button
+				icon={ download }
+				variant="secondary"
+				onClick={ handleExportChildClick }
+			>
+				{ __( 'Export Child Theme', 'create-block-theme' ) }
+			</Button>
+			<Spacer />
+			<Text variant="muted">
+				{ __(
+					'Export a child of this theme as a .zip file. The user changes will be preserved in the new theme.',
 					'create-block-theme'
 				) }
 			</Text>
