@@ -260,33 +260,49 @@ class Theme_Templates {
 	}
 
 	public static function escape_text_in_block( $block ) {
-		$blocks_to_escape = array(
-			'core/paragraph',
-			'core/button',
-			'core/heading',
-		);
 
-		if ( in_array( $block['blockName'], $blocks_to_escape, true ) ) {
-			$content = $block['innerContent'][0];
-			$doc     = new DOMDocument();
-			$doc->loadHTML( $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-			$elements = $doc->getElementsByTagName( '*' );
-			foreach ( $elements as $element ) {
-				// phpcs:ignore
-				$element->nodeValue = self::escape_text( $element->nodeValue );
-			}
-			$html = $doc->saveHTML();
-			// The above encodes the PHP tags we just added, which we don't want, so put them back.
-			$html                     = str_replace( '&lt;?php', '<?php', $html );
-			$html                     = str_replace( '?&gt;', '?>', $html );
-			$block['innerContent'][0] = $html;
+		// escape text in paragraph and heading blocks
+		if ( in_array( $block['blockName'], array( 'core/paragraph', 'core/heading' ), true ) ) {
+			$block = self::escape_paragraph_block( $block );
 		}
 
+		// escape text in button blocks
+		if ( in_array( $block['blockName'], array( 'core/button' ), true ) ) {
+			$block = self::escape_button_block( $block );
+		}
+
+		// process inner blocks
 		if ( ! empty( $block['innerBlocks'] ) ) {
 			foreach ( $block['innerBlocks'] as &$inner_block ) {
 				$inner_block = self::escape_text_in_block( $inner_block );
 			}
 		}
+
+		return $block;
+	}
+
+	private static function escape_paragraph_block( $block ) {
+
+		$markup = $block['innerContent'][0];
+
+		// remove the tags from the beginning and end of the markup
+		$markup = substr( $markup, strpos( $markup, '>' ) + 1 );
+		$markup = substr( $markup, 0, strrpos( $markup, '<' ) );
+
+		// escape what's left
+		$block['innerContent'][0] = self::escape_text( $markup );
+
+		return $block;
+	}
+
+	private static function escape_button_block( $block ) {
+		$markup = $block['innerContent'][0];
+
+		if ( preg_match( '/<a[^>]*>(.*?)<\/a>/', $markup, $matches ) ) {
+				$the_bits_to_localize = $matches[1];
+			$block['innerContent'][0] = str_replace( $the_bits_to_localize, self::escape_text( $the_bits_to_localize ), $markup );
+		}
+
 		return $block;
 	}
 

@@ -29,15 +29,11 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
 	public function test_buttons_are_localized() {
 		$template          = new stdClass();
-		$template->content = '
-			<!-- wp:buttons --><div class="wp-block-buttons">
-				<!-- wp:button -->
+		$template->content = '<!-- wp:button -->
 					<div class="wp-block-button">
 						<a class="wp-block-button__link wp-element-button">This is text to localize</a>
 					</div>
-				<!-- /wp:button -->
-			</div>
-		<!-- /wp:buttons -->';
+				<!-- /wp:button -->';
 		$new_template      = Theme_Templates::escape_text_in_template( $template );
 		$this->assertStringContainsString( 'This is text to localize', $new_template->content );
 		$this->assertStringNotContainsString( '<a class="wp-block-button__link wp-element-button">This is text to localize</a>', $new_template->content );
@@ -132,7 +128,19 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
 		$escaped_markup = serialize_block( $escaped_block );
 
-		$this->assertStringContainsString( '<?php echo __(\'&lt;This&gt; is a &lt;test&gt;\', \'\');?>', $escaped_markup );
+		$this->assertStringContainsString( '<?php echo __(\'&lt;This> is a &lt;test&gt;\', \'\');?>', $escaped_markup );
+	}
+
+	public function test_properly_encode_html_markup() {
+		$block          = parse_blocks(
+			'<!-- wp:paragraph -->
+			<p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p>
+			<!-- /wp:paragraph -->'
+		)[0];
+		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
+		$escaped_markup = serialize_block( $escaped_block );
+
+		$this->assertStringContainsString( '<?php echo __(\'<strong>Bold</strong> text has feelings &lt;&gt; TOO\', \'\');?>', $escaped_markup );
 	}
 
 }
