@@ -11,8 +11,32 @@ export async function fetchThemeJson() {
 
 	try {
 		const response = await apiFetch( fetchOptions );
-		const data = JSON.stringify( response, null, 2 );
-		return JSON.stringify( JSON.parse( data )?.data, null, 2 );
+
+		if ( ! response?.data || 'SUCCESS' !== response?.status ) {
+			throw new Error(
+				`Failed to fetch theme data: ${
+					response?.message || response?.status
+				}`
+			);
+		}
+
+		return JSON.stringify( response?.data, null, 2 );
+	} catch ( e ) {
+		// @todo: handle error
+	}
+}
+
+export async function saveThemeJson() {
+	const fetchOptions = {
+		path: '/create-block-theme/v1/save-theme-data',
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	};
+
+	try {
+		await apiFetch( fetchOptions );
 	} catch ( e ) {
 		// @todo: handle error
 	}
