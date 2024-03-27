@@ -107,40 +107,67 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 	}
 
 	public function test_properly_encode_quotes_and_doublequotes() {
-		$block          = parse_blocks(
-			'<!-- wp:heading -->
+		$template          = new stdClass();
+		$template->content = '<!-- wp:heading -->
 			<h3 class="wp-block-heading">"This" is a ' . "'test'" . '</h3>
-		<!-- /wp:heading -->'
-		)[0];
-		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
-		$escaped_markup = serialize_block( $escaped_block );
+		<!-- /wp:heading -->';
+		$escaped_template  = Theme_Templates::escape_text_in_template( $template );
 
 		/* That looks like a mess, but what it should look like for REAL is <?php echo esc_attr_e( '"This" is a \'test\'', '' ); ?> */
-		$this->assertStringContainsString( '<?php echo __(\'"This" is a \\\'test\\\'\', \'\');?>', $escaped_markup );
+		$this->assertStringContainsString( '<?php echo __(\'"This" is a \\\'test\\\'\', \'\');?>', $escaped_template->content );
 	}
 
 	public function test_properly_encode_lessthan_and_greaterthan() {
-		$block          = parse_blocks(
-			'<!-- wp:heading -->
+		$template          = new stdClass();
+		$template->content = '<!-- wp:heading -->
 			<h3 class="wp-block-heading">&lt;This> is a &lt;test&gt;</h3>
-		<!-- /wp:heading -->'
-		)[0];
-		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
-		$escaped_markup = serialize_block( $escaped_block );
+		<!-- /wp:heading -->';
+		$escaped_template  = Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( '<?php echo __(\'&lt;This> is a &lt;test&gt;\', \'\');?>', $escaped_markup );
+		$this->assertStringContainsString( '<?php echo __(\'&lt;This> is a &lt;test&gt;\', \'\');?>', $escaped_template->content );
 	}
 
 	public function test_properly_encode_html_markup() {
-		$block          = parse_blocks(
-			'<!-- wp:paragraph -->
+		$template          = new stdClass();
+		$template->content = '<!-- wp:paragraph -->
 			<p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p>
-			<!-- /wp:paragraph -->'
-		)[0];
-		$escaped_block  = Theme_Templates::escape_text_in_block( $block );
-		$escaped_markup = serialize_block( $escaped_block );
+			<!-- /wp:paragraph -->';
+		$escaped_template  = Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( '<?php echo __(\'<strong>Bold</strong> text has feelings &lt;&gt; TOO\', \'\');?>', $escaped_markup );
+		$this->assertStringContainsString( '<?php echo __(\'<strong>Bold</strong> text has feelings &lt;&gt; TOO\', \'\');?>', $escaped_template->content );
+	}
+
+	public function test_localize_alt_text_from_image() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/file.jpg" alt="This is alt text" /></figure>
+			<!-- /wp:image -->
+		';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( 'alt="<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
+	}
+
+	public function test_localize_alt_text_from_cover() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:cover {"url":"http://example.com/file.jpg","alt":"This is alt text"} -->
+			<div class="wp-block-cover">
+			<span aria-hidden="true" class="wp-block-cover__background"></span>
+			<img class="wp-block-cover__image-background" alt="This is alt text" src="http://example.com/file.jpg" data-object-fit="cover"/>
+			<div class="wp-block-cover__inner-container">
+				<!-- wp:paragraph -->
+				<p></p>
+				<!-- /wp:paragraph -->
+			</div>
+			</div>
+			<!-- /wp:cover -->
+		';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( 'alt="<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
+		$this->assertStringContainsString( '"alt":"<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
 	}
 
 }
+
+

@@ -251,59 +251,64 @@ class Theme_Templates {
 	}
 
 	public static function escape_text_in_template( $template ) {
-		$template_blocks = parse_blocks( $template->content );
+
+		$template_blocks  = parse_blocks( $template->content );
+		$text_to_localize = array();
+
+		// Gather up all the strings that need to be localized
 		foreach ( $template_blocks as &$block ) {
-			$block = self::escape_text_in_block( $block );
+			$text_to_localize = array_merge( $text_to_localize, self::get_text_to_localize_from_block( $block ) );
 		}
-		$template->content = serialize_blocks( $template_blocks );
+		$text_to_localize = array_unique( $text_to_localize );
+
+		// Localize the strings
+		foreach ( $text_to_localize as $text ) {
+			$template->content = str_replace( $text, self::escape_text( $text ), $template->content );
+		}
+
 		return $template;
 	}
 
-	public static function escape_text_in_block( $block ) {
+	private static function get_text_to_localize_from_block( $block ) {
 
-		// escape text in paragraph and heading blocks
+		$text_to_localize = array();
+
+		// Text Blocks (paragraphs and headings)
 		if ( in_array( $block['blockName'], array( 'core/paragraph', 'core/heading' ), true ) ) {
-			$block = self::escape_paragraph_block( $block );
+			$markup = $block['innerContent'][0];
+			// remove the tags from the beginning and end of the markup
+			$markup             = substr( $markup, strpos( $markup, '>' ) + 1 );
+			$markup             = substr( $markup, 0, strrpos( $markup, '<' ) );
+			$text_to_localize[] = $markup;
 		}
 
-		// escape text in button blocks
+		// Button Blocks
 		if ( in_array( $block['blockName'], array( 'core/button' ), true ) ) {
-			$block = self::escape_button_block( $block );
+			$markup = $block['innerContent'][0];
+			if ( preg_match( '/<a[^>]*>(.*?)<\/a>/', $markup, $matches ) ) {
+				$text_to_localize[] = $matches[1];
+			}
+		}
+
+		// Alt text in Image and Cover Blocks
+		if ( in_array( $block['blockName'], array( 'core/image', 'core/cover' ), true ) ) {
+			$markup = $block['innerContent'][0];
+			if ( preg_match( '/alt="(.*?)"/', $markup, $matches ) ) {
+				$text_to_localize[] = $matches[1];
+			}
+			if ( array_key_exists( 'alt', $block['attrs'] ) ) {
+				$text_to_localize[] = $block['attrs']['alt'];
+			}
 		}
 
 		// process inner blocks
 		if ( ! empty( $block['innerBlocks'] ) ) {
-			foreach ( $block['innerBlocks'] as &$inner_block ) {
-				$inner_block = self::escape_text_in_block( $inner_block );
+			foreach ( $block['innerBlocks'] as $inner_block ) {
+				$text_to_localize = array_merge( $text_to_localize, self::get_text_to_localize_from_block( $inner_block ) );
 			}
 		}
 
-		return $block;
-	}
-
-	private static function escape_paragraph_block( $block ) {
-
-		$markup = $block['innerContent'][0];
-
-		// remove the tags from the beginning and end of the markup
-		$markup = substr( $markup, strpos( $markup, '>' ) + 1 );
-		$markup = substr( $markup, 0, strrpos( $markup, '<' ) );
-
-		// escape what's left
-		$block['innerContent'][0] = self::escape_text( $markup );
-
-		return $block;
-	}
-
-	private static function escape_button_block( $block ) {
-		$markup = $block['innerContent'][0];
-
-		if ( preg_match( '/<a[^>]*>(.*?)<\/a>/', $markup, $matches ) ) {
-				$the_bits_to_localize = $matches[1];
-			$block['innerContent'][0] = str_replace( $the_bits_to_localize, self::escape_text( $the_bits_to_localize ), $markup );
-		}
-
-		return $block;
+		return $text_to_localize;
 	}
 
 	public static function escape_text( $text ) {
