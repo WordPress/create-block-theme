@@ -282,6 +282,17 @@ class Theme_Templates {
 			$text_to_localize[] = $markup;
 		}
 
+		// Quote Blocks
+		if ( in_array( $block['blockName'], array( 'core/quote', 'core/pullquote' ), true ) ) {
+			$markup = serialize_blocks( array( $block ) );
+			if ( preg_match( '/<p[^>]*>(.*?)<\/p>/', $markup, $matches ) ) {
+				$text_to_localize[] = $matches[1];
+			}
+			if ( preg_match( '/<cite[^>]*>(.*?)<\/cite>/', $markup, $matches ) ) {
+				$text_to_localize[] = $matches[1];
+			}
+		}
+
 		// Button Blocks
 		if ( in_array( $block['blockName'], array( 'core/button' ), true ) ) {
 			$markup = $block['innerContent'][0];

@@ -164,10 +164,39 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<!-- /wp:cover -->
 		';
 		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		// Check the markup attribute
 		$this->assertStringContainsString( 'alt="<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
+		// Check the block attribute
 		$this->assertStringContainsString( '"alt":"<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
 	}
 
+	public function test_localize_quote() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:quote -->
+			<blockquote class="wp-block-quote">
+				<!-- wp:paragraph -->
+				<p>This is my Quote</p>
+				<!-- /wp:paragraph -->
+				<cite>Citation too</cite>
+			</blockquote>
+		<!-- /wp:quote -->';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( "<?php echo __('This is my Quote', '');?>", $new_template->content );
+		$this->assertStringContainsString( "<?php echo __('Citation too', '');?>", $new_template->content );
+	}
+
+	public function test_localize_pullquote() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:pullquote -->
+			<figure class="wp-block-pullquote">
+				<blockquote>
+				<p>This is my Quote</p>
+				<cite>Citation too</cite>
+				</blockquote>
+			</figure>
+		<!-- /wp:pullquote -->';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( "<?php echo __('This is my Quote', '');?>", $new_template->content );
+		$this->assertStringContainsString( "<?php echo __('Citation too', '');?>", $new_template->content );
+	}
 }
-
-
