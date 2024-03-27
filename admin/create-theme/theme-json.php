@@ -1,6 +1,7 @@
 <?php
 
 class Theme_Json {
+
 	public static function add_theme_json_to_local( $export_type ) {
 		file_put_contents(
 			get_stylesheet_directory() . '/theme.json',

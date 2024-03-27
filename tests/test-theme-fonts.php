@@ -4,7 +4,7 @@
  *
  * @package Create_Block_Theme
  */
-class Create_Block_Theme_Fonts extends WP_UnitTestCase {
+class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 	protected static $admin_id;
 	protected static $editor_id;
@@ -123,6 +123,7 @@ class Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$request->set_param( 'author_uri', '' );
 		$request->set_param( 'tags_custom', '' );
 		$request->set_param( 'subfolder', '' );
+		$request->set_param( 'recommended_plugins', '' );
 
 		rest_do_request( $request );
 

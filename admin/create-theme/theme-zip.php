@@ -1,21 +1,19 @@
 <?php
 
 require_once( __DIR__ . '/theme-media.php' );
-require_once( __DIR__ . '/theme-blocks.php' );
 require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 require_once( __DIR__ . '/cbt-zip-archive.php' );
 
 class Theme_Zip {
 
-	public static function create_zip( $filename ) {
+	public static function create_zip( $filename, $theme_slug = null ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error( 'Zip Export not supported.' );
 		}
 
-		$theme_slug = get_stylesheet();
-		if ( ! empty( $_POST['theme']['name'] ) ) {
-			$theme_slug = Theme_Utils::get_theme_slug( $_POST['theme']['name'] );
+		if ( ! $theme_slug ) {
+			$theme_slug = get_stylesheet();
 		}
 
 		$zip = new CbtZipArchive( $theme_slug );
@@ -97,73 +95,63 @@ class Theme_Zip {
 	 *                      all = all templates no matter what
 	 */
 	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
-		$theme_templates = Theme_Templates::get_theme_templates( $export_type );
+
+		$theme_templates  = Theme_Templates::get_theme_templates( $export_type );
+		$template_folders = get_block_theme_folders();
 
 		if ( $theme_templates->templates ) {
-			$zip->addThemeDir( 'templates' );
+			$zip->addThemeDir( $template_folders['wp_template'] );
 		}
 
 		if ( $theme_templates->parts ) {
-			$zip->addThemeDir( 'parts' );
+			$zip->addThemeDir( $template_folders['wp_template_part'] );
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
-			$template_data = Theme_Blocks::make_template_images_local( $template );
-			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
 
-			// If there are images in the template, add it as a pattern
-			if ( count( $template_data->media ) > 0 ) {
-				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
-				$pattern_link_attributes = array(
-					'slug' => $pattern['slug'],
-				);
-				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
+			$template = Theme_Templates::prepare_template_for_export( $template );
 
-				// Add pattern to zip
-				$zip->addFromStringToTheme(
-					'patterns/' . $template_data->slug . '.php',
-					$pattern['content']
-				);
-
-				// Add media assets to zip
-				self::add_media_to_zip( $zip, $template_data->media );
-			}
-
-			// Add template to zip
+			// Write the template content
 			$zip->addFromStringToTheme(
-				'templates/' . $template_data->slug . '.html',
-				$template_data->content
+				$template_folders['wp_template'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				$template->content
 			);
 
+			// Write the media assets if there are any
+			if ( $template->media ) {
+				self::add_media_to_zip( $zip, $template->media );
+			}
+
+			// Write the pattern if it exists
+			if ( isset( $template->pattern ) ) {
+				$zip->addFromStringToTheme(
+					'patterns/' . $template->slug . '.php',
+					$template->pattern
+				);
+			}
 		}
 
-		foreach ( $theme_templates->parts as $template_part ) {
-			$template_data = Theme_Blocks::make_template_images_local( $template_part );
-			$template_data = Theme_Templates::replace_template_namespace( $template_data, $new_slug );
+		foreach ( $theme_templates->parts as $template ) {
+			$template = Theme_Templates::prepare_template_for_export( $template );
 
-			// If there are images in the template, add it as a pattern
-			if ( count( $template_data->media ) > 0 ) {
-				$pattern                 = Theme_Patterns::pattern_from_template( $template_data, $new_slug );
-				$pattern_link_attributes = array(
-					'slug' => $pattern['slug'],
-				);
-				$template_data->content  = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
+			// Write the template content
+			$zip->addFromStringToTheme(
+				$template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				$template->content
+			);
 
-				// Add pattern to zip
-				$zip->addFromStringToTheme(
-					'patterns/' . $template_data->slug . '.php',
-					$pattern['content']
-				);
-
-				// Add media assets to zip
-				self::add_media_to_zip( $zip, $template_data->media );
+			// Write the media assets if there are any
+			if ( $template->media ) {
+				self::add_media_to_zip( $zip, $template->media );
 			}
 
-			// Add template to zip
-			$zip->addFromStringToTheme(
-				'parts/' . $template_data->slug . '.html',
-				$template_data->content
-			);
+			// Write the pattern if it exists
+			if ( isset( $template->pattern ) ) {
+				$zip->addFromStringToTheme(
+					'patterns/' . $template->slug . '.php',
+					$template->pattern
+				);
+			}
 		}
 
 		return $zip;
@@ -174,6 +162,17 @@ class Theme_Zip {
 		foreach ( $media as $url ) {
 			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
 			$download_file = download_url( $url );
+
+			if ( is_wp_error( $download_file ) ) {
+				//we're going to try again with a new URL
+				//see, we might be running this in a docker container
+				//and if that's the case let's try again on port 80
+				$parsed_url = parse_url( $url );
+				if ( 'localhost' === $parsed_url['host'] && '80' !== $parsed_url['port'] ) {
+					$download_file = download_url( str_replace( 'localhost:' . $parsed_url['port'], 'localhost:80', $url ) );
+				}
+			}
+
 			// If there was an error downloading the file, skip it.
 			// TODO: Implement a warning if the file is missing
 			if ( ! is_wp_error( $download_file ) ) {

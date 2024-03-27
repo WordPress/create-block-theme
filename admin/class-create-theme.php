@@ -4,7 +4,6 @@ require_once __DIR__ . '/resolver_additions.php';
 require_once __DIR__ . '/create-theme/theme-tags.php';
 require_once __DIR__ . '/create-theme/theme-zip.php';
 require_once __DIR__ . '/create-theme/theme-media.php';
-require_once __DIR__ . '/create-theme/theme-blocks.php';
 require_once __DIR__ . '/create-theme/theme-patterns.php';
 require_once __DIR__ . '/create-theme/theme-templates.php';
 require_once __DIR__ . '/create-theme/theme-styles.php';
@@ -14,7 +13,7 @@ require_once __DIR__ . '/create-theme/theme-readme.php';
 require_once __DIR__ . '/create-theme/theme-form.php';
 require_once __DIR__ . '/create-theme/form-messages.php';
 require_once __DIR__ . '/create-theme/theme-fonts.php';
-
+require_once __DIR__ . '/create-theme/theme-create.php';
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -158,14 +157,14 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		// Add new metadata
-		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
 		);
 
 		// Add / replace screenshot.
-		if ( $this->is_valid_screenshot( $screenshot ) ) {
+		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -227,14 +226,14 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		// Add new metadata
-		$css_contents = Theme_Styles::build_child_style_css( $theme ) . $css_contents;
+		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
 		);
 
 		// Add / replace screenshot.
-		if ( $this->is_valid_screenshot( $screenshot ) ) {
+		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -289,11 +288,11 @@ class Create_Block_Theme_Admin {
 		// Add style.css.
 		$zip->addFromStringToTheme(
 			'style.css',
-			Theme_Styles::build_child_style_css( $theme )
+			Theme_Styles::build_style_css( $theme )
 		);
 
 		// Add / replace screenshot.
-		if ( $this->is_valid_screenshot( $screenshot ) ) {
+		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -362,7 +361,7 @@ class Create_Block_Theme_Admin {
 			);
 
 			// Add new metadata.
-			$css_contents = Theme_Styles::build_child_style_css( $theme );
+			$css_contents = Theme_Styles::build_style_css( $theme );
 
 			// Add style.css.
 			file_put_contents(
@@ -386,7 +385,7 @@ class Create_Block_Theme_Admin {
 			}
 
 			// Overwrite default screenshot if one is provided.
-			if ( $this->is_valid_screenshot( $screenshot ) ) {
+			if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 				file_put_contents(
 					$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
 					file_get_contents( $screenshot['tmp_name'] )
@@ -490,17 +489,5 @@ class Create_Block_Theme_Admin {
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_export_success' ) );
 			}
 		}
-	}
-
-	const ALLOWED_SCREENSHOT_TYPES = array(
-		'png' => 'image/png',
-	);
-
-	function is_valid_screenshot( $file ) {
-		$filetype = wp_check_filetype( $file['name'], self::ALLOWED_SCREENSHOT_TYPES );
-		if ( is_uploaded_file( $file['tmp_name'] ) && in_array( $filetype['type'], self::ALLOWED_SCREENSHOT_TYPES, true ) && $file['size'] < 2097152 ) {
-			return 1;
-		}
-		return 0;
 	}
 }

@@ -4,7 +4,7 @@
  *
  * @package Create_Block_Theme
  */
-class Create_Block_Theme_AdminTest extends WP_UnitTestCase {
+class Test_Create_Block_Theme_AdminTest extends WP_UnitTestCase {
 	public function setUp(): void {
 		parent::setUp();
 		$this->class_instance = new Create_Block_Theme_Admin();
