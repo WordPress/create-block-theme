@@ -62,10 +62,12 @@ Tags: {$tags}
 		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
 		$wp_version  = get_bloginfo( 'version' );
-		$template    = $theme['template'];
 		$text_domain = sanitize_title( $name );
-		$version     = '1.0.0';
-		$tags        = Theme_Tags::theme_tags_list( $theme );
+		if ( isset( $theme['template'] ) ) {
+			$template = $theme['template'];
+		}
+		$version = '1.0.0';
+		$tags    = Theme_Tags::theme_tags_list( $theme );
 
 		if ( isset( $theme['version'] ) ) {
 			$version = $theme['version'];

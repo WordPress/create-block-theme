@@ -77,10 +77,32 @@ class Create_Block_Theme_API {
 		);
 		register_rest_route(
 			'create-block-theme/v1',
+			'/create-child',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_create_child_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
 			'/export-clone',
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_export_cloned_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/export-child-clone',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_export_child_cloned_theme' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
@@ -131,6 +153,26 @@ class Create_Block_Theme_API {
 			array(
 				'status'  => 'SUCCESS',
 				'message' => __( 'Cloned Theme Created.', 'create-block-theme' ),
+			)
+		);
+	}
+
+	function rest_create_child_theme( $request ) {
+
+		$theme = $this->sanitize_theme_data( $request->get_params() );
+		//TODO: Handle screenshots
+		$screenshot = null;
+
+		$response = Theme_Create::create_child_theme( $theme, $screenshot );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Child Theme Created.', 'create-block-theme' ),
 			)
 		);
 	}
@@ -193,6 +235,56 @@ class Create_Block_Theme_API {
 		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		}
+
+		$zip->close();
+
+		header( 'Content-Type: application/zip' );
+		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
+		header( 'Content-Length: ' . filesize( $filename ) );
+		flush();
+		echo readfile( $filename );
+	}
+
+	function rest_export_child_cloned_theme( $request ) {
+
+		//TODO: Handle Screenshots
+		$screenshot = null;
+		$theme      = $this->sanitize_theme_data( $request->get_params() );
+
+		// Create ZIP file in the temporary directory.
+		$filename = tempnam( get_temp_dir(), $theme['slug'] );
+		$zip      = Theme_Zip::create_zip( $filename, $theme['slug'] );
+
+		$zip = Theme_Zip::add_templates_to_zip( $zip, 'user', $theme['slug'] );
+		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'variation' );
+
+		// Add readme.txt.
+		$zip->addFromStringToTheme(
+			'readme.txt',
+			Theme_Readme::build_readme_txt( $theme )
+		);
+
+		// Build style.css with new theme metadata
+		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
+		$css_contents      = Theme_Styles::build_style_css( $theme );
+		$zip->addFromStringToTheme(
+			'style.css',
+			$css_contents
+		);
+
+		// Add / replace screenshot.
+		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+			$zip->addFileToTheme(
+				$screenshot['tmp_name'],
+				'screenshot.png'
+			);
+		} else {
+			$source = plugin_dir_path( __DIR__ ) . 'assets/boilerplate/screenshot.png';
+			$zip->addFileToTheme(
+				$source,
 				'screenshot.png'
 			);
 		}

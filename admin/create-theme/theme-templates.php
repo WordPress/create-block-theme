@@ -186,19 +186,14 @@ class Theme_Templates {
 		$template_part_dir = $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'];
 		$patterns_dir      = $base_dir . DIRECTORY_SEPARATOR . 'patterns';
 
-		// If there is no templates folder, create it.
-		if ( ! is_dir( $template_dir ) ) {
+		// If there is no templates folder, and it is needed, create it.
+		if ( ! is_dir( $template_dir ) && count( $theme_templates->templates ) > 0 ) {
 			wp_mkdir_p( $template_dir );
 		}
 
-		// If there is no parts folder, create it.
-		if ( ! is_dir( $template_part_dir ) ) {
+		// If there is no parts folder, and it is needed, create it.
+		if ( ! is_dir( $template_part_dir ) && count( $theme_templates->parts ) > 0 ) {
 			wp_mkdir_p( $template_part_dir );
-		}
-
-		// If there is no patterns folder, create it.
-		if ( ! is_dir( $patterns_dir ) ) {
-			wp_mkdir_p( $patterns_dir );
 		}
 
 		foreach ( $theme_templates->templates as $template ) {
@@ -218,6 +213,10 @@ class Theme_Templates {
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
+				// If there is no patterns folder, create it.
+				if ( ! is_dir( $patterns_dir ) ) {
+					wp_mkdir_p( $patterns_dir );
+				}
 				file_put_contents(
 					$patterns_dir . DIRECTORY_SEPARATOR . $template->slug . '.php',
 					$template->pattern
@@ -242,6 +241,10 @@ class Theme_Templates {
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
+				// If there is no patterns folder, create it.
+				if ( ! is_dir( $patterns_dir ) ) {
+					wp_mkdir_p( $patterns_dir );
+				}
 				file_put_contents(
 					$patterns_dir . DIRECTORY_SEPARATOR . $template->slug . '.php',
 					$template->pattern
