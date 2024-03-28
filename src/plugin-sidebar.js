@@ -36,38 +36,39 @@ import {
 	chevronRight,
 	archive,
 } from '@wordpress/icons';
+import { SaveUserChangesPanel } from './editor-sidebar/save-panel';
 
 const CreateBlockThemePlugin = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const handleSaveClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/save',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
-			.then( () => {
-				// eslint-disable-next-line
-				alert(
-					__(
-						'Theme saved successfully. The editor will now reload.',
-						'create-block-theme'
-					)
-				);
-				window.location.reload();
-			} )
-			.catch( ( error ) => {
-				const errorMessage =
-					error.message ||
-					__(
-						'An error occurred while attempting to save the theme.',
-						'create-block-theme'
-					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
-	};
+	// const handleSaveClick = () => {
+	// 	apiFetch( {
+	// 		path: '/create-block-theme/v1/save',
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'Content-Type': 'application/json',
+	// 		},
+	// 	} )
+	// 		.then( () => {
+	// 			// eslint-disable-next-line
+	// 			alert(
+	// 				__(
+	// 					'Theme saved successfully. The editor will now reload.',
+	// 					'create-block-theme'
+	// 				)
+	// 			);
+	// 			window.location.reload();
+	// 		} )
+	// 		.catch( ( error ) => {
+	// 			const errorMessage =
+	// 				error.message ||
+	// 				__(
+	// 					'An error occurred while attempting to save the theme.',
+	// 					'create-block-theme'
+	// 				);
+	// 			createErrorNotice( errorMessage, { type: 'snackbar' } );
+	// 		} );
+	// };
 
 	const handleExportClick = () => {
 		const fetchOptions = {
@@ -122,7 +123,7 @@ const CreateBlockThemePlugin = () => {
 					<NavigatorScreen path="/">
 						<PanelBody>
 							<VStack>
-								<Button
+								{ /* <Button
 									icon={ archive }
 									onClick={ handleSaveClick }
 								>
@@ -130,7 +131,19 @@ const CreateBlockThemePlugin = () => {
 										'Save Changes',
 										'create-block-theme'
 									) }
-								</Button>
+								</Button> */ }
+								<NavigatorButton path="/save" icon={ archive }>
+									<Spacer />
+									<HStack justify="space-between">
+										<FlexItem>
+											{ __(
+												'Save Changes',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
 								<Text variant="muted">
 									{ __(
 										'Save user changes (including Templates and Global Styles) to the theme.',
@@ -190,6 +203,10 @@ const CreateBlockThemePlugin = () => {
 								</Text>
 							</VStack>
 						</PanelBody>
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/save">
+						<SaveUserChangesPanel />
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/update">
