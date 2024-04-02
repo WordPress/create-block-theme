@@ -33,6 +33,57 @@ class Theme_Create {
 		}
 	}
 
+	public static function create_child_theme( $theme, $screenshot ) {
+
+		// Create theme directory.
+		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
+
+		if ( $theme['subfolder'] ) {
+			$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
+		}
+
+		if ( file_exists( $new_theme_path ) ) {
+			return new WP_Error( 'theme_already_exists', __( 'Theme already exists.', 'create-block-theme' ) );
+		}
+
+		wp_mkdir_p( $new_theme_path );
+
+		// Add readme.txt.
+		file_put_contents(
+			$new_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
+			Theme_Readme::build_readme_txt( $theme )
+		);
+
+		// Add style.css.
+		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
+		$css_contents      = Theme_Styles::build_style_css( $theme );
+		file_put_contents(
+			$new_theme_path . DIRECTORY_SEPARATOR . 'style.css',
+			$css_contents
+		);
+
+		// Add theme.json
+		Theme_Templates::add_templates_to_local( 'user', $new_theme_path, $theme['slug'] );
+		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'variation' ) );
+
+		// Add Screenshot
+		if ( static::is_valid_screenshot( $screenshot ) ) {
+			file_put_contents(
+				$new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
+				file_get_contents( $screenshot['tmp_name'] )
+			);
+		} else {
+			$source = plugin_dir_path( __DIR__ ) . '../assets/boilerplate/screenshot.png';
+			copy( $source, $new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png' );
+		}
+
+		if ( $theme['subfolder'] ) {
+			switch_theme( $theme['subfolder'] . '/' . $theme['slug'] );
+		} else {
+			switch_theme( $theme['slug'] );
+		}
+	}
+
 	public static function create_blank_theme( $theme, $screenshot ) {
 
 		// Create theme directory.
