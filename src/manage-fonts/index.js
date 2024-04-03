@@ -1,5 +1,5 @@
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import FontFamily from './font-family';
 
 import DemoTextInput from '../demo-text-input';
@@ -222,16 +222,34 @@ export default function () {
 				} }
 			>
 				<h1 style={ { width: '400px', lineHeight: 1.4 } }>
-					The new Font Library is now available in the WordPress
-					editor.{ ' ' }
+					{ __(
+						'The new Font Library is now available in the WordPress editor.',
+						'create-block-theme'
+					) }
 				</h1>
-				<p>You can manage your theme fonts directly from the editor.</p>
+				<p>
+					{ __(
+						'You can manage your theme fonts directly from the',
+						'create-block-theme'
+					) }{ ' ' }
+					<a href="/wp-admin/site-editor.php?canvas=edit">
+						{ _x(
+							'editor',
+							'Link to the site editor',
+							'create-block-theme'
+						) }
+					</a>
+					.
+				</p>
 				<img
 					src="https://i0.wp.com/wordpress.org/news/files/2024/04/Font-Manager-2.png?w=620&ssl=1"
 					alt="WordPress 6.5 Font Library"
 				/>
 				<p>
-					For more information, please visit the{ ' ' }
+					{ __(
+						'For more information, please check out',
+						'create-block-theme'
+					) }{ ' ' }
 					<a href="https://wordpress.org/news/2024/04/regina/">{ `What's inside 6.5` }</a>
 					.
 				</p>
