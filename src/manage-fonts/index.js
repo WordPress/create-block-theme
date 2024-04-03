@@ -11,7 +11,7 @@ import ConfirmDeleteModal from './confirm-delete-modal';
 import { localFileAsThemeAssetUrl } from '../utils';
 import './manage-fonts.css';
 
-function ManageFonts() {
+export function ManageFonts() {
 	const nonce = document.querySelector( '#nonce' ).value;
 
 	// The element where the list of theme fonts is rendered coming from the server as JSON
@@ -200,4 +200,42 @@ function ManageFonts() {
 	);
 }
 
-export default ManageFonts;
+// export default ManageFonts;
+
+export default function () {
+	return (
+		<div
+			style={ {
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+			} }
+		>
+			<div
+				style={ {
+					width: '600px',
+					marginTop: '2rem',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					textAlign: 'center',
+				} }
+			>
+				<h1 style={ { width: '400px', lineHeight: 1.4 } }>
+					The new Font Library is now available in the WordPress
+					editor.{ ' ' }
+				</h1>
+				<p>You can manage your theme fonts directly from the editor.</p>
+				<img
+					src="https://i0.wp.com/wordpress.org/news/files/2024/04/Font-Manager-2.png?w=620&ssl=1"
+					alt="WordPress 6.5 Font Library"
+				/>
+				<p>
+					For more information, please visit the{ ' ' }
+					<a href="https://wordpress.org/news/2024/04/regina/">{ `What's inside 6.5` }</a>
+					.
+				</p>
+			</div>
+		</div>
+	);
+}
