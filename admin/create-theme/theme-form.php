@@ -15,6 +15,17 @@ class Theme_Form {
 		}
 		?>
 <div class="wrap">
+	<div class="notice notice-warning">
+		<p>
+			<?php
+				printf(
+					/* translators: %s: editor link. */
+					esc_html__( 'This page is deprecated and will be removed in the next release. Please try exporting from the Create Block Theme menu of the %s instead.', 'create-block-theme' ),
+					' <a href="' . esc_url( '/wp-admin/site-editor.php?canvas=edit' ) . '">' . __( 'editor', 'create-block-theme' ) . '</a>'
+				);
+			?>
+		</p>
+	</div>
 	<h1><?php _ex( 'Create Block Theme', 'UI String', 'create-block-theme' ); ?></h1>
 	<p>
 		<?php
