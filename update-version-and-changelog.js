@@ -20,7 +20,7 @@ async function getChangesSinceLastTag() {
 		const tags = tagsResult.all; // This should now properly reference an array of tags
 		if ( tags.length === 0 ) {
 			console.error( '❌ Error: No previous tags found.' );
-			return null; // Or however you wish to handle this case
+			return null;
 		}
 		const previousTag = tags[ 0 ]; // The most recent tag
 
@@ -34,7 +34,7 @@ async function getChangesSinceLastTag() {
 		console.error(
 			`❌ Error: Failed to get changes since the last tag. Details: ${ error }`
 		);
-		throw error; // It's generally a good idea to re-throw the error after logging so that calling functions can handle it appropriately.
+		throw error;
 	}
 }
 
