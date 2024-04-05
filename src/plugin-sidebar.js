@@ -199,13 +199,13 @@ const CreateBlockThemePlugin = () => {
 									onClick={ () => setIsEditorOpen( true ) }
 								>
 									{ __(
-										'Edit Theme JSON …',
+										'Inspect Theme JSON',
 										'create-block-theme'
 									) }
 								</Button>
 								<Text variant="muted">
 									{ __(
-										'Open the theme JSON editor to view and edit the theme data. Use with caution.',
+										'Open the theme JSON editor to view the theme data.',
 										'create-block-theme'
 									) }
 								</Text>

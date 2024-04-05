@@ -25,19 +25,3 @@ export async function fetchThemeJson() {
 		// @todo: handle error
 	}
 }
-
-export async function saveThemeJson() {
-	const fetchOptions = {
-		path: '/create-block-theme/v1/save-theme-data',
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-
-	try {
-		await apiFetch( fetchOptions );
-	} catch ( e ) {
-		// @todo: handle error
-	}
-}
