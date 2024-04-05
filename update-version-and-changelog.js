@@ -10,14 +10,33 @@ const git = simpleGit.default();
 const releaseType = process.env.RELEASE_TYPE;
 const VALID_RELEASE_TYPES = [ 'major', 'minor', 'patch' ];
 
-// To get the merges since the last tag
-async function getChangesSinceGitTag( tag ) {
-	const changes = await git.log( [
-		'--reverse',
-		'--merges',
-		`HEAD...${ tag }`,
-	] );
-	return changes;
+// To get the merges since the last (previous) tag
+async function getChangesSinceLastTag() {
+	try {
+		// Fetch all tags, sorted by creation date
+		const tagsResult = await git.tags( {
+			'--sort': '-creatordate',
+		} );
+		const tags = tagsResult.all; // This should now properly reference an array of tags
+		if ( tags.length === 0 ) {
+			console.error( '❌ Error: No previous tags found.' );
+			return null; // Or however you wish to handle this case
+		}
+		const previousTag = tags[ 0 ]; // The most recent tag
+
+		// Now get the changes since this tag
+		const changes = await git.log( [
+			'--reverse',
+			`${ previousTag }..HEAD`, // Correct the range to specify from the tag to the current HEAD
+		] );
+		console.log( changes );
+		return changes;
+	} catch ( error ) {
+		console.error(
+			`❌ Error: Failed to get changes since the last tag. Details: ${ error }`
+		);
+		throw error; // It's generally a good idea to re-throw the error after logging so that calling functions can handle it appropriately.
+	}
 }
 
 // To know if there are changes since the last tag.
@@ -54,6 +73,14 @@ async function updateVersion() {
 		process.exit( 1 );
 	}
 
+	// get changes since last tag
+	let changes = [];
+	try {
+		changes = await getChangesSinceLastTag();
+	} catch ( e ) {
+		console.error( `❌ Error: failed to get changes since last tag.` );
+	}
+
 	const packageJson = require( './package.json' );
 	const currentVersion = packageJson.version;
 
@@ -69,18 +96,7 @@ async function updateVersion() {
 	const currentTag = `v${ currentVersion }`;
 	const newTag = stdout.trim();
 	const newVersion = newTag.replace( 'v', '' );
-
-	// get changes since last tag
-	let changes = [];
-	let hasChangesSinceGitTag = false;
-	try {
-		changes = await getChangesSinceGitTag( currentTag );
-		hasChangesSinceGitTag = await getHasChangesSinceGitTag( currentTag );
-	} catch ( e ) {
-		console.error(
-			`❌ Error: failed to get changes since last tag. Verify that the tag ${ currentTag } exists in the git repo.`
-		);
-	}
+	const hasChangesSinceGitTag = await getHasChangesSinceGitTag( currentTag );
 
 	// check if there are any changes
 	if ( ! hasChangesSinceGitTag ) {
@@ -98,8 +114,14 @@ async function updateVersion() {
 
 	// update readme.txt version with the new changelog
 	const readme = fs.readFileSync( './readme.txt', 'utf8' );
+	const capitalizeFirstLetter = ( string ) =>
+		string.charAt( 0 ).toUpperCase() + string.slice( 1 );
+
 	const changelogChanges = changes.all
-		.map( ( change ) => `* ${ change.body || change.message }` )
+		.map(
+			( change ) =>
+				`* ${ capitalizeFirstLetter( change.message || change.body ) }`
+		)
 		.join( '\n' );
 	const newChangelog = `== Changelog ==\n\n= ${ newVersion } =\n${ changelogChanges }`;
 	let newReadme = readme.replace( '== Changelog ==', newChangelog );
