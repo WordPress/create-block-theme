@@ -73,8 +73,11 @@ async function updateVersion() {
 	let changes = [];
 	try {
 		changes = await getChangesSinceLastTag();
-	} catch ( e ) {
-		console.error( `❌ Error: failed to get changes since last tag.` );
+	} catch ( error ) {
+		console.error(
+			`❌ Error: failed to get changes since last tag: ${ error }`
+		);
+		process.exit( 1 );
 	}
 
 	const packageJson = require( './package.json' );
