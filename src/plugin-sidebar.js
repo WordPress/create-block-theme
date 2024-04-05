@@ -205,7 +205,7 @@ const CreateBlockThemePlugin = () => {
 								</Button>
 								<Text variant="muted">
 									{ __(
-										'Open the theme JSON file to inspect theme data.',
+										'Open the theme.json file to inspect theme data.',
 										'create-block-theme'
 									) }
 								</Text>
