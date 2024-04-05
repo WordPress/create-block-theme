@@ -17,7 +17,7 @@ async function getChangesSinceLastTag() {
 		const tagsResult = await git.tags( {
 			'--sort': '-creatordate',
 		} );
-		const tags = tagsResult.all; // This should now properly reference an array of tags
+		const tags = tagsResult.all;
 		if ( tags.length === 0 ) {
 			console.error( '❌ Error: No previous tags found.' );
 			return null;
@@ -25,9 +25,7 @@ async function getChangesSinceLastTag() {
 		const previousTag = tags[ 0 ]; // The most recent tag
 
 		// Now get the changes since this tag
-		const changes = await git.log( [
-			`${ previousTag }..HEAD`, // Correct the range to specify from the tag to the current HEAD
-		] );
+		const changes = await git.log( [ `${ previousTag }..HEAD` ] );
 		console.log( changes );
 		return changes;
 	} catch ( error ) {
