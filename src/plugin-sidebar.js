@@ -1,3 +1,4 @@
+import { useState } from '@wordpress/element';
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
 import { __, _x } from '@wordpress/i18n';
@@ -28,6 +29,8 @@ import {
 
 import { UpdateThemePanel } from './editor-sidebar/update-panel';
 import { CreateThemePanel } from './editor-sidebar/create-panel';
+import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
+
 import {
 	tool,
 	copy,
@@ -38,6 +41,7 @@ import {
 } from '@wordpress/icons';
 
 const CreateBlockThemePlugin = () => {
+	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const handleSaveClick = () => {
@@ -97,6 +101,7 @@ const CreateBlockThemePlugin = () => {
 
 		exportTheme();
 	};
+
 	return (
 		<>
 			<PluginSidebarMoreMenuItem
@@ -188,6 +193,22 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
+								<hr></hr>
+								<Button
+									icon={ edit }
+									onClick={ () => setIsEditorOpen( true ) }
+								>
+									{ __(
+										'Inspect Theme JSON',
+										'create-block-theme'
+									) }
+								</Button>
+								<Text variant="muted">
+									{ __(
+										'Open the theme.json file to inspect theme data.',
+										'create-block-theme'
+									) }
+								</Text>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
@@ -201,6 +222,11 @@ const CreateBlockThemePlugin = () => {
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
+			{ isEditorOpen && (
+				<ThemeJsonEditorModal
+					onRequestClose={ () => setIsEditorOpen( false ) }
+				/>
+			) }
 		</>
 	);
 };
