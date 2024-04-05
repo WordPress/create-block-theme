@@ -29,6 +29,7 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 				extensions={ [ json() ] }
 				value={ themeData }
 				onChange={ handleSave }
+				readOnly={ true }
 			/>
 		</Modal>
 	);
