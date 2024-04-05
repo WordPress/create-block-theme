@@ -28,9 +28,6 @@ async function getChangesSinceLastTag() {
 		const changes = await git.log( [ `${ previousTag }..HEAD` ] );
 		return changes;
 	} catch ( error ) {
-		console.error(
-			`❌ Error: Failed to get changes since the last tag. Details: ${ error }`
-		);
 		throw error;
 	}
 }
