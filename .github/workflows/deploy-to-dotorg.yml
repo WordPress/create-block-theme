@@ -46,7 +46,8 @@ jobs:
                   git push origin $VERSION
                   gh release create $VERSION --generate-notes
 
-            - uses: 10up/action-wordpress-plugin-deploy@stable
+            - name: Deploy Plugin to WordPress Plugin Directory
+              uses: 10up/action-wordpress-plugin-deploy@stable
               env:
                   SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
                   SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
