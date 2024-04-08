@@ -35,13 +35,13 @@ jobs:
 
             - name: Get New Version
               id: get-version
-              run: echo "VERSION=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+              run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
             - name: Create Tag and Release on GitHub
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  VERSION=${{ steps.get-version.outputs.VERSION }}
+                  VERSION=v${{ steps.get-version.outputs.VERSION }}
                   git tag $VERSION
                   git push origin $VERSION
                   gh release create $VERSION --generate-notes
