@@ -1,7 +1,5 @@
 name: Deploy to WordPress.org
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
     workflow_dispatch:
         inputs:
@@ -13,82 +11,46 @@ on:
                     - major
                     - minor
                     - patch
+    pull_request:
+        types: [closed]
+        branches:
+            - trunk
+
 jobs:
-    update-google-fonts-json:
-        if: github.repository_owner == 'WordPress'
-        # The type of runner that the job will run on
-        runs-on: ubuntu-latest
-
-        # Steps represent a sequence of tasks that will be executed as part of the job
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-
-            # Runs a single command using the runners shell
-            # This script fetchs the Goolgle Fonts API data and creates a PR if new data is available
-            - name: Update Google Fonts JSON file
-              env:
-                  GOOGLE_FONTS_API_KEY: ${{ secrets.GOOGLE_FONTS_API_KEY }}
-              run: |
-                  echo "Updating Google fonts JSON file"
-                  node ./update-google-fonts-json-file.js
-            - name: Commit Changes
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  git config user.name 'github-actions[bot]'
-                  git config user.email 'github-actions[bot]@users.noreply.github.com'
-                  git config --global --add --bool push.autoSetupRemote true
-
-                  git diff-index --quiet HEAD -- || \
-                  ( git add assets/google-fonts/fallback-fonts-list.json && \
-                    git checkout trunk && \
-                    git commit -m "Automation: update Google Fonts data file" --no-verify && \
-                    git push
-                  )
-    tag:
-        name: Checkout repo
+    deploy-to-wordpress:
+        if: >
+            github.event_name == 'pull_request' &&
+            github.event.pull_request.merged == true &&
+            startsWith(github.event.pull_request.head.ref, 'release/') &&
+            contains(github.event.pull_request.head.ref, '/major') || contains(github.event.pull_request.head.ref, '/minor') || contains(github.event.pull_request.head.ref, '/patch') &&
+            (github.event.pull_request.user.login == 'github-actions[bot]')
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-              with:
-                  fetch-depth: 0
 
-            - uses: actions/setup-node@v3
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
               with:
                   node-version: 18
 
-            - name: Install node dependencies
-              run: npm install
+            - name: Get New Version
+              id: get-version
+              run: echo "VERSION=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-            - name: Compile Javascript App
-              run: npm run build
-
-            - name: Update version and changelog
-              id: update-version
-              env:
-                  RELEASE_TYPE: ${{ github.event.inputs.release_type }}
-              run: npm run update-version
-
-            - name: Create Release
+            - name: Create Tag and Release on GitHub
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  git config user.name github-actions
-                  git config user.email github-actions@github.com
-                  git config --global --add --bool push.autoSetupRemote true
-                  git pull
-                  git diff-index --quiet HEAD -- || ( git add package.json package-lock.json readme.txt create-block-theme.php && git commit -m "Version bump & changelog update" --no-verify && git push )
-                  gh release create ${{steps.update-version.outputs.NEW_TAG }} --generate-notes
+                  VERSION=${{ steps.get-version.outputs.VERSION }}
+                  git tag $VERSION
+                  git push origin $VERSION
+                  gh release create $VERSION --generate-notes
 
-            - name: Create Block Theme Plugin Deploy to WordPress.org
-              uses: 10up/action-wordpress-plugin-deploy@stable
+            - uses: 10up/action-wordpress-plugin-deploy@stable
               env:
                   SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
                   SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-                  VERSION: ${{ steps.update-version.outputs.NEW_VERSION }}
+                  VERSION: ${{ steps.get-version.outputs.VERSION }}
 
             - name: WordPress.org plugin asset/readme update
               uses: 10up/action-wordpress-plugin-asset-update@stable
