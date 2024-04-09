@@ -53,7 +53,7 @@ Saves user's changes as a [style variation](https://developer.wordpress.org/them
 
 ### Embed Google Fonts or local font files
 
-**DEPRECATED:** Font can now be managed using WordPress' native Font Library. [More information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site).
+**DEPRECATED:** Fonts can now be managed using WordPress' native Font Library. [More information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site).
 
 ## How to Use the Plugin
 
