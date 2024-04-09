@@ -32,6 +32,11 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
+            - name: Install node dependencies
+              run: npm install
+
+            - name: Compile JavaScript App
+              run: npm run build
 
             - name: Get New Version
               id: get-version
