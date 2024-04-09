@@ -21,13 +21,12 @@ The plugin is development only — not intended for use on production websites, 
 = Step 1 – Setup =
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
-In the WordPress Admin Dashboard, under Appearance there will be three new pages called:
+In the WordPress Admin Dashboard, under Appearance there will be a new page called:
 
 - Create Block Theme
-- Manage fonts
 
 = Step 2 – Style Customizations =
-Make changes to your site styles and templates using the Site Editor. You can also include new fonts using the plugin options.
+Make changes to your site styles and templates using the Site Editor.
 
 = Step 3 – Export =
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
