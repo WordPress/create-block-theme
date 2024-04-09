@@ -15,9 +15,6 @@ A WordPress plugin to create block themes.
 This plugin allows you to:
 
 - Create a new theme, blank theme, child theme or style variation.
-- List and preview font families and font faces embeded in your theme.
-- Embed Google Fonts in your theme.
-- Embed local font assets in your theme.
 
 The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
 
