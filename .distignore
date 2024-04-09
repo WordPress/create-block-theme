@@ -29,5 +29,8 @@ babel.config.js
 composer.json
 composer.lock
 package-lock.json
-phpcs.xml.dist
 webpack.config.js
+.phpcs.xml.dist
+phpunit.xml.dist
+tests/
+bin/

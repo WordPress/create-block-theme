@@ -10,8 +10,6 @@ This plugin allows you to:
 
 - Export your existing theme with all customizations made in the Site Editor
 - Create a new theme, blank theme, child theme, or style variation from the Site Editor
--   Embed Google Fonts locally in your theme
--   Embed local font assets in your theme
 
 Learn more about Create Block Theme:
 
@@ -55,14 +53,7 @@ Saves user's changes as a [style variation](https://developer.wordpress.org/them
 
 ### Embed Google Fonts or local font files
 
-This feature allows you to embed fonts into your active theme. You can embed Google Fonts and local font assets.
-
-When you add a font the plugin will add to your theme:
-
--   The font files to your theme's file structure under this path `./assets/fonts`.
--   The font face definitions to the `theme.json` file.
-
-You can continue using your modified theme or you can export it as a new theme containing the new fonts.
+**DEPRECATED:** Fonts can now be managed using WordPress' native Font Library. [More information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site).
 
 ## How to Use the Plugin
 
@@ -70,15 +61,13 @@ You can continue using your modified theme or you can export it as a new theme c
 
 To use the latest release of the Create Block Theme plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/create-block-theme).
 
-In the WordPress Admin Dashboard, under Appearance there will be three new pages called:
+In the WordPress Admin Dashboard, under Appearance there will be a new page called:
 
 -   Create Block Theme
--   Embed Google font in your active theme
--   Embed local font file assets
 
-### Step 2: Fonts, styles and templates customizations
+### Step 2: Styles and templates customizations
 
-Make changes to your site styles and templates using the Site Editor. You can also include new fonts using the plugin options.
+Make changes to your site styles and templates using the Site Editor.
 
 ### Step 3: Save
 

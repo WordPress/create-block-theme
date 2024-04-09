@@ -15,22 +15,18 @@ A WordPress plugin to create block themes.
 This plugin allows you to:
 
 - Create a new theme, blank theme, child theme or style variation.
-- List and preview font families and font faces embeded in your theme.
-- Embed Google Fonts in your theme.
-- Embed local font assets in your theme.
 
 The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
 
 = Step 1 – Setup =
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
-In the WordPress Admin Dashboard, under Appearance there will be three new pages called:
+In the WordPress Admin Dashboard, under Appearance there will be a new page called:
 
 - Create Block Theme
-- Manage fonts
 
 = Step 2 – Style Customizations =
-Make changes to your site styles and templates using the Site Editor. You can also include new fonts using the plugin options.
+Make changes to your site styles and templates using the Site Editor.
 
 = Step 3 – Export =
 Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
