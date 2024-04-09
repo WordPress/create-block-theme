@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 1.13.8
+Stable tag: 2.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,30 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.0.0 =
+* Remove reviewer addition (#544)
+* Refactor GitHub release workflows (#542)
+* Fix changelog creation script (#541)
+* Add theme json inspector (#520)
+* Add deprecation notice in theme export admin screen (#540)
+* Replace font management with screen pointing to native font library (#539)
+* Added creation of theme validation to site editor interface (#532)
+* Add/child theme creation (#531)
+* Add blueprint.json file to enable plugin previews (#511)
+* Extracted any logic that may need to be tested from the api class (#522)
+* Use CORE for Font Management (#518)
+* Add integration tests (#393)
+* Remove CODE_OF_CONDUCT.md from .distignore. (#515)
+* Remove repo specific CoC. (#514)
+* GitHub Actions: Add JavaScript Unit Test (#508)
+* Add files and directories not needed for release to `.distignore` (#512)
+* Replace dash icon with SVG icon (#506)
+* Fix browser warning error when clicking the reset button (#505)
+* Add markdown and package.json lint command (#504)
+* Fix react warning error on font upload page (#502)
+* Fix dynamic property deprecation (#501)
+* Add text domain to translation target (#499)
 
 = 1.13.8 =
 
