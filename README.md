@@ -65,7 +65,7 @@ In the WordPress Admin Dashboard, under Appearance there will be a new page call
 
 -   Create Block Theme
 
-### Step 2: Fonts, styles and templates customizations
+### Step 2: Styles and templates customizations
 
 Make changes to your site styles and templates using the Site Editor.
 
