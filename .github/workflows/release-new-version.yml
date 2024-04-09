@@ -1,0 +1,72 @@
+name: Create new release PR
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_type:
+                description: 'Release type'
+                required: true
+                type: choice
+                options:
+                    - major
+                    - minor
+                    - patch
+
+jobs:
+    prepare-release:
+        if: github.event_name == 'workflow_dispatch'
+        name: Prepare Release PR
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+
+            - name: Install node dependencies
+              run: npm install
+
+            - name: Compile Javascript App
+              run: npm run build
+
+            - name: Create version update branch
+              id: create-branch
+              run: |
+                  BRANCH_NAME="release/$(date +%Y-%m-%d)/${{ github.event.inputs.release_type }}-release"
+                  git checkout -b $BRANCH_NAME
+                  echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+            - name: Update version and changelog
+              id: update-version
+              run: |
+                  npm run update-version
+                  echo "NEW_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+              env:
+                  RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+
+            - name: Commit changes
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email 'github-actions[bot]@users.noreply.github.com'
+                  git add .
+                  git commit -m "Version bump & changelog update" --no-verify
+                  git push --set-upstream origin ${{ steps.create-branch.outputs.BRANCH_NAME }}
+
+            - name: Create Pull Request
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh pr create \
+                  --title "[Automation] New ${{ github.event.inputs.release_type }} Release: ${{ steps.update-version.outputs.NEW_VERSION }}" \
+                  --base trunk \
+                  --head ${{ steps.create-branch.outputs.BRANCH_NAME }} \
+                  --label "Release: ${{ github.event.inputs.release_type }}" \
+                  --reviewer "WordPress/block-themers" \
+                  --body "
+                    ### Release PR 🤖
+                    This is a release PR for version **${{ steps.update-version.outputs.NEW_VERSION }}**, run by **@${{ github.actor }}**.
+                    It updates the version of the Plugin and adds changes since the last tag to the Changelog file.
+                    Merging this PR will trigger a new release and update the Plugin in the WordPress Plugin Directory."
