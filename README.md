@@ -61,7 +61,7 @@ Saves user's changes as a [style variation](https://developer.wordpress.org/them
 
 To use the latest release of the Create Block Theme plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/create-block-theme).
 
-In the WordPress Admin Dashboard, under Appearance there will be a new pages called:
+In the WordPress Admin Dashboard, under Appearance there will be a new page called:
 
 -   Create Block Theme
 
