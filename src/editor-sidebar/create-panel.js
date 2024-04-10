@@ -22,7 +22,7 @@ import {
 } from '@wordpress/components';
 import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
 
-export const CreateThemePanel = () => {
+export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
@@ -306,107 +306,118 @@ export const CreateThemePanel = () => {
 						setTheme( { ...theme, subfolder: value } )
 					}
 				/>
+				{ createType === 'createClone' && (
+					<>
+						<Button
+							icon={ copy }
+							variant="primary"
+							onClick={ handleCloneClick }
+						>
+							{ __( 'Clone Theme', 'create-block-theme' ) }
+						</Button>
+						<Spacer />
+						<Text variant="muted">
+							{ __(
+								'Create a copy of this theme on the server and activate it. The user changes will be preserved in the new theme.',
+								'create-block-theme'
+							) }
+						</Text>
+					</>
+				) }
+				{ createType === 'createChild' && (
+					<>
+						<Button
+							icon={ copy }
+							variant="primary"
+							onClick={ handleCreateChildClick }
+						>
+							{ __( 'Create Child Theme', 'create-block-theme' ) }
+						</Button>
+						<Spacer />
+						<Text variant="muted">
+							{ __(
+								'Create a child theme on the server and activate it. The user changes will be preserved in the new theme.',
+								'create-block-theme'
+							) }
+						</Text>
+					</>
+				) }
+				{ createType === 'createVariation' && (
+					<>
+						<Button
+							icon={ copy }
+							variant="primary"
+							onClick={ handleCreateVariationClick }
+						>
+							{ __(
+								'Create Theme Variation',
+								'create-block-theme'
+							) }
+						</Button>
+						<Spacer />
+						<Text variant="muted">
+							{ __(
+								'Save the Global Styles changes as a theme variation.',
+								'create-block-theme'
+							) }
+						</Text>
+					</>
+				) }
+				{ createType === 'exportClone' && (
+					<>
+						<Button
+							icon={ download }
+							variant="primary"
+							onClick={ handleExportClick }
+						>
+							{ __( 'Export Theme', 'create-block-theme' ) }
+						</Button>
+						<Spacer />
+						<Text variant="muted">
+							{ __(
+								'Export a copy of this theme as a .zip file. The user changes will be preserved in the new theme.',
+								'create-block-theme'
+							) }
+						</Text>
+					</>
+				) }
+				{ createType === 'exportChild' && (
+					<>
+						<Button
+							icon={ download }
+							variant="primary"
+							onClick={ handleExportChildClick }
+						>
+							{ __( 'Export Child Theme', 'create-block-theme' ) }
+						</Button>
+						<Spacer />
+						<Text variant="muted">
+							{ __(
+								'Export a child of this theme as a .zip file. The user changes will be preserved in the new theme.',
+								'create-block-theme'
+							) }
+						</Text>
+					</>
+				) }
+				{ createType === 'createBlank' && (
+					<>
+						<Button
+							icon={ addCard }
+							variant="primary"
+							onClick={ handleCreateBlankClick }
+						>
+							{ __( 'Create Blank Theme', 'create-block-theme' ) }
+						</Button>
+						<Spacer />
+						<Text variant="muted">
+							{ __(
+								'Create a blank theme with no styles or templates.',
+								'create-block-theme'
+							) }
+						</Text>
+					</>
+				) }
 			</VStack>
-			<Spacer />
-			<hr></hr>
-			<Spacer />
-			<Button
-				icon={ copy }
-				variant="secondary"
-				onClick={ handleCloneClick }
-			>
-				{ __( 'Clone Theme', 'create-block-theme' ) }
-			</Button>
-			<Spacer />
-			<Text variant="muted">
-				{ __(
-					'Create a copy of this theme on the server and activate it. The user changes will be preserved in the new theme.',
-					'create-block-theme'
-				) }
-			</Text>
-			<hr></hr>
-			<Spacer />
-			<Button
-				icon={ copy }
-				variant="secondary"
-				onClick={ handleCreateChildClick }
-			>
-				{ __( 'Create Child Theme', 'create-block-theme' ) }
-			</Button>
-			<Spacer />
-			<Text variant="muted">
-				{ __(
-					'Create a child theme on the server and activate it. The user changes will be preserved in the new theme.',
-					'create-block-theme'
-				) }
-			</Text>
-
-			<hr></hr>
-			<Spacer />
-			<Button
-				icon={ copy }
-				variant="secondary"
-				onClick={ handleCreateVariationClick }
-			>
-				{ __( 'Create Theme Variation', 'create-block-theme' ) }
-			</Button>
-			<Spacer />
-			<Text variant="muted">
-				{ __(
-					'Save the Global Styles changes as a theme variation.',
-					'create-block-theme'
-				) }
-			</Text>
-
-			<hr></hr>
-			<Spacer />
-			<Button
-				icon={ download }
-				variant="secondary"
-				onClick={ handleExportClick }
-			>
-				{ __( 'Export Theme', 'create-block-theme' ) }
-			</Button>
-			<Spacer />
-			<Text variant="muted">
-				{ __(
-					'Export a copy of this theme as a .zip file. The user changes will be preserved in the new theme.',
-					'create-block-theme'
-				) }
-			</Text>
-			<hr></hr>
-			<Spacer />
-			<Button
-				icon={ download }
-				variant="secondary"
-				onClick={ handleExportChildClick }
-			>
-				{ __( 'Export Child Theme', 'create-block-theme' ) }
-			</Button>
-			<Spacer />
-			<Text variant="muted">
-				{ __(
-					'Export a child of this theme as a .zip file. The user changes will be preserved in the new theme.',
-					'create-block-theme'
-				) }
-			</Text>
-			<hr></hr>
-			<Spacer />
-			<Button
-				icon={ addCard }
-				variant="secondary"
-				onClick={ handleCreateBlankClick }
-			>
-				{ __( 'Create Blank Theme', 'create-block-theme' ) }
-			</Button>
-			<Spacer />
-			<Text variant="muted">
-				{ __(
-					'Create a blank theme with no styles or templates.',
-					'create-block-theme'
-				) }
-			</Text>
-			<Spacer />
 		</PanelBody>
 	);
 };
