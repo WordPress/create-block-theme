@@ -103,6 +103,12 @@ To inspect the active theme's theme.json contents:
 
 Many of these options are also available under the older, deprecated Create Block Theme page under Appearance > Create Block Theme.
 
+To install and uninstall fonts:
+
+- Install and activate a font from any source using the WordPress Font Library.
+- Select "Save Changes" to save all of the active fonts to the currently active theme. These fonts will then be activated in the theme and deactivated in the system (and may be safely deleted from the system).
+- Any fonts that are installed in the theme that have been deactivated with the WordPress Font Library will be removed from the theme.
+
 ## How to Contribute
 
 We welcome contributions in all forms, including code, design, documentation, and triage. Please see our [Contributing Guidelines](/CONTRIBUTING.md) for more information.
