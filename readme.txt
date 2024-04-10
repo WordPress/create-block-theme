@@ -43,15 +43,18 @@ Make changes to your site styles, fonts, pages and templates using the Editor.
 Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.
 
 To simply save recent changes made in the Editor to the currently active theme or export the theme:
+
 - Select "Save Changes" to save any recent changes to the currently active theme.
 - Select "Export Zip" to export the theme as a zip file.
 
 To edit the theme metadata:
+
 - Select "Theme Info" to edit the metadata for the theme. These details will be used in the style.css file.
 
 2. Theme Info editing panel in the WordPress Editor
 
 To create a new theme, child theme, or style variation, select "Create Theme" to access the following options for the currently active theme:
+
 - "Clone Theme" to create a copy of the active theme.
 - "Create Child Theme" to create a child theme of the active theme.
 - "Create Theme Variation" to create a style variation.
@@ -62,6 +65,7 @@ To create a new theme, child theme, or style variation, select "Create Theme" to
 3. Create Theme panel in the WordPress Editor
 
 To inspect the active theme's theme.json contents:
+
 - Select "Inspect Theme JSON"
 
 4. theme.json inspector in the WordPress Editor
