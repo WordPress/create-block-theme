@@ -69,9 +69,7 @@ To use the latest release of the Create Block Theme plugin on your WordPress sit
 
 There will be a new panel accessible from the WordPress Editor, which you can open by clicking on a new icon to the right of the "Save" button, at the top of the Editor.
 
-In the WordPress Admin Dashboard, under Appearance there will also be a new page called:
-
--   Create Block Theme
+In the WordPress Admin Dashboard, under Appearance there will also be a new page called "Create Block Theme".
 
 ### Step 2: Styles and templates customizations
 
