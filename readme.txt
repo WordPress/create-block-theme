@@ -23,7 +23,7 @@ All newly created themes or style variations will include changes made within th
 
 This plugin also makes several changes to the contents of an exported theme, including:
 
-- Adds all images used in templates or pages to the theme's `assets` folder.
+- Adds all images used in templates to the theme's `assets` folder.
 - Ensures the block markup used in templates and patterns is export-ready.
 - Ensures most strings used in templates and patterns are translate-ready.
 
@@ -37,7 +37,7 @@ There will be a new panel accessible from the WordPress Editor, which you can op
 1. Create Block Theme panel in the WordPress Editor
 
 = Step 2 – Style Customizations =
-Make changes to your site styles, fonts, pages and templates using the Editor.
+Make changes to your site styles, fonts and templates using the Editor.
 
 = Step 3 – Export =
 Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.

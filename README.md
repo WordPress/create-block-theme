@@ -13,7 +13,7 @@ This plugin allows you to:
 
 This plugin also makes several changes to the contents of an exported theme, including:
 
-- Adds all images used in templates or pages to the theme's `assets` folder.
+- Adds all images used in templates to the theme's `assets` folder.
 - Ensures the block markup used in templates and patterns is export-ready.
 - Ensures most strings used in templates and patterns are translate-ready.
 
@@ -73,7 +73,7 @@ In the WordPress Admin Dashboard, under Appearance there will also be a new page
 
 ### Step 2: Styles and templates customizations
 
-Make changes to your site styles, fonts, pages and templates using the Editor.
+Make changes to your site styles, fonts and templates using the Editor.
 
 ### Step 3: Save
 
