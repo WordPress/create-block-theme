@@ -1,5 +1,9 @@
-import { useState, useEffect, createInterpolateElement } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import {
+	useState,
+	useEffect,
+	createInterpolateElement,
+} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import FontFamily from './font-family';
 
 import DemoTextInput from '../demo-text-input';
