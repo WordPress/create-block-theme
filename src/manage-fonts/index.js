@@ -1,4 +1,4 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, createInterpolateElement } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import FontFamily from './font-family';
 
@@ -228,30 +228,36 @@ export default function () {
 					) }
 				</h1>
 				<p>
-					{ __(
-						'You can manage your theme fonts directly from the',
-						'create-block-theme'
-					) }{ ' ' }
-					<a href="/wp-admin/site-editor.php?canvas=edit">
-						{ _x(
-							'editor',
-							'Link to the site editor',
+					{ createInterpolateElement(
+						__(
+							'You can manage your theme fonts directly from the <a>editor</a>.',
 							'create-block-theme'
-						) }
-					</a>
-					.
+						),
+						{
+							a: (
+								// eslint-disable-next-line jsx-a11y/anchor-has-content
+								<a href="/wp-admin/site-editor.php?canvas=edit" />
+							),
+						}
+					) }
 				</p>
 				<img
 					src="https://i0.wp.com/wordpress.org/news/files/2024/04/Font-Manager-2.png?w=620&ssl=1"
 					alt="WordPress 6.5 Font Library"
 				/>
 				<p>
-					{ __(
-						'For more information, please check out',
-						'create-block-theme'
-					) }{ ' ' }
-					<a href="https://wordpress.org/news/2024/04/regina/">{ `What's inside 6.5` }</a>
-					.
+					{ createInterpolateElement(
+						__(
+							"For more information, please check out <a>What's inside 6.5</a>.",
+							'create-block-theme'
+						),
+						{
+							a: (
+								// eslint-disable-next-line jsx-a11y/anchor-has-content
+								<a href="https://wordpress.org/news/2024/04/regina/" />
+							),
+						}
+					) }
 				</p>
 			</div>
 		</div>
