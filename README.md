@@ -57,9 +57,9 @@ Generate a boilerplate "empty" theme inside of the current site's themes directo
 
 Saves user's changes as a [style variation](https://developer.wordpress.org/themes/advanced-topics/theme-json/#global-styles-variations) of the currently active theme.
 
-### Embed Google Fonts or local font files
+### Embed Fonts
 
-**DEPRECATED:** Fonts can now be managed using WordPress' native Font Library. [More information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site).
+Save fonts in your theme that have been installed with the Font Library (found in WordPress 6.5+, [more information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site)).
 
 ## How to Use the Plugin
 
