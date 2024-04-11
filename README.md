@@ -1,15 +1,21 @@
 # Create Block Theme
 
-Welcome to Create Block Theme - a WordPress plugin to create block themes from within the Site Editor.
+Welcome to Create Block Theme - a WordPress plugin to create block themes from within the Editor.
 
-It works alongside features that are already available in the Site Editor to enhance the workflow for creating block themes. After being tested in this plugin, some of the features included here may be moved into the Site Editor itself.
+It works alongside features that are already available in the Editor to enhance the workflow for creating block themes. After being tested in this plugin, some of the features included here may be moved into the Editor itself.
 
 *Disclaimer:* Create Block Theme enables development features and thus is a tool that should be treated like as such; you can think of it as a Development Mode for WordPress, and you should keep in mind that changes made through this plugin could change your site and/or theme permanently.
 
 This plugin allows you to:
 
-- Export your existing theme with all customizations made in the Site Editor
-- Create a new theme, blank theme, child theme, or style variation from the Site Editor
+- Export your existing theme with all customizations made in the Editor
+- Create a new theme, blank theme, child theme, or style variation from the Editor
+
+This plugin also makes several changes to the contents of an exported theme, including:
+
+- Adds all images used in templates to the theme's `assets` folder.
+- Ensures the block markup used in templates and patterns is export-ready.
+- Ensures most strings used in templates and patterns are translate-ready.
 
 Learn more about Create Block Theme:
 
@@ -51,9 +57,9 @@ Generate a boilerplate "empty" theme inside of the current site's themes directo
 
 Saves user's changes as a [style variation](https://developer.wordpress.org/themes/advanced-topics/theme-json/#global-styles-variations) of the currently active theme.
 
-### Embed Google Fonts or local font files
+### Embed Fonts
 
-**DEPRECATED:** Fonts can now be managed using WordPress' native Font Library. [More information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site).
+Save fonts in your theme that have been installed with the Font Library (found in WordPress 6.5+, [more information](https://wordpress.org/documentation/wordpress-version/version-6-5/#add-and-manage-fonts-across-your-site)).
 
 ## How to Use the Plugin
 
@@ -61,17 +67,47 @@ Saves user's changes as a [style variation](https://developer.wordpress.org/them
 
 To use the latest release of the Create Block Theme plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/create-block-theme).
 
-In the WordPress Admin Dashboard, under Appearance there will be a new page called:
+There will be a new panel accessible from the WordPress Editor, which you can open by clicking on a new icon to the right of the "Save" button, at the top of the Editor.
 
--   Create Block Theme
+In the WordPress Admin Dashboard, under Appearance there will also be a new page called "Create Block Theme".
 
 ### Step 2: Styles and templates customizations
 
-Make changes to your site styles and templates using the Site Editor.
+Make changes to your site styles, fonts and templates using the Editor.
 
 ### Step 3: Save
 
-Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click the "Generate" button to save the theme.
+Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.
+
+To simply save recent changes made in the Editor to the currently active theme or export the theme:
+
+- Select "Save Changes" to save any recent changes to the currently active theme.
+- Select "Export Zip" to export the theme as a zip file.
+
+To edit the theme metadata:
+
+- Select "Theme Info" to edit the metadata for the theme. These details will be used in the style.css file.
+
+To create a new theme, child theme, or style variation, select "Create Theme" to access the following options for the currently active theme:
+
+- "Clone Theme" to create a copy of the active theme.
+- "Create Child Theme" to create a child theme of the active theme.
+- "Create Theme Variation" to create a style variation.
+- "Export Theme" to export the theme as a zip file.
+- "Export Child Theme" to export a child of the currently active theme as a zip file.
+- "Create Blank Theme" to create a new, blank theme with no styles or templates.
+
+To inspect the active theme's theme.json contents:
+
+- Select "Inspect Theme JSON"
+
+Many of these options are also available under the older, deprecated Create Block Theme page under Appearance > Create Block Theme.
+
+To install and uninstall fonts:
+
+- Install and activate a font from any source using the WordPress Font Library.
+- Select "Save Changes" to save all of the active fonts to the currently active theme. These fonts will then be activated in the theme and deactivated in the system (and may be safely deleted from the system).
+- Any fonts that are installed in the theme that have been deactivated with the WordPress Font Library will be removed from the theme.
 
 ## How to Contribute
 

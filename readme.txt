@@ -14,22 +14,71 @@ A WordPress plugin to create block themes.
 
 This plugin allows you to:
 
-- Create a new theme, blank theme, child theme or style variation.
+- Create a blank theme
+- Create a new theme based on the currently active theme
+- Create a child theme of the active parent theme
+- Create a new style variation
+
+All newly created themes or style variations will include changes made within the WordPress Editor.
+
+This plugin also makes several changes to the contents of an exported theme, including:
+
+- Adds all images used in templates to the theme's `assets` folder.
+- Ensures the block markup used in templates and patterns is export-ready.
+- Ensures most strings used in templates and patterns are translate-ready.
 
 The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
 
 = Step 1 – Setup =
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
 
-In the WordPress Admin Dashboard, under Appearance there will be a new page called:
+There will be a new panel accessible from the WordPress Editor, which you can open by clicking on a new icon to the right of the "Save" button, at the top of the Editor.
 
-- Create Block Theme
+1. Create Block Theme panel in the WordPress Editor
 
 = Step 2 – Style Customizations =
-Make changes to your site styles and templates using the Site Editor.
+Make changes to your site styles, fonts and templates using the Editor.
 
 = Step 3 – Export =
-Still in the WordPress dashboard, navigate to "Appearance" -> "Create Block Theme" section. Select one of the available options and then, if necessary, add the details for the theme here. These details will be used in the style.css file. Click "Generate” button, to save the theme.
+Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.
+
+To simply save recent changes made in the Editor to the currently active theme or export the theme:
+
+- Select "Save Changes" to save any recent changes to the currently active theme.
+- Select "Export Zip" to export the theme as a zip file.
+
+To edit the theme metadata:
+
+- Select "Theme Info" to edit the metadata for the theme. These details will be used in the style.css file.
+
+2. Theme Info editing panel in the WordPress Editor
+
+To create a new theme, child theme, or style variation, select "Create Theme" to access the following options for the currently active theme:
+
+- "Clone Theme" to create a copy of the active theme.
+- "Create Child Theme" to create a child theme of the active theme.
+- "Create Theme Variation" to create a style variation.
+- "Export Theme" to export the theme as a zip file.
+- "Export Child Theme" to export a child of the currently active theme as a zip file.
+- "Create Blank Theme" to create a new, blank theme with no styles or templates.
+
+3. Create Theme panel in the WordPress Editor
+
+To inspect the active theme's theme.json contents:
+
+- Select "Inspect Theme JSON"
+
+4. theme.json inspector in the WordPress Editor
+
+To install and uninstall fonts:
+
+- Install and activate a font from any source using the WordPress Font Library.
+- Select "Save Changes" to save all of the active fonts to the currently active theme. These fonts will then be activated in the theme and deactivated in the system (and may be safely deleted from the system).
+- Any fonts that are installed in the theme that have been deactivated with the WordPress Font Library will be removed from the theme.
+
+Many of these options are also available under the older, deprecated Create Block Theme page under Appearance > Create Block Theme.
+
+5. Page under Appearance > Create Block Theme
 
 == Frequently Asked Questions ==
 
