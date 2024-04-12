@@ -1,4 +1,5 @@
 import apiFetch from '@wordpress/api-fetch';
+import { downloadFile } from './utils';
 
 export async function fetchThemeJson() {
 	const fetchOptions = {
@@ -45,5 +46,18 @@ export async function postUpdateThemeMetadata( theme ) {
 		headers: {
 			'Content-Type': 'application/json',
 		},
+	} );
+}
+
+export async function downloadExportedTheme() {
+	return apiFetch( {
+		path: '/create-block-theme/v1/export',
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		parse: false,
+	} ).then( ( response ) => {
+		downloadFile( response );
 	} );
 }
