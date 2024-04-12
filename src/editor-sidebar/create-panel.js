@@ -19,51 +19,52 @@ import {
 	Button,
 	TextControl,
 	TextareaControl,
-	CheckboxControl,
 } from '@wordpress/components';
 import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
 
-export const CreateThemePanel = ( { createType } ) => {
-	const { createErrorNotice } = useDispatch( noticesStore );
+export const CreateThemePanel = ({ createType, saveType }) => {
 
-	const [ theme, setTheme ] = useState( {
+	const { createErrorNotice } = useDispatch(noticesStore);
+
+	const [theme, setTheme] = useState({
 		name: '',
 		description: '',
 		uri: '',
 		author: '',
 		author_uri: '',
 		tags_custom: '',
-	} );
+		subfolder: '',
+	});
 
-	useSelect( ( select ) => {
+	useSelect((select) => {
 		const themeData = select( 'core' ).getCurrentTheme();
-		if ( createType.includes( 'export') ) {
-		setTheme( {
-			name: themeData.name.raw,
-			description: themeData.description.raw,
-			uri: themeData.theme_uri.raw,
-			author: themeData.author.raw,
-			author_uri: themeData.author_uri.raw,
+		setTheme({
+ 			...theme,
 			subfolder:
-				themeData.stylesheet.lastIndexOf( '/' ) > 1
+				themeData.stylesheet.lastIndexOf('/') > 1
 					? themeData.stylesheet.substring(
-							0,
-							themeData.stylesheet.lastIndexOf( '/' )
-					  )
+						0,
+						themeData.stylesheet.lastIndexOf('/')
+					)
 					: '',
-		} );
-	} else {
-		setTheme( {
-			subfolder:
-				themeData.stylesheet.lastIndexOf( '/' ) > 1
-					? themeData.stylesheet.substring(
-							0,
-							themeData.stylesheet.lastIndexOf( '/' )
-					  )
-					: '',
-		} );
+		});
+	}, []);
+
+	const cloneTheme = ( createType, saveType ) => {
+		if (createType === 'createClone') {
+			if (saveType === 'download') {
+				handleExportClick();
+			} else {
+				handleCloneClick();
+			}
+		} else if (createType === 'createChild') {
+			if (saveType === 'download') {
+				handleExportChildClick();
+			} else {
+				handleCreateChildClick();
+			}
+		}
 	}
-	}, [] );
 
 	const handleExportClick = () => {
 		const fetchOptions = {
@@ -78,17 +79,17 @@ export const CreateThemePanel = ( { createType } ) => {
 
 		async function exportCloneTheme() {
 			try {
-				const response = await apiFetch( fetchOptions );
-				downloadFile( response );
-			} catch ( error ) {
+				const response = await apiFetch(fetchOptions);
+				downloadFile(response);
+			} catch (error) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
 						? error.message
 						: __(
-								'An error occurred while attempting to export the theme.',
-								'create-block-theme'
-						  );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
+							'An error occurred while attempting to export the theme.',
+							'create-block-theme'
+						);
+				createErrorNotice(errorMessage, { type: 'snackbar' });
 			}
 		}
 
@@ -108,17 +109,17 @@ export const CreateThemePanel = ( { createType } ) => {
 
 		async function exportCloneTheme() {
 			try {
-				const response = await apiFetch( fetchOptions );
-				downloadFile( response );
-			} catch ( error ) {
+				const response = await apiFetch(fetchOptions);
+				downloadFile(response);
+			} catch (error) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
 						? error.message
 						: __(
-								'An error occurred while attempting to export the child theme.',
-								'create-block-theme'
-						  );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
+							'An error occurred while attempting to export the child theme.',
+							'create-block-theme'
+						);
+				createErrorNotice(errorMessage, { type: 'snackbar' });
 			}
 		}
 
@@ -126,15 +127,15 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateBlankClick = () => {
-		apiFetch( {
+		apiFetch({
 			path: '/create-block-theme/v1/create-blank',
 			method: 'POST',
 			data: theme,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		} )
-			.then( () => {
+		})
+			.then(() => {
 				// eslint-disable-next-line
 				alert(
 					__(
@@ -143,28 +144,28 @@ export const CreateThemePanel = ( { createType } ) => {
 					)
 				);
 				window.location.reload();
-			} )
-			.catch( ( error ) => {
+			})
+			.catch((error) => {
 				const errorMessage =
 					error.message ||
 					__(
 						'An error occurred while attempting to create the theme.',
 						'create-block-theme'
 					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
+				createErrorNotice(errorMessage, { type: 'snackbar' });
+			});
 	};
 
 	const handleCloneClick = () => {
-		apiFetch( {
+		apiFetch({
 			path: '/create-block-theme/v1/clone',
 			method: 'POST',
 			data: theme,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		} )
-			.then( () => {
+		})
+			.then(() => {
 				// eslint-disable-next-line
 				alert(
 					__(
@@ -173,28 +174,28 @@ export const CreateThemePanel = ( { createType } ) => {
 					)
 				);
 				window.location.reload();
-			} )
-			.catch( ( error ) => {
+			})
+			.catch((error) => {
 				const errorMessage =
 					error.message ||
 					__(
 						'An error occurred while attempting to create the theme.',
 						'create-block-theme'
 					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
+				createErrorNotice(errorMessage, { type: 'snackbar' });
+			});
 	};
 
 	const handleCreateChildClick = () => {
-		apiFetch( {
+		apiFetch({
 			path: '/create-block-theme/v1/create-child',
 			method: 'POST',
 			data: theme,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		} )
-			.then( () => {
+		})
+			.then(() => {
 				// eslint-disable-next-line
 				alert(
 					__(
@@ -203,219 +204,125 @@ export const CreateThemePanel = ( { createType } ) => {
 					)
 				);
 				window.location.reload();
-			} )
-			.catch( ( error ) => {
+			})
+			.catch((error) => {
 				const errorMessage =
 					error.message ||
 					__(
 						'An error occurred while attempting to create the theme.',
 						'create-block-theme'
 					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
-	};
-
-	const handleCreateVariationClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-variation',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
-			.then( () => {
-				// eslint-disable-next-line
-				alert(
-					__(
-						'Theme variation created successfully. The editor will now reload.',
-						'create-block-theme'
-					)
-				);
-				window.location.reload();
-			} )
-			.catch( ( error ) => {
-				const errorMessage =
-					error.message ||
-					__(
-						'An error occurred while attempting to create the theme variation.',
-						'create-block-theme'
-					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
+				createErrorNotice(errorMessage, { type: 'snackbar' });
+			});
 	};
 
 	return (
 		<PanelBody>
 			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft }>
+				<NavigatorToParentButton icon={chevronLeft}>
 					{
-						__( 'Clone Theme', 'create-block-theme' )
+						__('Create Theme', 'create-block-theme')
 					}
 				</NavigatorToParentButton>
 			</Heading>
 
 			<VStack>
 				<TextControl
-					label={ __( 'Theme name', 'create-block-theme' ) }
-					value={ theme.name }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, name: value } )
+					label={__('Theme name', 'create-block-theme')}
+					value={theme.name}
+					onChange={(value) =>
+						setTheme({ ...theme, name: value })
 					}
 				/>
 				<details>
-					<summary>Theme MetaData</summary>
+					<summary>{__('Additional Theme MetaData', 'create-block-theme')}</summary>
 					<Spacer />
-				<TextareaControl
-					label={ __( 'Theme description', 'create-block-theme' ) }
-					value={ theme.description }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, description: value } )
-					}
-					placeholder={ __(
-						'A short description of the theme',
-						'create-block-theme'
-					) }
-				/>
-				<TextControl
-					label={ __( 'Theme URI', 'create-block-theme' ) }
-					value={ theme.uri }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, uri: value } )
-					}
-					placeholder={ __(
-						'https://github.com/wordpress/twentytwentythree/',
-						'create-block-theme'
-					) }
-				/>
-				<TextControl
-					label={ __( 'Author', 'create-block-theme' ) }
-					value={ theme.author }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, author: value } )
-					}
-					placeholder={ __(
-						'the WordPress team',
-						'create-block-theme'
-					) }
-				/>
-				<TextControl
-					label={ __( 'Author URI', 'create-block-theme' ) }
-					value={ theme.author_uri }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, author_uri: value } )
-					}
-					placeholder={ __(
-						'https://wordpress.org/',
-						'create-block-theme'
-					) }
-				/>
+					<TextareaControl
+						label={__('Theme description', 'create-block-theme')}
+						value={theme.description}
+						onChange={(value) =>
+							setTheme({ ...theme, description: value })
+						}
+						placeholder={__(
+							'A short description of the theme',
+							'create-block-theme'
+						)}
+					/>
+					<TextControl
+						label={__('Theme URI', 'create-block-theme')}
+						value={theme.uri}
+						onChange={(value) =>
+							setTheme({ ...theme, uri: value })
+						}
+						placeholder={__(
+							'https://github.com/wordpress/twentytwentythree/',
+							'create-block-theme'
+						)}
+					/>
+					<TextControl
+						label={__('Author', 'create-block-theme')}
+						value={theme.author}
+						onChange={(value) =>
+							setTheme({ ...theme, author: value })
+						}
+						placeholder={__(
+							'the WordPress team',
+							'create-block-theme'
+						)}
+					/>
+					<TextControl
+						label={__('Author URI', 'create-block-theme')}
+						value={theme.author_uri}
+						onChange={(value) =>
+							setTheme({ ...theme, author_uri: value })
+						}
+						placeholder={__(
+							'https://wordpress.org/',
+							'create-block-theme'
+						)}
+					/>
 				</details>
 				<br />
-				{ createType === 'createClone' && (
+				{createType === 'createClone' && (
 					<>
 						<Button
-							icon={ copy }
+							icon={ saveType === 'download' ? download : copy }
 							variant="primary"
-							onClick={ handleCloneClick }
+							onClick={ ()=> cloneTheme( theme, createType, saveType ) }
 						>
-							{ __( 'Create Theme', 'create-block-theme' ) }
+							{__('Create Theme', 'create-block-theme')}
 						</Button>
 					</>
-				) }
-				{ createType === 'createChild' && (
+				)}
+				{createType === 'createChild' && (
 					<>
 						<Button
-							icon={ copy }
+							icon={ saveType === 'download' ? download : copy }
 							variant="primary"
-							onClick={ handleCreateChildClick }
+							onClick={ ()=> cloneTheme( theme, createType, saveType ) }
 						>
-							{ __( 'Create Child Theme', 'create-block-theme' ) }
+							{__('Create Child Theme', 'create-block-theme')}
 						</Button>
-						<Spacer />
-						<Text variant="muted">
-							{ __(
-								'Create a child theme on the server and activate it. The user changes will be preserved in the new theme.',
-								'create-block-theme'
-							) }
-						</Text>
 					</>
-				) }
-				{ createType === 'createVariation' && (
+				)}
+				{createType === 'createBlank' && (
 					<>
 						<Button
-							icon={ copy }
-							variant="primary"
-							onClick={ handleCreateVariationClick }
-						>
-							{ __(
-								'Create Theme Variation',
-								'create-block-theme'
-							) }
-						</Button>
-						<Spacer />
-						<Text variant="muted">
-							{ __(
-								'Save the Global Styles changes as a theme variation.',
-								'create-block-theme'
-							) }
-						</Text>
-					</>
-				) }
-				{ createType === 'exportClone' && (
-					<>
-						<Button
-							icon={ download }
-							variant="primary"
-							onClick={ handleExportClick }
-						>
-							{ __( 'Export Theme', 'create-block-theme' ) }
-						</Button>
-						<Spacer />
-						<Text variant="muted">
-							{ __(
-								'Export a copy of this theme as a .zip file. The user changes will be preserved in the new theme.',
-								'create-block-theme'
-							) }
-						</Text>
-					</>
-				) }
-				{ createType === 'exportChild' && (
-					<>
-						<Button
-							icon={ download }
-							variant="primary"
-							onClick={ handleExportChildClick }
-						>
-							{ __( 'Export Child Theme', 'create-block-theme' ) }
-						</Button>
-						<Spacer />
-						<Text variant="muted">
-							{ __(
-								'Export a child of this theme as a .zip file. The user changes will be preserved in the new theme.',
-								'create-block-theme'
-							) }
-						</Text>
-					</>
-				) }
-				{ createType === 'createBlank' && (
-					<>
-						<Button
-							icon={ addCard }
+							icon={addCard}
 							variant="primary"
 							onClick={ handleCreateBlankClick }
 						>
-							{ __( 'Create Blank Theme', 'create-block-theme' ) }
+							{__('Create Blank Theme', 'create-block-theme')}
 						</Button>
 						<Spacer />
 						<Text variant="muted">
-							{ __(
+							{__(
 								'Create a blank theme with no styles or templates.',
 								'create-block-theme'
-							) }
+							)}
 						</Text>
 					</>
-				) }
+				)}
 			</VStack>
 		</PanelBody>
 	);

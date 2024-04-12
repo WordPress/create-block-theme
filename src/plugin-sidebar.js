@@ -48,9 +48,14 @@ import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal
 import { downloadExportedTheme } from './resolvers';
 
 const CreateBlockThemePlugin = () => {
+
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
 
 	const [ isMetadataEditorOpen, setIsMetadataEditorOpen ] = useState( false );
+
+	const [ cloneCreateType, setCloneCreateType ] = useState( '' );
+
+	const [ cloneSaveType, setCloneSaveType ] = useState( '' );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -192,6 +197,7 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton
 									path="/clone/type"
 									icon={ copy }
+									onClick={ () => { setCloneCreateType( 'createClone' ) } }
 								>
 									<Spacer />
 									<HStack>
@@ -214,6 +220,7 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton
 									path="/clone/type"
 									icon={ copy }
+									onClick={ () => { setCloneCreateType( 'createChild' ) } }
 								>
 									<Spacer />
 									<HStack>
@@ -255,8 +262,9 @@ const CreateBlockThemePlugin = () => {
 								</Text>
 								<hr></hr>
 								<NavigatorButton
-									path="/clone/theme"
+									path="/clone/create"
 									icon={ copy }
+									onClick={ () => { setCloneSaveType( 'create' ) } }
 								>
 									<Spacer />
 									<HStack>
@@ -277,8 +285,9 @@ const CreateBlockThemePlugin = () => {
 								</Text>
 								<hr></hr>
 								<NavigatorButton
-									path="/clone/theme"
-									icon={ copy }
+									path="/clone/create"
+									icon={ download }
+									onClick={ () => { setCloneSaveType( 'download' ) } }
 								>
 									<Spacer />
 									<HStack>
@@ -305,8 +314,8 @@ const CreateBlockThemePlugin = () => {
 						<CreateThemePanel createType={ 'createBlank' } />
 					</NavigatorScreen>
 
-					<NavigatorScreen path="/clone/theme">
-						<CreateThemePanel createType={ 'createClone' } />
+					<NavigatorScreen path="/clone/create">
+						<CreateThemePanel createType={ cloneCreateType } saveType={ cloneSaveType } />
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/create/variation">
