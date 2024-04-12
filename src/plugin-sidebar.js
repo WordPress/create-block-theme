@@ -48,7 +48,6 @@ import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal
 import { downloadExportedTheme } from './resolvers';
 
 const CreateBlockThemePlugin = () => {
-
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
 
 	const [ isMetadataEditorOpen, setIsMetadataEditorOpen ] = useState( false );
@@ -197,13 +196,15 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton
 									path="/clone/type"
 									icon={ copy }
-									onClick={ () => { setCloneCreateType( 'createClone' ) } }
+									onClick={ () => {
+										setCloneCreateType( 'createClone' );
+									} }
 								>
 									<Spacer />
 									<HStack>
 										<FlexItem>
 											{ __(
-												'Create Regular Theme',
+												'Create Theme',
 												'create-block-theme'
 											) }
 										</FlexItem>
@@ -220,7 +221,9 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton
 									path="/clone/type"
 									icon={ copy }
-									onClick={ () => { setCloneCreateType( 'createChild' ) } }
+									onClick={ () => {
+										setCloneCreateType( 'createChild' );
+									} }
 								>
 									<Spacer />
 									<HStack>
@@ -264,7 +267,9 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton
 									path="/clone/create"
 									icon={ copy }
-									onClick={ () => { setCloneSaveType( 'create' ) } }
+									onClick={ () => {
+										setCloneSaveType( 'create' );
+									} }
 								>
 									<Spacer />
 									<HStack>
@@ -287,7 +292,9 @@ const CreateBlockThemePlugin = () => {
 								<NavigatorButton
 									path="/clone/create"
 									icon={ download }
-									onClick={ () => { setCloneSaveType( 'download' ) } }
+									onClick={ () => {
+										setCloneSaveType( 'download' );
+									} }
 								>
 									<Spacer />
 									<HStack>
@@ -315,7 +322,10 @@ const CreateBlockThemePlugin = () => {
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/clone/create">
-						<CreateThemePanel createType={ cloneCreateType } saveType={ cloneSaveType } />
+						<CreateThemePanel
+							createType={ cloneCreateType }
+							saveType={ cloneSaveType }
+						/>
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/create/variation">
