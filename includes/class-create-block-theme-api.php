@@ -420,17 +420,29 @@ class Create_Block_Theme_API {
 	 */
 	function rest_save_theme( $request ) {
 
-		Theme_Fonts::persist_font_settings();
+		$options = $request->get_params();
 
-		if ( is_child_theme() ) {
-			Theme_Templates::add_templates_to_local( 'current' );
-			Theme_Json::add_theme_json_to_local( 'current' );
-		} else {
-			Theme_Templates::add_templates_to_local( 'all' );
-			Theme_Json::add_theme_json_to_local( 'all' );
+		if ( isset( $options['saveFonts'] ) ) {
+			Theme_Fonts::persist_font_settings();
 		}
-		Theme_Styles::clear_user_styles_customizations();
-		Theme_Templates::clear_user_templates_customizations();
+
+		if ( isset( $options['saveTemplates'] ) ) {
+			if ( is_child_theme() ) {
+				Theme_Templates::add_templates_to_local( 'current' );
+			} else {
+				Theme_Templates::add_templates_to_local( 'all' );
+			}
+			Theme_Templates::clear_user_templates_customizations();
+		}
+
+		if ( isset( $options['saveStyle'] ) ) {
+			if ( is_child_theme() ) {
+				Theme_Json::add_theme_json_to_local( 'current' );
+			} else {
+				Theme_Json::add_theme_json_to_local( 'all' );
+			}
+			Theme_Styles::clear_user_styles_customizations();
+		}
 
 		return new WP_REST_Response(
 			array(

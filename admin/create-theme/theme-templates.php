@@ -153,10 +153,23 @@ class Theme_Templates {
 	 * @param string $slug The slug of the theme.
 	 * @return object The prepared template.
 	 */
-	public static function prepare_template_for_export( $template, $slug = null ) {
+	public static function prepare_template_for_export( $template, $slug = null, $options = null ) {
 
-		$template = self::eliminate_environment_specific_content( $template );
-		$template = self::escape_text_in_template( $template );
+		if ( ! $options ) {
+			$options = array(
+				array( 'localizeText' => true ),
+				array( 'removeNavRefs' => true ),
+			);
+		}
+
+		if ( $options['localizeText'] ) {
+			$template = self::eliminate_environment_specific_content( $template );
+		}
+
+		if ( $options['localizeText'] ) {
+			$template = self::escape_text_in_template( $template );
+		}
+
 		$template = Theme_Media::make_template_images_local( $template );
 		$template = self::paternize_template( $template );
 
@@ -176,7 +189,7 @@ class Theme_Templates {
 	 * @param string $path The path to the theme folder. If null it is assumed to be the current theme.
 	 * @param string $slug The slug of the theme. If null it is assumed to be the current theme.
 	 */
-	public static function add_templates_to_local( $export_type, $path = null, $slug = null ) {
+	public static function add_templates_to_local( $export_type, $path = null, $slug = null, $options = null ) {
 
 		$theme_templates  = self::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
@@ -198,7 +211,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = self::prepare_template_for_export( $template, $slug );
+			$template = self::prepare_template_for_export( $template, $slug, $options );
 
 			// Write the template content
 			file_put_contents(
