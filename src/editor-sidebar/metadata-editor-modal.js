@@ -1,9 +1,6 @@
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import CodeMirror from '@uiw/react-codemirror';
-import { json } from '@codemirror/lang-json';
-import { fetchThemeJson } from '../resolvers';
 import {
 	// eslint-disable-next-line
 	__experimentalVStack as VStack,
@@ -11,24 +8,15 @@ import {
 	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line
 	__experimentalText as Text,
-	// eslint-disable-next-line
-	__experimentalHeading as Heading,
-	// eslint-disable-next-line
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
-	PanelBody,
 	Modal,
 	Button,
 	TextControl,
 	TextareaControl,
 	ExternalLink,
 } from '@wordpress/components';
+import { postUpdateThemeMetadata } from '../resolvers';
 
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
-
-	const themeName = useSelect( ( select ) =>
-		select( 'core' ).getCurrentTheme()
-	)?.name?.raw;
-
 	const [ theme, setTheme ] = useState( {
 		name: '',
 		description: '',
@@ -40,15 +28,28 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		recommended_plugins: '',
 	} );
 
+	useSelect( async ( select ) => {
+		const themeData = select( 'core' ).getCurrentTheme();
+		setTheme( {
+			name: themeData.name.raw,
+			description: themeData.description.raw,
+			uri: themeData.theme_uri.raw,
+			version: themeData.version,
+			author: themeData.author.raw,
+			author_uri: themeData.author_uri.raw,
+			tags_custom: themeData.tags.rendered,
+			subfolder:
+				themeData.stylesheet.lastIndexOf( '/' ) > 1
+					? themeData.stylesheet.substring(
+							0,
+							themeData.stylesheet.lastIndexOf( '/' )
+					  )
+					: '',
+		} );
+	}, [] );
+
 	const handleUpdateClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/update',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		postUpdateThemeMetadata( theme )
 			.then( () => {
 				// eslint-disable-next-line
 				alert(
@@ -72,10 +73,9 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	return (
 		<Modal
 			isFullScreen
-			title={ `Metadata for ${ themeName }` }
+			title={ `Metadata for ${ theme?.name }` }
 			onRequestClose={ onRequestClose }
 		>
-
 			<VStack>
 				<Text>
 					{ __(

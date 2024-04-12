@@ -36,3 +36,14 @@ export async function postCreateThemeVariation( name ) {
 		},
 	} );
 }
+
+export async function postUpdateThemeMetadata( theme ) {
+	return apiFetch( {
+		path: '/create-block-theme/v1/update',
+		method: 'POST',
+		data: theme,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} );
+}
