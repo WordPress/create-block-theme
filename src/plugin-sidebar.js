@@ -34,49 +34,28 @@ import {
 import { UpdateThemePanel } from './editor-sidebar/update-panel';
 import { CreateThemePanel } from './editor-sidebar/create-panel';
 import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
+import { SaveThemePanel } from './editor-sidebar/save-panel';
+import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
 
 import {
 	tool,
 	copy,
 	download,
 	edit,
+	code,
 	chevronRight,
 	chevronLeft,
+	addCard,
+	blockMeta,
 	archive,
 } from '@wordpress/icons';
+import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
+	const [ isMetadataEditorOpen, setIsMetadataEditorOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const handleSaveClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/save',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
-			.then( () => {
-				// eslint-disable-next-line
-				alert(
-					__(
-						'Theme saved successfully. The editor will now reload.',
-						'create-block-theme'
-					)
-				);
-				window.location.reload();
-			} )
-			.catch( ( error ) => {
-				const errorMessage =
-					error.message ||
-					__(
-						'An error occurred while attempting to save the theme.',
-						'create-block-theme'
-					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
-	};
 
 	const handleExportClick = () => {
 		const fetchOptions = {
@@ -132,44 +111,21 @@ const CreateBlockThemePlugin = () => {
 					<NavigatorScreen path="/">
 						<PanelBody>
 							<VStack spacing={ 0 }>
-								<Button
-									icon={ archive }
-									onClick={ handleSaveClick }
-								>
-									{ __(
-										'Save Changes',
-										'create-block-theme'
-									) }
-								</Button>
-								<Text variant="muted">
-									{ __(
-										'Save user changes (including Templates and Global Styles) to the theme.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<NavigatorButton path="/create" icon={ copy }>
+								<NavigatorButton path="/save" icon={ copy }>
 									<Spacer />
 									<HStack>
 										<FlexItem>
 											{ __(
-												'Create Theme',
+												'Save Changes to Theme',
 												'create-block-theme'
 											) }
 										</FlexItem>
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Create a new theme based on your current theme or create a new blank theme.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
 								<NavigatorButton
 									path="/create/variation"
-									icon={ copy }
+									icon={ blockMeta }
 								>
 									<Spacer />
 									<HStack>
@@ -182,88 +138,37 @@ const CreateBlockThemePlugin = () => {
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Save the Global Styles changes as a theme variation.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<NavigatorButton path="/export" icon={ copy }>
-									<Spacer />
-									<HStack>
-										<FlexItem>
-											{ __(
-												'Export Theme',
-												'create-block-theme'
-											) }
-										</FlexItem>
-										<Icon icon={ chevronRight } />
-									</HStack>
-								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Export your theme as a zip file.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<NavigatorButton path="/update" icon={ edit }>
-									<Spacer />
-									<HStack justify="space-between">
-										<FlexItem>
-											{ __(
-												'Theme Info',
-												'create-block-theme'
-											) }
-										</FlexItem>
-										<Icon icon={ chevronRight } />
-									</HStack>
-								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Edit Metadata properties of your current theme.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
 								<Button
 									icon={ edit }
-									onClick={ () => setIsEditorOpen( true ) }
+									onClick={ () => setIsMetadataEditorOpen( true ) }
 								>
 									{ __(
-										'Inspect Theme JSON',
+										'MetaData',
 										'create-block-theme'
 									) }
 								</Button>
-								<Text variant="muted">
+								<Button
+									icon={ code }
+									onClick={ () => setIsEditorOpen( true ) }
+								>
 									{ __(
-										'Open the theme.json file to inspect theme data.',
+										'theme.json',
 										'create-block-theme'
 									) }
-								</Text>
-							</VStack>
-						</PanelBody>
-					</NavigatorScreen>
-
-					<NavigatorScreen path="/update">
-						<UpdateThemePanel />
-					</NavigatorScreen>
-
-					<NavigatorScreen path="/create">
-						<PanelBody>
-							<Heading>
-								<NavigatorToParentButton icon={ chevronLeft }>
+								</Button>
+								<Button
+									icon={ download }
+									onClick={ () => setIsEditorOpen( true ) }
+								>
 									{ __(
-										'Create Theme',
+										'Export Zip',
 										'create-block-theme'
 									) }
-								</NavigatorToParentButton>
-							</Heading>
-							<VStack>
+								</Button>
+								<hr></hr>
 								<NavigatorButton
 									path="/create/blank"
-									icon={ copy }
+									icon={ addCard }
 								>
 									<Spacer />
 									<HStack>
@@ -276,15 +181,8 @@ const CreateBlockThemePlugin = () => {
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Create a blank theme with no styles or templates.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
 								<NavigatorButton
-									path="/create/clone"
+									path="/clone"
 									icon={ copy }
 								>
 									<Spacer />
@@ -298,15 +196,52 @@ const CreateBlockThemePlugin = () => {
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
-								<Text variant="muted">
+							</VStack>
+						</PanelBody>
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/clone">
+						<PanelBody>
+							<Heading>
+								<NavigatorToParentButton icon={ chevronLeft }>
 									{ __(
-										'Create a copy of this theme on the server and activate it. The user changes will be preserved in the new theme.',
+										'Clone Theme',
+										'create-block-theme'
+									) }
+								</NavigatorToParentButton>
+							</Heading>
+							<VStack>
+								<Text>
+									{ __(
+										'Would you like to make a Regular Theme or a Child Theme?',
 										'create-block-theme'
 									) }
 								</Text>
 								<hr></hr>
 								<NavigatorButton
-									path="/create/child"
+									path="/clone/type"
+									icon={ copy }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Create Regular Theme',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+								<Text variant="muted">
+									{ __(
+										'Create a clone of this theme with a new name. The user changes will be preserved in the new theme.',
+										'create-block-theme'
+									) }
+								</Text>
+								<hr></hr>
+								<NavigatorButton
+									path="/clone/type"
 									icon={ copy }
 								>
 									<Spacer />
@@ -322,106 +257,100 @@ const CreateBlockThemePlugin = () => {
 								</NavigatorButton>
 								<Text variant="muted">
 									{ __(
-										'Create a child theme on the server and activate it. The user changes will be preserved in the new theme.',
+										'Create a child theme that uses this theme as a parent. This theme will remain unchanged and the user changes will be preserved in the new child theme.',
 										'create-block-theme'
 									) }
 								</Text>
+							</VStack>
+						</PanelBody>
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/clone/type">
+						<PanelBody>
+							<Heading>
+								<NavigatorToParentButton icon={ chevronLeft }>
+									{ __(
+										'Clone Theme',
+										'create-block-theme'
+									) }
+								</NavigatorToParentButton>
+							</Heading>
+							<VStack>
+								<Text>
+									{ __(
+										'Would you like to create the theme on your server or export it as a zip file?',
+										'create-block-theme'
+									) }
+								</Text>
+								<hr></hr>
+								<NavigatorButton
+									path="/clone/theme"
+									icon={ copy }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Create on Server',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+						<Text variant="muted">
+							{ __(
+								'Create the new theme on the server and activate it. The user changes will be preserved in the new theme.',
+								'create-block-theme'
+							) }
+						</Text>
+								<hr></hr>
+								<NavigatorButton
+									path="/clone/theme"
+									icon={ copy }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Export Zip',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+						<Text variant="muted">
+							{ __(
+								'Export a copy of this theme as a .zip file. The user changes will be preserved in the new theme.',
+								'create-block-theme'
+							) }
+						</Text>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
 					<NavigatorScreen path="/create/blank">
 						<CreateThemePanel createType={ 'createBlank' } />
 					</NavigatorScreen>
-					<NavigatorScreen path="/create/clone">
+					<NavigatorScreen path="/clone/theme">
 						<CreateThemePanel createType={ 'createClone' } />
 					</NavigatorScreen>
-					<NavigatorScreen path="/create/child">
-						<CreateThemePanel createType={ 'createChild' } />
-					</NavigatorScreen>
 					<NavigatorScreen path="/create/variation">
-						<CreateThemePanel createType={ 'createVariation' } />
+						<CreateVariationPanel />
 					</NavigatorScreen>
-					<NavigatorScreen path="/export">
-						<PanelBody>
-							<Heading>
-								<NavigatorToParentButton icon={ chevronLeft }>
-									{ __(
-										'Export Theme',
-										'create-block-theme'
-									) }
-								</NavigatorToParentButton>
-							</Heading>
-							<VStack>
-								<Button
-									icon={ download }
-									onClick={ handleExportClick }
-								>
-									{ __( 'Export Zip', 'create-block-theme' ) }
-								</Button>
-								<Text variant="muted">
-									{ __(
-										'Export your theme as a zip file. The user changes will NOT be preserved in the new theme. To include those save the theme first.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<NavigatorButton
-									path="/export/clone"
-									icon={ copy }
-								>
-									<Spacer />
-									<HStack>
-										<FlexItem>
-											{ __(
-												'Export Clone',
-												'create-block-theme'
-											) }
-										</FlexItem>
-										<Icon icon={ chevronRight } />
-									</HStack>
-								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Export a copy of this theme with new MetaData as a .zip file. The user changes will be preserved in the new theme.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<NavigatorButton
-									path="/export/child"
-									icon={ copy }
-								>
-									<Spacer />
-									<HStack>
-										<FlexItem>
-											{ __(
-												'Export Child',
-												'create-block-theme'
-											) }
-										</FlexItem>
-										<Icon icon={ chevronRight } />
-									</HStack>
-								</NavigatorButton>
-								<Text variant="muted">
-									{ __(
-										'Export a child of this theme as a .zip file. The user changes will be preserved in the new theme.',
-										'create-block-theme'
-									) }
-								</Text>
-							</VStack>
-						</PanelBody>
-					</NavigatorScreen>
-					<NavigatorScreen path="/export/clone">
-						<CreateThemePanel createType={ 'exportClone' } />
-					</NavigatorScreen>
-					<NavigatorScreen path="/export/child">
-						<CreateThemePanel createType={ 'exportChild' } />
+					<NavigatorScreen path="/save">
+						<SaveThemePanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
 			{ isEditorOpen && (
 				<ThemeJsonEditorModal
 					onRequestClose={ () => setIsEditorOpen( false ) }
+				/>
+			) }
+			{ isMetadataEditorOpen && (
+				<ThemeMetadataEditorModal
+					onRequestClose={ () => setIsMetadataEditorOpen( false ) }
 				/>
 			) }
 		</>

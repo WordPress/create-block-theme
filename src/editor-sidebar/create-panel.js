@@ -19,6 +19,7 @@ import {
 	Button,
 	TextControl,
 	TextareaControl,
+	CheckboxControl,
 } from '@wordpress/components';
 import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
 
@@ -36,6 +37,7 @@ export const CreateThemePanel = ( { createType } ) => {
 
 	useSelect( ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
+		if ( createType.includes( 'export') ) {
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
@@ -50,6 +52,17 @@ export const CreateThemePanel = ( { createType } ) => {
 					  )
 					: '',
 		} );
+	} else {
+		setTheme( {
+			subfolder:
+				themeData.stylesheet.lastIndexOf( '/' ) > 1
+					? themeData.stylesheet.substring(
+							0,
+							themeData.stylesheet.lastIndexOf( '/' )
+					  )
+					: '',
+		} );
+	}
 	}, [] );
 
 	const handleExportClick = () => {
@@ -236,18 +249,13 @@ export const CreateThemePanel = ( { createType } ) => {
 		<PanelBody>
 			<Heading>
 				<NavigatorToParentButton icon={ chevronLeft }>
-					{ __( 'Create Theme', 'create-block-theme' ) }
+					{
+						__( 'Clone Theme', 'create-block-theme' )
+					}
 				</NavigatorToParentButton>
 			</Heading>
 
 			<VStack>
-				<Text>
-					{ __(
-						'Enter Metadata properties of the new theme.',
-						'create-block-theme'
-					) }
-				</Text>
-				<Spacer />
 				<TextControl
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
@@ -255,6 +263,9 @@ export const CreateThemePanel = ( { createType } ) => {
 						setTheme( { ...theme, name: value } )
 					}
 				/>
+				<details>
+					<summary>Theme MetaData</summary>
+					<Spacer />
 				<TextareaControl
 					label={ __( 'Theme description', 'create-block-theme' ) }
 					value={ theme.description }
@@ -299,13 +310,8 @@ export const CreateThemePanel = ( { createType } ) => {
 						'create-block-theme'
 					) }
 				/>
-				<TextControl
-					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
-					value={ theme.subfolder }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, subfolder: value } )
-					}
-				/>
+				</details>
+				<br />
 				{ createType === 'createClone' && (
 					<>
 						<Button
@@ -313,15 +319,8 @@ export const CreateThemePanel = ( { createType } ) => {
 							variant="primary"
 							onClick={ handleCloneClick }
 						>
-							{ __( 'Clone Theme', 'create-block-theme' ) }
+							{ __( 'Create Theme', 'create-block-theme' ) }
 						</Button>
-						<Spacer />
-						<Text variant="muted">
-							{ __(
-								'Create a copy of this theme on the server and activate it. The user changes will be preserved in the new theme.',
-								'create-block-theme'
-							) }
-						</Text>
 					</>
 				) }
 				{ createType === 'createChild' && (
