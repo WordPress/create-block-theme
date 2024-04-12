@@ -1,14 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
-import { downloadFile } from '../utils';
+import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
-	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line
 	__experimentalText as Text,
 	// eslint-disable-next-line
@@ -18,13 +14,11 @@ import {
 	PanelBody,
 	Button,
 	TextControl,
-	TextareaControl,
-	CheckboxControl,
 } from '@wordpress/components';
-import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
+import { chevronLeft, copy } from '@wordpress/icons';
+import { postCreateThemeVariation } from '../resolvers';
 
-export const CreateVariationPanel = ( { createType } ) => {
-
+export const CreateVariationPanel = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
@@ -32,14 +26,7 @@ export const CreateVariationPanel = ( { createType } ) => {
 	} );
 
 	const handleCreateVariationClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-variation',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		postCreateThemeVariation( theme.name )
 			.then( () => {
 				// eslint-disable-next-line
 				alert(
@@ -65,20 +52,18 @@ export const CreateVariationPanel = ( { createType } ) => {
 		<PanelBody>
 			<Heading>
 				<NavigatorToParentButton icon={ chevronLeft }>
-					{
-						__( 'Create Variation', 'create-block-theme' )
-					}
+					{ __( 'Create Variation', 'create-block-theme' ) }
 				</NavigatorToParentButton>
 			</Heading>
 
 			<VStack>
-						<Text>
-							{ __(
-								'Save the Global Styles changes as a theme variation.',
-								'create-block-theme'
-							) }
-						</Text>
-						<br />
+				<Text>
+					{ __(
+						'Save the Global Styles changes as a theme variation.',
+						'create-block-theme'
+					) }
+				</Text>
+				<br />
 				<TextControl
 					label={ __( 'Variation name', 'create-block-theme' ) }
 					value={ theme.name }
@@ -87,16 +72,13 @@ export const CreateVariationPanel = ( { createType } ) => {
 					}
 				/>
 				<br />
-						<Button
-							icon={ copy }
-							variant="primary"
-							onClick={ handleCreateVariationClick }
-						>
-							{ __(
-								'Create Theme Variation',
-								'create-block-theme'
-							) }
-						</Button>
+				<Button
+					icon={ copy }
+					variant="primary"
+					onClick={ handleCreateVariationClick }
+				>
+					{ __( 'Create Theme Variation', 'create-block-theme' ) }
+				</Button>
 			</VStack>
 		</PanelBody>
 	);

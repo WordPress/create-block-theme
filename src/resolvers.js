@@ -25,3 +25,14 @@ export async function fetchThemeJson() {
 		// @todo: handle error
 	}
 }
+
+export async function postCreateThemeVariation( name ) {
+	return apiFetch( {
+		path: '/create-block-theme/v1/create-variation',
+		method: 'POST',
+		data: { name },
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} );
+}
