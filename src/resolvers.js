@@ -57,8 +57,7 @@ export async function downloadExportedTheme() {
 			'Content-Type': 'application/json',
 		},
 		parse: false,
-	} )
-		.then( ( response ) => {
-			downloadFile( response );
-		} );
+	} ).then( ( response ) => {
+		downloadFile( response );
+	} );
 }
