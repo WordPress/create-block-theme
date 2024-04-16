@@ -12,17 +12,24 @@ class Theme_Fonts {
 		static::copy_activated_fonts_to_theme();
 	}
 
-	public static function copy_activated_fonts_to_theme() {
-
+	public static function get_user_activated_fonts() {
 		$user_settings = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$theme_json    = MY_Theme_JSON_Resolver::get_theme_file_contents();
+		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
+			return null;
+		}
+
+		return $user_settings['typography']['fontFamilies']['custom'];
+	}
+
+	public static function copy_activated_fonts_to_theme() {
+		$font_families_to_copy = static::get_user_activated_fonts();
 
 		// If there are no custom fonts, bounce out
-		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
+		if ( is_null( $font_families_to_copy ) ) {
 			return;
 		}
 
-		$font_families_to_copy = $user_settings['typography']['fontFamilies']['custom'];
+		$theme_json = MY_Theme_JSON_Resolver::get_theme_file_contents();
 
 		// copy font face assets to theme and change the src to the new location
 		require_once ABSPATH . 'wp-admin/includes/file.php';
