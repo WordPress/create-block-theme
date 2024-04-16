@@ -422,24 +422,24 @@ class Create_Block_Theme_API {
 
 		$options = $request->get_params();
 
-		if ( isset( $options['saveFonts'] ) ) {
+		if ( isset( $options['saveFonts'] ) && true === $options['saveFonts'] ) {
 			Theme_Fonts::persist_font_settings();
 		}
 
-		if ( isset( $options['saveTemplates'] ) ) {
+		if ( isset( $options['saveTemplates'] ) && true === $options['saveTemplates'] ) {
 			if ( is_child_theme() ) {
-				Theme_Templates::add_templates_to_local( 'current' );
+				Theme_Templates::add_templates_to_local( 'current', null, null, $options );
 			} else {
-				Theme_Templates::add_templates_to_local( 'all' );
+				Theme_Templates::add_templates_to_local( 'all', null, null, $options );
 			}
 			Theme_Templates::clear_user_templates_customizations();
 		}
 
-		if ( isset( $options['saveStyle'] ) ) {
+		if ( isset( $options['saveStyle'] ) && true === $options['saveStyle'] ) {
 			if ( is_child_theme() ) {
-				Theme_Json::add_theme_json_to_local( 'current' );
+				Theme_Json::add_theme_json_to_local( 'current', null, null, $options );
 			} else {
-				Theme_Json::add_theme_json_to_local( 'all' );
+				Theme_Json::add_theme_json_to_local( 'all', null, null, $options );
 			}
 			Theme_Styles::clear_user_styles_customizations();
 		}

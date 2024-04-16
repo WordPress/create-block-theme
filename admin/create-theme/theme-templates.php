@@ -157,16 +157,14 @@ class Theme_Templates {
 
 		if ( ! $options ) {
 			$options = array(
-				array( 'localizeText' => true ),
-				array( 'removeNavRefs' => true ),
+				'localizeText'  => true,
+				'removeNavRefs' => true,
 			);
 		}
 
-		if ( $options['localizeText'] ) {
-			$template = self::eliminate_environment_specific_content( $template );
-		}
+		$template = self::eliminate_environment_specific_content( $template, $options );
 
-		if ( $options['localizeText'] ) {
+		if ( array_key_exists( 'localizeText', $options ) && $options['localizeText'] ) {
 			$template = self::escape_text_in_template( $template );
 		}
 
@@ -239,7 +237,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->parts as $template ) {
 
-			$template = self::prepare_template_for_export( $template, $slug );
+			$template = self::prepare_template_for_export( $template, $slug, $options );
 
 			// Write the template content
 			file_put_contents(
@@ -365,16 +363,18 @@ class Theme_Templates {
 		return "<?php echo __('" . $text . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
-	private static function eliminate_environment_specific_content_from_block( $block ) {
+	private static function eliminate_environment_specific_content_from_block( $block, $options = null ) {
 
 		// remove theme attribute from template parts
 		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
 			unset( $block['attrs']['theme'] );
 		}
 
-		// remove ref attribute from blocks
+		// (optionally) remove ref attribute from nav blocks
 		if ( 'core/navigation' === $block['blockName'] && isset( $block['attrs']['ref'] ) ) {
-			unset( $block['attrs']['ref'] );
+			if ( ! $options || ( array_key_exists( 'removeNavRefs', $options ) && $options['removeNavRefs'] ) ) {
+				unset( $block['attrs']['ref'] );
+			}
 		}
 
 		// remove id attributes and classes from image and cover blocks
@@ -407,13 +407,13 @@ class Theme_Templates {
 		return $block;
 	}
 
-	public static function eliminate_environment_specific_content( $template ) {
+	public static function eliminate_environment_specific_content( $template, $options = null ) {
 
 		$template_blocks = parse_blocks( $template->content );
 		$parsed_content  = '';
 
 		foreach ( $template_blocks as $block ) {
-			$parsed_block    = static::eliminate_environment_specific_content_from_block( $block );
+			$parsed_block    = static::eliminate_environment_specific_content_from_block( $block, $options );
 			$parsed_content .= serialize_block( $parsed_block );
 		}
 
