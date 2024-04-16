@@ -400,7 +400,7 @@ class Theme_Templates {
 		// process any inner blocks
 		if ( ! empty( $block['innerBlocks'] ) ) {
 			foreach ( $block['innerBlocks'] as $inner_block_key => $inner_block ) {
-				$block['innerBlocks'][ $inner_block_key ] = static::eliminate_environment_specific_content_from_block( $inner_block );
+				$block['innerBlocks'][ $inner_block_key ] = static::eliminate_environment_specific_content_from_block( $inner_block, $options );
 			}
 		}
 
