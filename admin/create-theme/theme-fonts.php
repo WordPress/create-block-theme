@@ -22,7 +22,12 @@ class Theme_Fonts {
 	}
 
 	public static function copy_activated_fonts_to_theme() {
-		$font_families_to_copy = static::get_user_activated_fonts();
+		$user_settings = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
+		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
+			return null;
+		}
+
+		$font_families_to_copy = $user_settings['typography']['fontFamilies']['custom'];
 
 		// If there are no custom fonts, bounce out
 		if ( is_null( $font_families_to_copy ) ) {
