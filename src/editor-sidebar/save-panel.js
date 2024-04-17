@@ -63,6 +63,17 @@ export const SaveThemePanel = () => {
 
 			<VStack>
 				<CheckboxControl
+					label="Save Fonts"
+					help="Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme."
+					checked={ saveOptions.saveFonts }
+					onChange={ () => {
+						setSaveOptions( {
+							...saveOptions,
+							saveFonts: ! saveOptions.saveFonts,
+						} );
+					} }
+				/>
+				<CheckboxControl
 					label="Save Style Changes"
 					help="Save Global Styles values set in the Editor to the theme."
 					checked={ saveOptions.saveStyle }
@@ -87,7 +98,10 @@ export const SaveThemePanel = () => {
 				<CheckboxControl
 					label="Localize Text"
 					help="Any text in a template will be copied to a pattern and localized."
-					checked={ saveOptions.localizeText }
+					disabled={ ! saveOptions.saveTemplates }
+					checked={
+						saveOptions.saveTemplates && saveOptions.localizeText
+					}
 					onChange={ () => {
 						setSaveOptions( {
 							...saveOptions,
@@ -96,20 +110,12 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Save Fonts"
-					help="Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme."
-					checked={ saveOptions.saveFonts }
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							saveFonts: ! saveOptions.saveFonts,
-						} );
-					} }
-				/>
-				<CheckboxControl
 					label="Remove Navigation Refs"
 					help="Remove Navigation Refs from the theme returning your navigation to the default state."
-					checked={ saveOptions.removeNavRefs }
+					disabled={ ! saveOptions.saveTemplates }
+					checked={
+						saveOptions.saveTemplates && saveOptions.removeNavRefs
+					}
 					onChange={ () => {
 						setSaveOptions( {
 							...saveOptions,
