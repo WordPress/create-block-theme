@@ -20,7 +20,7 @@ export const SaveThemePanel = () => {
 		saveTemplates: true,
 		saveFonts: true,
 		removeNavRefs: false,
-		localizeText: true,
+		localizeText: false,
 	} );
 
 	const handleSaveClick = () => {
