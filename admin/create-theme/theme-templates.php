@@ -157,7 +157,7 @@ class Theme_Templates {
 
 		if ( ! $options ) {
 			$options = array(
-				'localizeText'  => true,
+				'localizeText'  => false,
 				'removeNavRefs' => true,
 			);
 		}
