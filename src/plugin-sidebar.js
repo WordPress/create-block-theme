@@ -129,7 +129,7 @@ const CreateBlockThemePlugin = () => {
 										setIsMetadataEditorOpen( true )
 									}
 								>
-									{ __( 'MetaData', 'create-block-theme' ) }
+									{ __( 'Edit Theme Metadata', 'create-block-theme' ) }
 								</Button>
 								<Button
 									icon={ code }
