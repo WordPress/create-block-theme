@@ -135,7 +135,7 @@ const CreateBlockThemePlugin = () => {
 									icon={ code }
 									onClick={ () => setIsEditorOpen( true ) }
 								>
-									{ __( 'theme.json', 'create-block-theme' ) }
+									{ __( 'View theme.json', 'create-block-theme' ) }
 								</Button>
 								<Button
 									icon={ download }
