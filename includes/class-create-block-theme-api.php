@@ -462,7 +462,7 @@ class Create_Block_Theme_API {
 		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
 		$sanitized_theme['template']            = '';
-		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
+		$sanitized_theme['slug']                = Theme_Utils::get_theme_slug( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
 		return $sanitized_theme;
 	}
