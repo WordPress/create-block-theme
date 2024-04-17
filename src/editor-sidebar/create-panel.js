@@ -2,7 +2,6 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
-import { downloadFile } from '../utils';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line
@@ -20,9 +19,9 @@ import {
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { chevronLeft, addCard, download, copy } from '@wordpress/icons';
+import { chevronLeft, addCard, copy } from '@wordpress/icons';
 
-export const CreateThemePanel = ( { createType, saveType } ) => {
+export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
@@ -51,78 +50,10 @@ export const CreateThemePanel = ( { createType, saveType } ) => {
 
 	const cloneTheme = () => {
 		if ( createType === 'createClone' ) {
-			if ( saveType === 'download' ) {
-				handleExportClick();
-			} else {
-				handleCloneClick();
-			}
+			handleCloneClick();
 		} else if ( createType === 'createChild' ) {
-			if ( saveType === 'download' ) {
-				handleExportChildClick();
-			} else {
-				handleCreateChildClick();
-			}
+			handleCreateChildClick();
 		}
-	};
-
-	const handleExportClick = () => {
-		const fetchOptions = {
-			path: '/create-block-theme/v1/export-clone',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			parse: false,
-		};
-
-		async function exportCloneTheme() {
-			try {
-				const response = await apiFetch( fetchOptions );
-				downloadFile( response );
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __(
-								'An error occurred while attempting to export the theme.',
-								'create-block-theme'
-						  );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		exportCloneTheme();
-	};
-
-	const handleExportChildClick = () => {
-		const fetchOptions = {
-			path: '/create-block-theme/v1/export-child-clone',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			parse: false,
-		};
-
-		async function exportCloneTheme() {
-			try {
-				const response = await apiFetch( fetchOptions );
-				downloadFile( response );
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __(
-								'An error occurred while attempting to export the child theme.',
-								'create-block-theme'
-						  );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		exportCloneTheme();
 	};
 
 	const handleCreateBlankClick = () => {
@@ -291,7 +222,7 @@ export const CreateThemePanel = ( { createType, saveType } ) => {
 				{ createType === 'createClone' && (
 					<>
 						<Button
-							icon={ saveType === 'download' ? download : copy }
+							icon={ copy }
 							variant="primary"
 							onClick={ () => cloneTheme() }
 						>
@@ -302,7 +233,7 @@ export const CreateThemePanel = ( { createType, saveType } ) => {
 				{ createType === 'createChild' && (
 					<>
 						<Button
-							icon={ saveType === 'download' ? download : copy }
+							icon={ copy }
 							variant="primary"
 							onClick={ () => cloneTheme() }
 						>
