@@ -168,7 +168,7 @@ const CreateBlockThemePlugin = () => {
 									<HStack>
 										<FlexItem>
 											{ __(
-												'Clone Theme',
+												'Create Theme',
 												'create-block-theme'
 											) }
 										</FlexItem>
@@ -184,7 +184,7 @@ const CreateBlockThemePlugin = () => {
 							<Heading>
 								<NavigatorToParentButton icon={ chevronLeft }>
 									{ __(
-										'Clone Theme',
+										'Create Block Theme',
 										'create-block-theme'
 									) }
 								</NavigatorToParentButton>
@@ -192,7 +192,7 @@ const CreateBlockThemePlugin = () => {
 							<VStack>
 								<Text>
 									{ __(
-										'Would you like to make a Regular Theme or a Child Theme?',
+										'Would you like to clone this Theme or create a Child Theme?',
 										'create-block-theme'
 									) }
 								</Text>
@@ -208,7 +208,7 @@ const CreateBlockThemePlugin = () => {
 									<HStack>
 										<FlexItem>
 											{ __(
-												'Create Theme',
+												'Clone Theme',
 												'create-block-theme'
 											) }
 										</FlexItem>
