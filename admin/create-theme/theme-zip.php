@@ -31,6 +31,10 @@ class Theme_Zip {
 
 	public static function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
 
+		$theme    = wp_get_theme();
+		$old_slug = $theme->get( 'TextDomain' );
+		$old_name = $theme->get( 'Name' );
+
 		// Get real path for our folder
 		$theme_path = get_stylesheet_directory();
 
@@ -72,7 +76,7 @@ class Theme_Zip {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = Theme_Utils::replace_namespace( $contents, $new_slug, $new_name );
+						$contents = Theme_Utils::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
 					}
 
 					// Add current file to archive
