@@ -21,6 +21,7 @@ export const SaveThemePanel = () => {
 		saveFonts: true,
 		removeNavRefs: false,
 		localizeText: false,
+		localizeImages: false,
 	} );
 
 	const handleSaveClick = () => {
@@ -106,6 +107,20 @@ export const SaveThemePanel = () => {
 						setSaveOptions( {
 							...saveOptions,
 							localizeText: ! saveOptions.localizeText,
+						} );
+					} }
+				/>
+				<CheckboxControl
+					label="Localize Images"
+					help="Any images in a template will be copied to a local /assets folder and referenced from there via a pattern."
+					disabled={ ! saveOptions.saveTemplates }
+					checked={
+						saveOptions.saveTemplates && saveOptions.localizeImages
+					}
+					onChange={ () => {
+						setSaveOptions( {
+							...saveOptions,
+							localizeImages: ! saveOptions.localizeImages,
 						} );
 					} }
 				/>

@@ -22,8 +22,13 @@ class Theme_Create {
 		wp_mkdir_p( $new_theme_path );
 
 		// Copy theme files.
+		$template_options = array(
+			'localizeText'   => false,
+			'removeNavRefs'  => false,
+			'localizeImages' => false,
+		);
 		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
-		Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'] );
+		Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 
 		if ( $theme['subfolder'] ) {

@@ -157,8 +157,9 @@ class Theme_Templates {
 
 		if ( ! $options ) {
 			$options = array(
-				'localizeText'  => false,
-				'removeNavRefs' => true,
+				'localizeText'   => false,
+				'removeNavRefs'  => true,
+				'localizeImages' => true,
 			);
 		}
 
@@ -168,7 +169,10 @@ class Theme_Templates {
 			$template = self::escape_text_in_template( $template );
 		}
 
-		$template = Theme_Media::make_template_images_local( $template );
+		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
+			$template = Theme_Media::make_template_images_local( $template );
+		}
+
 		$template = self::paternize_template( $template );
 
 		if ( $slug ) {
