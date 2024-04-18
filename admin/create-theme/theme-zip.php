@@ -21,12 +21,63 @@ class Theme_Zip {
 		return $zip;
 	}
 
-	public static function add_theme_json_to_zip( $zip, $export_type ) {
+	public static function add_theme_json_to_zip( $zip, $theme_json ) {
 		$zip->addFromStringToTheme(
 			'theme.json',
-			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
+			$theme_json
 		);
 		return $zip;
+	}
+
+	public static function add_activated_fonts_to_zip( $zip, $theme_json_string ) {
+
+		$theme_json = json_decode( $theme_json_string, true );
+
+		$font_families_to_copy     = Theme_Fonts::get_user_activated_fonts();
+		$theme_font_asset_location = '/assets/fonts/';
+		$font_slugs_to_remove      = array();
+
+		foreach ( $font_families_to_copy as &$font_family ) {
+			if ( ! isset( $font_family['fontFace'] ) ) {
+				continue;
+			}
+			$font_slugs_to_remove[] = $font_family['slug'];
+			foreach ( $font_family['fontFace'] as &$font_face ) {
+				$font_filename = basename( $font_face['src'] );
+				$font_dir      = wp_get_font_dir();
+				if ( str_contains( $font_face['src'], $font_dir['url'] ) ) {
+					$zip->addFileToTheme( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_filename );
+				} else {
+					// otherwise download it from wherever it is hosted
+					$tmp_file = download_url( $font_face['src'] );
+					$zip->addFileToTheme( $tmp_file, $theme_font_asset_location . '/' . $font_filename );
+					unlink( $tmp_file );
+				}
+
+				$font_face['src'] = 'file:./assets/fonts/' . $font_filename;
+			}
+		}
+
+		if ( ! isset( $theme_json['settings']['typography']['fontFamilies'] ) ) {
+			$theme_json['settings']['typography']['fontFamilies'] = array();
+		}
+
+		// Remove user fonts that have already been added to the theme_json
+		// otherwise they will be duplicated when we add them next
+		foreach ( $theme_json['settings']['typography']['fontFamilies'] as $key => $theme_font_family ) {
+			if ( in_array( $theme_font_family['slug'], $font_slugs_to_remove, true ) ) {
+				unset( $theme_json['settings']['typography']['fontFamilies'][ $key ] );
+			}
+		}
+
+		// Copy user fonts to theme
+		$theme_json['settings']['typography']['fontFamilies'] = array_merge(
+			$theme_json['settings']['typography']['fontFamilies'],
+			$font_families_to_copy
+		);
+
+		return wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
 	}
 
 	public static function copy_theme_to_zip( $zip, $new_slug, $new_name ) {

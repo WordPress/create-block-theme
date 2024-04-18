@@ -269,10 +269,14 @@ class Create_Block_Theme_API {
 		// Create ZIP file in the temporary directory.
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename, $theme['slug'] );
+		$zip      = Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
+		$zip      = Theme_Zip::add_templates_to_zip( $zip, 'all', $theme['slug'] );
 
-		$zip = Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', $theme['slug'] );
-		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
+		//TODO: Should the font persistent be optional?
+		// If so then the Font Library fonts will need to be removed from the theme.json settings.
+		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'all' );
+		$theme_json = Theme_Zip::add_activated_fonts_to_zip( $zip, $theme_json );
+		$zip        = Theme_Zip::add_theme_json_to_zip( $zip, $theme_json );
 
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
@@ -316,8 +320,11 @@ class Create_Block_Theme_API {
 		$filename = tempnam( get_temp_dir(), $theme['slug'] );
 		$zip      = Theme_Zip::create_zip( $filename, $theme['slug'] );
 
-		$zip = Theme_Zip::add_templates_to_zip( $zip, 'user', $theme['slug'] );
-		$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'variation' );
+		//TODO: Should the font persistent be optional?
+		// If so then the Font Library fonts will need to be removed from the theme.json settings.
+		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'variation' );
+		$theme_json = Theme_Zip::add_activated_fonts_to_zip( $zip, $theme_json );
+		$zip        = Theme_Zip::add_theme_json_to_zip( $zip, $theme_json );
 
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
@@ -369,12 +376,16 @@ class Create_Block_Theme_API {
 		$zip = Theme_Zip::copy_theme_to_zip( $zip, null, null );
 
 		if ( is_child_theme() ) {
-			$zip = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme_slug );
-			$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'current' );
+			$zip        = Theme_Zip::add_templates_to_zip( $zip, 'current', $theme_slug );
+			$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'current' );
 		} else {
-			$zip = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
-			$zip = Theme_Zip::add_theme_json_to_zip( $zip, 'all' );
+			$zip        = Theme_Zip::add_templates_to_zip( $zip, 'all', null );
+			$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'all' );
 		}
+
+		$theme_json = Theme_Zip::add_activated_fonts_to_zip( $zip, $theme_json );
+
+		$zip = Theme_Zip::add_theme_json_to_zip( $zip, $theme_json );
 
 		$zip->close();
 
