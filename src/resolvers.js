@@ -1,4 +1,5 @@
 import apiFetch from '@wordpress/api-fetch';
+import { downloadFile } from './utils';
 
 export async function fetchThemeJson() {
 	const fetchOptions = {
@@ -24,4 +25,39 @@ export async function fetchThemeJson() {
 	} catch ( e ) {
 		// @todo: handle error
 	}
+}
+
+export async function postCreateThemeVariation( name ) {
+	return apiFetch( {
+		path: '/create-block-theme/v1/create-variation',
+		method: 'POST',
+		data: { name },
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} );
+}
+
+export async function postUpdateThemeMetadata( theme ) {
+	return apiFetch( {
+		path: '/create-block-theme/v1/update',
+		method: 'POST',
+		data: theme,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} );
+}
+
+export async function downloadExportedTheme() {
+	return apiFetch( {
+		path: '/create-block-theme/v1/export',
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		parse: false,
+	} ).then( ( response ) => {
+		downloadFile( response );
+	} );
 }

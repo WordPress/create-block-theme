@@ -4,13 +4,26 @@
  */
 class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
+	/**
+	 * Ensure that the string in a template is replaced with the appropraite PHP code
+	 */
 	public function test_paragraphs_are_localized() {
 		$template          = new stdClass();
 		$template->content = '<!-- wp:paragraph --><p>This is text to localize</p><!-- /wp:paragraph -->';
 		$new_template      = Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( 'This is text to localize', $new_template->content );
+		$this->assertStringContainsString( "<p><?php echo __('This is text to localize', '');?></p>", $new_template->content );
 		$this->assertStringNotContainsString( '<p>This is text to localize</p>', $new_template->content );
+	}
 
+	/**
+	 * Ensure that escape_text_in_template is not called when the localizeText flag is set to false
+	 */
+	public function test_paragraphs_are_not_localized() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = '<!-- wp:paragraph --><p>This is text to not localize</p><!-- /wp:paragraph -->';
+		$new_template      = Theme_Templates::prepare_template_for_export( $template, null, array( 'localizeText' => false ) );
+		$this->assertStringContainsString( '<!-- wp:paragraph --><p>This is text to not localize</p><!-- /wp:paragraph -->', $new_template->content );
 	}
 
 	public function test_paragraphs_in_groups_are_localized() {
@@ -74,6 +87,14 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		';
 		$new_template      = Theme_Templates::eliminate_environment_specific_content( $template );
 		$this->assertStringContainsString( '<!-- wp:navigation /-->', $new_template->content );
+	}
+
+	public function test_not_eliminate_nav_block_ref() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = '<!-- wp:navigation {"ref":4} /-->';
+		$new_template      = Theme_Templates::prepare_template_for_export( $template, null, array( 'removeNavRefs' => false ) );
+		$this->assertStringContainsString( '<!-- wp:navigation {"ref":4} /-->', $new_template->content );
 	}
 
 	public function test_eliminate_id_from_image() {

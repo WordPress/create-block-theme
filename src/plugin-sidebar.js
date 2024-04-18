@@ -2,8 +2,6 @@ import { useState } from '@wordpress/element';
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
 import { __, _x } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
-import { downloadFile } from './utils';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -18,88 +16,57 @@ import {
 	// eslint-disable-next-line
 	__experimentalNavigatorButton as NavigatorButton,
 	// eslint-disable-next-line
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	// eslint-disable-next-line
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line
 	__experimentalText as Text,
+	// eslint-disable-next-line
+	__experimentalHeading as Heading,
 	Button,
 	Icon,
 	FlexItem,
 	PanelBody,
 } from '@wordpress/components';
-
-import { UpdateThemePanel } from './editor-sidebar/update-panel';
-import { CreateThemePanel } from './editor-sidebar/create-panel';
-import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
-
 import {
 	tool,
 	copy,
 	download,
 	edit,
+	code,
 	chevronRight,
-	archive,
+	chevronLeft,
+	addCard,
+	blockMeta,
 } from '@wordpress/icons';
+
+import { CreateThemePanel } from './editor-sidebar/create-panel';
+import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
+import { SaveThemePanel } from './editor-sidebar/save-panel';
+import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
+import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
+import { downloadExportedTheme } from './resolvers';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
+
+	const [ isMetadataEditorOpen, setIsMetadataEditorOpen ] = useState( false );
+
+	const [ cloneCreateType, setCloneCreateType ] = useState( '' );
+
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const handleSaveClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/save',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
-			.then( () => {
-				// eslint-disable-next-line
-				alert(
-					__(
-						'Theme saved successfully. The editor will now reload.',
-						'create-block-theme'
-					)
-				);
-				window.location.reload();
-			} )
-			.catch( ( error ) => {
-				const errorMessage =
-					error.message ||
-					__(
-						'An error occurred while attempting to save the theme.',
-						'create-block-theme'
-					);
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			} );
-	};
-
 	const handleExportClick = () => {
-		const fetchOptions = {
-			path: '/create-block-theme/v1/export',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			parse: false,
-		};
-
-		async function exportTheme() {
-			try {
-				const response = await apiFetch( fetchOptions );
-				downloadFile( response );
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __(
-								'An error occurred while attempting to export the theme.',
-								'create-block-theme'
-						  );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		exportTheme();
+		downloadExportedTheme().catch( ( error ) => {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __(
+							'An error occurred while attempting to export the theme.',
+							'create-block-theme'
+					  );
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		} );
 	};
 
 	return (
@@ -126,56 +93,77 @@ const CreateBlockThemePlugin = () => {
 				<NavigatorProvider initialPath="/">
 					<NavigatorScreen path="/">
 						<PanelBody>
-							<VStack>
-								<Button
-									icon={ archive }
-									onClick={ handleSaveClick }
-								>
-									{ __(
-										'Save Changes',
-										'create-block-theme'
-									) }
-								</Button>
-								<Text variant="muted">
-									{ __(
-										'Save user changes (including Templates and Global Styles) to the theme.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<Button
-									icon={ download }
-									onClick={ handleExportClick }
-								>
-									{ __( 'Export Zip', 'create-block-theme' ) }
-								</Button>
-								<Text variant="muted">
-									{ __(
-										'Export your theme as a zip file. Note: You may want to save your user changes to the theme first.',
-										'create-block-theme'
-									) }
-								</Text>
-								<hr></hr>
-								<NavigatorButton path="/update" icon={ edit }>
+							<VStack spacing={ 0 }>
+								<NavigatorButton path="/save" icon={ copy }>
 									<Spacer />
-									<HStack justify="space-between">
+									<HStack>
 										<FlexItem>
 											{ __(
-												'Theme Info',
+												'Save Changes to Theme',
 												'create-block-theme'
 											) }
 										</FlexItem>
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
-								<Text variant="muted">
+								<NavigatorButton
+									path="/create/variation"
+									icon={ blockMeta }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Create Theme Variation',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+								<Button
+									icon={ edit }
+									onClick={ () =>
+										setIsMetadataEditorOpen( true )
+									}
+								>
 									{ __(
-										'Edit Metadata properties of your current theme.',
+										'Edit Theme Metadata',
 										'create-block-theme'
 									) }
-								</Text>
+								</Button>
+								<Button
+									icon={ code }
+									onClick={ () => setIsEditorOpen( true ) }
+								>
+									{ __(
+										'View theme.json',
+										'create-block-theme'
+									) }
+								</Button>
+								<Button
+									icon={ download }
+									onClick={ () => handleExportClick() }
+								>
+									{ __( 'Export Zip', 'create-block-theme' ) }
+								</Button>
 								<hr></hr>
-								<NavigatorButton path="/create" icon={ copy }>
+								<NavigatorButton
+									path="/create/blank"
+									icon={ addCard }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Create Blank Theme',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+								<NavigatorButton path="/clone" icon={ copy }>
 									<Spacer />
 									<HStack>
 										<FlexItem>
@@ -187,25 +175,74 @@ const CreateBlockThemePlugin = () => {
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
-								<Text variant="muted">
+							</VStack>
+						</PanelBody>
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/clone">
+						<PanelBody>
+							<Heading>
+								<NavigatorToParentButton icon={ chevronLeft }>
 									{ __(
-										'Create a new theme based on your current theme and either save it or export it.',
+										'Create Block Theme',
+										'create-block-theme'
+									) }
+								</NavigatorToParentButton>
+							</Heading>
+							<VStack>
+								<Text>
+									{ __(
+										'Would you like to clone this Theme or create a Child Theme?',
 										'create-block-theme'
 									) }
 								</Text>
 								<hr></hr>
-								<Button
-									icon={ edit }
-									onClick={ () => setIsEditorOpen( true ) }
+								<NavigatorButton
+									path="/clone/create"
+									icon={ copy }
+									onClick={ () => {
+										setCloneCreateType( 'createClone' );
+									} }
 								>
-									{ __(
-										'Inspect Theme JSON',
-										'create-block-theme'
-									) }
-								</Button>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Clone Theme',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
 								<Text variant="muted">
 									{ __(
-										'Open the theme.json file to inspect theme data.',
+										'Create a clone of this theme with a new name. The user changes will be preserved in the new theme.',
+										'create-block-theme'
+									) }
+								</Text>
+								<hr></hr>
+								<NavigatorButton
+									path="/clone/create"
+									icon={ copy }
+									onClick={ () => {
+										setCloneCreateType( 'createChild' );
+									} }
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Create Child Theme',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+								<Text variant="muted">
+									{ __(
+										'Create a child theme that uses this theme as a parent. This theme will remain unchanged and the user changes will be preserved in the new child theme.',
 										'create-block-theme'
 									) }
 								</Text>
@@ -213,18 +250,33 @@ const CreateBlockThemePlugin = () => {
 						</PanelBody>
 					</NavigatorScreen>
 
-					<NavigatorScreen path="/update">
-						<UpdateThemePanel />
+					<NavigatorScreen path="/create/blank">
+						<CreateThemePanel createType={ 'createBlank' } />
 					</NavigatorScreen>
 
-					<NavigatorScreen path="/create">
-						<CreateThemePanel />
+					<NavigatorScreen path="/clone/create">
+						<CreateThemePanel createType={ cloneCreateType } />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/create/variation">
+						<CreateVariationPanel />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/save">
+						<SaveThemePanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
+
 			{ isEditorOpen && (
 				<ThemeJsonEditorModal
 					onRequestClose={ () => setIsEditorOpen( false ) }
+				/>
+			) }
+
+			{ isMetadataEditorOpen && (
+				<ThemeMetadataEditorModal
+					onRequestClose={ () => setIsMetadataEditorOpen( false ) }
 				/>
 			) }
 		</>

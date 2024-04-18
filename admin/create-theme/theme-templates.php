@@ -153,11 +153,26 @@ class Theme_Templates {
 	 * @param string $slug The slug of the theme.
 	 * @return object The prepared template.
 	 */
-	public static function prepare_template_for_export( $template, $slug = null ) {
+	public static function prepare_template_for_export( $template, $slug = null, $options = null ) {
 
-		$template = self::eliminate_environment_specific_content( $template );
-		$template = self::escape_text_in_template( $template );
-		$template = Theme_Media::make_template_images_local( $template );
+		if ( ! $options ) {
+			$options = array(
+				'localizeText'   => false,
+				'removeNavRefs'  => true,
+				'localizeImages' => true,
+			);
+		}
+
+		$template = self::eliminate_environment_specific_content( $template, $options );
+
+		if ( array_key_exists( 'localizeText', $options ) && $options['localizeText'] ) {
+			$template = self::escape_text_in_template( $template );
+		}
+
+		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
+			$template = Theme_Media::make_template_images_local( $template );
+		}
+
 		$template = self::paternize_template( $template );
 
 		if ( $slug ) {
@@ -176,7 +191,7 @@ class Theme_Templates {
 	 * @param string $path The path to the theme folder. If null it is assumed to be the current theme.
 	 * @param string $slug The slug of the theme. If null it is assumed to be the current theme.
 	 */
-	public static function add_templates_to_local( $export_type, $path = null, $slug = null ) {
+	public static function add_templates_to_local( $export_type, $path = null, $slug = null, $options = null ) {
 
 		$theme_templates  = self::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
@@ -198,7 +213,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = self::prepare_template_for_export( $template, $slug );
+			$template = self::prepare_template_for_export( $template, $slug, $options );
 
 			// Write the template content
 			file_put_contents(
@@ -226,7 +241,7 @@ class Theme_Templates {
 
 		foreach ( $theme_templates->parts as $template ) {
 
-			$template = self::prepare_template_for_export( $template, $slug );
+			$template = self::prepare_template_for_export( $template, $slug, $options );
 
 			// Write the template content
 			file_put_contents(
@@ -352,16 +367,18 @@ class Theme_Templates {
 		return "<?php echo __('" . $text . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
-	private static function eliminate_environment_specific_content_from_block( $block ) {
+	private static function eliminate_environment_specific_content_from_block( $block, $options = null ) {
 
 		// remove theme attribute from template parts
 		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
 			unset( $block['attrs']['theme'] );
 		}
 
-		// remove ref attribute from blocks
+		// (optionally) remove ref attribute from nav blocks
 		if ( 'core/navigation' === $block['blockName'] && isset( $block['attrs']['ref'] ) ) {
-			unset( $block['attrs']['ref'] );
+			if ( ! $options || ( array_key_exists( 'removeNavRefs', $options ) && $options['removeNavRefs'] ) ) {
+				unset( $block['attrs']['ref'] );
+			}
 		}
 
 		// remove id attributes and classes from image and cover blocks
@@ -387,20 +404,20 @@ class Theme_Templates {
 		// process any inner blocks
 		if ( ! empty( $block['innerBlocks'] ) ) {
 			foreach ( $block['innerBlocks'] as $inner_block_key => $inner_block ) {
-				$block['innerBlocks'][ $inner_block_key ] = static::eliminate_environment_specific_content_from_block( $inner_block );
+				$block['innerBlocks'][ $inner_block_key ] = static::eliminate_environment_specific_content_from_block( $inner_block, $options );
 			}
 		}
 
 		return $block;
 	}
 
-	public static function eliminate_environment_specific_content( $template ) {
+	public static function eliminate_environment_specific_content( $template, $options = null ) {
 
 		$template_blocks = parse_blocks( $template->content );
 		$parsed_content  = '';
 
 		foreach ( $template_blocks as $block ) {
-			$parsed_block    = static::eliminate_environment_specific_content_from_block( $block );
+			$parsed_block    = static::eliminate_environment_specific_content_from_block( $block, $options );
 			$parsed_content .= serialize_block( $parsed_block );
 		}
 
