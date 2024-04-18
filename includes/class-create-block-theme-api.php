@@ -438,11 +438,7 @@ class Create_Block_Theme_API {
 		}
 
 		if ( isset( $options['saveTemplates'] ) && true === $options['saveTemplates'] ) {
-			if ( is_child_theme() ) {
-				Theme_Templates::add_templates_to_local( 'current', null, null, $options );
-			} else {
-				Theme_Templates::add_templates_to_local( 'all', null, null, $options );
-			}
+			Theme_Templates::add_templates_to_local( 'user', null, null, $options );
 			Theme_Templates::clear_user_templates_customizations();
 		}
 
