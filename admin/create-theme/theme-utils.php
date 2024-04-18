@@ -30,12 +30,9 @@ class Theme_Utils {
 		return $extension;
 	}
 
-	public static function replace_namespace( $content, $new_slug, $new_name ) {
-		$theme               = wp_get_theme();
-		$old_slug            = $theme->get( 'TextDomain' );
+	public static function replace_namespace( $content, $old_slug, $new_slug, $old_name, $new_name ) {
 		$new_slug_underscore = str_replace( '-', '_', $new_slug );
 		$old_slug_underscore = str_replace( '-', '_', $old_slug );
-		$old_name            = $theme->get( 'Name' );
 
 		// Generate placeholders
 		$placeholder_slug            = md5( $old_slug );
@@ -56,6 +53,10 @@ class Theme_Utils {
 	}
 
 	public static function clone_theme_to_folder( $location, $new_slug, $new_name ) {
+
+		$theme    = wp_get_theme();
+		$old_slug = $theme->get( 'TextDomain' );
+		$old_name = $theme->get( 'Name' );
 
 		// Get real path for our folder
 		$theme_path = get_stylesheet_directory();
@@ -97,7 +98,7 @@ class Theme_Utils {
 			if ( preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
 				// Replace namespace values if provided
 				if ( $new_slug ) {
-					$contents = self::replace_namespace( $contents, $new_slug, $new_name );
+					$contents = self::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
 				}
 			}
 

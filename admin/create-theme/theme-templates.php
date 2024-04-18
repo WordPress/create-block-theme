@@ -131,10 +131,10 @@ class Theme_Templates {
 	 * @param object $template The template to extract content from.
 	 * @return object The template with the patternized content.
 	 */
-	public static function paternize_template( $template ) {
+	public static function paternize_template( $template, $slug = null ) {
 		// If there is any PHP in the template then paternize
 		if ( str_contains( $template->content, '<?php' ) ) {
-			$pattern                 = Theme_Patterns::pattern_from_template( $template );
+			$pattern                 = Theme_Patterns::pattern_from_template( $template, $slug );
 			$pattern_link_attributes = array(
 				'slug' => $pattern['slug'],
 			);
@@ -173,11 +173,11 @@ class Theme_Templates {
 			$template = Theme_Media::make_template_images_local( $template );
 		}
 
-		$template = self::paternize_template( $template );
-
 		if ( $slug ) {
 			$template = self::replace_template_namespace( $template, $slug );
 		}
+
+		$template = self::paternize_template( $template, $slug );
 
 		return $template;
 	}
