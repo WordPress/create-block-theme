@@ -18,10 +18,12 @@ This plugin allows you to:
 - Create a new theme based on the currently active theme
 - Create a child theme of the active parent theme
 - Create a new style variation
+- Export a theme
+- Save user changed templates and styles to the active theme
 
 All newly created themes or style variations will include changes made within the WordPress Editor.
 
-This plugin also makes several changes to the contents of an exported theme, including:
+This plugin also makes several changes to the contents of a theme, including:
 
 - Adds all images used in templates to the theme's `assets` folder.
 - Ensures the block markup used in templates and patterns is export-ready.
@@ -42,27 +44,27 @@ Make changes to your site styles, fonts and templates using the Editor.
 = Step 3 – Export =
 Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.
 
-To simply save recent changes made in the Editor to the currently active theme or export the theme:
+To save recent changes made in the Editor to the currently active theme:
 
 - Select "Save Changes" to save any recent changes to the currently active theme.
+
+2. Create Block Theme save panel in the WordPress Editor
+
+To install and uninstall fonts:
+
+- Install and activate a font from any source using the WordPress Font Library.
+- Select "Save Changes To Theme" and select "Save Fonts" to save all of the active fonts to the currently active theme. These fonts will then be activated in the theme and deactivated in the system (and may be safely deleted from the system).
+- Any fonts that are installed in the theme that have been deactivated with the WordPress Font Library will be removed from the theme.
+
+or export the theme:
+
 - Select "Export Zip" to export the theme as a zip file.
 
 To edit the theme metadata:
 
-- Select "Theme Info" to edit the metadata for the theme. These details will be used in the style.css file.
+- Select "Edit Theme Metadata" to edit the metadata for the theme. These details will be used in the style.css file.
 
-2. Theme Info editing panel in the WordPress Editor
-
-To create a new theme, child theme, or style variation, select "Create Theme" to access the following options for the currently active theme:
-
-- "Clone Theme" to create a copy of the active theme.
-- "Create Child Theme" to create a child theme of the active theme.
-- "Create Theme Variation" to create a style variation.
-- "Export Theme" to export the theme as a zip file.
-- "Export Child Theme" to export a child of the currently active theme as a zip file.
-- "Create Blank Theme" to create a new, blank theme with no styles or templates.
-
-3. Create Theme panel in the WordPress Editor
+3. Theme Metadata editing panel in the WordPress Editor
 
 To inspect the active theme's theme.json contents:
 
@@ -70,15 +72,31 @@ To inspect the active theme's theme.json contents:
 
 4. theme.json inspector in the WordPress Editor
 
-To install and uninstall fonts:
+To create a new blank theme:
 
-- Install and activate a font from any source using the WordPress Font Library.
-- Select "Save Changes" to save all of the active fonts to the currently active theme. These fonts will then be activated in the theme and deactivated in the system (and may be safely deleted from the system).
-- Any fonts that are installed in the theme that have been deactivated with the WordPress Font Library will be removed from the theme.
+- Select "Create Blank Theme"
+- Supply a name for the new theme (and optional additional Metadata)
+- Click "Create Blank Theme"
+
+To create a variation:
+
+- Select "Create Theme Variation"
+- Provide a name for the new Variation
+- Click "Create Theme Variation"
+
+To create a new Clone of the current theme or to create a Child of the current theme:ons for the currently active theme:
+
+- Click "Create Theme"
+- Click "Clone Theme" to create a new Theme based on the active theme with your changes
+- Click "Create Child Theme" to create a new Child Theme with the active theme as a parent with your changes
+
+5. Create Theme panel 1 in the WordPress Editor
+
+6. Create Theme panel 2 in the WordPress Editor
 
 Many of these options are also available under the older, deprecated Create Block Theme page under Appearance > Create Block Theme.
 
-5. Page under Appearance > Create Block Theme
+7. Page under Appearance > Create Block Theme
 
 == Frequently Asked Questions ==
 

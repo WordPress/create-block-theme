@@ -79,23 +79,47 @@ Make changes to your site styles, fonts and templates using the Editor.
 
 Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.
 
-To simply save recent changes made in the Editor to the currently active theme or export the theme:
+To save recent changes made in the Editor to the currently active theme or export the theme:
 
-- Select "Save Changes" to save any recent changes to the currently active theme.
-- Select "Export Zip" to export the theme as a zip file.
+- Select "Save Changes to Theme" and select any options to customize what is saved
+- Check "Save Fonts" to copy the assets for any fonts installed and activated through the Font Library to the active font
+- Check "Save Style Changes" to copy your style changes made to the theme.json file
+- Check "Save Template Changes" to copy template changes made in the Editor to your activated theme.
+- With "Save Template Changes you may also select the following:
+- Check "Localize Text" to copy content to patterns from templates so that they can be localized for internationalization.
+- Check "Localize Images" to copy any images referenced in templates to the theme asset folder and reference them from a pattern.
+- Check "Remove Navigation Refs" to remove any navigation ref IDs from templates.
+- Click "Save Changes" to save any recent changes to the currently active theme.
+
+To export your theme to a zip file ready to import into another system:
+
+- Select "Export Zip"
 
 To edit the theme metadata:
 
-- Select "Theme Info" to edit the metadata for the theme. These details will be used in the style.css file.
+- Select "Edit Theme Metadata" to edit the metadata for the theme. These details will be used in the style.css file.
 
-To create a new theme, child theme, or style variation, select "Create Theme" to access the following options for the currently active theme:
+To create a new blank theme:
 
-- "Clone Theme" to create a copy of the active theme.
-- "Create Child Theme" to create a child theme of the active theme.
-- "Create Theme Variation" to create a style variation.
-- "Export Theme" to export the theme as a zip file.
-- "Export Child Theme" to export a child of the currently active theme as a zip file.
-- "Create Blank Theme" to create a new, blank theme with no styles or templates.
+- Select "Create Blank Theme"
+- Supply a name for the new theme (and optional additional Metadata)
+- Click "Create Blank Theme"
+
+The theme will be created and activated.
+
+To create a variation:
+
+- Select "Create Theme Variation"
+- Provide a name for the new Variation
+- Click "Create Theme Variation"
+
+A new variation will be created.
+
+To create a new Clone of the current theme or to create a Child of the current theme:
+
+- Click "Create Theme"
+- Click "Clone Theme" to create a new Theme based on the active theme with your changes
+- Click "Create Child Theme" to create a new Child Theme with the active theme as a parent with your changes
 
 To inspect the active theme's theme.json contents:
 
