@@ -115,7 +115,7 @@ To create a variation:
 
 A new variation will be created.
 
-To create a new Clone of the current theme or to create a Child of the current theme:ons for the currently active theme:
+To create a new Clone of the current theme or to create a Child of the current theme:
 
 - Click "Create Theme"
 - Click "Clone Theme" to create a new Theme based on the active theme with your changes
