@@ -18,6 +18,7 @@ export const SaveThemePanel = () => {
 	const [ saveOptions, setSaveOptions ] = useState( {
 		saveStyle: true,
 		saveTemplates: true,
+		processOnlySavedTemplates: true,
 		saveFonts: true,
 		removeNavRefs: false,
 		localizeText: false,
@@ -93,6 +94,22 @@ export const SaveThemePanel = () => {
 						setSaveOptions( {
 							...saveOptions,
 							saveTemplates: ! saveOptions.saveTemplates,
+						} );
+					} }
+				/>
+				<CheckboxControl
+					label="Process Only Saved Templates"
+					help="Process only templates you have modified in the Editor. Any templates you have not modified will be left as is."
+					disabled={ ! saveOptions.saveTemplates }
+					checked={
+						saveOptions.saveTemplates &&
+						saveOptions.processOnlySavedTemplates
+					}
+					onChange={ () => {
+						setSaveOptions( {
+							...saveOptions,
+							processOnlySavedTemplates:
+								! saveOptions.processOnlySavedTemplates,
 						} );
 					} }
 				/>
