@@ -44,7 +44,7 @@ Make changes to your site styles, fonts and templates using the Editor.
 = Step 3 – Export =
 Still in the WordPress Editor, navigate to the Create Block Theme menu at the top of the Editor.
 
-To save recent changes made in the Editor to the currently active theme
+To save recent changes made in the Editor to the currently active theme:
 
 - Select "Save Changes" to save any recent changes to the currently active theme.
 
