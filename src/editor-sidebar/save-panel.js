@@ -1,5 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	// eslint-disable-next-line
@@ -23,6 +25,8 @@ export const SaveThemePanel = () => {
 		localizeText: false,
 		localizeImages: false,
 	} );
+
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const handleSaveClick = () => {
 		apiFetch( {

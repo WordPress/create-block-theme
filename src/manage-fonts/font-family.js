@@ -2,7 +2,7 @@ import { useContext } from '@wordpress/element';
 import { Button, Icon } from '@wordpress/components';
 import FontFace from './font-face';
 import { ManageFontsContext } from '../fonts-context';
-import { __, _n } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
 function FontFamily( { fontFamily, deleteFont } ) {

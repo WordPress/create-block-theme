@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { Button, Icon } from '@wordpress/components';
 
 function PageHeader( { toggleIsHelpOpen } ) {
-	const { adminUrl } = createBlockTheme;
+	const { adminUrl } = window.createBlockTheme;
 
 	return (
 		<>

@@ -5,17 +5,19 @@ export const ManageFontsContext = createContext();
 
 export function ManageFontsProvider( { children } ) {
 	const [ demoType, setDemoType ] = useState(
-		localStorage.getItem( 'cbt_default-demo-type' ) || DEFAULT_DEMO_TYPE
+		window.localStorage.getItem( 'cbt_default-demo-type' ) ||
+			DEFAULT_DEMO_TYPE
 	);
 
 	const [ demoText, setDemoText ] = useState(
-		localStorage.getItem( 'cbt_default-demo-text' ) ||
+		window.localStorage.getItem( 'cbt_default-demo-text' ) ||
 			DEMO_DEFAULTS[ demoType ].text
 	);
 
 	const [ demoFontSize, setDemoFontSize ] = useState(
-		parseInt( localStorage.getItem( 'cbt_default-demo-font-size' ) ) ||
-			DEMO_DEFAULTS[ demoType ].size
+		parseInt(
+			window.localStorage.getItem( 'cbt_default-demo-font-size' )
+		) || DEMO_DEFAULTS[ demoType ].size
 	);
 
 	const [ axes, setAxes ] = useState( {} );
@@ -32,18 +34,21 @@ export function ManageFontsProvider( { children } ) {
 
 	const handleDemoTextChange = ( newDemoText ) => {
 		setDemoText( newDemoText );
-		localStorage.setItem( 'cbt_default-demo-text', newDemoText );
+		window.localStorage.setItem( 'cbt_default-demo-text', newDemoText );
 	};
 
 	const handleDemoTypeChange = ( newDemoType ) => {
 		setDemoType( newDemoType );
-		localStorage.setItem( 'cbt_default-demo-type', newDemoType );
+		window.localStorage.setItem( 'cbt_default-demo-type', newDemoType );
 		resetDefaults( newDemoType );
 	};
 
 	const handleDemoFontSizeChange = ( newDemoFontSize ) => {
 		setDemoFontSize( newDemoFontSize );
-		localStorage.setItem( 'cbt_default-demo-font-size', newDemoFontSize );
+		window.localStorage.setItem(
+			'cbt_default-demo-font-size',
+			newDemoFontSize
+		);
 	};
 
 	const resetDefaults = ( newDemoType ) => {
@@ -55,7 +60,7 @@ export function ManageFontsProvider( { children } ) {
 
 	// The list of families that are open (showing the list of font faces) in the font manager.
 	const [ familiesOpen, setFamiliesOpen ] = useState(
-		JSON.parse( localStorage.getItem( 'cbt_families-open' ) ) || []
+		JSON.parse( window.localStorage.getItem( 'cbt_families-open' ) ) || []
 	);
 
 	const handleToggleFamily = ( familyName ) => {
@@ -68,7 +73,7 @@ export function ManageFontsProvider( { children } ) {
 			newFamiliesOpen = [ ...familiesOpen, familyName ];
 		}
 		setFamiliesOpen( newFamiliesOpen );
-		localStorage.setItem(
+		window.localStorage.setItem(
 			'cbt_families-open',
 			JSON.stringify( newFamiliesOpen )
 		);

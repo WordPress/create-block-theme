@@ -47,7 +47,7 @@ export function localFileAsThemeAssetUrl( url ) {
 	if ( ! url ) {
 		return url;
 	}
-	return url.replace( 'file:./', createBlockTheme.themeUrl + '/' );
+	return url.replace( 'file:./', window.createBlockTheme.themeUrl + '/' );
 }
 
 export async function downloadFile( response ) {
@@ -57,9 +57,10 @@ export async function downloadFile( response ) {
 		.split( 'filename=' )[ 1 ];
 
 	// Check if the browser supports navigator.msSaveBlob or navigator.saveBlob
-	if ( navigator.msSaveBlob || navigator.saveBlob ) {
-		const saveBlob = navigator.msSaveBlob || navigator.saveBlob;
-		saveBlob.call( navigator, blob, filename );
+	if ( window.navigator.msSaveBlob || window.navigator.saveBlob ) {
+		const saveBlob =
+			window.navigator.msSaveBlob || window.navigator.saveBlob;
+		saveBlob.call( window.navigator, blob, filename );
 	} else {
 		// Fall back to creating an object URL and triggering a download using an anchor element
 		const url = URL.createObjectURL( blob );
