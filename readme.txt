@@ -36,8 +36,6 @@ Install and activate the [Create Block Theme](https://wordpress.org/plugins/crea
 
 There will be a new panel accessible from the WordPress Editor, which you can open by clicking on a new icon to the right of the "Save" button, at the top of the Editor.
 
-1. Create Block Theme panel in the WordPress Editor
-
 = Step 2 – Style Customizations =
 Make changes to your site styles, fonts and templates using the Editor.
 
@@ -47,8 +45,6 @@ Still in the WordPress Editor, navigate to the Create Block Theme menu at the to
 To save recent changes made in the Editor to the currently active theme:
 
 - Select "Save Changes" to save any recent changes to the currently active theme.
-
-2. Create Block Theme save panel in the WordPress Editor
 
 To install and uninstall fonts:
 
@@ -64,13 +60,9 @@ To edit the theme metadata:
 
 - Select "Edit Theme Metadata" to edit the metadata for the theme. These details will be used in the style.css file.
 
-3. Theme Metadata editing panel in the WordPress Editor
-
 To inspect the active theme's theme.json contents:
 
 - Select "Inspect Theme JSON"
-
-4. theme.json inspector in the WordPress Editor
 
 To create a new blank theme:
 
@@ -90,13 +82,7 @@ To create a new Clone of the current theme or to create a Child of the current t
 - Click "Clone Theme" to create a new Theme based on the active theme with your changes
 - Click "Create Child Theme" to create a new Child Theme with the active theme as a parent with your changes
 
-5. Create Theme panel 1 in the WordPress Editor
-
-6. Create Theme panel 2 in the WordPress Editor
-
 Many of these options are also available under the older, deprecated Create Block Theme page under Appearance > Create Block Theme.
-
-7. Page under Appearance > Create Block Theme
 
 == Frequently Asked Questions ==
 
@@ -123,6 +109,16 @@ If you are having problems, please try the following:
 - First follow the general troubleshooting steps above.
 - Please make sure you `WP_DEBUG` setting in your `wp-config.php` file is set to `false` like this: `define( 'WP_DEBUG', false );`.
 - If your theme includes PHP files, ensure those files do **not** use PHP closing tags `?>` at the end of the file. If they do, remove them.
+
+
+== Screenshots ==
+1. Create Block Theme panel in the WordPress Editor
+2. Create Block Theme save panel in the WordPress Editor
+3. Theme Metadata editing panel in the WordPress Editor
+4. theme.json inspector in the WordPress Editor
+5. Create Theme panel 1 in the WordPress Editor
+6. Create Theme panel 2 in the WordPress Editor
+7. Page under Appearance > Create Block Theme
 
 
 == Changelog ==
