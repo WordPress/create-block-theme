@@ -1,3 +1,4 @@
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -22,7 +23,11 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 	return (
 		<Modal
 			isFullScreen
-			title={ `theme.json for ${ themeName }` }
+			title={ sprintf(
+				// translators: %s: theme name.
+				__( 'theme.json for %s', 'create-block-theme' ),
+				themeName
+			) }
 			onRequestClose={ onRequestClose }
 		>
 			<CodeMirror

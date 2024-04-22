@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -73,7 +73,11 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	return (
 		<Modal
 			isFullScreen
-			title={ `Metadata for ${ theme?.name }` }
+			title={ sprintf(
+				// translators: %s: theme name.
+				__( 'Metadata for %s', 'create-block-theme' ),
+				theme?.name
+			) }
 			onRequestClose={ onRequestClose }
 		>
 			<VStack>
