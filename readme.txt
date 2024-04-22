@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.0.2
+Stable tag: 2.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -126,6 +126,16 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.1.0 =
+* Save only templates that have been changed (#572)
+* I18n: Make modal titles translatable (#575)
+* Update readme with changes from UI changes and updated screenshots (#571)
+* Fix concatenation of translation strings (#554)
+* Include activated Fonts on theme zip export functions (#564)
+* Fix/un transposed patterns (#567)
+* Try/refactor editor UI (#563)
+* Update readme files with editor-specific steps and screenshot references (#555)
 
 = 2.0.2 =
 * Update readme, remove test files from release build (#548)
