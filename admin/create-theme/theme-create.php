@@ -74,12 +74,12 @@ class Theme_Create {
 		// Add Screenshot
 		if ( static::is_valid_screenshot( $screenshot ) ) {
 			file_put_contents(
-				$new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
+				$new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.jpg',
 				file_get_contents( $screenshot['tmp_name'] )
 			);
 		} else {
-			$source = plugin_dir_path( __DIR__ ) . '../assets/boilerplate/screenshot.png';
-			copy( $source, $new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png' );
+			$source = plugin_dir_path( __DIR__ ) . '../assets/boilerplate/screenshot.jpg';
+			copy( $source, $new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.jpg' );
 		}
 
 		if ( $theme['subfolder'] ) {
@@ -134,7 +134,7 @@ class Theme_Create {
 		// Overwrite default screenshot if one is provided.
 		if ( static::is_valid_screenshot( $screenshot ) ) {
 			file_put_contents(
-				$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
+				$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.jpg',
 				file_get_contents( $screenshot['tmp_name'] )
 			);
 		}

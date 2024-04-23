@@ -167,7 +167,7 @@ class Create_Block_Theme_Admin {
 		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
-				'screenshot.png'
+				'screenshot.jpg'
 			);
 		}
 
@@ -236,7 +236,7 @@ class Create_Block_Theme_Admin {
 		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
-				'screenshot.png'
+				'screenshot.jpg'
 			);
 		}
 
@@ -295,7 +295,7 @@ class Create_Block_Theme_Admin {
 		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
-				'screenshot.png'
+				'screenshot.jpg'
 			);
 		}
 
@@ -387,7 +387,7 @@ class Create_Block_Theme_Admin {
 			// Overwrite default screenshot if one is provided.
 			if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 				file_put_contents(
-					$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
+					$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.jpg',
 					file_get_contents( $screenshot['tmp_name'] )
 				);
 			}

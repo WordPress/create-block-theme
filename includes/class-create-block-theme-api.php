@@ -297,7 +297,7 @@ class Create_Block_Theme_API {
 		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
-				'screenshot.png'
+				'screenshot.jpg'
 			);
 		}
 
@@ -344,13 +344,13 @@ class Create_Block_Theme_API {
 		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
-				'screenshot.png'
+				'screenshot.jpg'
 			);
 		} else {
-			$source = plugin_dir_path( __DIR__ ) . 'assets/boilerplate/screenshot.png';
+			$source = plugin_dir_path( __DIR__ ) . 'assets/boilerplate/screenshot.jpg';
 			$zip->addFileToTheme(
 				$source,
-				'screenshot.png'
+				'screenshot.jpg'
 			);
 		}
 
