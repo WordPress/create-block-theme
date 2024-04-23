@@ -1,6 +1,13 @@
 {
 	"extends": "plugin:@wordpress/eslint-plugin/recommended",
-	"rules": {
-		"no-undef": "off"
-	}
+	"globals": {
+		"FileReader": true,
+		"FontFace": true
+	},
+	"overrides": [
+		{
+			"files": [ "**/test/**/*.js" ],
+			"extends": [ "plugin:@wordpress/eslint-plugin/test-unit" ]
+		}
+	]
 }

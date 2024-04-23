@@ -1,6 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line
 	__experimentalVStack as VStack,
@@ -27,6 +28,8 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		tags_custom: '',
 		recommended_plugins: '',
 	} );
+
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();

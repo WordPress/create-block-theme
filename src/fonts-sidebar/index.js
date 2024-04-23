@@ -1,4 +1,4 @@
-import { __, _n } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { trash } from '@wordpress/icons';

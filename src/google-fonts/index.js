@@ -143,7 +143,7 @@ function GoogleFonts() {
 	useEffect( () => {
 		( async () => {
 			const responseData = await fetch(
-				createBlockTheme.googleFontsDataUrl
+				window.createBlockTheme.googleFontsDataUrl
 			);
 			const parsedData = await responseData.json();
 			setGoogleFontsData( parsedData );

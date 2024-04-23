@@ -3,7 +3,7 @@ import { chevronLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 function BackButton() {
-	const { adminUrl } = createBlockTheme;
+	const { adminUrl } = window.createBlockTheme;
 	return (
 		<Button
 			varint="secondary"
