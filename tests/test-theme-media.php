@@ -60,4 +60,24 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 	}
 
+	public function test_make_group_block_local() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = '
+			<!-- wp:group {"style":{"background":{"backgroundImage":{"url":"http://example.com/image.jpg","id":31,"source":"file","title":"Screenshot 2024-04-18 at 14-08-49 Blog Home ‹ Template ‹ a8c-wp-env ‹ Editor — WordPress"}}},"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"></div>
+			<!-- /wp:group -->
+		';
+		$new_template      = Theme_Templates::prepare_template_for_export( $template );
+
+		// Content should be replaced with a pattern block
+		$this->assertStringContainsString( '<!-- wp:pattern', $new_template->content );
+
+		// The media to install should be in the collection
+		$this->assertContains( 'http://example.com/image.jpg', $new_template->media );
+
+		// The pattern is correctly encoded
+		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
+
+	}
 }
