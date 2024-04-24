@@ -21,7 +21,7 @@ class Theme_Form {
 				printf(
 					/* translators: %s: editor link. */
 					esc_html__( 'This page is deprecated and will be removed in the next release. Please try exporting from the Create Block Theme menu of the %s instead.', 'create-block-theme' ),
-					' <a href="' . esc_url( '/wp-admin/site-editor.php?canvas=edit' ) . '">' . __( 'editor', 'create-block-theme' ) . '</a>'
+					' <a href="' . esc_url( admin_url( 'site-editor.php?canvas=edit' ) ) . '">' . __( 'editor', 'create-block-theme' ) . '</a>'
 				);
 			?>
 		</p>

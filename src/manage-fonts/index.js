@@ -240,14 +240,17 @@ export default function () {
 						{
 							a: (
 								// eslint-disable-next-line jsx-a11y/anchor-has-content
-								<a href="/wp-admin/site-editor.php?canvas=edit" />
+								<a href="site-editor.php?canvas=edit" />
 							),
 						}
 					) }
 				</p>
 				<img
 					src="https://i0.wp.com/wordpress.org/news/files/2024/04/Font-Manager-2.png?w=620&ssl=1"
-					alt="WordPress 6.5 Font Library"
+					alt={ __(
+						'WordPress 6.5 Font Library',
+						'create-block-theme'
+					) }
 				/>
 				<p>
 					{ createInterpolateElement(
