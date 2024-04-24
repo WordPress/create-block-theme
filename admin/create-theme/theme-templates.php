@@ -389,6 +389,9 @@ class Theme_Templates {
 				unset( $block['attrs']['id'] );
 				// remove wp-image-[id] class from inner content
 				foreach ( $block['innerContent'] as $inner_key => $inner_content ) {
+					if ( is_null( $inner_content ) ) {
+						continue;
+					}
 					$block['innerContent'][ $inner_key ] = str_replace( 'wp-image-' . $image_id, '', $inner_content );
 				}
 			}
