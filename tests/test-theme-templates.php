@@ -299,4 +299,45 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringContainsString( "<?php echo __('Content to Localize', '');?>", $new_template->content );
 		$this->assertStringContainsString( "<?php echo __('Alt Text Is Here', '');?>", $new_template->content );
 	}
+
+	public function test_localize_cover_block_children() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:cover -->
+			<div class="wp-block-cover">
+			<div class="wp-block-cover__inner-container">
+				<!-- wp:paragraph -->
+				<p>This is text to localize</p>
+				<!-- /wp:paragraph -->
+			</div>
+			</div>
+			<!-- /wp:cover -->
+		';
+		$new_template      = Theme_Templates::escape_text_in_template( $template );
+
+		$this->assertStringContainsString( '<p><?php echo __(\'This is text to localize\', \'\');?></p>', $new_template->content );
+	}
+
+	public function test_localize_nested_cover_block_children() {
+		$template          = new stdClass();
+		$template->content = '
+		<!-- wp:cover -->
+		<div class="wp-block-cover">
+		<div class="wp-block-cover__inner-container">
+			<!-- wp:cover {"url":"http://localhost:4759/wp-content/themes/pub/cover-test/assets/images/cover-inner.png","id":82,"dimRatio":0,"customOverlayColor":"#64554a","isUserOverlayColor":true,"focalPoint":{"x":0.5,"y":1},"minHeight":100,"minHeightUnit":"vh","contentPosition":"top center","style":{"spacing":{"padding":{"top":"150px","right":"0","bottom":"150px","left":"0"}}},"layout":{"type":"default"}} -->
+			<div class="wp-block-cover has-custom-content-position is-position-top-center" style="padding-top:150px;padding-right:0;padding-bottom:150px;padding-left:0;min-height:100vh">
+			<div class="wp-block-cover__inner-container">
+				<!-- wp:paragraph -->
+				<p>This is text to localize</p>
+				<!-- /wp:paragraph -->
+			</div></div>
+			<!-- /wp:cover -->
+		</div></div>
+		<!-- /wp:cover -->
+		';
+		$new_template      = Theme_Templates::eliminate_environment_specific_content( $template );
+
+		$this->assertStringContainsString( 'This is text to localize', $new_template->content );
+	}
+
 }
