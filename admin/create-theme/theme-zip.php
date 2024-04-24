@@ -37,6 +37,10 @@ class Theme_Zip {
 		$theme_font_asset_location = '/assets/fonts/';
 		$font_slugs_to_remove      = array();
 
+		if ( ! $font_families_to_copy ) {
+			return $theme_json_string;
+		}
+
 		foreach ( $font_families_to_copy as &$font_family ) {
 			if ( ! isset( $font_family['fontFace'] ) ) {
 				continue;
