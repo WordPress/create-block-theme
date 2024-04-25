@@ -73,6 +73,13 @@ class Theme_Media {
 					}
 				}
 			}
+
+			// Gets the absolute URLs of background images in these blocks
+			if ( 'core/group' === $block['blockName'] ) {
+				if ( isset( $block['attrs']['style']['background']['backgroundImage']['url'] ) && Theme_Utils::is_absolute_url( $block['attrs']['style']['background']['backgroundImage']['url'] ) ) {
+					$media[] = $block['attrs']['style']['background']['backgroundImage']['url'];
+				}
+			}
 		}
 
 		return $media;
