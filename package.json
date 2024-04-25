@@ -18,7 +18,6 @@
 		"node": ">=18",
 		"npm": ">=9"
 	},
-	"main": "build/index.js",
 	"dependencies": {
 		"@codemirror/lang-json": "^6.0.1",
 		"@uiw/react-codemirror": "^4.21.24",
@@ -43,7 +42,7 @@
 		"simple-git": "^3.18.0"
 	},
 	"scripts": {
-		"build": "wp-scripts build src/index.js src/plugin-sidebar.js src/wp-org-theme-directory.js",
+		"build": "wp-scripts build src/plugin-sidebar.js src/wp-org-theme-directory.js",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:css:fix": "npm run lint:css -- --fix",
@@ -57,7 +56,7 @@
 		"test:php:watch": "wp-env run cli --env-cwd='wp-content/plugins/create-block-theme' composer run-script test:watch",
 		"test:php:setup": "wp-env start",
 		"packages-update": "wp-scripts packages-update",
-		"start": "wp-scripts start src/index.js src/plugin-sidebar.js src/wp-org-theme-directory.js",
+		"start": "wp-scripts start src/plugin-sidebar.js src/wp-org-theme-directory.js",
 		"composer": "wp-env run cli --env-cwd=wp-content/plugins/create-block-theme composer",
 		"update-version": "node update-version-and-changelog.js",
 		"prepare": "husky install",

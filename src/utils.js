@@ -1,35 +1,4 @@
-import { __, _x } from '@wordpress/i18n';
-
-export function getStyleFromGoogleVariant( variant ) {
-	return variant.includes( 'italic' ) ? 'italic' : 'normal';
-}
-
-export function getWeightFromGoogleVariant( variant ) {
-	return variant === 'regular' || variant === 'italic'
-		? '400'
-		: variant.replace( 'italic', '' );
-}
-
-export function getGoogleVariantFromStyleAndWeight( style, weight ) {
-	if ( weight === '400' ) {
-		if ( style === 'italic' ) {
-			return 'italic';
-		}
-		return 'regular';
-	}
-	if ( style === 'normal' ) {
-		return weight;
-	}
-	return weight + style;
-}
-
-export function localizeFontStyle( style ) {
-	const styles = {
-		normal: _x( 'Normal', 'Font style', 'create-block-theme' ),
-		italic: _x( 'Italic', 'Font style', 'create-block-theme' ),
-	};
-	return styles[ style ] !== undefined ? styles[ style ] : style;
-}
+import { __ } from '@wordpress/i18n';
 
 export function forceHttps( url ) {
 	return url.replace( 'http://', 'https://' );
