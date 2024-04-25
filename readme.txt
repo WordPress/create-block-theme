@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,11 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.1.2 =
+* Document the release process (#594)
+* Make sure code is being deployed to the directory only on Release PR Merge (#593)
+* Remove font management (#595)
 
 = 2.1.1 =
 * Process group background image when saving theme (#586)
