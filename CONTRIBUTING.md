@@ -50,6 +50,24 @@ There are several linter commands available to help ensure the plugin follows th
 
 To test a WordPress plugin, you need to have WordPress itself installed. If you already have a WordPress environment setup, use the above Create Block Theme build as a standard WordPress plugin by putting the `create-block-theme` directory in your wp-content/plugins/ directory.
 
+## Releasing a new version of Create Block Theme
+
+We have an automated process for the release of new versions of Create Block Theme to the public.
+
+### 1 - Initiate the Release Process
+
+To begin the release process, execute the [**Create new release PR**](https://github.com/WordPress/create-block-theme/actions/workflows/release-new-version.yml) workflow from the Actions tab. Choose the type of release — major, minor, or patch — from the "Run workflow" dropdown menu. This action triggers the creation of a new Release PR, such as [#592](https://github.com/WordPress/create-block-theme/pull/592/files), which includes an automated version bump and proposed changes to the Change Log.
+
+
+### 2 - Update the Release PR
+
+Keep the Release PR current by incorporating any new changes from the `trunk` that are intended for this release. Use the `git cherry-pick [commit-hash]` command to add specific commits to the Release Branch associated with the Release PR. The Release Branch is named using the format: `release/[creation-date]/[release-type]-release`, where `[creation-date]` is the date the Release PR was created, and `[release-type]` is the type selected during the workflow initiation.
+
+
+### 3 - Finalize the Release
+
+Once the release is deemed complete and ready, it must be reviewed and approved by members of the organization. Following approval, the Release PR is merged into the main branch. This action triggers the [**Deploy to Dotorg**](https://github.com/WordPress/create-block-theme/actions/workflows/deploy-to-dotorg.yml) workflow, which tags the release on both GitHub and the WordPress Plugin Directory SVN. A Release Confirmation is then triggered on WordPress.org, notifying plugin maintainers via email of the new release awaiting confirmation. Upon confirmation, the new version becomes live on the WordPress Plugin Directory.
+
 ## Guidelines
 
 -   As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/).
