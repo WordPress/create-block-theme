@@ -1,16 +1,6 @@
 name: Deploy to WordPress.org
 
 on:
-    workflow_dispatch:
-        inputs:
-            release_type:
-                description: 'Release type'
-                required: true
-                type: choice
-                options:
-                    - major
-                    - minor
-                    - patch
     pull_request:
         types: [closed]
         branches:
