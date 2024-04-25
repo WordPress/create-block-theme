@@ -34,22 +34,19 @@ export const CreateThemePanel = ( { createType } ) => {
 		subfolder: '',
 	} );
 
-	useSelect(
-		( select ) => {
-			const themeData = select( 'core' ).getCurrentTheme();
-			setTheme( {
-				...theme,
-				subfolder:
-					themeData.stylesheet.lastIndexOf( '/' ) > 1
-						? themeData.stylesheet.substring(
-								0,
-								themeData.stylesheet.lastIndexOf( '/' )
-						  )
-						: '',
-			} );
-		},
-		[ theme ]
-	);
+	useSelect( ( select ) => {
+		const themeData = select( 'core' ).getCurrentTheme();
+		setTheme( {
+			...theme,
+			subfolder:
+				themeData.stylesheet.lastIndexOf( '/' ) > 1
+					? themeData.stylesheet.substring(
+							0,
+							themeData.stylesheet.lastIndexOf( '/' )
+					  )
+					: '',
+		} );
+	}, [] );
 
 	const cloneTheme = () => {
 		if ( createType === 'createClone' ) {
