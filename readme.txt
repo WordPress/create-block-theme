@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,15 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.1.1 =
+* Process group background image when saving theme (#586)
+* Removed unnecessary filter rejecting unsafe URLs (#588)
+* Fix/cover-block-content-stripped (#587)
+* When there are no fonts to export an error is thrown (null ref).  This change checks for fonts to copy to the theme before trying to. (#582)
+* Fix hardcoded wp-admin URLs (#576)
+* Code Quality: Remove `no-undef` eslint rule (#577)
+* Move screenshot refs to screenshot section (#580)
 
 = 2.1.0 =
 * Save only templates that have been changed (#572)
