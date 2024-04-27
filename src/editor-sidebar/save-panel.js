@@ -14,7 +14,9 @@ import {
 	Button,
 	CheckboxControl,
 } from '@wordpress/components';
-import { chevronLeft, archive } from '@wordpress/icons';
+import { archive } from '@wordpress/icons';
+
+import ScreenHeader from './screen-header';
 
 export const SaveThemePanel = () => {
 	const [ saveOptions, setSaveOptions ] = useState( {
@@ -61,12 +63,9 @@ export const SaveThemePanel = () => {
 
 	return (
 		<PanelBody>
-			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft }>
-					{ __( 'Save Changes', 'create-block-theme' ) }
-				</NavigatorToParentButton>
-			</Heading>
-
+			<ScreenHeader
+				title={ __( 'Save Changes', 'create-block-theme' ) }
+			/>
 			<VStack>
 				<CheckboxControl
 					label="Save Fonts"

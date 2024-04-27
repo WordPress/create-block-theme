@@ -15,8 +15,10 @@ import {
 	Button,
 	TextControl,
 } from '@wordpress/components';
-import { chevronLeft, copy } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 import { postCreateThemeVariation } from '../resolvers';
+
+import ScreenHeader from './screen-header';
 
 export const CreateVariationPanel = () => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -50,12 +52,9 @@ export const CreateVariationPanel = () => {
 
 	return (
 		<PanelBody>
-			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft }>
-					{ __( 'Create Variation', 'create-block-theme' ) }
-				</NavigatorToParentButton>
-			</Heading>
-
+			<ScreenHeader
+				title={ __( 'Create Variation', 'create-block-theme' ) }
+			/>
 			<VStack>
 				<Text>
 					{ __(
