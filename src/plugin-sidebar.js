@@ -35,7 +35,6 @@ import {
 	edit,
 	code,
 	chevronRight,
-	chevronLeft,
 	addCard,
 	blockMeta,
 } from '@wordpress/icons';
@@ -45,6 +44,7 @@ import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
 import { SaveThemePanel } from './editor-sidebar/save-panel';
 import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
 import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
+import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
 
 const CreateBlockThemePlugin = () => {
@@ -181,14 +181,12 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/clone">
 						<PanelBody>
-							<Heading>
-								<NavigatorToParentButton icon={ chevronLeft }>
-									{ __(
-										'Create Block Theme',
-										'create-block-theme'
-									) }
-								</NavigatorToParentButton>
-							</Heading>
+							<ScreenHeader
+								title={ __(
+									'Create Block Theme',
+									'create-block-theme'
+								) }
+							/>
 							<VStack>
 								<Text>
 									{ __(
