@@ -114,8 +114,14 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Process Only Modified Templates"
-					help="Process only templates you have modified in the Editor. Any templates you have not modified will be left as is."
+					label={ __(
+						'Process Only Modified Templates',
+						'create-block-theme'
+					) }
+					help={ __(
+						'Process only templates you have modified in the Editor. Any templates you have not modified will be left as is.',
+						'create-block-theme'
+					) }
 					disabled={ ! saveOptions.saveTemplates }
 					checked={
 						saveOptions.saveTemplates &&
