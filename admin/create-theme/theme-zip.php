@@ -195,7 +195,7 @@ class Theme_Zip {
 
 			// Write the template content
 			$zip->addFromStringToTheme(
-				$template_folders['wp_template_part'] . '/' . $template->slug . '.html',
+				path_join( $template_folders['wp_template_part'], $template->slug . '.html' ),
 				$template->content
 			);
 
