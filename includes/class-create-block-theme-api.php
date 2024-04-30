@@ -367,6 +367,13 @@ class Create_Block_Theme_API {
 	 * Export the theme as a ZIP file.
 	 */
 	function rest_export_theme( $request ) {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			return new WP_Error(
+				'missing_zip_package',
+				__( 'Unable to create a zip file. ZipArchive not available.', 'create-block-theme' ),
+			);
+		}
+
 		$theme_slug = wp_get_theme()->get( 'TextDomain' );
 
 		// Create ZIP file in the temporary directory.

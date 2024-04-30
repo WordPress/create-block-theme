@@ -462,6 +462,9 @@ class Create_Block_Theme_Admin {
 				$this->create_blank_theme( $_POST['theme'], $_FILES['screenshot'] );
 
 				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_blank_success' ) );
+			} elseif ( ! class_exists( 'ZipArchive' ) ) {
+				// Avoid running if ZipArchive is not enabled.
+				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_unsupported_zip_archive' ) );
 			} elseif ( is_child_theme() ) {
 				if ( 'sibling' === $_POST['theme']['type'] ) {
 					if ( '' === $_POST['theme']['name'] ) {

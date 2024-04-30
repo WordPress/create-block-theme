@@ -34,7 +34,7 @@ class Theme_Zip {
 		$theme_json = json_decode( $theme_json_string, true );
 
 		$font_families_to_copy     = Theme_Fonts::get_user_activated_fonts();
-		$theme_font_asset_location = '/assets/fonts/';
+		$theme_font_asset_location = 'assets/fonts';
 		$font_slugs_to_remove      = array();
 
 		if ( ! $font_families_to_copy ) {
@@ -47,14 +47,15 @@ class Theme_Zip {
 			}
 			$font_slugs_to_remove[] = $font_family['slug'];
 			foreach ( $font_family['fontFace'] as &$font_face ) {
-				$font_filename = basename( $font_face['src'] );
-				$font_dir      = wp_get_font_dir();
+				$font_filename  = basename( $font_face['src'] );
+				$font_dir       = wp_get_font_dir();
+				$font_face_path = path_join( $theme_font_asset_location, $font_filename );
 				if ( str_contains( $font_face['src'], $font_dir['url'] ) ) {
-					$zip->addFileToTheme( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_filename );
+					$zip->addFileToTheme( path_join( $font_dir['path'], $font_filename ), $font_face_path );
 				} else {
 					// otherwise download it from wherever it is hosted
 					$tmp_file = download_url( $font_face['src'] );
-					$zip->addFileToTheme( $tmp_file, $theme_font_asset_location . '/' . $font_filename );
+					$zip->addFileToTheme( $tmp_file, $font_face_path );
 					unlink( $tmp_file );
 				}
 
@@ -172,7 +173,7 @@ class Theme_Zip {
 
 			// Write the template content
 			$zip->addFromStringToTheme(
-				$template_folders['wp_template'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				path_join( $template_folders['wp_template'], $template->slug . '.html' ),
 				$template->content
 			);
 
@@ -195,7 +196,7 @@ class Theme_Zip {
 
 			// Write the template content
 			$zip->addFromStringToTheme(
-				$template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . $template->slug . '.html',
+				path_join( $template_folders['wp_template_part'], $template->slug . '.html' ),
 				$template->content
 			);
 

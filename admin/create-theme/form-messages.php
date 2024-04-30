@@ -103,4 +103,13 @@ class Form_Messages {
 			</div>
 		<?php
 	}
+
+	public static function admin_notice_error_unsupported_zip_archive() {
+		$themes_dir = get_theme_root();
+		?>
+			<div class="notice notice-error">
+				<p><?php _e( 'Unable to create a zip file. ZipArchive not available.', 'create-block-theme' ); ?></p>
+			</div>
+		<?php
+	}
 }
