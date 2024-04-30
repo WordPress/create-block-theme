@@ -46,6 +46,7 @@ import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
 import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
 import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
+import { downloadFile } from './utils';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
@@ -56,8 +57,12 @@ const CreateBlockThemePlugin = () => {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const handleExportClick = () => {
-		downloadExportedTheme().catch( ( error ) => {
+	const handleExportClick = async () => {
+		try {
+			const response = await downloadExportedTheme();
+			downloadFile( response );
+		} catch ( errorResponse ) {
+			const error = await errorResponse.json();
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
@@ -66,7 +71,7 @@ const CreateBlockThemePlugin = () => {
 							'create-block-theme'
 					  );
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		} );
+		}
 	};
 
 	return (

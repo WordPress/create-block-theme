@@ -1,5 +1,4 @@
 import apiFetch from '@wordpress/api-fetch';
-import { downloadFile } from './utils';
 
 export async function fetchThemeJson() {
 	const fetchOptions = {
@@ -57,7 +56,5 @@ export async function downloadExportedTheme() {
 			'Content-Type': 'application/json',
 		},
 		parse: false,
-	} ).then( ( response ) => {
-		downloadFile( response );
 	} );
 }
