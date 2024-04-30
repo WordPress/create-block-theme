@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,16 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.1.3 =
+* Editor Sidebar: Persist "Save Changes" panel settings (#607)
+* Fix problem with zip file creation on Windows (#606)
+* Fix custom fonts assets path (#601)
+* Remove unused `UpdateThemePanel` component (#608)
+* Check ZipArchive class before zip export (#609)
+* Editor Sidebar: Make save panel text translatable (#603)
+* Editor Sidebar: Improve screen title UI (#605)
+* Move files (#598)
 
 = 2.1.2 =
 * Document the release process (#594)
