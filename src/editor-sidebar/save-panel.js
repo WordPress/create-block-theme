@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
 import {
@@ -15,27 +14,46 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import { archive } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 import ScreenHeader from './screen-header';
 
+const PREFERENCE_SCOPE = 'create-block-theme';
+const PREFERENCE_KEY = 'save-changes';
+
 export const SaveThemePanel = () => {
-	const [ saveOptions, setSaveOptions ] = useState( {
-		saveStyle: true,
-		saveTemplates: true,
-		processOnlySavedTemplates: true,
-		saveFonts: true,
-		removeNavRefs: false,
-		localizeText: false,
-		localizeImages: false,
-	} );
+	const preference = useSelect( ( select ) => {
+		const _preference = select( preferencesStore ).get(
+			PREFERENCE_SCOPE,
+			PREFERENCE_KEY
+		);
+		return {
+			saveStyle: _preference?.saveStyle ?? true,
+			saveTemplates: _preference?.saveTemplates ?? true,
+			processOnlySavedTemplates:
+				_preference?.processOnlySavedTemplates ?? true,
+			saveFonts: _preference?.saveFonts ?? true,
+			removeNavRefs: _preference?.removeNavRefs ?? false,
+			localizeText: _preference?.localizeText ?? false,
+			localizeImages: _preference?.localizeImages ?? false,
+		};
+	}, [] );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const handleTogglePreference = ( key ) => {
+		setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, {
+			...preference,
+			[ key ]: ! preference[ key ],
+		} );
+	};
 
 	const handleSaveClick = () => {
 		apiFetch( {
 			path: '/create-block-theme/v1/save',
 			method: 'POST',
-			data: saveOptions,
+			data: preference,
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -73,13 +91,8 @@ export const SaveThemePanel = () => {
 						'Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme.',
 						'create-block-theme'
 					) }
-					checked={ saveOptions.saveFonts }
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							saveFonts: ! saveOptions.saveFonts,
-						} );
-					} }
+					checked={ preference.saveFonts }
+					onChange={ () => handleTogglePreference( 'saveFonts' ) }
 				/>
 				<CheckboxControl
 					label={ __( 'Save Style Changes', 'create-block-theme' ) }
@@ -87,13 +100,8 @@ export const SaveThemePanel = () => {
 						'Save Global Styles values set in the Editor to the theme.',
 						'create-block-theme'
 					) }
-					checked={ saveOptions.saveStyle }
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							saveStyle: ! saveOptions.saveStyle,
-						} );
-					} }
+					checked={ preference.saveStyle }
+					onChange={ () => handleTogglePreference( 'saveStyle' ) }
 				/>
 				<CheckboxControl
 					label={ __(
@@ -104,13 +112,8 @@ export const SaveThemePanel = () => {
 						'Save Template and Template Part changes made in the Editor to the theme.',
 						'create-block-theme'
 					) }
-					checked={ saveOptions.saveTemplates }
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							saveTemplates: ! saveOptions.saveTemplates,
-						} );
-					} }
+					checked={ preference.saveTemplates }
+					onChange={ () => handleTogglePreference( 'saveTemplates' ) }
 				/>
 				<CheckboxControl
 					label={ __(
@@ -121,18 +124,14 @@ export const SaveThemePanel = () => {
 						'Process only templates you have modified in the Editor. Any templates you have not modified will be left as is.',
 						'create-block-theme'
 					) }
-					disabled={ ! saveOptions.saveTemplates }
+					disabled={ ! preference.saveTemplates }
 					checked={
-						saveOptions.saveTemplates &&
-						saveOptions.processOnlySavedTemplates
+						preference.saveTemplates &&
+						preference.processOnlySavedTemplates
 					}
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							processOnlySavedTemplates:
-								! saveOptions.processOnlySavedTemplates,
-						} );
-					} }
+					onChange={ () =>
+						handleTogglePreference( 'processOnlySavedTemplates' )
+					}
 				/>
 				<CheckboxControl
 					label={ __( 'Localize Text', 'create-block-theme' ) }
@@ -140,16 +139,11 @@ export const SaveThemePanel = () => {
 						'Any text in a template will be copied to a pattern and localized.',
 						'create-block-theme'
 					) }
-					disabled={ ! saveOptions.saveTemplates }
+					disabled={ ! preference.saveTemplates }
 					checked={
-						saveOptions.saveTemplates && saveOptions.localizeText
+						preference.saveTemplates && preference.localizeText
 					}
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							localizeText: ! saveOptions.localizeText,
-						} );
-					} }
+					onChange={ () => handleTogglePreference( 'localizeText' ) }
 				/>
 				<CheckboxControl
 					label={ __( 'Localize Images', 'create-block-theme' ) }
@@ -157,16 +151,13 @@ export const SaveThemePanel = () => {
 						'Any images in a template will be copied to a local /assets folder and referenced from there via a pattern.',
 						'create-block-theme'
 					) }
-					disabled={ ! saveOptions.saveTemplates }
+					disabled={ ! preference.saveTemplates }
 					checked={
-						saveOptions.saveTemplates && saveOptions.localizeImages
+						preference.saveTemplates && preference.localizeImages
 					}
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							localizeImages: ! saveOptions.localizeImages,
-						} );
-					} }
+					onChange={ () =>
+						handleTogglePreference( 'localizeImages' )
+					}
 				/>
 				<CheckboxControl
 					label={ __(
@@ -177,16 +168,11 @@ export const SaveThemePanel = () => {
 						'Remove Navigation Refs from the theme returning your navigation to the default state.',
 						'create-block-theme'
 					) }
-					disabled={ ! saveOptions.saveTemplates }
+					disabled={ ! preference.saveTemplates }
 					checked={
-						saveOptions.saveTemplates && saveOptions.removeNavRefs
+						preference.saveTemplates && preference.removeNavRefs
 					}
-					onChange={ () => {
-						setSaveOptions( {
-							...saveOptions,
-							removeNavRefs: ! saveOptions.removeNavRefs,
-						} );
-					} }
+					onChange={ () => handleTogglePreference( 'removeNavRefs' ) }
 				/>
 				<Button
 					variant="primary"
