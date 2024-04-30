@@ -51,7 +51,7 @@ class Theme_Zip {
 				$font_dir       = wp_get_font_dir();
 				$font_face_path = path_join( $theme_font_asset_location, $font_filename );
 				if ( str_contains( $font_face['src'], $font_dir['url'] ) ) {
-					$zip->addFileToTheme( $font_dir['path'] . '/' . $font_filename, $font_face_path );
+					$zip->addFileToTheme( path_join( $font_dir['path'], $font_filename ), $font_face_path );
 				} else {
 					// otherwise download it from wherever it is hosted
 					$tmp_file = download_url( $font_face['src'] );
