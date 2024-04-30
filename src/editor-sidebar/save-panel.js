@@ -14,7 +14,9 @@ import {
 	Button,
 	CheckboxControl,
 } from '@wordpress/components';
-import { chevronLeft, archive } from '@wordpress/icons';
+import { archive } from '@wordpress/icons';
+
+import ScreenHeader from './screen-header';
 
 export const SaveThemePanel = () => {
 	const [ saveOptions, setSaveOptions ] = useState( {
@@ -61,16 +63,16 @@ export const SaveThemePanel = () => {
 
 	return (
 		<PanelBody>
-			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft }>
-					{ __( 'Save Changes', 'create-block-theme' ) }
-				</NavigatorToParentButton>
-			</Heading>
-
+			<ScreenHeader
+				title={ __( 'Save Changes', 'create-block-theme' ) }
+			/>
 			<VStack>
 				<CheckboxControl
-					label="Save Fonts"
-					help="Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme."
+					label={ __( 'Save Fonts', 'create-block-theme' ) }
+					help={ __(
+						'Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme.',
+						'create-block-theme'
+					) }
 					checked={ saveOptions.saveFonts }
 					onChange={ () => {
 						setSaveOptions( {
@@ -80,8 +82,11 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Save Style Changes"
-					help="Save Global Styles values set in the Editor to the theme."
+					label={ __( 'Save Style Changes', 'create-block-theme' ) }
+					help={ __(
+						'Save Global Styles values set in the Editor to the theme.',
+						'create-block-theme'
+					) }
 					checked={ saveOptions.saveStyle }
 					onChange={ () => {
 						setSaveOptions( {
@@ -91,8 +96,14 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Save Template Changes"
-					help="Save Template and Template Part changes made in the Editor to the theme."
+					label={ __(
+						'Save Template Changes',
+						'create-block-theme'
+					) }
+					help={ __(
+						'Save Template and Template Part changes made in the Editor to the theme.',
+						'create-block-theme'
+					) }
 					checked={ saveOptions.saveTemplates }
 					onChange={ () => {
 						setSaveOptions( {
@@ -102,8 +113,14 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Process Only Modified Templates"
-					help="Process only templates you have modified in the Editor. Any templates you have not modified will be left as is."
+					label={ __(
+						'Process Only Modified Templates',
+						'create-block-theme'
+					) }
+					help={ __(
+						'Process only templates you have modified in the Editor. Any templates you have not modified will be left as is.',
+						'create-block-theme'
+					) }
 					disabled={ ! saveOptions.saveTemplates }
 					checked={
 						saveOptions.saveTemplates &&
@@ -118,8 +135,11 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Localize Text"
-					help="Any text in a template will be copied to a pattern and localized."
+					label={ __( 'Localize Text', 'create-block-theme' ) }
+					help={ __(
+						'Any text in a template will be copied to a pattern and localized.',
+						'create-block-theme'
+					) }
 					disabled={ ! saveOptions.saveTemplates }
 					checked={
 						saveOptions.saveTemplates && saveOptions.localizeText
@@ -132,8 +152,11 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Localize Images"
-					help="Any images in a template will be copied to a local /assets folder and referenced from there via a pattern."
+					label={ __( 'Localize Images', 'create-block-theme' ) }
+					help={ __(
+						'Any images in a template will be copied to a local /assets folder and referenced from there via a pattern.',
+						'create-block-theme'
+					) }
 					disabled={ ! saveOptions.saveTemplates }
 					checked={
 						saveOptions.saveTemplates && saveOptions.localizeImages
@@ -146,8 +169,14 @@ export const SaveThemePanel = () => {
 					} }
 				/>
 				<CheckboxControl
-					label="Remove Navigation Refs"
-					help="Remove Navigation Refs from the theme returning your navigation to the default state."
+					label={ __(
+						'Remove Navigation Refs',
+						'create-block-theme'
+					) }
+					help={ __(
+						'Remove Navigation Refs from the theme returning your navigation to the default state.',
+						'create-block-theme'
+					) }
 					disabled={ ! saveOptions.saveTemplates }
 					checked={
 						saveOptions.saveTemplates && saveOptions.removeNavRefs

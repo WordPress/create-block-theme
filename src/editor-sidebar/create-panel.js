@@ -19,7 +19,9 @@ import {
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { chevronLeft, addCard, copy } from '@wordpress/icons';
+import { addCard, copy } from '@wordpress/icons';
+
+import ScreenHeader from './screen-header';
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -148,12 +150,9 @@ export const CreateThemePanel = ( { createType } ) => {
 
 	return (
 		<PanelBody>
-			<Heading>
-				<NavigatorToParentButton icon={ chevronLeft }>
-					{ __( 'Create Theme', 'create-block-theme' ) }
-				</NavigatorToParentButton>
-			</Heading>
-
+			<ScreenHeader
+				title={ __( 'Create Theme', 'create-block-theme' ) }
+			/>
 			<VStack>
 				<TextControl
 					label={ __( 'Theme name', 'create-block-theme' ) }
