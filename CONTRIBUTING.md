@@ -6,6 +6,8 @@ Welcome to Create Block Theme! All are welcome here.
 
 We welcome contributions in all forms, including code, design, documentation, and triage.
 
+There is a [GitHub project board](https://github.com/orgs/WordPress/projects/188/views/1) which is used to plan and track the progress of the plugin.
+
 ### Development Setup
 
 The basic setup for development is:
