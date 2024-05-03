@@ -6,7 +6,11 @@ Welcome to Create Block Theme! All are welcome here.
 
 We welcome contributions in all forms, including code, design, documentation, and triage.
 
-There is a [GitHub project board](https://github.com/orgs/WordPress/projects/188/views/1) which is used to plan and track the progress of the plugin.
+### Discussions
+
+Contributors can be found in the [#core-editor](https://make.wordpress.org/chat/) and [#outreach](https://wordpress.slack.com/archives/C015GUFFC00) channels in [Make WordPress Slack](https://make.wordpress.org/chat).
+
+There is also a [GitHub project board](https://github.com/orgs/WordPress/projects/188/views/1) which is used to plan and track the progress of the plugin.
 
 ### Development Setup
 
