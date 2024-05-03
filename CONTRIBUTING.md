@@ -59,7 +59,7 @@ Members of the [Block Themers GitHub team](https://github.com/orgs/WordPress/tea
 - Demonstrated a commitment to improving how block themes are built in the editor
 - Made 2-3 meaningful contributions to the plugin (similar to the [Gutenberg team requirements](https://developer.wordpress.org/block-editor/contributors/repository-management/#teams))
 
-If you meet this criteria and would like to be added to the Block Themers team, feel free to ask in the [#core-editor](https://make.wordpress.org/chat/) or [#core-themes](https://wordpress.slack.com/archives/C02RP4VMP) Slack channels.
+If you meet this criteria and would like to be added to the Block Themers team, feel free to ask in the [#core-editor](https://make.wordpress.org/chat/) Slack channel.
 
 If you are not a member of the team, you can still contribute by forking the repository and submitting a pull request.
 
