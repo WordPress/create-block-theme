@@ -50,6 +50,14 @@ There are several linter commands available to help ensure the plugin follows th
 
 To test a WordPress plugin, you need to have WordPress itself installed. If you already have a WordPress environment setup, use the above Create Block Theme build as a standard WordPress plugin by putting the `create-block-theme` directory in your wp-content/plugins/ directory.
 
+### Repository Management
+
+Members of the [Block Themers GitHub team](https://github.com/orgs/WordPress/teams/block-themers) have write access to the repository. The team is made up of contributors who have demonstrated a commitment to the project by making 2-3 meaninful contributions (similar to the [Gutenberg team requirements](https://developer.wordpress.org/block-editor/contributors/repository-management/#teams)).
+
+If you meet this criterion of several meaningful contributions having been accepted into the repository and would like to be added to the Block Themers team, feel free to ask in the [#core-editor](https://make.wordpress.org/chat/) or [#core-themes](https://wordpress.slack.com/archives/C02RP4VMP) Slack channels.
+
+If you are not a member of the team, you can still contribute by forking the repository and submitting a pull request.
+
 ## Releasing a new version of Create Block Theme
 
 We have an automated process for the release of new versions of Create Block Theme to the public.
