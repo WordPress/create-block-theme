@@ -1,9 +1,20 @@
+/**
+ * External dependencies
+ */
+import CodeMirror from '@uiw/react-codemirror';
+import { json } from '@codemirror/lang-json';
+
+/**
+ * WordPress dependencies
+ */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import CodeMirror from '@uiw/react-codemirror';
-import { json } from '@codemirror/lang-json';
+
+/**
+ * Internal dependencies
+ */
 import { fetchThemeJson } from '../resolvers';
 
 const ThemeJsonEditorModal = ( { onRequestClose } ) => {
@@ -34,7 +45,7 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 				extensions={ [ json() ] }
 				value={ themeData }
 				onChange={ handleSave }
-				readOnly={ true }
+				readOnly
 			/>
 		</Modal>
 	);

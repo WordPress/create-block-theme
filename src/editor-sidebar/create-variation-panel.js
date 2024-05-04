@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -16,8 +19,11 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { copy } from '@wordpress/icons';
-import { postCreateThemeVariation } from '../resolvers';
 
+/**
+ * Internal dependencies
+ */
+import { postCreateThemeVariation } from '../resolvers';
 import ScreenHeader from './screen-header';
 
 export const CreateVariationPanel = () => {

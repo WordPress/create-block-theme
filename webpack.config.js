@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config.js' );
 

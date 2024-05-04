@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { useState } from '@wordpress/element';
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
@@ -39,6 +42,9 @@ import {
 	blockMeta,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
 import { CreateThemePanel } from './editor-sidebar/create-panel';
 import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
 import { SaveThemePanel } from './editor-sidebar/save-panel';

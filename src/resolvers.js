@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import apiFetch from '@wordpress/api-fetch';
 
 export async function fetchThemeJson() {

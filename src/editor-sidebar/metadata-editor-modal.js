@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -15,6 +18,10 @@ import {
 	TextareaControl,
 	ExternalLink,
 } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
 import { postUpdateThemeMetadata } from '../resolvers';
 
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
@@ -92,7 +99,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				</Text>
 				<Spacer />
 				<TextControl
-					disabled={ true }
+					disabled
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
 				/>

@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -21,6 +24,9 @@ import {
 } from '@wordpress/components';
 import { addCard, copy } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
 import ScreenHeader from './screen-header';
 
 export const CreateThemePanel = ( { createType } ) => {
