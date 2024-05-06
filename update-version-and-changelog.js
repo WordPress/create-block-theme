@@ -1,4 +1,8 @@
 /* eslint-disable no-console */
+
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' );
 const core = require( '@actions/core' );
 const simpleGit = require( 'simple-git' );

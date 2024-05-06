@@ -4,6 +4,16 @@
 		"FileReader": true,
 		"FontFace": true
 	},
+	"rules": {
+		"@wordpress/dependency-group": "error",
+		"@wordpress/i18n-text-domain": [
+			"error",
+			{
+				"allowedTextDomain": "create-block-theme"
+			}
+		],
+		"react/jsx-boolean-value": "error"
+	},
 	"overrides": [
 		{
 			"files": [ "**/test/**/*.js" ],

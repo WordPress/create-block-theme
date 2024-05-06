@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -16,6 +19,9 @@ import {
 import { archive } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 
+/**
+ * Internal dependencies
+ */
 import ScreenHeader from './screen-header';
 
 const PREFERENCE_SCOPE = 'create-block-theme';

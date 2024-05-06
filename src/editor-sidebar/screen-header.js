@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import {
 	// eslint-disable-next-line
 	__experimentalHStack as HStack,
