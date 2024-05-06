@@ -16,7 +16,7 @@ The basic setup for development is:
 
 #### Prerequisites
 
--   [Node.js](https://nodejs.org/en/) (v16.9.1)
+-   [Node.js](https://nodejs.org/en/) (>= v20.10.0)
 -   [Composer](https://getcomposer.org/) (used for linting PHP)
 -   WordPress Development Site, such as [wp-env](https://github.com/WordPress/gutenberg/blob/trunk/packages/env/README.md) or [Local](https://localwp.com/)
 -   We recommend using [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) to manage your Node.js versions
