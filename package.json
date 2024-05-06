@@ -15,12 +15,13 @@
 		"url": "https://wordpress.org/support/plugin/create-block-theme/"
 	},
 	"engines": {
-		"node": ">=18",
-		"npm": ">=9"
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
 	},
 	"dependencies": {
 		"@codemirror/lang-json": "^6.0.1",
 		"@uiw/react-codemirror": "^4.21.24",
+		"@wordpress/env": "^9.9.0",
 		"@wordpress/icons": "^9.24.0",
 		"lib-font": "^2.4.0"
 	},
@@ -30,7 +31,6 @@
 		"@wordpress/base-styles": "^4.28.0",
 		"@wordpress/browserslist-config": "^5.16.0",
 		"@wordpress/element": "^5.10.0",
-		"@wordpress/env": "^8.3.0",
 		"@wordpress/eslint-plugin": "^17.2.0",
 		"@wordpress/prettier-config": "^2.25.13",
 		"@wordpress/scripts": "^26.16.0",
