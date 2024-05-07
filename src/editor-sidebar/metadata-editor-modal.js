@@ -2,27 +2,40 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
+	// eslint-disable-next-line
+	__experimentalHStack as HStack,
 	// eslint-disable-next-line
 	__experimentalVStack as VStack,
 	// eslint-disable-next-line
 	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line
 	__experimentalText as Text,
+	BaseControl,
 	Modal,
 	Button,
 	TextControl,
 	TextareaControl,
 	ExternalLink,
 } from '@wordpress/components';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { postUpdateThemeMetadata } from '../resolvers';
+
+const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
+	'image/png',
+	'image/gif',
+	'image/jpg',
+	'image/jpeg',
+	'image/webp',
+	'image/avif',
+];
 
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	const [ theme, setTheme ] = useState( {
@@ -37,6 +50,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const screenshotRemoveButtonRef = useRef();
 
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
@@ -48,6 +62,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
+			screenshot: themeData.screenshot,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
@@ -195,6 +210,72 @@ Plugin Description`,
 						setTheme( { ...theme, recommended_plugins: value } )
 					}
 				/>
+				<BaseControl>
+					<BaseControl.VisualLabel>
+						{ __( 'Screenshot', 'create-block-theme' ) }
+					</BaseControl.VisualLabel>
+					<MediaUploadCheck>
+						<MediaUpload
+							title={ __( 'Screenshot', 'create-block-theme' ) }
+							// onSelect={ onUpdateImage }
+							allowedTypes={ ALLOWED_SCREENSHOT_MEDIA_TYPES }
+							render={ ( { open } ) => (
+								<>
+									{ theme.screenshot ? (
+										<VStack>
+											<img
+												src={ theme.screenshot }
+												style={ {
+													maxWidth: '200px',
+													height: 'auto',
+													aspectRatio: '4 / 3',
+													objectFit: 'cover',
+												} }
+												alt=""
+											/>
+											<HStack justify="flex-start">
+												<Button
+													size="small"
+													onClick={ open }
+												>
+													{ __(
+														'Replace',
+														'create-block-theme'
+													) }
+												</Button>
+												<Button
+													isDestructive
+													size="small"
+													onClick={ () => {
+														// TODO: Remove Image
+														screenshotRemoveButtonRef.current.focus();
+													} }
+												>
+													{ __(
+														'Remove',
+														'create-block-theme'
+													) }
+												</Button>
+											</HStack>
+										</VStack>
+									) : (
+										<Button
+											variant="secondary"
+											size="compact"
+											onClick={ open }
+										>
+											{ __(
+												'Add screenshot',
+												'create-block-theme'
+											) }
+										</Button>
+									) }
+								</>
+							) }
+							value={ theme.screenshot }
+						/>
+					</MediaUploadCheck>
+				</BaseControl>
 				<TextControl
 					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
 					value={ theme.subfolder }
@@ -204,7 +285,7 @@ Plugin Description`,
 				/>
 			</VStack>
 			<Spacer />
-			<Button variant="secondary" onClick={ handleUpdateClick }>
+			<Button variant="primary" onClick={ handleUpdateClick }>
 				{ __( 'Update', 'create-block-theme' ) }
 			</Button>
 		</Modal>
