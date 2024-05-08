@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -50,7 +50,6 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const screenshotRemoveButtonRef = useRef();
 
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
@@ -95,6 +94,11 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			} );
 	};
+
+	const onUpdateImage = ( image ) => {
+		setTheme( { ...theme, screenshot: image.url } );
+	};
+
 	return (
 		<Modal
 			isFullScreen
@@ -217,7 +221,7 @@ Plugin Description`,
 					<MediaUploadCheck>
 						<MediaUpload
 							title={ __( 'Screenshot', 'create-block-theme' ) }
-							// onSelect={ onUpdateImage }
+							onSelect={ onUpdateImage }
 							allowedTypes={ ALLOWED_SCREENSHOT_MEDIA_TYPES }
 							render={ ( { open } ) => (
 								<>
@@ -240,19 +244,6 @@ Plugin Description`,
 												>
 													{ __(
 														'Replace',
-														'create-block-theme'
-													) }
-												</Button>
-												<Button
-													isDestructive
-													size="small"
-													onClick={ () => {
-														// TODO: Remove Image
-														screenshotRemoveButtonRef.current.focus();
-													} }
-												>
-													{ __(
-														'Remove',
 														'create-block-theme'
 													) }
 												</Button>
