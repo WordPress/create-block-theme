@@ -205,27 +205,34 @@ class Theme_Utils {
 		return null;
 	}
 
-	public static function process_screenshot( $file_path ) {
-		$new_screeenshot_id      = attachment_url_to_postid( $file_path );
+	public static function copy_screenshot( $file_path ) {
+
+		$new_screeenshot_id = attachment_url_to_postid( $file_path );
+
+		if ( ! $new_screeenshot_id ) {
+			return new \WP_Error( 'screenshot_not_found', __( 'Screenshot not found', 'create-block-theme' ) );
+		}
+
 		$new_screenshot_metadata = wp_get_attachment_metadata( $new_screeenshot_id );
 		$upload_dir              = wp_get_upload_dir();
 
 		$new_screenshot_location = path_join( $upload_dir['basedir'], $new_screenshot_metadata['file'] );
 
-		// TODO: We're not actually processing anything.  The image might be of the wrong dimensions, too large, etc.
-		// We're just getting the file location so that we can copy it.
-		// Should we process it?  Or just enforce that the screenshot is the correct size?
+		$new_screenshot_filetype = Theme_Utils::get_screenshot_file_extension( $file_path );
+		$new_location            = path_join( get_stylesheet_directory(), 'screenshot.' . $new_screenshot_filetype );
 
-		return $new_screenshot_location;
+		// copy and resize the image
+		$image_editor = wp_get_image_editor( $new_screenshot_location );
+		$image_editor->resize( 1200, 900, true );
+		$image_editor->save( $new_location );
+
+		return true;
 	}
 
 	public static function replace_screenshot( $new_screenshot_path ) {
 		if ( ! Theme_Utils::is_valid_screenshot_file( $new_screenshot_path ) ) {
 			return new \WP_Error( 'invalid_screenshot', __( 'Invalid screenshot file', 'create-block-theme' ) );
 		}
-
-		// Clean up, resize or compress the screenshot if necessary
-		$processed_screenshot_location = Theme_Utils::process_screenshot( $new_screenshot_path );
 
 		// Remove the old screenshot
 		$old_screenshot = wp_get_theme()->get_screenshot( 'relative' );
@@ -234,9 +241,7 @@ class Theme_Utils {
 		}
 
 		// Copy the new screenshot
-		$new_screenshot_filetype = Theme_Utils::get_screenshot_file_extension( $new_screenshot_path );
-		$new_location            = path_join( get_stylesheet_directory(), 'screenshot.' . $new_screenshot_filetype );
-		copy( $processed_screenshot_location, $new_location );
+		return Theme_Utils::copy_screenshot( $new_screenshot_path );
 	}
 
 }
