@@ -228,7 +228,10 @@ class Theme_Utils {
 		$processed_screenshot_location = Theme_Utils::process_screenshot( $new_screenshot_path );
 
 		// Remove the old screenshot
-		unlink( path_join( get_stylesheet_directory(), wp_get_theme()->get_screenshot( 'relative' ) ) );
+		$old_screenshot = wp_get_theme()->get_screenshot( 'relative' );
+		if ( $old_screenshot ) {
+			unlink( path_join( get_stylesheet_directory(), $old_screenshot ) );
+		}
 
 		// Copy the new screenshot
 		$new_screenshot_filetype = Theme_Utils::get_screenshot_file_extension( $new_screenshot_path );
