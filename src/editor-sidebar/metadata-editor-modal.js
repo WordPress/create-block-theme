@@ -226,7 +226,7 @@ Plugin Description`,
 							render={ ( { open } ) => (
 								<>
 									{ theme.screenshot ? (
-										<VStack>
+										<VStack alignment="left">
 											<img
 												src={ theme.screenshot }
 												style={ {
@@ -237,29 +237,30 @@ Plugin Description`,
 												} }
 												alt=""
 											/>
-											<HStack justify="flex-start">
-												<Button
-													size="small"
-													onClick={ open }
-												>
-													{ __(
-														'Replace',
-														'create-block-theme'
-													) }
-												</Button>
-											</HStack>
+											<Button
+												variant="secondary"
+												size="compact"
+												onClick={ open }
+											>
+												{ __(
+													'Replace',
+													'create-block-theme'
+												) }
+											</Button>
 										</VStack>
 									) : (
-										<Button
-											variant="secondary"
-											size="compact"
-											onClick={ open }
-										>
-											{ __(
-												'Add screenshot',
-												'create-block-theme'
-											) }
-										</Button>
+										<HStack alignment="left">
+											<Button
+												variant="secondary"
+												size="compact"
+												onClick={ open }
+											>
+												{ __(
+													'Add screenshot',
+													'create-block-theme'
+												) }
+											</Button>
+										</HStack>
 									) }
 								</>
 							) }
