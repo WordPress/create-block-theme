@@ -57,10 +57,10 @@ if ( ! function_exists( 'oldslug_support' ) ) :
 	function oldslug_support() {
 ";
 
-		$updated_code_string = Theme_Utils::replace_namespace( $code_string, 'oldslug', Theme_Utils::get_theme_slug( 'New Slug' ), 'OldSlug', 'New Slug' );
-		$this->assertStringContainsString( '@package newslug', $updated_code_string );
+		$updated_code_string = Theme_Utils::replace_namespace( $code_string, 'oldslug', sanitize_title( 'New Slug' ), 'OldSlug', 'New Slug' );
+		$this->assertStringContainsString( '@package new-slug', $updated_code_string );
 		$this->assertStringNotContainsString( 'old-slug', $updated_code_string );
-		$this->assertStringContainsString( 'function newslug_support', $updated_code_string );
-		$this->assertStringContainsString( "function_exists( 'newslug_support' )", $updated_code_string );
+		$this->assertStringContainsString( 'function new_slug_support', $updated_code_string );
+		$this->assertStringContainsString( "function_exists( 'new_slug_support' )", $updated_code_string );
 	}
 }
