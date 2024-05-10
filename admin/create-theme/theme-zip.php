@@ -5,7 +5,7 @@ require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 require_once( __DIR__ . '/cbt-zip-archive.php' );
 
-class Theme_Zip {
+class CBT_Theme_Zip {
 
 	public static function create_zip( $filename, $theme_slug = null ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
