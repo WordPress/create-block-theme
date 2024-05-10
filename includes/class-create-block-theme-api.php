@@ -407,7 +407,7 @@ class Create_Block_Theme_API {
 	 * Update the theme metadata and relocate the theme.
 	 */
 	function rest_update_theme( $request ) {
-		$theme = $request->get_params();
+		$theme = $this->sanitize_theme_data( $request->get_params() );
 
 		// Update the metadata of the theme in the style.css file
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
@@ -487,6 +487,7 @@ class Create_Block_Theme_API {
 		$sanitized_theme['author_uri']          = sanitize_text_field( $theme['author_uri'] );
 		$sanitized_theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
 		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] );
+		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
 		$sanitized_theme['template']            = '';
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
