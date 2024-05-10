@@ -34,7 +34,7 @@ class CBT_Theme_Create {
 		Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( path_join( $new_theme_path, 'theme.json' ), MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::build_readme_txt( $theme ) );
-		file_put_contents( path_join( $new_theme_path, 'style.css' ), Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
+		file_put_contents( path_join( $new_theme_path, 'style.css' ), CBT_Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
 
 		if ( $theme['subfolder'] ) {
 			switch_theme( $theme['subfolder'] . '/' . $theme['slug'] );
@@ -66,7 +66,7 @@ class CBT_Theme_Create {
 
 		// Add style.css.
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
-		$css_contents      = Theme_Styles::build_style_css( $theme );
+		$css_contents      = CBT_Theme_Styles::build_style_css( $theme );
 		file_put_contents(
 			$new_theme_path . DIRECTORY_SEPARATOR . 'style.css',
 			$css_contents
@@ -113,7 +113,7 @@ class CBT_Theme_Create {
 		);
 
 		// Add new metadata.
-		$css_contents = Theme_Styles::build_style_css( $theme );
+		$css_contents = CBT_Theme_Styles::build_style_css( $theme );
 
 		// Add style.css.
 		file_put_contents(

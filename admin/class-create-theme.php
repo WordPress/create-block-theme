@@ -157,7 +157,7 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		// Add new metadata
-		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
+		$css_contents = CBT_Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
@@ -226,7 +226,7 @@ class Create_Block_Theme_Admin {
 		// Remove metadata from style.css file
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
 		// Add new metadata
-		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
+		$css_contents = CBT_Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
@@ -288,7 +288,7 @@ class Create_Block_Theme_Admin {
 		// Add style.css.
 		$zip->addFromStringToTheme(
 			'style.css',
-			Theme_Styles::build_style_css( $theme )
+			CBT_Theme_Styles::build_style_css( $theme )
 		);
 
 		// Add / replace screenshot.
@@ -361,7 +361,7 @@ class Create_Block_Theme_Admin {
 			);
 
 			// Add new metadata.
-			$css_contents = Theme_Styles::build_style_css( $theme );
+			$css_contents = CBT_Theme_Styles::build_style_css( $theme );
 
 			// Add style.css.
 			file_put_contents(
@@ -428,7 +428,7 @@ class Create_Block_Theme_Admin {
 				} else {
 					$this->save_theme_locally( 'all' );
 				}
-				Theme_Styles::clear_user_styles_customizations();
+				CBT_Theme_Styles::clear_user_styles_customizations();
 				Theme_Templates::clear_user_templates_customizations();
 
 				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_save_success' ) );
@@ -447,7 +447,7 @@ class Create_Block_Theme_Admin {
 				} else {
 					$this->save_variation( 'all', $_POST['theme'] );
 				}
-				Theme_Styles::clear_user_styles_customizations();
+				CBT_Theme_Styles::clear_user_styles_customizations();
 
 				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_variation_success' ) );
 			} elseif ( 'blank' === $_POST['theme']['type'] ) {

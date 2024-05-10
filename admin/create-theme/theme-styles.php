@@ -2,7 +2,7 @@
 
 require_once( __DIR__ . '/theme-tags.php' );
 
-class Theme_Styles {
+class CBT_Theme_Styles {
 
 	/**
 	 * Update a style CSS file with given values

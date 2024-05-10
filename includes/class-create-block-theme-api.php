@@ -287,7 +287,7 @@ class Create_Block_Theme_API {
 		// Build style.css with new theme metadata
 		$css_contents = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$css_contents = trim( substr( $css_contents, strpos( $css_contents, '*/' ) + 2 ) );
-		$css_contents = Theme_Styles::build_style_css( $theme ) . $css_contents;
+		$css_contents = CBT_Theme_Styles::build_style_css( $theme ) . $css_contents;
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
@@ -334,7 +334,7 @@ class Create_Block_Theme_API {
 
 		// Build style.css with new theme metadata
 		$theme['template'] = wp_get_theme()->get( 'TextDomain' );
-		$css_contents      = Theme_Styles::build_style_css( $theme );
+		$css_contents      = CBT_Theme_Styles::build_style_css( $theme );
 		$zip->addFromStringToTheme(
 			'style.css',
 			$css_contents
@@ -411,7 +411,7 @@ class Create_Block_Theme_API {
 
 		// Update the metadata of the theme in the style.css file
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
-		$style_css = Theme_Styles::update_style_css( $style_css, $theme );
+		$style_css = CBT_Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
 		file_put_contents(
 			get_stylesheet_directory() . '/readme.txt',
@@ -468,7 +468,7 @@ class Create_Block_Theme_API {
 			} else {
 				CBT_Theme_JSON::add_theme_json_to_local( 'all', null, null, $options );
 			}
-			Theme_Styles::clear_user_styles_customizations();
+			CBT_Theme_Styles::clear_user_styles_customizations();
 		}
 
 		return new WP_REST_Response(
