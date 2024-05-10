@@ -16,7 +16,7 @@ class Theme_Zip {
 			$theme_slug = get_stylesheet();
 		}
 
-		$zip = new CbtZipArchive( $theme_slug );
+		$zip = new CBT_Zip_Archive( $theme_slug );
 		$zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE );
 		return $zip;
 	}
