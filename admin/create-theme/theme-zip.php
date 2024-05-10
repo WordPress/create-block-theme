@@ -220,7 +220,7 @@ class Theme_Zip {
 	static function add_media_to_zip( $zip, $media ) {
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
-			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
+			$folder_path   = CBT_Theme_Media::get_media_folder_path_from_url( $url );
 			$download_file = download_url( $url );
 
 			if ( is_wp_error( $download_file ) ) {

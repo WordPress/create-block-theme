@@ -2,7 +2,7 @@
 
 require_once( __DIR__ . '/theme-utils.php' );
 
-class Theme_Media {
+class CBT_Theme_Media {
 
 	public static function get_media_folder_path_from_url( $url ) {
 		$extension        = strtolower( pathinfo( $url, PATHINFO_EXTENSION ) );
@@ -140,7 +140,7 @@ class Theme_Media {
 
 		// Replace the absolute URLs with relative URLs in the templates
 		foreach ( $template->media as $media_url ) {
-			$local_media_url   = Theme_Media::make_relative_media_url( $media_url );
+			$local_media_url   = CBT_Theme_Media::make_relative_media_url( $media_url );
 			$template->content = str_replace( $media_url, $local_media_url, $template->content );
 		}
 

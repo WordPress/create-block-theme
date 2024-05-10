@@ -11,7 +11,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 			<figure class="wp-block-image"><img src="http://example.com/image.jpg" alt="Alternative Text" /></figure>
 			<!-- /wp:image -->
 		';
-		$new_template      = Theme_Media::make_template_images_local( $template );
+		$new_template      = CBT_Theme_Media::make_template_images_local( $template );
 
 		// The image should be replaced with a relative URL
 		$this->assertStringNotContainsString( 'http://example.com/image.jpg', $new_template->content );
@@ -31,7 +31,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 				</div>
 			<!-- /wp:cover -->
 		';
-		$new_template      = Theme_Media::make_template_images_local( $template );
+		$new_template      = CBT_Theme_Media::make_template_images_local( $template );
 
 		// The image should be replaced with a relative URL
 		$this->assertStringNotContainsString( 'http://example.com/image.jpg', $new_template->content );

@@ -170,7 +170,7 @@ class Theme_Templates {
 		}
 
 		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
-			$template = Theme_Media::make_template_images_local( $template );
+			$template = CBT_Theme_Media::make_template_images_local( $template );
 		}
 
 		if ( $slug ) {
@@ -223,7 +223,7 @@ class Theme_Templates {
 
 			// Write the media assets if there are any
 			if ( $template->media ) {
-				Theme_Media::add_media_to_local( $template->media );
+				CBT_Theme_Media::add_media_to_local( $template->media );
 			}
 
 			// Write the pattern if it exists
@@ -251,7 +251,7 @@ class Theme_Templates {
 
 			// Write the media assets if there are any
 			if ( $template->media ) {
-				Theme_Media::add_media_to_local( $template->media );
+				CBT_Theme_Media::add_media_to_local( $template->media );
 			}
 
 			// Write the pattern if it exists
