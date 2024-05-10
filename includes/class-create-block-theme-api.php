@@ -418,6 +418,11 @@ class Create_Block_Theme_API {
 			Theme_Readme::update_readme_txt( $theme )
 		);
 
+		// Replace Screenshot
+		if ( wp_get_theme()->get_screenshot() !== $theme['screenshot'] ) {
+			Theme_Utils::replace_screenshot( $theme['screenshot'] );
+		}
+
 		// Relocate the theme to a new folder
 		$response = Theme_Utils::relocate_theme( $theme['subfolder'] );
 

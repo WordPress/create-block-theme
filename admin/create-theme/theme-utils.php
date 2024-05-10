@@ -169,4 +169,63 @@ class Theme_Utils {
 		return 0;
 	}
 
+	public static function is_valid_screenshot_file( $file_path ) {
+		return Theme_Utils::get_screenshot_file_extension( $file_path ) !== null;
+	}
+
+	public static function get_screenshot_file_extension( $file_path ) {
+		$allowed_screenshot_types = array(
+			'png'  => 'image/png',
+			'gif'  => 'image/gif',
+			'jpg'  => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+			'webp' => 'image/webp',
+			'avif' => 'image/avif',
+		);
+		$filetype                 = wp_check_filetype( $file_path, $allowed_screenshot_types );
+		if ( in_array( $filetype['type'], $allowed_screenshot_types, true ) ) {
+			return $filetype['ext'];
+		}
+		return null;
+	}
+
+	public static function copy_screenshot( $file_path ) {
+
+		$new_screeenshot_id = attachment_url_to_postid( $file_path );
+
+		if ( ! $new_screeenshot_id ) {
+			return new \WP_Error( 'screenshot_not_found', __( 'Screenshot not found', 'create-block-theme' ) );
+		}
+
+		$new_screenshot_metadata = wp_get_attachment_metadata( $new_screeenshot_id );
+		$upload_dir              = wp_get_upload_dir();
+
+		$new_screenshot_location = path_join( $upload_dir['basedir'], $new_screenshot_metadata['file'] );
+
+		$new_screenshot_filetype = Theme_Utils::get_screenshot_file_extension( $file_path );
+		$new_location            = path_join( get_stylesheet_directory(), 'screenshot.' . $new_screenshot_filetype );
+
+		// copy and resize the image
+		$image_editor = wp_get_image_editor( $new_screenshot_location );
+		$image_editor->resize( 1200, 900, true );
+		$image_editor->save( $new_location );
+
+		return true;
+	}
+
+	public static function replace_screenshot( $new_screenshot_path ) {
+		if ( ! Theme_Utils::is_valid_screenshot_file( $new_screenshot_path ) ) {
+			return new \WP_Error( 'invalid_screenshot', __( 'Invalid screenshot file', 'create-block-theme' ) );
+		}
+
+		// Remove the old screenshot
+		$old_screenshot = wp_get_theme()->get_screenshot( 'relative' );
+		if ( $old_screenshot ) {
+			unlink( path_join( get_stylesheet_directory(), $old_screenshot ) );
+		}
+
+		// Copy the new screenshot
+		return Theme_Utils::copy_screenshot( $new_screenshot_path );
+	}
+
 }
