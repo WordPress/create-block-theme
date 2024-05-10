@@ -3,7 +3,7 @@
 require_once( __DIR__ . '/theme-media.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 
-class Theme_Templates {
+class CBT_Theme_Templates {
 
 	/**
 	 * Build a collection of templates and template-parts that should be exported (and modified)

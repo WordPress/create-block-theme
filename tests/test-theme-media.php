@@ -47,7 +47,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 			<figure class="wp-block-image"><img src="http://example.com/image.jpg" alt="Alternative Text" /></figure>
 			<!-- /wp:image -->
 		';
-		$new_template      = Theme_Templates::prepare_template_for_export( $template );
+		$new_template      = CBT_Theme_Templates::prepare_template_for_export( $template );
 
 		// Content should be replaced with a pattern block
 		$this->assertStringContainsString( '<!-- wp:pattern', $new_template->content );
@@ -68,7 +68,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 			<div class="wp-block-group"></div>
 			<!-- /wp:group -->
 		';
-		$new_template      = Theme_Templates::prepare_template_for_export( $template );
+		$new_template      = CBT_Theme_Templates::prepare_template_for_export( $template );
 
 		// Content should be replaced with a pattern block
 		$this->assertStringContainsString( '<!-- wp:pattern', $new_template->content );

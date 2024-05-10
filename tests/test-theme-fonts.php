@@ -103,10 +103,10 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 	private function save_theme() {
 		CBT_Theme_Fonts::persist_font_settings();
-		// Theme_Templates::add_templates_to_local( 'all' );
+		// CBT_Theme_Templates::add_templates_to_local( 'all' );
 		// CBT_Theme_JSON::add_theme_json_to_local( 'all' );
 		// CBT_Theme_Styles::clear_user_styles_customizations();
-		// Theme_Templates::clear_user_templates_customizations();
+		// CBT_Theme_Templates::clear_user_templates_customizations();
 	}
 
 	private function create_blank_theme() {

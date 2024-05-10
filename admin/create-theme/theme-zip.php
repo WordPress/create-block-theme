@@ -156,7 +156,7 @@ class Theme_Zip {
 	 */
 	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 
-		$theme_templates  = Theme_Templates::get_theme_templates( $export_type );
+		$theme_templates  = CBT_Theme_Templates::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
 
 		if ( $theme_templates->templates ) {
@@ -169,7 +169,7 @@ class Theme_Zip {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = Theme_Templates::prepare_template_for_export( $template );
+			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
 
 			// Write the template content
 			$zip->addFromStringToTheme(
@@ -192,7 +192,7 @@ class Theme_Zip {
 		}
 
 		foreach ( $theme_templates->parts as $template ) {
-			$template = Theme_Templates::prepare_template_for_export( $template );
+			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
 
 			// Write the template content
 			$zip->addFromStringToTheme(

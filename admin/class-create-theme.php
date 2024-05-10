@@ -70,7 +70,7 @@ class Create_Block_Theme_Admin {
 	}
 
 	function save_theme_locally( $export_type ) {
-		Theme_Templates::add_templates_to_local( $export_type );
+		CBT_Theme_Templates::add_templates_to_local( $export_type );
 		CBT_Theme_JSON::add_theme_json_to_local( $export_type );
 	}
 
@@ -429,7 +429,7 @@ class Create_Block_Theme_Admin {
 					$this->save_theme_locally( 'all' );
 				}
 				CBT_Theme_Styles::clear_user_styles_customizations();
-				Theme_Templates::clear_user_templates_customizations();
+				CBT_Theme_Templates::clear_user_templates_customizations();
 
 				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_save_success' ) );
 			} elseif ( 'variation' === $_POST['theme']['type'] ) {
