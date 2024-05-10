@@ -145,7 +145,7 @@ class Create_Block_Theme_API {
 
 	function rest_get_theme_data( $request ) {
 		try {
-			$theme_data = MY_Theme_JSON_Resolver::get_theme_file_contents();
+			$theme_data = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
@@ -274,7 +274,7 @@ class Create_Block_Theme_API {
 
 		//TODO: Should the font persistent be optional?
 		// If so then the Font Library fonts will need to be removed from the theme.json settings.
-		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'all' );
+		$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'all' );
 		$theme_json = CBT_Theme_Zip::add_activated_fonts_to_zip( $zip, $theme_json );
 		$zip        = CBT_Theme_Zip::add_theme_json_to_zip( $zip, $theme_json );
 
@@ -322,7 +322,7 @@ class Create_Block_Theme_API {
 
 		//TODO: Should the font persistent be optional?
 		// If so then the Font Library fonts will need to be removed from the theme.json settings.
-		$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'variation' );
+		$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'variation' );
 		$theme_json = CBT_Theme_Zip::add_activated_fonts_to_zip( $zip, $theme_json );
 		$zip        = CBT_Theme_Zip::add_theme_json_to_zip( $zip, $theme_json );
 
@@ -384,10 +384,10 @@ class Create_Block_Theme_API {
 
 		if ( is_child_theme() ) {
 			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'current', $theme_slug );
-			$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'current' );
+			$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'current' );
 		} else {
 			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'all', null );
-			$theme_json = MY_Theme_JSON_Resolver::export_theme_data( 'all' );
+			$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'all' );
 		}
 
 		$theme_json = CBT_Theme_Zip::add_activated_fonts_to_zip( $zip, $theme_json );

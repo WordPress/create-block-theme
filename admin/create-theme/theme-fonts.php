@@ -13,7 +13,7 @@ class CBT_Theme_Fonts {
 	}
 
 	public static function get_user_activated_fonts() {
-		$user_settings = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
 			return null;
 		}
@@ -22,7 +22,7 @@ class CBT_Theme_Fonts {
 	}
 
 	public static function copy_activated_fonts_to_theme() {
-		$user_settings = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
 			return null;
 		}
@@ -34,7 +34,7 @@ class CBT_Theme_Fonts {
 			return;
 		}
 
-		$theme_json = MY_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 
 		// copy font face assets to theme and change the src to the new location
 		require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -82,17 +82,17 @@ class CBT_Theme_Fonts {
 		}
 
 		// Update the user settings
-		MY_Theme_JSON_Resolver::write_user_settings( $user_settings );
+		CBT_Theme_JSON_Resolver::write_user_settings( $user_settings );
 
 		// Update theme.json
-		MY_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
 
 	}
 
 	public static function remove_deactivated_fonts_from_theme() {
 
-		$user_settings = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$theme_json    = MY_Theme_JSON_Resolver::get_theme_file_contents();
+		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$theme_json    = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 
 		// If there are no deactivated theme fonts, bounce out
 		if ( ! isset( $user_settings['typography']['fontFamilies']['theme'] ) ) {
@@ -131,7 +131,7 @@ class CBT_Theme_Fonts {
 				}
 			)
 		);
-		MY_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
 
 		// Remove user preferences for theme font activation
 		unset( $user_settings['typography']['fontFamilies']['theme'] );
@@ -142,7 +142,7 @@ class CBT_Theme_Fonts {
 			unset( $user_settings['typography'] );
 		}
 
-		MY_Theme_JSON_Resolver::write_user_settings( $user_settings );
+		CBT_Theme_JSON_Resolver::write_user_settings( $user_settings );
 	}
 
 }

@@ -27,19 +27,19 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		wp_set_current_user( self::$admin_id );
 
-		$user_data_begin = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$user_data_begin = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 
 		$test_theme_slug = $this->create_blank_theme();
 
 		$this->activate_user_font();
 
-		$user_data_before  = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$theme_data_before = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$user_data_before  = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$theme_data_before = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
 
 		$this->save_theme();
 
-		$user_data_after  = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$theme_data_after = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$user_data_after  = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$theme_data_after = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
 
 		// ensure that the font was added and then removed from user space
 		$this->assertarraynothaskey( 'typography', $user_data_begin );
@@ -66,16 +66,16 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		$this->activate_font_in_theme_and_override_in_user();
 
-		$user_data_before         = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$theme_data_before        = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
-		$merged_data_before       = MY_Theme_JSON_Resolver::get_merged_data()->get_settings();
+		$user_data_before         = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$theme_data_before        = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$merged_data_before       = CBT_Theme_JSON_Resolver::get_merged_data()->get_settings();
 		$theme_file_exists_before = file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' );
 
 		$this->save_theme();
 
-		$user_data_after         = MY_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$theme_data_after        = MY_Theme_JSON_Resolver::get_theme_data()->get_settings();
-		$merged_data_after       = MY_Theme_JSON_Resolver::get_merged_data()->get_settings();
+		$user_data_after         = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$theme_data_after        = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$merged_data_after       = CBT_Theme_JSON_Resolver::get_merged_data()->get_settings();
 		$theme_file_exists_after = file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' );
 
 		// ensure that the font was added to the theme settings and removed in user settings and therefore missing in merged settings
@@ -127,13 +127,13 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		rest_do_request( $request );
 
-		MY_Theme_JSON_Resolver::clean_cached_data();
+		CBT_Theme_JSON_Resolver::clean_cached_data();
 
 		return $test_theme_slug;
 	}
 
 	private function uninstall_theme( $theme_slug ) {
-		MY_Theme_JSON_Resolver::write_user_settings( array() );
+		CBT_Theme_JSON_Resolver::write_user_settings( array() );
 		delete_theme( $theme_slug );
 	}
 
@@ -166,7 +166,7 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 			),
 		);
 
-		MY_Theme_JSON_Resolver::write_user_settings( $settings );
+		CBT_Theme_JSON_Resolver::write_user_settings( $settings );
 	}
 
 	private function activate_font_in_theme_and_override_in_user() {
@@ -186,7 +186,7 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		copy( $font_test_source, $font_test_destination );
 
 		// Add the font to the theme
-		$theme_json                   = MY_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json                   = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 		$theme_original_font_families = $theme_json['settings']['typography']['fontFamilies'];
 		$theme_json['settings']['typography']['fontFamilies'][] = array(
 			'slug'       => 'open-sans',
@@ -201,7 +201,7 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 				),
 			),
 		);
-		MY_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
 
 		// Deactivate the test font in the theme.  To do this the 'theme' collection
 		// is overwritten to declare the intention of having it gone.
@@ -209,7 +209,7 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		// the test font family to the theme.
 		$settings                                        = array();
 		$settings['typography']['fontFamilies']['theme'] = $theme_original_font_families;
-		MY_Theme_JSON_Resolver::write_user_settings( $settings );
+		CBT_Theme_JSON_Resolver::write_user_settings( $settings );
 	}
 
 

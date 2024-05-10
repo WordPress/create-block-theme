@@ -32,7 +32,7 @@ class CBT_Theme_Create {
 		);
 		CBT_Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
 		CBT_Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
-		file_put_contents( path_join( $new_theme_path, 'theme.json' ), MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
+		file_put_contents( path_join( $new_theme_path, 'theme.json' ), CBT_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::build_readme_txt( $theme ) );
 		file_put_contents( path_join( $new_theme_path, 'style.css' ), CBT_Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
 
@@ -74,7 +74,7 @@ class CBT_Theme_Create {
 
 		// Add theme.json
 		CBT_Theme_Templates::add_templates_to_local( 'user', $new_theme_path, $theme['slug'] );
-		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', MY_Theme_JSON_Resolver::export_theme_data( 'variation' ) );
+		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', CBT_Theme_JSON_Resolver::export_theme_data( 'variation' ) );
 
 		// Add Screenshot
 		if ( static::is_valid_screenshot( $screenshot ) ) {

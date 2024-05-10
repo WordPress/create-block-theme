@@ -8,7 +8,7 @@ function cbt_augment_resolver_with_utilities() {
 		return;
 	}
 
-	class MY_Theme_JSON_Resolver extends WP_Theme_JSON_Resolver {
+	class CBT_Theme_JSON_Resolver extends WP_Theme_JSON_Resolver {
 
 		/**
 		 * Export the combined (and flattened) THEME and CUSTOM data.

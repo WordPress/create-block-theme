@@ -109,7 +109,7 @@ class Create_Block_Theme_Admin {
 
 		$zip = CBT_Theme_Zip::copy_theme_to_zip( $zip, null, null );
 		$zip = CBT_Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
-		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, MY_Theme_JSON_Resolver::export_theme_data( 'current' ) );
+		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, CBT_Theme_JSON_Resolver::export_theme_data( 'current' ) );
 
 		$zip->close();
 
@@ -144,7 +144,7 @@ class Create_Block_Theme_Admin {
 
 		$zip = CBT_Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
 		$zip = CBT_Theme_Zip::add_templates_to_zip( $zip, 'current', $theme['slug'] );
-		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, MY_Theme_JSON_Resolver::export_theme_data( 'current' ) );
+		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, CBT_Theme_JSON_Resolver::export_theme_data( 'current' ) );
 
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
@@ -213,7 +213,7 @@ class Create_Block_Theme_Admin {
 		$zip = CBT_Theme_Zip::copy_theme_to_zip( $zip, $theme['slug'], $theme['name'] );
 
 		$zip = CBT_Theme_Zip::add_templates_to_zip( $zip, 'all', $theme['slug'] );
-		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
+		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, CBT_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
@@ -277,7 +277,7 @@ class Create_Block_Theme_Admin {
 		$zip      = CBT_Theme_Zip::create_zip( $filename );
 
 		$zip = CBT_Theme_Zip::add_templates_to_zip( $zip, 'user', $theme['slug'] );
-		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, MY_Theme_JSON_Resolver::export_theme_data( 'user' ) );
+		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, CBT_Theme_JSON_Resolver::export_theme_data( 'user' ) );
 
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
@@ -321,7 +321,7 @@ class Create_Block_Theme_Admin {
 
 		$zip = CBT_Theme_Zip::copy_theme_to_zip( $zip, null, null );
 		$zip = CBT_Theme_Zip::add_templates_to_zip( $zip, 'all', null );
-		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
+		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, CBT_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 
 		$zip->close();
 
