@@ -16,23 +16,32 @@ class Theme_Styles {
 		$uri           = $theme['uri'];
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
-		$wp_version    = get_bloginfo( 'version' );
+		$wp_version    = Theme_Utils::get_current_wordpress_version();
+		$wp_min        = $current_theme->get( 'RequiresWP' );
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$template      = $current_theme->get( 'Template' );
 		$text_domain   = $theme['slug'];
+		$tags          = Theme_Tags::theme_tags_list( $theme );
+		//These items don't seem to be available via ->get('License') calls
+		$license     = 'GNU General Public License v2 or later';
+		$license_uri = 'http://www.gnu.org/licenses/gpl-2.0.html';
+		preg_match( '/License: (.+)/', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$license = $matches[1];
+		}
+		preg_match( '/License URI: (.+)/', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$license_uri = $matches[1];
+		}
 
-		//TODO: These items don't seem to be available via ->get('License') calls
-		$license      = 'GNU General Public License v2 or later';
-		$license_uri  = 'http://www.gnu.org/licenses/gpl-2.0.html';
-		$tags         = Theme_Tags::theme_tags_list( $theme );
 		$css_metadata = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 6.0
+Requires at least: {$wp_min}
 Tested up to: {$wp_version}
 Requires PHP: {$requires_php}
 Version: {$version}
@@ -61,7 +70,8 @@ Tags: {$tags}
 		$uri         = $theme['uri'];
 		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
-		$wp_version  = get_bloginfo( 'version' );
+		$wp_version  = Theme_Utils::get_current_wordpress_version();
+		$wp_min      = wp_get_theme()->get( 'RequiresWP' );
 		$text_domain = sanitize_title( $name );
 		if ( isset( $theme['template'] ) ) {
 			$template = $theme['template'];
@@ -79,7 +89,7 @@ Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 6.0
+Requires at least: {$wp_min}
 Tested up to: {$wp_version}
 Requires PHP: 5.7
 Version: {$version}
