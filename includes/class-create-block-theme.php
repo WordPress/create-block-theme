@@ -60,7 +60,7 @@ class Create_Block_Theme {
 
 		$plugin_admin       = new CBT_WP_Admin();
 		$wp_theme_directory = new CBT_WP_Theme_Directory();
-		$plugin_api         = new Create_Block_Theme_API();
+		$plugin_api         = new CBT_Theme_API();
 	}
 
 	/**

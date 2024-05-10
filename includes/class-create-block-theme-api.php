@@ -7,7 +7,7 @@
  * @subpackage Create_Block_Theme/admin
  * @author     WordPress.org
  */
-class Create_Block_Theme_API {
+class CBT_Theme_API {
 
 	/**
 	 * Initialize the class and set its properties.
