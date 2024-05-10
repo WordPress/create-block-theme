@@ -33,7 +33,7 @@ class Theme_Zip {
 
 		$theme_json = json_decode( $theme_json_string, true );
 
-		$font_families_to_copy     = Theme_Fonts::get_user_activated_fonts();
+		$font_families_to_copy     = CBT_Theme_Fonts::get_user_activated_fonts();
 		$theme_font_asset_location = 'assets/fonts';
 		$font_slugs_to_remove      = array();
 

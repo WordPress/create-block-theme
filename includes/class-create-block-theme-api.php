@@ -446,7 +446,7 @@ class Create_Block_Theme_API {
 		$options = $request->get_params();
 
 		if ( isset( $options['saveFonts'] ) && true === $options['saveFonts'] ) {
-			Theme_Fonts::persist_font_settings();
+			CBT_Theme_Fonts::persist_font_settings();
 		}
 
 		if ( isset( $options['saveTemplates'] ) && true === $options['saveTemplates'] ) {

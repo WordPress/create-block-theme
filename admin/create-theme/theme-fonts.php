@@ -1,7 +1,7 @@
 <?php
 
 
-class Theme_Fonts {
+class CBT_Theme_Fonts {
 
 	/**
 	 * Copy any ACTIVATED fonts from USER configuration to THEME configuration including any font face assets.
