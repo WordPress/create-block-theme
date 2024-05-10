@@ -34,7 +34,11 @@ class Theme_Styles {
 		if ( isset( $matches[1] ) ) {
 			$license_uri = $matches[1];
 		}
-
+		$copyright = '';
+		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$copyright = $matches[1];
+		}
 		$css_metadata = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -55,9 +59,8 @@ License URI: {$license_uri}
 
 		$css_metadata .= "Text Domain: {$text_domain}
 Tags: {$tags}
-*/
 
-";
+{$copyright}*/";
 		return $css_metadata . $css_contents;
 	}
 
