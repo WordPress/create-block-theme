@@ -38,9 +38,19 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 		$this->assertStringContainsString( $expected_image_credits, $readme_without_newlines, 'The expected image credits are missing.' );
 		$this->assertStringContainsString( $expected_recommended_plugins, $readme_without_newlines, 'The expected recommended plugins are missing.' );
 
-		if ( $data['is_child_theme'] ) {
+		// Assetion specific to child themes.
+		if ( isset( $data['is_child_theme'] ) && $data['is_child_theme'] ) {
 			$this->assertStringContainsString(
 				$data['name'] . ' is a child theme of Test Readme Theme (https://example.org/themes/test-readme-theme), (C) the WordPress team, [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)',
+				$readme_without_newlines,
+				'The expected reference to the parent theme is missing.'
+			);
+		}
+
+		// Assetion specific to child themes.
+		if ( isset( $data['is_cloned_theme'] ) && $data['is_cloned_theme'] ) {
+			$this->assertStringContainsString(
+				$data['name'] . ' is based on Test Readme Theme (https://example.org/themes/test-readme-theme), (C) the WordPress team, [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)',
 				$readme_without_newlines,
 				'The expected reference to the parent theme is missing.'
 			);
@@ -49,7 +59,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 
 	public function data_test_create() {
 		return array(
-			'complete data for a nomal theme' => array(
+			'complete data for a nomal theme'  => array(
 				'data' => array(
 					'name'                 => 'My Theme',
 					'description'          => 'New theme description',
@@ -63,10 +73,9 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
 					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
-					'is_child_theme'       => false,
 				),
 			),
-			'complete data for a child theme' => array(
+			'complete data for a child theme'  => array(
 				'data' => array(
 					'name'                 => 'My Child Theme',
 					'description'          => 'New child theme description',
@@ -81,6 +90,23 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
 					'is_child_theme'       => true,
+				),
+			),
+			'complete data for a cloned theme' => array(
+				'data' => array(
+					'name'                 => 'My Cloned Theme',
+					'description'          => 'New cloned theme description',
+					'uri'                  => 'https://example.com',
+					'author'               => 'New theme author',
+					'author_uri'           => 'https://example.com/author',
+					'copyright_year'       => '2079',
+					'wp_version'           => '14.14',
+					'required_php_version' => '12.0',
+					'license'              => 'GPLv2 or later',
+					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
+					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
+					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
+					'is_cloned_theme'      => true,
 				),
 			),
 			// TODO: Add more test cases.
