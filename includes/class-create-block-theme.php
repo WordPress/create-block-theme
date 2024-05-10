@@ -58,7 +58,7 @@ class Create_Block_Theme {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin       = new Create_Block_Theme_Admin();
+		$plugin_admin       = new CBT_WP_Admin();
 		$wp_theme_directory = new CBT_WP_Theme_Directory();
 		$plugin_api         = new Create_Block_Theme_API();
 	}

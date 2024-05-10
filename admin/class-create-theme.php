@@ -21,7 +21,7 @@ require_once __DIR__ . '/create-theme/theme-create.php';
  * @subpackage Create_Block_Theme/admin
  * @author     WordPress.org
  */
-class Create_Block_Theme_Admin {
+class CBT_WP_Admin {
 	public $theme;
 
 	/**
