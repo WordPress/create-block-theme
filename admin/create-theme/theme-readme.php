@@ -25,7 +25,7 @@ class Theme_Readme {
 	}
 
 	/**
-	* Build a readme.txt file for CHILD/GRANDCHILD themes.
+	* Creates readme.txt text content from theme data.
 	*
 	* @param array $theme The theme data.
 	* {
