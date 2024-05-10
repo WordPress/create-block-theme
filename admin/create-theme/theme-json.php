@@ -1,6 +1,6 @@
 <?php
 
-class Theme_Json {
+class CBT_Theme_JSON {
 
 	public static function add_theme_json_to_local( $export_type ) {
 		file_put_contents(

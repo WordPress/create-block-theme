@@ -71,11 +71,11 @@ class Create_Block_Theme_Admin {
 
 	function save_theme_locally( $export_type ) {
 		Theme_Templates::add_templates_to_local( $export_type );
-		Theme_Json::add_theme_json_to_local( $export_type );
+		CBT_Theme_JSON::add_theme_json_to_local( $export_type );
 	}
 
 	function save_variation( $export_type, $theme ) {
-		Theme_Json::add_theme_json_variation_to_local( 'variation', $theme );
+		CBT_Theme_JSON::add_theme_json_variation_to_local( 'variation', $theme );
 	}
 
 	public function download_file( $file, $filename ) {

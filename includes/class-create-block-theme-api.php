@@ -221,7 +221,7 @@ class Create_Block_Theme_API {
 
 	function rest_create_variation( $request ) {
 
-		$response = Theme_Json::add_theme_json_variation_to_local( 'variation', $this->sanitize_theme_data( $request->get_params() ) );
+		$response = CBT_Theme_JSON::add_theme_json_variation_to_local( 'variation', $this->sanitize_theme_data( $request->get_params() ) );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -464,9 +464,9 @@ class Create_Block_Theme_API {
 
 		if ( isset( $options['saveStyle'] ) && true === $options['saveStyle'] ) {
 			if ( is_child_theme() ) {
-				Theme_Json::add_theme_json_to_local( 'current', null, null, $options );
+				CBT_Theme_JSON::add_theme_json_to_local( 'current', null, null, $options );
 			} else {
-				Theme_Json::add_theme_json_to_local( 'all', null, null, $options );
+				CBT_Theme_JSON::add_theme_json_to_local( 'all', null, null, $options );
 			}
 			Theme_Styles::clear_user_styles_customizations();
 		}
