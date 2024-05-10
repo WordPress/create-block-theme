@@ -6,23 +6,7 @@ class Theme_Utils {
 	}
 
 	public static function get_theme_slug( $new_theme_name ) {
-		$theme = wp_get_theme();
-
-		// If the source theme has a single-word slug but the new theme has a multi-word slug
-		// then function will look like: function apple-bumpkin_support() and that won't work.
-		// There are no issues if it is multi-word>single-word or multi>multi or single>single.
-		// Due to the complexity of this situation (compared to the simplicity of the others)
-		// this will enforce the usage of a singleword slug for those themes.
-
-		$old_slug = $theme->get( 'TextDomain' );
-		$new_slug = sanitize_title( $new_theme_name );
-		$new_slug = preg_replace( '/\s+/', '', $new_slug ); // Remove spaces
-
-		if ( ! str_contains( $old_slug, '-' ) && str_contains( $new_slug, '-' ) ) {
-			return str_replace( '-', '', $new_slug );
-		}
-
-		return $new_slug;
+		return sanitize_title( $new_theme_name );
 	}
 
 	public static function get_file_extension_from_url( $url ) {
@@ -31,8 +15,8 @@ class Theme_Utils {
 	}
 
 	public static function replace_namespace( $content, $old_slug, $new_slug, $old_name, $new_name ) {
-		$new_slug_underscore = str_replace( '-', '_', $new_slug );
-		$old_slug_underscore = str_replace( '-', '_', $old_slug );
+		$new_slug_underscore = str_replace( '-', '_', $new_slug ) . '_';
+		$old_slug_underscore = str_replace( '-', '_', $old_slug ) . '_';
 
 		// Generate placeholders
 		$placeholder_slug            = md5( $old_slug );
@@ -40,13 +24,13 @@ class Theme_Utils {
 		$placeholder_name            = md5( $old_name );
 
 		// Replace old values with placeholders
-		$content = str_replace( $old_slug, $placeholder_slug, $content );
 		$content = str_replace( $old_slug_underscore, $placeholder_slug_underscore, $content );
+		$content = str_replace( $old_slug, $placeholder_slug, $content );
 		$content = str_replace( $old_name, $placeholder_name, $content );
 
 		// Replace placeholders with new values
-		$content = str_replace( $placeholder_slug, $new_slug, $content );
 		$content = str_replace( $placeholder_slug_underscore, $new_slug_underscore, $content );
+		$content = str_replace( $placeholder_slug, $new_slug, $content );
 		$content = str_replace( $placeholder_name, $new_name, $content );
 
 		return $content;
@@ -183,6 +167,65 @@ class Theme_Utils {
 			return 1;
 		}
 		return 0;
+	}
+
+	public static function is_valid_screenshot_file( $file_path ) {
+		return Theme_Utils::get_screenshot_file_extension( $file_path ) !== null;
+	}
+
+	public static function get_screenshot_file_extension( $file_path ) {
+		$allowed_screenshot_types = array(
+			'png'  => 'image/png',
+			'gif'  => 'image/gif',
+			'jpg'  => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+			'webp' => 'image/webp',
+			'avif' => 'image/avif',
+		);
+		$filetype                 = wp_check_filetype( $file_path, $allowed_screenshot_types );
+		if ( in_array( $filetype['type'], $allowed_screenshot_types, true ) ) {
+			return $filetype['ext'];
+		}
+		return null;
+	}
+
+	public static function copy_screenshot( $file_path ) {
+
+		$new_screeenshot_id = attachment_url_to_postid( $file_path );
+
+		if ( ! $new_screeenshot_id ) {
+			return new \WP_Error( 'screenshot_not_found', __( 'Screenshot not found', 'create-block-theme' ) );
+		}
+
+		$new_screenshot_metadata = wp_get_attachment_metadata( $new_screeenshot_id );
+		$upload_dir              = wp_get_upload_dir();
+
+		$new_screenshot_location = path_join( $upload_dir['basedir'], $new_screenshot_metadata['file'] );
+
+		$new_screenshot_filetype = Theme_Utils::get_screenshot_file_extension( $file_path );
+		$new_location            = path_join( get_stylesheet_directory(), 'screenshot.' . $new_screenshot_filetype );
+
+		// copy and resize the image
+		$image_editor = wp_get_image_editor( $new_screenshot_location );
+		$image_editor->resize( 1200, 900, true );
+		$image_editor->save( $new_location );
+
+		return true;
+	}
+
+	public static function replace_screenshot( $new_screenshot_path ) {
+		if ( ! Theme_Utils::is_valid_screenshot_file( $new_screenshot_path ) ) {
+			return new \WP_Error( 'invalid_screenshot', __( 'Invalid screenshot file', 'create-block-theme' ) );
+		}
+
+		// Remove the old screenshot
+		$old_screenshot = wp_get_theme()->get_screenshot( 'relative' );
+		if ( $old_screenshot ) {
+			unlink( path_join( get_stylesheet_directory(), $old_screenshot ) );
+		}
+
+		// Copy the new screenshot
+		return Theme_Utils::copy_screenshot( $new_screenshot_path );
 	}
 
 }

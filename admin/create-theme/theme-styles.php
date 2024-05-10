@@ -11,7 +11,7 @@ class Theme_Styles {
 
 		$current_theme = wp_get_theme();
 		$css_contents  = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
-		$name          = $current_theme->get( 'Name' );
+		$name          = stripslashes( $theme['name'] );
 		$description   = stripslashes( $theme['description'] );
 		$uri           = $theme['uri'];
 		$author        = stripslashes( $theme['author'] );
@@ -20,7 +20,7 @@ class Theme_Styles {
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$template      = $current_theme->get( 'Template' );
-		$text_domain   = $current_theme->get( 'TextDomain' );
+		$text_domain   = $theme['slug'];
 
 		//TODO: These items don't seem to be available via ->get('License') calls
 		$license      = 'GNU General Public License v2 or later';
@@ -66,7 +66,7 @@ Tags: {$tags}
 		if ( isset( $theme['template'] ) ) {
 			$template = $theme['template'];
 		}
-		$version = '1.0.0';
+		$version = '1.0';
 		$tags    = Theme_Tags::theme_tags_list( $theme );
 
 		if ( isset( $theme['version'] ) ) {

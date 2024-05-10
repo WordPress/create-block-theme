@@ -418,6 +418,11 @@ class Create_Block_Theme_API {
 		$readme_content = Theme_Readme::update( $theme );
 		Theme_Readme::write( $readme_content );
 
+		// Replace Screenshot
+		if ( wp_get_theme()->get_screenshot() !== $theme['screenshot'] ) {
+			Theme_Utils::replace_screenshot( $theme['screenshot'] );
+		}
+
 		// Relocate the theme to a new folder
 		$response = Theme_Utils::relocate_theme( $theme['subfolder'] );
 
@@ -484,7 +489,7 @@ class Create_Block_Theme_API {
 		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
 		$sanitized_theme['template']            = '';
-		$sanitized_theme['slug']                = Theme_Utils::get_theme_slug( $theme['name'] );
+		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
 		return $sanitized_theme;
 	}

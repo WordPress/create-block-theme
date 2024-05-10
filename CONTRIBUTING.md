@@ -6,6 +6,12 @@ Welcome to Create Block Theme! All are welcome here.
 
 We welcome contributions in all forms, including code, design, documentation, and triage.
 
+### Discussions
+
+Contributors can be found in the [#core-editor](https://make.wordpress.org/chat/) and [#outreach](https://wordpress.slack.com/archives/C015GUFFC00) channels in [Make WordPress Slack](https://make.wordpress.org/chat).
+
+There is also a [GitHub project board](https://github.com/orgs/WordPress/projects/188/views/1) which is used to plan and track the progress of the plugin.
+
 ### Development Setup
 
 The basic setup for development is:
@@ -49,6 +55,17 @@ There are several linter commands available to help ensure the plugin follows th
 -   PHP: `npm run lint:php` & `npm run lint:php:fix`
 
 To test a WordPress plugin, you need to have WordPress itself installed. If you already have a WordPress environment setup, use the above Create Block Theme build as a standard WordPress plugin by putting the `create-block-theme` directory in your wp-content/plugins/ directory.
+
+### Repository Management
+
+Members of the [Block Themers GitHub team](https://github.com/orgs/WordPress/teams/block-themers) have write access to the repository. The team is made up of contributors who have:
+
+- Demonstrated a commitment to improving how block themes are built in the editor
+- Made 2-3 meaningful contributions to the plugin (similar to the [Gutenberg team requirements](https://developer.wordpress.org/block-editor/contributors/repository-management/#teams))
+
+If you meet this criteria and would like to be added to the Block Themers team, feel free to ask in the [#core-editor](https://make.wordpress.org/chat/) Slack channel.
+
+If you are not a member of the team, you can still contribute by forking the repository and submitting a pull request.
 
 ## Releasing a new version of Create Block Theme
 
