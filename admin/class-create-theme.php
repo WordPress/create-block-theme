@@ -149,7 +149,7 @@ class Create_Block_Theme_Admin {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Augment style.css
@@ -198,7 +198,6 @@ class Create_Block_Theme_Admin {
 		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
 		$theme['slug']                = $theme_slug;
 		$theme['template']            = '';
-		$theme['original_theme']      = wp_get_theme()->get( 'Name' );
 		$theme['text_domain']         = $theme_slug;
 
 		// Use previous theme's tags if custom tags are empty.
@@ -218,7 +217,7 @@ class Create_Block_Theme_Admin {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Augment style.css
@@ -267,7 +266,7 @@ class Create_Block_Theme_Admin {
 		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
 		$theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] );
 		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
-		$theme['is_parent_theme']     = true;
+		$theme['is_child_theme']      = true;
 		$theme['text_domain']         = $child_theme_slug;
 		$theme['template']            = $parent_theme_slug;
 		$theme['slug']                = $child_theme_slug;
@@ -282,7 +281,7 @@ class Create_Block_Theme_Admin {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Add style.css.
@@ -357,7 +356,7 @@ class Create_Block_Theme_Admin {
 			// Add readme.txt.
 			file_put_contents(
 				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-				Theme_Readme::build_readme_txt( $theme )
+				Theme_Readme::create( $theme )
 			);
 
 			// Add new metadata.

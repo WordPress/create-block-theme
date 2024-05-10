@@ -7,7 +7,6 @@ class Theme_Create {
 	);
 
 	public static function clone_current_theme( $theme ) {
-
 		// Create theme directory.
 		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
 
@@ -56,7 +55,7 @@ class Theme_Create {
 		// Add readme.txt.
 		file_put_contents(
 			$new_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Add style.css.
@@ -104,7 +103,7 @@ class Theme_Create {
 		// Add readme.txt.
 		file_put_contents(
 			$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Add new metadata.
