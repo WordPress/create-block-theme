@@ -1,6 +1,6 @@
 <?php
 
-function augment_resolver_with_utilities() {
+function cbt_augment_resolver_with_utilities() {
 
 	//Ultimately it is desireable for Core to have this functionality natively.
 	// In the meantime we are patching the functionality we are expecting into the Theme JSON Resolver here
@@ -130,4 +130,4 @@ function augment_resolver_with_utilities() {
 	}
 }
 
-add_action( 'plugins_loaded', 'augment_resolver_with_utilities' );
+add_action( 'plugins_loaded', 'cbt_augment_resolver_with_utilities' );
