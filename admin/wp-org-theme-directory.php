@@ -1,6 +1,6 @@
 <?php
 
-class WP_Theme_Directory {
+class CBT_WP_Theme_Directory {
 
 	const THEME_NAMES_ENDPOINT = 'https://themes.svn.wordpress.org/';
 
@@ -18,7 +18,7 @@ class WP_Theme_Directory {
 			'/wp-org-theme-names',
 			array(
 				'methods'             => 'GET',
-				'callback'            => array( 'WP_Theme_Directory', 'get_theme_names' ),
+				'callback'            => array( 'CBT_WP_Theme_Directory', 'get_theme_names' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
