@@ -281,7 +281,7 @@ class Create_Block_Theme_API {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::build_readme_txt( $theme )
 		);
 
 		// Build style.css with new theme metadata
@@ -329,7 +329,7 @@ class Create_Block_Theme_API {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::build_readme_txt( $theme )
 		);
 
 		// Build style.css with new theme metadata
@@ -415,7 +415,7 @@ class Create_Block_Theme_API {
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
 		file_put_contents(
 			get_stylesheet_directory() . '/readme.txt',
-			Theme_Readme::update_readme_txt( $theme )
+			CBT_Theme_Readme::update_readme_txt( $theme )
 		);
 
 		// Replace Screenshot

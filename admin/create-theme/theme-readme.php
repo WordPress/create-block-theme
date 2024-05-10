@@ -1,6 +1,6 @@
 <?php
 
-class Theme_Readme {
+class CBT_Theme_Readme {
 	/**
 	* Build a readme.txt file for CHILD/GRANDCHILD themes.
 	*/

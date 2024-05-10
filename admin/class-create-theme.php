@@ -149,7 +149,7 @@ class Create_Block_Theme_Admin {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::build_readme_txt( $theme )
 		);
 
 		// Augment style.css
@@ -218,7 +218,7 @@ class Create_Block_Theme_Admin {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::build_readme_txt( $theme )
 		);
 
 		// Augment style.css
@@ -282,7 +282,7 @@ class Create_Block_Theme_Admin {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::build_readme_txt( $theme )
 		);
 
 		// Add style.css.
@@ -357,7 +357,7 @@ class Create_Block_Theme_Admin {
 			// Add readme.txt.
 			file_put_contents(
 				$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-				Theme_Readme::build_readme_txt( $theme )
+				CBT_Theme_Readme::build_readme_txt( $theme )
 			);
 
 			// Add new metadata.
