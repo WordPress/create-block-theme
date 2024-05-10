@@ -57,12 +57,8 @@ class Theme_Readme {
 		$recommended_plugins  = $theme['recommended_plugins'] ?? '';
 		$is_child_theme       = $theme['is_child_theme'] ?? false;
 
-		// Generates a reference to the original theme for child and cloned themes.
-		$original_theme_credits = $is_child_theme
-			? self::original_theme_credits( $name, $is_child_theme )
-			: null;
 		// Generates the copyright section text.
-		$copyright_section_content = self::copyright_text( $name, $copy_year, $author, $original_theme_credits );
+		$copyright_section_content = self::get_copyright_text( $theme );
 
 		// Create empty readme content
 		$readme_content = '';
@@ -101,34 +97,32 @@ License URI: {$license_uri}
 	}
 
 	/**
-	 * Build string for original theme credits.
-	 * Used in readme.txt of cloned themes.
+	 * Get the theme data from the installed theme.
 	 *
 	 * @param string $new_name New theme name.
-	 * @return string
+	 * @return array The theme data.
+	 * {
+	 *    @type string $name The theme name.
+	 *    @type string $uri The theme URI.
+	 *    @type string $author The theme author.
+	 *    @type string $license The theme license.
+	 *    @type string $license_uri The theme license URI.
+	 * }
 	 */
-	private static function original_theme_credits( $new_name, $is_child_theme = false ) {
-		$readme_content = self::get_content();
-
+	private static function get_active_theme_data() {
 		$original_name        = wp_get_theme()->get( 'Name' ) ?? '';
 		$original_uri         = wp_get_theme()->get( 'ThemeURI' ) ?? '';
 		$original_author      = wp_get_theme()->get( 'Author' ) ?? '';
 		$original_license     = self::get_prop( 'License' );
 		$original_license_uri = self::get_prop( 'License URI' );
 
-		$original_theme_reference = '%1$s is a child theme of %2$s (%3$s), (C) %4$s, [%5$s](%6$s)';
-
-		$theme_credit_content = sprintf(
-			$original_theme_reference,
-			$new_name,
-			$original_name,
-			$original_uri,
-			$original_author,
-			$original_license,
-			$original_license_uri
+		return array(
+			'name'        => $original_name,
+			'uri'         => $original_uri,
+			'author'      => $original_author,
+			'license'     => $original_license,
+			'license_uri' => $original_license_uri,
 		);
-
-		return $theme_credit_content;
 	}
 
 	/**
@@ -139,7 +133,11 @@ License URI: {$license_uri}
 	 * @param string $author The theme author.
 	 * @return string The default copyright text.
 	 */
-	private static function copyright_text( $name, $year, $author, $append = '' ) {
+	private static function get_copyright_text( $theme ) {
+		$name   = $theme['name'];
+		$year   = $theme['copy_year'] ?? gmdate( 'Y' );
+		$author = $theme['author'] ?? '';
+
 		$text = "
 {$name} WordPress Theme, (C) {$year} {$author}
 {$name} is distributed under the terms of the GNU GPL.
@@ -154,9 +152,35 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 ";
-		if ( ! empty( $append ) ) {
-			$text .= "\n" . $append;
+
+		$is_child_theme  = $theme['is_child_theme'] ?? false;
+		$is_cloned_theme = $theme['is_cloned_theme'] ?? false;
+
+		/*
+		 * If the theme is a child theme or a cloned theme, add a reference to the parent theme.
+		 *
+		 * Example: "My Child Theme is a child theme of My Parent Theme (https://example.org/themes/my-parent-theme), (C) the WordPress team, [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)"
+		 */
+		if ( $is_child_theme || $is_cloned_theme ) {
+			$original_theme = self::get_active_theme_data();
+
+			$reference_string = $is_child_theme
+				? '%1$s is a child theme of %2$s (%3$s), (C) %4$s, [%5$s](%6$s)'
+				: '%1$s is based on %2$s (%3$s), (C) %4$s, [%5$s](%6$s)';
+
+			$reference = sprintf(
+				$reference_string,
+				$name,
+				$original_theme['name'],
+				$original_theme['uri'],
+				$original_theme['author'],
+				$original_theme['license'],
+				$original_theme['license_uri']
+			);
+
+			$text .= "\n\n" . $reference;
 		}
+
 		return $text;
 	}
 
