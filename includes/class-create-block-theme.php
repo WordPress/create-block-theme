@@ -9,7 +9,7 @@
  * @author     WordPress.org
  */
 #[AllowDynamicProperties]
-class Create_Block_Theme {
+class CBT_Plugin {
 
 	/**
 	 * Define the core functionality of the plugin.
