@@ -12,7 +12,7 @@ class Theme_Readme {
 		$author              = $theme['author'];
 		$author_uri          = $theme['author_uri'];
 		$copy_year           = gmdate( 'Y' );
-		$wp_version          = get_bloginfo( 'version' );
+		$wp_version          = Theme_Utils::get_current_wordpress_version();
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 		$is_parent_theme     = $theme['is_parent_theme'] ?? false;
@@ -209,7 +209,7 @@ GNU General Public License for more details.";
 	public static function update_readme_txt( $theme ) {
 		$description         = $theme['description'];
 		$author              = $theme['author'];
-		$wp_version          = get_bloginfo( 'version' );
+		$wp_version          = Theme_Utils::get_current_wordpress_version();
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 		$updated_readme      = '';

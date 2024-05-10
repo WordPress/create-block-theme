@@ -228,4 +228,12 @@ class Theme_Utils {
 		return Theme_Utils::copy_screenshot( $new_screenshot_path );
 	}
 
+	public static function get_current_wordpress_version() {
+		$wp_version = get_bloginfo( 'version' );
+		if ( preg_match( '/^\d+\.\d+/', $wp_version, $matches ) ) {
+			$wp_version = $matches[0];
+		}
+		return $wp_version;
+	}
+
 }
