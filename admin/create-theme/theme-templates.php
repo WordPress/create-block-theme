@@ -134,11 +134,11 @@ class Theme_Templates {
 	public static function paternize_template( $template, $slug = null ) {
 		// If there is any PHP in the template then paternize
 		if ( str_contains( $template->content, '<?php' ) ) {
-			$pattern                 = Theme_Patterns::pattern_from_template( $template, $slug );
+			$pattern                 = CBT_Theme_Patterns::pattern_from_template( $template, $slug );
 			$pattern_link_attributes = array(
 				'slug' => $pattern['slug'],
 			);
-			$template->content       = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
+			$template->content       = CBT_Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 			$template->pattern       = $pattern['content'];
 		}
 		return $template;
