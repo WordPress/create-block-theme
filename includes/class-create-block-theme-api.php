@@ -165,7 +165,7 @@ class Create_Block_Theme_API {
 
 	function rest_get_readme_data( $request ) {
 		try {
-			$readme_data = Theme_Utils::get_readme_data();
+			$readme_data = CBT_Theme_Utils::get_readme_data();
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
@@ -294,7 +294,7 @@ class Create_Block_Theme_API {
 		);
 
 		// Add / replace screenshot.
-		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+		if ( CBT_Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -341,7 +341,7 @@ class Create_Block_Theme_API {
 		);
 
 		// Add / replace screenshot.
-		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+		if ( CBT_Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -420,11 +420,11 @@ class Create_Block_Theme_API {
 
 		// Replace Screenshot
 		if ( wp_get_theme()->get_screenshot() !== $theme['screenshot'] ) {
-			Theme_Utils::replace_screenshot( $theme['screenshot'] );
+			CBT_Theme_Utils::replace_screenshot( $theme['screenshot'] );
 		}
 
 		// Relocate the theme to a new folder
-		$response = Theme_Utils::relocate_theme( $theme['subfolder'] );
+		$response = CBT_Theme_Utils::relocate_theme( $theme['subfolder'] );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;

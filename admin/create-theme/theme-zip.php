@@ -132,7 +132,7 @@ class Theme_Zip {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = Theme_Utils::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
+						$contents = CBT_Theme_Utils::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
 					}
 
 					// Add current file to archive

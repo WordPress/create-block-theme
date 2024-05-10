@@ -39,18 +39,18 @@ class CBT_Theme_Media {
 				$html = new WP_HTML_Tag_Processor( $block['innerHTML'] );
 				while ( $html->next_tag( 'img' ) ) {
 					$url = $html->get_attribute( 'src' );
-					if ( Theme_Utils::is_absolute_url( $url ) ) {
+					if ( CBT_Theme_Utils::is_absolute_url( $url ) ) {
 						$media[] = $url;
 					}
 				}
 				$html = new WP_HTML_Tag_Processor( $html->__toString() );
 				while ( $html->next_tag( 'video' ) ) {
 					$url = $html->get_attribute( 'src' );
-					if ( Theme_Utils::is_absolute_url( $url ) ) {
+					if ( CBT_Theme_Utils::is_absolute_url( $url ) ) {
 						$media[] = $url;
 					}
 					$poster_url = $html->get_attribute( 'poster' );
-					if ( Theme_Utils::is_absolute_url( $poster_url ) ) {
+					if ( CBT_Theme_Utils::is_absolute_url( $poster_url ) ) {
 						$media[] = $poster_url;
 					}
 				}
@@ -66,7 +66,7 @@ class CBT_Theme_Media {
 						preg_match( '/background-image: url\((.*)\)/', $style, $matches );
 						if ( isset( $matches[1] ) ) {
 							$url = $matches[1];
-							if ( Theme_Utils::is_absolute_url( $url ) ) {
+							if ( CBT_Theme_Utils::is_absolute_url( $url ) ) {
 								$media[] = $url;
 							}
 						}
@@ -76,7 +76,7 @@ class CBT_Theme_Media {
 
 			// Gets the absolute URLs of background images in these blocks
 			if ( 'core/group' === $block['blockName'] ) {
-				if ( isset( $block['attrs']['style']['background']['backgroundImage']['url'] ) && Theme_Utils::is_absolute_url( $block['attrs']['style']['background']['backgroundImage']['url'] ) ) {
+				if ( isset( $block['attrs']['style']['background']['backgroundImage']['url'] ) && CBT_Theme_Utils::is_absolute_url( $block['attrs']['style']['background']['backgroundImage']['url'] ) ) {
 					$media[] = $block['attrs']['style']['background']['backgroundImage']['url'];
 				}
 			}
@@ -92,7 +92,7 @@ class CBT_Theme_Media {
 	 * @return string $relative_url
 	 */
 	public static function make_relative_media_url( $absolute_url ) {
-		if ( ! empty( $absolute_url ) && Theme_Utils::is_absolute_url( $absolute_url ) ) {
+		if ( ! empty( $absolute_url ) && CBT_Theme_Utils::is_absolute_url( $absolute_url ) ) {
 			$folder_path = self::get_media_folder_path_from_url( $absolute_url );
 			return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $folder_path . basename( $absolute_url );
 		}

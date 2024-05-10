@@ -97,7 +97,7 @@ class Create_Block_Theme_Admin {
 	function export_child_theme( $theme ) {
 		if ( $theme['name'] ) {
 			// Used when CREATING a child theme
-			$theme['slug'] = Theme_Utils::get_theme_slug( $theme['name'] );
+			$theme['slug'] = CBT_Theme_Utils::get_theme_slug( $theme['name'] );
 		} else {
 			// Used with EXPORTING a child theme
 			$theme['slug'] = wp_get_theme()->get( 'TextDomain' );
@@ -123,7 +123,7 @@ class Create_Block_Theme_Admin {
 	 * Create a sibling theme of the activated theme
 	 */
 	function create_sibling_theme( $theme, $screenshot ) {
-		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+		$theme_slug = CBT_Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
 		$theme['name']                = sanitize_text_field( $theme['name'] );
@@ -164,7 +164,7 @@ class Create_Block_Theme_Admin {
 		);
 
 		// Add / replace screenshot.
-		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+		if ( CBT_Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -185,7 +185,7 @@ class Create_Block_Theme_Admin {
 	 * Clone the activated theme to create a new theme
 	 */
 	function clone_theme( $theme, $screenshot ) {
-		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+		$theme_slug = CBT_Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
 		$theme['name']                = sanitize_text_field( $theme['name'] );
@@ -233,7 +233,7 @@ class Create_Block_Theme_Admin {
 		);
 
 		// Add / replace screenshot.
-		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+		if ( CBT_Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -255,8 +255,8 @@ class Create_Block_Theme_Admin {
 	 * Create a child theme of the activated theme
 	 */
 	function create_child_theme( $theme, $screenshot ) {
-		$parent_theme_slug = Theme_Utils::get_theme_slug( $this->theme->get( 'Name' ) );
-		$child_theme_slug  = Theme_Utils::get_theme_slug( $theme['name'] );
+		$parent_theme_slug = CBT_Theme_Utils::get_theme_slug( $this->theme->get( 'Name' ) );
+		$child_theme_slug  = CBT_Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
 		$theme['name']                = sanitize_text_field( $theme['name'] );
@@ -292,7 +292,7 @@ class Create_Block_Theme_Admin {
 		);
 
 		// Add / replace screenshot.
-		if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+		if ( CBT_Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 			$zip->addFileToTheme(
 				$screenshot['tmp_name'],
 				'screenshot.png'
@@ -334,7 +334,7 @@ class Create_Block_Theme_Admin {
 	}
 
 	function create_blank_theme( $theme, $screenshot ) {
-		$theme_slug = Theme_Utils::get_theme_slug( $theme['name'] );
+		$theme_slug = CBT_Theme_Utils::get_theme_slug( $theme['name'] );
 
 		// Sanitize inputs.
 		$theme['name']                = sanitize_text_field( $theme['name'] );
@@ -385,7 +385,7 @@ class Create_Block_Theme_Admin {
 			}
 
 			// Overwrite default screenshot if one is provided.
-			if ( Theme_Utils::is_valid_screenshot( $screenshot ) ) {
+			if ( CBT_Theme_Utils::is_valid_screenshot( $screenshot ) ) {
 				file_put_contents(
 					$blank_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png',
 					file_get_contents( $screenshot['tmp_name'] )

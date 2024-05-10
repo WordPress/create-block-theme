@@ -30,7 +30,7 @@ class CBT_Theme_Create {
 			'removeNavRefs'  => false,
 			'localizeImages' => false,
 		);
-		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
+		CBT_Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
 		CBT_Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( path_join( $new_theme_path, 'theme.json' ), MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::build_readme_txt( $theme ) );
