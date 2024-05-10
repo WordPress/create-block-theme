@@ -45,7 +45,7 @@ class Create_Block_Theme {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-api.php';
 
-		$this->loader = new Create_Block_Theme_Loader();
+		$this->loader = new CBT_Plugin_Loader();
 
 	}
 
