@@ -270,7 +270,7 @@ class CBT_Theme_Form {
 						</p>
 
 						<div>
-							<?php Theme_Tags::theme_tags_section(); ?>
+							<?php CBT_Theme_Tags::theme_tags_section(); ?>
 						</div>
 					</div>
 					<input type="hidden" name="page" value="create-block-theme">

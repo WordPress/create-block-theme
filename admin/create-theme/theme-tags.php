@@ -5,7 +5,7 @@
  * @package Create Block Theme
  */
 
-class Theme_Tags {
+class CBT_Theme_Tags {
 	/**
 	 * Build theme tags list for style.css.
 	 *
