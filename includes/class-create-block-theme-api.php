@@ -185,7 +185,7 @@ class Create_Block_Theme_API {
 
 	function rest_clone_theme( $request ) {
 
-		$response = Theme_Create::clone_current_theme( $this->sanitize_theme_data( $request->get_params() ) );
+		$response = CBT_Theme_Create::clone_current_theme( $this->sanitize_theme_data( $request->get_params() ) );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -205,7 +205,7 @@ class Create_Block_Theme_API {
 		//TODO: Handle screenshots
 		$screenshot = null;
 
-		$response = Theme_Create::create_child_theme( $theme, $screenshot );
+		$response = CBT_Theme_Create::create_child_theme( $theme, $screenshot );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -241,7 +241,7 @@ class Create_Block_Theme_API {
 		//TODO: Handle screenshots
 		$screenshot = null;
 
-		$response = Theme_Create::create_blank_theme( $theme, $screenshot );
+		$response = CBT_Theme_Create::create_blank_theme( $theme, $screenshot );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;

@@ -1,6 +1,6 @@
 <?php
 
-class Theme_Create {
+class CBT_Theme_Create {
 
 	const ALLOWED_SCREENSHOT_TYPES = array(
 		'png' => 'image/png',
