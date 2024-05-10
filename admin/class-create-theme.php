@@ -409,18 +409,18 @@ class Create_Block_Theme_Admin {
 
 			// Check user capabilities.
 			if ( ! current_user_can( 'edit_theme_options' ) ) {
-				return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+				return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_name' ) );
 			}
 
 			// Check nonce
 			if ( ! wp_verify_nonce( $_POST['nonce'], 'create_block_theme' ) ) {
-				return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+				return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_name' ) );
 			}
 
 			if ( 'save' === $_POST['theme']['type'] ) {
 				// Avoid running if WordPress dosn't have permission to overwrite the theme folder
 				if ( ! wp_is_writable( get_stylesheet_directory() ) ) {
-					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_file_permissions' ) );
+					return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_file_permissions' ) );
 				}
 
 				if ( is_child_theme() ) {
@@ -431,15 +431,15 @@ class Create_Block_Theme_Admin {
 				Theme_Styles::clear_user_styles_customizations();
 				Theme_Templates::clear_user_templates_customizations();
 
-				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_save_success' ) );
+				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_save_success' ) );
 			} elseif ( 'variation' === $_POST['theme']['type'] ) {
 				if ( '' === $_POST['theme']['variation'] ) {
-					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_variation_name' ) );
+					return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_variation_name' ) );
 				}
 
 				// Avoid running if WordPress dosn't have permission to write the theme folder
 				if ( ! wp_is_writable( get_stylesheet_directory() ) ) {
-					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_file_permissions' ) );
+					return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_file_permissions' ) );
 				}
 
 				if ( is_child_theme() ) {
@@ -449,47 +449,47 @@ class Create_Block_Theme_Admin {
 				}
 				Theme_Styles::clear_user_styles_customizations();
 
-				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_variation_success' ) );
+				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_variation_success' ) );
 			} elseif ( 'blank' === $_POST['theme']['type'] ) {
 				// Avoid running if WordPress dosn't have permission to write the themes folder
 				if ( ! wp_is_writable( get_theme_root() ) ) {
-					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_themes_file_permissions' ) );
+					return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_themes_file_permissions' ) );
 				}
 
 				if ( '' === $_POST['theme']['name'] ) {
-					return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+					return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_name' ) );
 				}
 				$this->create_blank_theme( $_POST['theme'], $_FILES['screenshot'] );
 
-				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_blank_success' ) );
+				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_blank_success' ) );
 			} elseif ( ! class_exists( 'ZipArchive' ) ) {
 				// Avoid running if ZipArchive is not enabled.
-				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_unsupported_zip_archive' ) );
+				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_unsupported_zip_archive' ) );
 			} elseif ( is_child_theme() ) {
 				if ( 'sibling' === $_POST['theme']['type'] ) {
 					if ( '' === $_POST['theme']['name'] ) {
-						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+						return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_name' ) );
 					}
 					$this->create_sibling_theme( $_POST['theme'], $_FILES['screenshot'] );
 				} else {
 					$this->export_child_theme( $_POST['theme'] );
 				}
-				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_export_success' ) );
+				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_export_success' ) );
 			} else {
 				if ( 'child' === $_POST['theme']['type'] ) {
 					if ( '' === $_POST['theme']['name'] ) {
-						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+						return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_name' ) );
 					}
 					$this->create_child_theme( $_POST['theme'], $_FILES['screenshot'] );
 				} elseif ( 'clone' === $_POST['theme']['type'] ) {
 					if ( '' === $_POST['theme']['name'] ) {
-						return add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_error_theme_name' ) );
+						return add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_error_theme_name' ) );
 					}
 					$this->clone_theme( $_POST['theme'], $_FILES['screenshot'] );
 				} else {
 					$this->export_theme( $_POST['theme'] );
 				}
-				add_action( 'admin_notices', array( 'Form_Messages', 'admin_notice_export_success' ) );
+				add_action( 'admin_notices', array( 'CBT_Form_Messages', 'admin_notice_export_success' ) );
 			}
 		}
 	}
