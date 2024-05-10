@@ -15,7 +15,8 @@ class CBT_ThemeReadme_Update extends CBT_Theme_Readme_UnitTestCase {
 	 * @dataProvider data_test_update
 	 */
 	public function test_update( $data ) {
-		$readme = Theme_Readme::update( $data );
+		$readme_content = Theme_Readme::get_content();
+		$readme         = Theme_Readme::update( $data, $readme_content );
 
 		// Removes the newlines from the readme content to make it easier to search for strings.
 		$readme_without_newlines = str_replace( "\n", '', $readme );

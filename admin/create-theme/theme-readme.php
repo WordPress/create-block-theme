@@ -194,9 +194,10 @@ GNU General Public License for more details.
 	 *   @type string $image_credits The image credits.
 	 *   @type string $recommended_plugins The recommended plugins.
 	 * }
+	 * @param string $readme_content readme.txt content.
 	 * @return string
 	 */
-	public static function update( $theme ) {
+	public static function update( $theme, $readme_content = '' ) {
 		// Theme data.
 		$description         = $theme['description'] ?? '';
 		$author              = $theme['author'] ?? '';
@@ -204,31 +205,22 @@ GNU General Public License for more details.
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 
-		// Get current readme content.
-		$readme_content = self::get_content();
-		$updated_readme = $readme_content;
-
-		// If the readme content is empty, return.
-		if ( ! $readme_content ) {
-			return;
-		}
-
 		// Update description.
-		$updated_readme = self::add_or_update_section( 'Description', $description, $updated_readme );
+		$readme_content = self::add_or_update_section( 'Description', $description, $readme_content );
 
 		// Update Author/Contributors.
-		$updated_readme = self::add_or_update_prop( 'Contributors', $author, $updated_readme );
+		$readme_content = self::add_or_update_prop( 'Contributors', $author, $readme_content );
 
 		// Update "Tested up to" version.
-		$updated_readme = self::add_or_update_prop( 'Tested up to', $wp_version, $updated_readme );
+		$readme_content = self::add_or_update_prop( 'Tested up to', $wp_version, $readme_content );
 
 		// Update recommended plugins section.
-		$updated_readme = self::add_or_update_section( 'Recommended Plugins', $recommended_plugins, $updated_readme );
+		$readme_content = self::add_or_update_section( 'Recommended Plugins', $recommended_plugins, $readme_content );
 
 		// Update image credits section.
-		$updated_readme = self::add_or_update_section( 'Images', $image_credits, $updated_readme );
+		$readme_content = self::add_or_update_section( 'Images', $image_credits, $readme_content );
 
-		return $updated_readme;
+		return $readme_content;
 	}
 
 	/**

@@ -415,7 +415,8 @@ class Create_Block_Theme_API {
 		$style_css = Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
 
-		$readme_content = Theme_Readme::update( $theme );
+		$readme_content = Theme_Readme::get_content();
+		$readme_content = Theme_Readme::update( $theme, $readme_content );
 		Theme_Readme::write( $readme_content );
 
 		// Replace Screenshot
