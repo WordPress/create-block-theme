@@ -417,7 +417,7 @@ class Create_Block_Theme_API {
 
 		$readme_content = Theme_Readme::get_content();
 		$readme_content = Theme_Readme::update( $theme, $readme_content );
-		Theme_Readme::write( $readme_content );
+		file_put_contents( Theme_Readme::file_path(), $readme_content );
 
 		// Replace Screenshot
 		if ( wp_get_theme()->get_screenshot() !== $theme['screenshot'] ) {

@@ -285,17 +285,6 @@ GNU General Public License for more details.
 	}
 
 	/**
-	 * Write the readme.txt file.
-	 *
-	 * @param string $content The content to write.
-	 * @return bool True if the content was written, false otherwise.
-	 */
-	public static function write( $content ) {
-		$path = self::file_path();
-		return (bool) file_put_contents( $path, $content );
-	}
-
-	/**
 	 * Get property value from the readme content.
 	 *
 	 * @return string The property value

@@ -56,7 +56,7 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 		parent::tear_down();
 
 		// Restore the original readme.txt content.
-		Theme_Readme::write( $this->orig_readme_content );
+		file_put_contents( Theme_Readme::file_path(), $this->orig_readme_content );
 
 		// Restore the original active theme.
 		switch_theme( $this->orig_active_theme_slug );
