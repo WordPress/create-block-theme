@@ -2,7 +2,7 @@
 
 require_once( __DIR__ . '/theme-tags.php' );
 
-class Theme_Form {
+class CBT_Theme_Form {
 	public static function create_admin_form_page() {
 		if ( ! wp_is_block_theme() ) {
 			?>

@@ -64,9 +64,9 @@ class Create_Block_Theme_Admin {
 		}
 		$page_title = _x( 'Create Block Theme', 'UI String', 'create-block-theme' );
 		$menu_title = _x( 'Create Block Theme', 'UI String', 'create-block-theme' );
-		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', array( 'Theme_Form', 'create_admin_form_page' ) );
+		add_theme_page( $page_title, $menu_title, 'edit_theme_options', 'create-block-theme', array( 'CBT_Theme_Form', 'create_admin_form_page' ) );
 
-		add_action( 'admin_enqueue_scripts', array( 'Theme_Form', 'form_script' ) );
+		add_action( 'admin_enqueue_scripts', array( 'CBT_Theme_Form', 'form_script' ) );
 	}
 
 	function save_theme_locally( $export_type ) {
