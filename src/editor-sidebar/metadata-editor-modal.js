@@ -15,6 +15,7 @@ import {
 	// eslint-disable-next-line
 	__experimentalText as Text,
 	BaseControl,
+	FlexBlock,
 	Modal,
 	Button,
 	TextControl,
@@ -22,6 +23,7 @@ import {
 	ExternalLink,
 } from '@wordpress/components';
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,6 +49,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		author_uri: '',
 		tags_custom: '',
 		recommended_plugins: '',
+		image_credits: [],
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -69,6 +72,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 							themeData.stylesheet.lastIndexOf( '/' )
 					  )
 					: '',
+			image_credits: [],
 		} );
 	}, [] );
 
@@ -97,6 +101,13 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 
 	const onUpdateImage = ( image ) => {
 		setTheme( { ...theme, screenshot: image.url } );
+	};
+
+	const onAddCredit = () => {
+		setTheme( {
+			...theme,
+			image_credits: [ ...theme.image_credits, {} ],
+		} );
 	};
 
 	return (
@@ -267,6 +278,109 @@ Plugin Description`,
 							value={ theme.screenshot }
 						/>
 					</MediaUploadCheck>
+				</BaseControl>
+				<BaseControl>
+					<BaseControl.VisualLabel>
+						{ __( 'Image Credits', 'create-block-theme' ) }
+					</BaseControl.VisualLabel>
+					<VStack alignment="left">
+						{ theme.image_credits.map( ( credit, index ) => (
+							<HStack key={ index } align="flex-end">
+								<FlexBlock>
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __(
+											'Title',
+											'create-block-theme'
+										) }
+										value={ credit?.title || '' }
+										onChange={ ( value ) => {
+											const newCredits = [
+												...theme.image_credits,
+											];
+											newCredits[ index ] = {
+												...credit,
+												title: value,
+											};
+											setTheme( {
+												...theme,
+												image_credits: newCredits,
+											} );
+										} }
+									/>
+								</FlexBlock>
+								<TextControl
+									__nextHasNoMarginBottom
+									label={ __(
+										'License Type',
+										'create-block-theme'
+									) }
+									value={ credit.license }
+									onChange={ ( value ) => {
+										const newCredits = [
+											...theme.image_credits,
+										];
+										newCredits[ index ] = {
+											...credit,
+											license: value,
+										};
+										setTheme( {
+											...theme,
+											image_credits: newCredits,
+										} );
+									} }
+								/>
+								<TextControl
+									__nextHasNoMarginBottom
+									label={ __(
+										'Source URL',
+										'create-block-theme'
+									) }
+									value={ credit.url }
+									onChange={ ( value ) => {
+										const newCredits = [
+											...theme.image_credits,
+										];
+										newCredits[ index ] = {
+											...credit,
+											url: value,
+										};
+										setTheme( {
+											...theme,
+											image_credits: newCredits,
+										} );
+									} }
+								/>
+								<Button
+									isDestructive
+									variant="secondary"
+									size="compact"
+									label={ __(
+										'Remove',
+										'create-block-theme'
+									) }
+									icon={ trash }
+									onClick={ () => {
+										const newCredits = [
+											...theme.image_credits,
+										];
+										newCredits.splice( index, 1 );
+										setTheme( {
+											...theme,
+											image_credits: newCredits,
+										} );
+									} }
+								/>
+							</HStack>
+						) ) }
+						<Button
+							variant="secondary"
+							size="compact"
+							onClick={ onAddCredit }
+						>
+							{ __( 'Add credit', 'create-block-theme' ) }
+						</Button>
+					</VStack>
 				</BaseControl>
 				<TextControl
 					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
