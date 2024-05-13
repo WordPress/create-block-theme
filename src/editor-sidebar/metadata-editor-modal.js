@@ -191,16 +191,19 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					}
 					onChange={ onChangeTags }
 				/>
-				<ExternalLink
-					href="https://make.wordpress.org/themes/handbook/review/required/theme-tags/"
+				<HStack
 					style={ {
-						fontSize: '12px',
 						marginTop: '-20px',
 						marginBottom: '1rem',
 					} }
 				>
-					{ __( 'Read more.', 'create-block-theme' ) }
-				</ExternalLink>
+					<ExternalLink
+						href="https://make.wordpress.org/themes/handbook/review/required/theme-tags/"
+						style={ { fontSize: '12px' } }
+					>
+						{ __( 'Read more.', 'create-block-theme' ) }
+					</ExternalLink>
+				</HStack>
 				<TextareaControl
 					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
 					help={
