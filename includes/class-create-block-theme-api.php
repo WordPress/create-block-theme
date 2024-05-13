@@ -165,7 +165,8 @@ class Create_Block_Theme_API {
 
 	function rest_get_readme_data( $request ) {
 		try {
-			$readme_data = Theme_Utils::get_readme_data();
+			$readme_data = Theme_Readme::get_sections();
+
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
@@ -408,7 +409,7 @@ class Create_Block_Theme_API {
 	 * Update the theme metadata and relocate the theme.
 	 */
 	function rest_update_theme( $request ) {
-		$theme = $request->get_params();
+		$theme = $this->sanitize_theme_data( $request->get_params() );
 
 		// Update the metadata of the theme in the style.css file
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );

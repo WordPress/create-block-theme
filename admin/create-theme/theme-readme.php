@@ -307,4 +307,27 @@ GNU General Public License for more details.
 		}
 	}
 
+	public static function get_sections() {
+
+		$readme_content = self::get_content();
+		$sections       = array();
+
+		// Regular expression to find the section, handling both '==' and '==='
+		$pattern = '/(={2,3}\s*(.*?)\s*={2,3})(.*?)(?=(={2,3}|$))/s';
+
+		// Find all sections
+		preg_match_all( $pattern, $readme_content, $matches, PREG_SET_ORDER );
+
+		// Loop through the matches
+		foreach ( $matches as $match ) {
+			$section_title   = str_replace( '-', '_', sanitize_title( $match[2] ) );
+			$section_content = trim( $match[3] );
+
+			// Add the section to the sections array
+			$sections[ $section_title ] = $section_content;
+		}
+
+		return $sections;
+	}
+
 }
