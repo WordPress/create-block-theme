@@ -27,7 +27,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { postUpdateThemeMetadata } from '../resolvers';
+import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
 
 const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/png',
@@ -54,6 +54,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
+		const readmeData = await fetchReadmeData();
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
@@ -63,6 +64,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
 			screenshot: themeData.screenshot,
+			recommended_plugins: readmeData.recommended_plugins,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(

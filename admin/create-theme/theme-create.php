@@ -7,9 +7,10 @@ class Theme_Create {
 	);
 
 	public static function clone_current_theme( $theme ) {
-
-		$theme['version']     = '1.0';
-		$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
+		// Default values for cloned themes
+		$theme['is_cloned_theme'] = true;
+		$theme['version']         = '1.0';
+		$theme['tags_custom']     = implode( ', ', wp_get_theme()->get( 'Tags' ) );
 
 		// Create theme directory.
 		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
@@ -33,7 +34,11 @@ class Theme_Create {
 		Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
 		Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( path_join( $new_theme_path, 'theme.json' ), MY_Theme_JSON_Resolver::export_theme_data( 'all' ) );
-		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), Theme_Readme::build_readme_txt( $theme ) );
+
+		// Create the text of readme.txt file and write it to the file.
+		$readme_content = Theme_Readme::create( $theme );
+		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), $readme_content );
+
 		file_put_contents( path_join( $new_theme_path, 'style.css' ), Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
 
 		if ( $theme['subfolder'] ) {
@@ -61,7 +66,7 @@ class Theme_Create {
 		// Add readme.txt.
 		file_put_contents(
 			$new_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Add style.css.
@@ -109,7 +114,7 @@ class Theme_Create {
 		// Add readme.txt.
 		file_put_contents(
 			$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Add new metadata.

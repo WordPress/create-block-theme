@@ -165,7 +165,8 @@ class Create_Block_Theme_API {
 
 	function rest_get_readme_data( $request ) {
 		try {
-			$readme_data = Theme_Utils::get_readme_data();
+			$readme_data = Theme_Readme::get_sections();
+
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
@@ -201,7 +202,8 @@ class Create_Block_Theme_API {
 
 	function rest_create_child_theme( $request ) {
 
-		$theme = $this->sanitize_theme_data( $request->get_params() );
+		$theme                   = $this->sanitize_theme_data( $request->get_params() );
+		$theme['is_child_theme'] = true;
 		//TODO: Handle screenshots
 		$screenshot = null;
 
@@ -281,7 +283,7 @@ class Create_Block_Theme_API {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Build style.css with new theme metadata
@@ -329,7 +331,7 @@ class Create_Block_Theme_API {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			Theme_Readme::build_readme_txt( $theme )
+			Theme_Readme::create( $theme )
 		);
 
 		// Build style.css with new theme metadata
@@ -407,16 +409,16 @@ class Create_Block_Theme_API {
 	 * Update the theme metadata and relocate the theme.
 	 */
 	function rest_update_theme( $request ) {
-		$theme = $request->get_params();
+		$theme = $this->sanitize_theme_data( $request->get_params() );
 
 		// Update the metadata of the theme in the style.css file
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$style_css = Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
-		file_put_contents(
-			get_stylesheet_directory() . '/readme.txt',
-			Theme_Readme::update_readme_txt( $theme )
-		);
+
+		$readme_content = Theme_Readme::get_content();
+		$readme_content = Theme_Readme::update( $theme, $readme_content );
+		file_put_contents( Theme_Readme::file_path(), $readme_content );
 
 		// Replace Screenshot
 		if ( wp_get_theme()->get_screenshot() !== $theme['screenshot'] ) {
