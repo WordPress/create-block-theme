@@ -483,14 +483,14 @@ class CBT_Theme_API {
 
 	private function sanitize_theme_data( $theme ) {
 		$sanitized_theme['name']                = sanitize_text_field( $theme['name'] );
-		$sanitized_theme['description']         = sanitize_text_field( $theme['description'] );
-		$sanitized_theme['uri']                 = sanitize_text_field( $theme['uri'] );
-		$sanitized_theme['author']              = sanitize_text_field( $theme['author'] );
-		$sanitized_theme['author_uri']          = sanitize_text_field( $theme['author_uri'] );
-		$sanitized_theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
-		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] );
-		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] );
-		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$sanitized_theme['description']         = sanitize_text_field( $theme['description'] ?? '' );
+		$sanitized_theme['uri']                 = sanitize_text_field( $theme['uri'] ?? '' );
+		$sanitized_theme['author']              = sanitize_text_field( $theme['author'] ?? '' );
+		$sanitized_theme['author_uri']          = sanitize_text_field( $theme['author_uri'] ?? '' );
+		$sanitized_theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] ?? '' );
+		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] ?? '' );
+		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
+		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
 		$sanitized_theme['template']            = '';
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
