@@ -21,11 +21,19 @@ class CBT_Theme_Styles {
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$template      = $current_theme->get( 'Template' );
 		$text_domain   = $theme['slug'];
+		$license       = 'GNU General Public License v2 or later';
+		$license_uri   = 'http://www.gnu.org/licenses/gpl-2.0.html';
+		$tags          = CBT_Theme_Tags::theme_tags_list( $theme );
 
-		//TODO: These items don't seem to be available via ->get('License') calls
-		$license      = 'GNU General Public License v2 or later';
-		$license_uri  = 'http://www.gnu.org/licenses/gpl-2.0.html';
-		$tags         = CBT_Theme_Tags::theme_tags_list( $theme );
+		preg_match( '/License: (.+)/', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$license = $matches[1];
+		}
+		preg_match( '/License URI: (.+)/', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$license_uri = $matches[1];
+		}
+
 		$css_metadata = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
