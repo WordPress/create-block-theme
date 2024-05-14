@@ -1,11 +1,11 @@
 <?php
 
-class Theme_Json {
+class CBT_Theme_JSON {
 
 	public static function add_theme_json_to_local( $export_type ) {
 		file_put_contents(
 			get_stylesheet_directory() . '/theme.json',
-			MY_Theme_JSON_Resolver::export_theme_data( $export_type )
+			CBT_Theme_JSON_Resolver::export_theme_data( $export_type )
 		);
 	}
 
@@ -27,7 +27,7 @@ class Theme_Json {
 			'title'   => $theme['name'],
 		);
 
-		$variation_theme_json = MY_Theme_JSON_Resolver::export_theme_data( $export_type, $extra_theme_data );
+		$variation_theme_json = CBT_Theme_JSON_Resolver::export_theme_data( $export_type, $extra_theme_data );
 
 		file_put_contents(
 			$variation_path . $theme['slug'] . '.json',

@@ -5,7 +5,7 @@ require_once( __DIR__ . '/theme-templates.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 require_once( __DIR__ . '/cbt-zip-archive.php' );
 
-class Theme_Zip {
+class CBT_Theme_Zip {
 
 	public static function create_zip( $filename, $theme_slug = null ) {
 		if ( ! class_exists( 'ZipArchive' ) ) {
@@ -16,7 +16,7 @@ class Theme_Zip {
 			$theme_slug = get_stylesheet();
 		}
 
-		$zip = new CbtZipArchive( $theme_slug );
+		$zip = new CBT_Zip_Archive( $theme_slug );
 		$zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE );
 		return $zip;
 	}
@@ -33,7 +33,7 @@ class Theme_Zip {
 
 		$theme_json = json_decode( $theme_json_string, true );
 
-		$font_families_to_copy     = Theme_Fonts::get_user_activated_fonts();
+		$font_families_to_copy     = CBT_Theme_Fonts::get_user_activated_fonts();
 		$theme_font_asset_location = 'assets/fonts';
 		$font_slugs_to_remove      = array();
 
@@ -132,7 +132,7 @@ class Theme_Zip {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = Theme_Utils::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
+						$contents = CBT_Theme_Utils::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
 					}
 
 					// Add current file to archive
@@ -156,7 +156,7 @@ class Theme_Zip {
 	 */
 	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
 
-		$theme_templates  = Theme_Templates::get_theme_templates( $export_type );
+		$theme_templates  = CBT_Theme_Templates::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
 
 		if ( $theme_templates->templates ) {
@@ -169,7 +169,7 @@ class Theme_Zip {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = Theme_Templates::prepare_template_for_export( $template );
+			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
 
 			// Write the template content
 			$zip->addFromStringToTheme(
@@ -192,7 +192,7 @@ class Theme_Zip {
 		}
 
 		foreach ( $theme_templates->parts as $template ) {
-			$template = Theme_Templates::prepare_template_for_export( $template );
+			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
 
 			// Write the template content
 			$zip->addFromStringToTheme(
@@ -220,7 +220,7 @@ class Theme_Zip {
 	static function add_media_to_zip( $zip, $media ) {
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
-			$folder_path   = Theme_Media::get_media_folder_path_from_url( $url );
+			$folder_path   = CBT_Theme_Media::get_media_folder_path_from_url( $url );
 			$download_file = download_url( $url );
 
 			if ( is_wp_error( $download_file ) ) {

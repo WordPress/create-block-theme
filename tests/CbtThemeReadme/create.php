@@ -3,10 +3,10 @@
 require_once __DIR__ . '/base.php';
 
 /**
- * Test the create method of the Theme_Readme class.
+ * Test the create method of the CBT_Theme_Readme class.
  *
  * @package Create_Block_Theme
- * @covers Theme_Readme::create
+ * @covers CBT_Theme_Readme::create
  * @group readme
  */
 class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
@@ -15,7 +15,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 	 * @dataProvider data_test_create
 	 */
 	public function test_create( $data ) {
-		$readme = Theme_Readme::create( $data );
+		$readme = CBT_Theme_Readme::create( $data );
 
 		// Removes the newlines from the readme content to make it easier to search for strings.
 		$readme_without_newlines = str_replace( "\n", '', $readme );

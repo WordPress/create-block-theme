@@ -2,7 +2,7 @@
 
 require_once( __DIR__ . '/theme-tags.php' );
 
-class Theme_Styles {
+class CBT_Theme_Styles {
 
 	/**
 	 * Update a style CSS file with given values
@@ -25,7 +25,7 @@ class Theme_Styles {
 		//TODO: These items don't seem to be available via ->get('License') calls
 		$license      = 'GNU General Public License v2 or later';
 		$license_uri  = 'http://www.gnu.org/licenses/gpl-2.0.html';
-		$tags         = Theme_Tags::theme_tags_list( $theme );
+		$tags         = CBT_Theme_Tags::theme_tags_list( $theme );
 		$css_metadata = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
@@ -67,7 +67,7 @@ Tags: {$tags}
 			$template = $theme['template'];
 		}
 		$version = '1.0';
-		$tags    = Theme_Tags::theme_tags_list( $theme );
+		$tags    = CBT_Theme_Tags::theme_tags_list( $theme );
 
 		if ( isset( $theme['version'] ) ) {
 			$version = $theme['version'];

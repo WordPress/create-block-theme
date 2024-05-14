@@ -2,7 +2,7 @@
 
 require_once( __DIR__ . '/theme-tags.php' );
 
-class Theme_Form {
+class CBT_Theme_Form {
 	public static function create_admin_form_page() {
 		if ( ! wp_is_block_theme() ) {
 			?>
@@ -270,7 +270,7 @@ class Theme_Form {
 						</p>
 
 						<div>
-							<?php Theme_Tags::theme_tags_section(); ?>
+							<?php CBT_Theme_Tags::theme_tags_section(); ?>
 						</div>
 					</div>
 					<input type="hidden" name="page" value="create-block-theme">

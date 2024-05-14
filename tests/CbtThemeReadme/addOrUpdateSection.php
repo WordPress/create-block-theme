@@ -3,10 +3,10 @@
 require_once __DIR__ . '/base.php';
 
 /**
- * Test the add_or_update_section method of the Theme_Readme class.
+ * Test the add_or_update_section method of the CBT_Theme_Readme class.
  *
  * @package Create_Block_Theme
- * @covers Theme_Readme::add_or_update_section
+ * @covers CBT_Theme_Readme::add_or_update_section
  * @group readme
  *
  */
@@ -16,7 +16,7 @@ class CBT_ThemeReadme_AddOrUpdateSection extends CBT_Theme_Readme_UnitTestCase {
 		$section_content = 'Test content abc123';
 
 		// Add a new section.
-		$readme = Theme_Readme::add_or_update_section( $section_title, $section_content );
+		$readme = CBT_Theme_Readme::add_or_update_section( $section_title, $section_content );
 
 		// Check if the section was added.
 		$this->assertStringContainsString( $section_title, $readme, 'The section title is missing.' );
@@ -25,7 +25,7 @@ class CBT_ThemeReadme_AddOrUpdateSection extends CBT_Theme_Readme_UnitTestCase {
 		// Update the section.
 		$section_content_updated = 'Updated content xyz890';
 
-		$readme = Theme_Readme::add_or_update_section( $section_title, $section_content_updated );
+		$readme = CBT_Theme_Readme::add_or_update_section( $section_title, $section_content_updated );
 
 		// Check if the old content was updated.
 		$this->assertStringNotContainsString( $section_content, $readme, 'The old content is still present.' );
@@ -44,7 +44,7 @@ class CBT_ThemeReadme_AddOrUpdateSection extends CBT_Theme_Readme_UnitTestCase {
 		$section_content = '';
 
 		// Empty section should not be added.
-		$readme = Theme_Readme::add_or_update_section( $section_title, $section_content );
+		$readme = CBT_Theme_Readme::add_or_update_section( $section_title, $section_content );
 		$this->assertStringNotContainsString( $section_title, $readme, 'The title of an empty section should not be added.' );
 	}
 }

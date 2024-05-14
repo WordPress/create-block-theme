@@ -7,7 +7,7 @@
  * @subpackage Create_Block_Theme/includes
  * @author     WordPress.org
  */
-class Create_Block_Theme_Loader {
+class CBT_Plugin_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.

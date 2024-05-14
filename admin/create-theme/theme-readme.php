@@ -1,6 +1,6 @@
 <?php
 
-class Theme_Readme {
+class CBT_Theme_Readme {
 
 	/**
 	 * Get the path to the readme.txt file.

@@ -3,7 +3,7 @@
 require_once( __DIR__ . '/theme-media.php' );
 require_once( __DIR__ . '/theme-patterns.php' );
 
-class Theme_Templates {
+class CBT_Theme_Templates {
 
 	/**
 	 * Build a collection of templates and template-parts that should be exported (and modified)
@@ -134,11 +134,11 @@ class Theme_Templates {
 	public static function paternize_template( $template, $slug = null ) {
 		// If there is any PHP in the template then paternize
 		if ( str_contains( $template->content, '<?php' ) ) {
-			$pattern                 = Theme_Patterns::pattern_from_template( $template, $slug );
+			$pattern                 = CBT_Theme_Patterns::pattern_from_template( $template, $slug );
 			$pattern_link_attributes = array(
 				'slug' => $pattern['slug'],
 			);
-			$template->content       = Theme_Patterns::create_pattern_link( $pattern_link_attributes );
+			$template->content       = CBT_Theme_Patterns::create_pattern_link( $pattern_link_attributes );
 			$template->pattern       = $pattern['content'];
 		}
 		return $template;
@@ -170,7 +170,7 @@ class Theme_Templates {
 		}
 
 		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
-			$template = Theme_Media::make_template_images_local( $template );
+			$template = CBT_Theme_Media::make_template_images_local( $template );
 		}
 
 		if ( $slug ) {
@@ -223,7 +223,7 @@ class Theme_Templates {
 
 			// Write the media assets if there are any
 			if ( $template->media ) {
-				Theme_Media::add_media_to_local( $template->media );
+				CBT_Theme_Media::add_media_to_local( $template->media );
 			}
 
 			// Write the pattern if it exists
@@ -251,7 +251,7 @@ class Theme_Templates {
 
 			// Write the media assets if there are any
 			if ( $template->media ) {
-				Theme_Media::add_media_to_local( $template->media );
+				CBT_Theme_Media::add_media_to_local( $template->media );
 			}
 
 			// Write the pattern if it exists

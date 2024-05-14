@@ -1,6 +1,6 @@
 <?php
 
-class Form_Messages {
+class CBT_Form_Messages {
 	public static function admin_notice_error_theme_name() {
 		$class   = 'notice notice-error';
 		$message = __( 'Please specify a theme name.', 'create-block-theme' );

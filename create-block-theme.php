@@ -37,10 +37,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-create-block-theme.php';
  *
  * @since    0.0.2
  */
-function run_create_block_theme() {
+function cbt_run_create_block_theme() {
 
-	$plugin = new Create_Block_Theme();
+	$plugin = new CBT_Plugin();
 	$plugin->run();
 
 }
-run_create_block_theme();
+cbt_run_create_block_theme();

@@ -9,7 +9,7 @@
  * @author     WordPress.org
  */
 #[AllowDynamicProperties]
-class Create_Block_Theme {
+class CBT_Plugin {
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -45,7 +45,7 @@ class Create_Block_Theme {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-api.php';
 
-		$this->loader = new Create_Block_Theme_Loader();
+		$this->loader = new CBT_Plugin_Loader();
 
 	}
 
@@ -58,9 +58,9 @@ class Create_Block_Theme {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin       = new Create_Block_Theme_Admin();
-		$wp_theme_directory = new WP_Theme_Directory();
-		$plugin_api         = new Create_Block_Theme_API();
+		$plugin_admin       = new CBT_WP_Admin();
+		$wp_theme_directory = new CBT_WP_Theme_Directory();
+		$plugin_api         = new CBT_Theme_API();
 	}
 
 	/**

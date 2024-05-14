@@ -46,7 +46,7 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 		switch_theme( 'test-theme-readme' );
 
 		// Store the original readme.txt content.
-		$this->orig_readme_content = Theme_Readme::get_content();
+		$this->orig_readme_content = CBT_Theme_Readme::get_content();
 	}
 
 	/**
@@ -56,7 +56,7 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 		parent::tear_down();
 
 		// Restore the original readme.txt content.
-		file_put_contents( Theme_Readme::file_path(), $this->orig_readme_content );
+		file_put_contents( CBT_Theme_Readme::file_path(), $this->orig_readme_content );
 
 		// Restore the original active theme.
 		switch_theme( $this->orig_active_theme_slug );

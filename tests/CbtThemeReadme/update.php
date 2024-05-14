@@ -3,10 +3,10 @@
 require_once __DIR__ . '/base.php';
 
 /**
- * Test the update method of the Theme_Readme class.
+ * Test the update method of the CBT_Theme_Readme class.
  *
  * @package Create_Block_Theme
- * @covers Theme_Readme::update
+ * @covers CBT_Theme_Readme::update
  * @group readme
  */
 class CBT_ThemeReadme_Update extends CBT_Theme_Readme_UnitTestCase {
@@ -15,8 +15,8 @@ class CBT_ThemeReadme_Update extends CBT_Theme_Readme_UnitTestCase {
 	 * @dataProvider data_test_update
 	 */
 	public function test_update( $data ) {
-		$readme_content = Theme_Readme::get_content();
-		$readme         = Theme_Readme::update( $data, $readme_content );
+		$readme_content = CBT_Theme_Readme::get_content();
+		$readme         = CBT_Theme_Readme::update( $data, $readme_content );
 
 		// Removes the newlines from the readme content to make it easier to search for strings.
 		$readme_without_newlines = str_replace( "\n", '', $readme );
