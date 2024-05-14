@@ -1,5 +1,21 @@
 <?php
 
+require_once __DIR__ . '/create-theme/resolver_additions.php';
+require_once __DIR__ . '/create-theme/theme-locale.php';
+require_once __DIR__ . '/create-theme/theme-tags.php';
+require_once __DIR__ . '/create-theme/theme-zip.php';
+require_once __DIR__ . '/create-theme/theme-media.php';
+require_once __DIR__ . '/create-theme/theme-patterns.php';
+require_once __DIR__ . '/create-theme/theme-templates.php';
+require_once __DIR__ . '/create-theme/theme-styles.php';
+require_once __DIR__ . '/create-theme/theme-json.php';
+require_once __DIR__ . '/create-theme/theme-utils.php';
+require_once __DIR__ . '/create-theme/theme-readme.php';
+require_once __DIR__ . '/create-theme/theme-form.php';
+require_once __DIR__ . '/create-theme/form-messages.php';
+require_once __DIR__ . '/create-theme/theme-fonts.php';
+require_once __DIR__ . '/create-theme/theme-create.php';
+
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
  *
