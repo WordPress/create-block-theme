@@ -7,9 +7,10 @@ class CBT_Theme_Create {
 	);
 
 	public static function clone_current_theme( $theme ) {
-
-		$theme['version']     = '1.0';
-		$theme['tags_custom'] = implode( ', ', wp_get_theme()->get( 'Tags' ) );
+		// Default values for cloned themes
+		$theme['is_cloned_theme'] = true;
+		$theme['version']         = '1.0';
+		$theme['tags_custom']     = implode( ', ', wp_get_theme()->get( 'Tags' ) );
 
 		// Create theme directory.
 		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
@@ -33,7 +34,7 @@ class CBT_Theme_Create {
 		CBT_Theme_Utils::clone_theme_to_folder( $new_theme_path, $theme['slug'], $theme['name'] );
 		CBT_Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( path_join( $new_theme_path, 'theme.json' ), CBT_Theme_JSON_Resolver::export_theme_data( 'all' ) );
-		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::build_readme_txt( $theme ) );
+		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::create( $theme ) );
 		file_put_contents( path_join( $new_theme_path, 'style.css' ), CBT_Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
 
 		if ( $theme['subfolder'] ) {
@@ -61,7 +62,7 @@ class CBT_Theme_Create {
 		// Add readme.txt.
 		file_put_contents(
 			$new_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-			CBT_Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::create( $theme )
 		);
 
 		// Add style.css.
@@ -109,7 +110,7 @@ class CBT_Theme_Create {
 		// Add readme.txt.
 		file_put_contents(
 			$blank_theme_path . DIRECTORY_SEPARATOR . 'readme.txt',
-			CBT_Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::create( $theme )
 		);
 
 		// Add new metadata.

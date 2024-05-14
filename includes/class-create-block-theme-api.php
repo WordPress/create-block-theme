@@ -165,7 +165,7 @@ class CBT_Theme_API {
 
 	function rest_get_readme_data( $request ) {
 		try {
-			$readme_data = CBT_Theme_Utils::get_readme_data();
+			$readme_data = CBT_Theme_Readme::get_sections();
 			return new WP_REST_Response(
 				array(
 					'status'  => 'SUCCESS',
@@ -201,7 +201,8 @@ class CBT_Theme_API {
 
 	function rest_create_child_theme( $request ) {
 
-		$theme = $this->sanitize_theme_data( $request->get_params() );
+		$theme                   = $this->sanitize_theme_data( $request->get_params() );
+		$theme['is_child_theme'] = true;
 		//TODO: Handle screenshots
 		$screenshot = null;
 
@@ -281,7 +282,7 @@ class CBT_Theme_API {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			CBT_Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::create( $theme )
 		);
 
 		// Build style.css with new theme metadata
@@ -329,7 +330,7 @@ class CBT_Theme_API {
 		// Add readme.txt.
 		$zip->addFromStringToTheme(
 			'readme.txt',
-			CBT_Theme_Readme::build_readme_txt( $theme )
+			CBT_Theme_Readme::create( $theme )
 		);
 
 		// Build style.css with new theme metadata
@@ -407,15 +408,16 @@ class CBT_Theme_API {
 	 * Update the theme metadata and relocate the theme.
 	 */
 	function rest_update_theme( $request ) {
-		$theme = $request->get_params();
+		$theme = $this->sanitize_theme_data( $request->get_params() );
 
 		// Update the metadata of the theme in the style.css file
 		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
 		$style_css = CBT_Theme_Styles::update_style_css( $style_css, $theme );
 		file_put_contents( get_stylesheet_directory() . '/style.css', $style_css );
+
 		file_put_contents(
-			get_stylesheet_directory() . '/readme.txt',
-			CBT_Theme_Readme::update_readme_txt( $theme )
+			CBT_Theme_Readme::file_path(),
+			CBT_Theme_Readme::update( $theme, CBT_Theme_Readme::get_content() )
 		);
 
 		// Replace Screenshot

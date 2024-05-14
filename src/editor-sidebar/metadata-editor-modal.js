@@ -15,6 +15,7 @@ import {
 	// eslint-disable-next-line
 	__experimentalText as Text,
 	BaseControl,
+	FormTokenField,
 	Modal,
 	Button,
 	TextControl,
@@ -26,7 +27,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { postUpdateThemeMetadata } from '../resolvers';
+import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
 
 const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/png',
@@ -53,6 +54,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
+		const readmeData = await fetchReadmeData();
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
@@ -62,6 +64,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
 			screenshot: themeData.screenshot,
+			recommended_plugins: readmeData.recommended_plugins,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
@@ -93,6 +96,10 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					);
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			} );
+	};
+
+	const onChangeTags = ( newTags ) => {
+		setTheme( { ...theme, tags_custom: newTags.join( ', ' ) } );
 	};
 
 	const onUpdateImage = ( image ) => {
@@ -177,17 +184,26 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 						'create-block-theme'
 					) }
 				/>
-				<TextareaControl
+				<FormTokenField
 					label={ __( 'Theme tags', 'create-block-theme' ) }
-					value={ theme.tags_custom }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, tags_custom: value } )
+					value={
+						theme.tags_custom ? theme.tags_custom.split( ', ' ) : []
 					}
-					placeholder={ __(
-						'A comma-separated collection of tags',
-						'create-block-theme'
-					) }
+					onChange={ onChangeTags }
 				/>
+				<HStack
+					style={ {
+						marginTop: '-20px',
+						marginBottom: '1rem',
+					} }
+				>
+					<ExternalLink
+						href="https://make.wordpress.org/themes/handbook/review/required/theme-tags/"
+						style={ { fontSize: '12px' } }
+					>
+						{ __( 'Read more.', 'create-block-theme' ) }
+					</ExternalLink>
+				</HStack>
 				<TextareaControl
 					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
 					help={
