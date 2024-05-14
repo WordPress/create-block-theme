@@ -208,6 +208,12 @@ class CBT_Theme_Utils {
 		return CBT_Theme_Utils::copy_screenshot( $new_screenshot_path );
 	}
 
+	/**
+	 * Get the current WordPress version.
+	 *
+	 * @return string The current WordPress in the format x.x (major.minor)
+	 * Example: 6.5
+	 */
 	public static function get_current_wordpress_version() {
 		$wp_version = get_bloginfo( 'version' );
 		if ( preg_match( '/^\d+\.\d+/', $wp_version, $matches ) ) {
