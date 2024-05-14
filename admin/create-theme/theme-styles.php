@@ -24,6 +24,7 @@ class CBT_Theme_Styles {
 		$license       = 'GNU General Public License v2 or later';
 		$license_uri   = 'http://www.gnu.org/licenses/gpl-2.0.html';
 		$tags          = CBT_Theme_Tags::theme_tags_list( $theme );
+		$copyright     = '';
 
 		preg_match( '/License: (.+)/', $style_css, $matches );
 		if ( isset( $matches[1] ) ) {
@@ -32,6 +33,10 @@ class CBT_Theme_Styles {
 		preg_match( '/License URI: (.+)/', $style_css, $matches );
 		if ( isset( $matches[1] ) ) {
 			$license_uri = $matches[1];
+		}
+		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$copyright = $matches[1];
 		}
 
 		$css_metadata = "/*
@@ -54,7 +59,8 @@ License URI: {$license_uri}
 
 		$css_metadata .= "Text Domain: {$text_domain}
 Tags: {$tags}
-*/
+
+{$copyright}*/
 
 ";
 		return $css_metadata . $css_contents;
