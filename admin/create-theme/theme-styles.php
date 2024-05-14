@@ -17,6 +17,7 @@ class CBT_Theme_Styles {
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
 		$wp_version    = get_bloginfo( 'version' );
+		$wp_min        = $current_theme->get( 'RequiresWP' );
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$template      = $current_theme->get( 'Template' );
@@ -45,7 +46,7 @@ Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 6.0
+Requires at least: {$wp_min}
 Tested up to: {$wp_version}
 Requires PHP: {$requires_php}
 Version: {$version}
