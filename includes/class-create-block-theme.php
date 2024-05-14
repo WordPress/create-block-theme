@@ -40,10 +40,9 @@ class CBT_Plugin {
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-create-theme.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/wp-org-theme-directory.php';
-
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-api.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-editor-tools.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-create-block-theme-admin-landing.php';
 
 		$this->loader = new CBT_Plugin_Loader();
 
@@ -57,10 +56,9 @@ class CBT_Plugin {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
-
-		$plugin_admin       = new CBT_WP_Admin();
-		$wp_theme_directory = new CBT_WP_Theme_Directory();
-		$plugin_api         = new CBT_Theme_API();
+		$plugin_api    = new CBT_Theme_API();
+		$editor_tools  = new Create_Block_Theme_Editor_Tools();
+		$admin_landing = new Create_Block_Theme_Admin_Landing();
 	}
 
 	/**

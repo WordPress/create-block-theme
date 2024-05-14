@@ -42,7 +42,7 @@
 		"simple-git": "^3.18.0"
 	},
 	"scripts": {
-		"build": "wp-scripts build src/plugin-sidebar.js src/wp-org-theme-directory.js",
+		"build": "wp-scripts build src/admin-landing-page.js src/plugin-sidebar.js",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:css:fix": "npm run lint:css -- --fix",
