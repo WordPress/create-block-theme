@@ -22,7 +22,7 @@ class CBT_ThemeReadme_Update extends CBT_Theme_Readme_UnitTestCase {
 		$readme_without_newlines = str_replace( "\n", '', $readme );
 
 		$expected_author              = 'Contributors: ' . $data['author'];
-		$expected_wp_version          = 'Tested up to: ' . $data['wp_version'] ?? get_bloginfo( 'version' );
+		$expected_wp_version          = 'Tested up to: ' . $data['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$expected_image_credits       = '== Images ==' . $data['image_credits'];
 		$expected_recommended_plugins = '== Recommended Plugins ==' . $data['recommended_plugins'];
 

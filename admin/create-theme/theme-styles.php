@@ -16,7 +16,7 @@ class CBT_Theme_Styles {
 		$uri           = $theme['uri'];
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
-		$wp_version    = get_bloginfo( 'version' );
+		$wp_version    = CBT_Theme_Utils::get_current_wordpress_version();
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$template      = $current_theme->get( 'Template' );
@@ -61,7 +61,7 @@ Tags: {$tags}
 		$uri         = $theme['uri'];
 		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
-		$wp_version  = get_bloginfo( 'version' );
+		$wp_version  = CBT_Theme_Utils::get_current_wordpress_version();
 		$text_domain = sanitize_title( $name );
 		if ( isset( $theme['template'] ) ) {
 			$template = $theme['template'];

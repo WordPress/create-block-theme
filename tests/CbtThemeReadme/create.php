@@ -25,7 +25,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 		$expected_uri                 = 'Theme URI: ' . $data['uri'];
 		$expected_author              = 'Contributors: ' . $data['author'];
 		$expected_author_uri          = 'Author URI: ' . $data['author_uri'];
-		$expected_wp_version          = 'Tested up to: ' . $data['wp_version'] ?? get_bloginfo( 'version' );
+		$expected_wp_version          = 'Tested up to: ' . $data['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$expected_php_version         = 'Requires PHP: ' . $data['required_php_version'];
 		$expected_license             = 'License: ' . $data['license'];
 		$expected_license_uri         = 'License URI: ' . $data['license_uri'];
