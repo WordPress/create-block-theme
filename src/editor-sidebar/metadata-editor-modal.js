@@ -15,6 +15,7 @@ import {
 	// eslint-disable-next-line
 	__experimentalText as Text,
 	BaseControl,
+	FormTokenField,
 	Modal,
 	Button,
 	TextControl,
@@ -95,6 +96,10 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					);
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			} );
+	};
+
+	const onChangeTags = ( newTags ) => {
+		setTheme( { ...theme, tags_custom: newTags.join( ', ' ) } );
 	};
 
 	const onUpdateImage = ( image ) => {
@@ -179,17 +184,26 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 						'create-block-theme'
 					) }
 				/>
-				<TextareaControl
+				<FormTokenField
 					label={ __( 'Theme tags', 'create-block-theme' ) }
-					value={ theme.tags_custom }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, tags_custom: value } )
+					value={
+						theme.tags_custom ? theme.tags_custom.split( ', ' ) : []
 					}
-					placeholder={ __(
-						'A comma-separated collection of tags',
-						'create-block-theme'
-					) }
+					onChange={ onChangeTags }
 				/>
+				<HStack
+					style={ {
+						marginTop: '-20px',
+						marginBottom: '1rem',
+					} }
+				>
+					<ExternalLink
+						href="https://make.wordpress.org/themes/handbook/review/required/theme-tags/"
+						style={ { fontSize: '12px' } }
+					>
+						{ __( 'Read more.', 'create-block-theme' ) }
+					</ExternalLink>
+				</HStack>
 				<TextareaControl
 					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
 					help={
