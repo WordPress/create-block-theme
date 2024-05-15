@@ -4,6 +4,12 @@
 */
 class CBT_Theme_Locale {
 
+	/**
+	 * Escape a string for localization.
+	 *
+	 * @param string $string The string to escape.
+	 * @return string The escaped string.
+	 */
 	public static function escape_string( $string ) {
 		// Avoid escaping if the text is not a string.
 		if ( ! is_string( $string ) ) {
