@@ -40,6 +40,7 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 				themeName
 			) }
 			onRequestClose={ onRequestClose }
+			className="create-block-theme__theme-json-modal"
 		>
 			<CodeMirror
 				extensions={ [ json() ] }

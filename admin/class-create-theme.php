@@ -51,8 +51,16 @@ class CBT_WP_Admin {
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);
+		wp_enqueue_style(
+			'create-block-theme-styles',
+			plugins_url( 'build/plugin-sidebar.css', dirname( __FILE__ ) ),
+			false,
+			$asset_file['version'],
+			'all'
+		);
 		wp_enqueue_script(
 			'create-block-theme-slot-fill',
+			'create-block-theme-styles'
 		);
 
 		// Enable localization in the plugin sidebar.
