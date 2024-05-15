@@ -86,7 +86,7 @@ class CBT_Theme_Locale {
 				continue;
 			}
 
-			// Replace the content with the new content based on the pattern.
+			// Builds the replacement callback function based on the block type.
 			switch ( $block['blockName'] ) {
 				case 'core/paragraph':
 				case 'core/heading':
@@ -96,52 +96,55 @@ class CBT_Theme_Locale {
 				case 'core/quote':
 				case 'core/pullquote':
 				case 'core/table':
-					// Iterates the html patterns and replace the content with the escaped content.
-					foreach ( $patterns as $pattern ) {
-						$replace_content_callback = function ( $content ) use ( $pattern ) {
-							if ( empty( $content ) ) {
-								return;
-							}
-							return preg_replace_callback(
-								$pattern,
-								function( $matches ) {
-									return $matches[1] . self::escape_string( $matches[2] ) . $matches[3];
-								},
-								$content
-							);
-						};
-
-						if ( ! empty( $block['innerContent'] ) ) {
-							$block['innerContent'] = is_array( $block['innerContent'] )
-							? array_map( $replace_content_callback, $block['innerContent'] )
-							: $replace_content_callback( $block['innerContent'] );
+					$replace_content_callback = function ( $content, $pattern ) {
+						if ( empty( $content ) ) {
+							return;
 						}
-					}
+						return preg_replace_callback(
+							$pattern,
+							function( $matches ) {
+								return $matches[1] . self::escape_string( $matches[2] ) . $matches[3];
+							},
+							$content
+						);
+					};
 					break;
 				case 'core/image':
 				case 'core/cover':
 				case 'core/media-text':
-					// Iterates the html patterns and replace the content with the escaped content.
-					foreach ( $patterns as $pattern ) {
-						$replace_content_callback = function ( $content ) use ( $pattern ) {
-							if ( empty( $content ) ) {
-								return;
-							}
-							return preg_replace_callback(
-								$pattern,
-								function( $matches ) {
-									return 'alt="' . self::escape_string( $matches[1] ) . '"';
-								},
-								$content
-							);
-						};
-						if ( ! empty( $block['innerContent'] ) ) {
-							$block['innerContent'] = is_array( $block['innerContent'] )
-							? array_map( $replace_content_callback, $block['innerContent'] )
-							: $replace_content_callback( $block['innerContent'] );
+					$replace_content_callback = function ( $content, $pattern ) {
+						if ( empty( $content ) ) {
+							return;
 						}
-					}
+						return preg_replace_callback(
+							$pattern,
+							function( $matches ) {
+								return 'alt="' . self::escape_string( $matches[1] ) . '"';
+							},
+							$content
+						);
+					};
 					break;
+				default:
+					$replace_content_callback = null;
+					break;
+			}
+
+			// Apply the replacement patterns to the block content.
+			foreach ( $patterns as $pattern ) {
+				if (
+					! empty( $block['innerContent'] ) &&
+					is_callable( $replace_content_callback )
+				) {
+					$block['innerContent'] = is_array( $block['innerContent'] )
+					? array_map(
+						function( $content ) use ( $replace_content_callback, $pattern ) {
+							return $replace_content_callback( $content, $pattern );
+						},
+						$block['innerContent']
+					)
+					: $replace_content_callback( $block['innerContent'], $pattern );
+				}
 			}
 		}
 		return $blocks;
