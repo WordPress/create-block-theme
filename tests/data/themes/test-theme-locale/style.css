@@ -1,0 +1,15 @@
+/*
+Theme Name: Test Locale Theme
+Theme URI: https://example.org/themes/test-locale-theme
+Author: the WordPress team
+Author URI: https://wordpress.org
+Description: Test Locale Theme is a theme for testing the text localization/escaping capabilities of the Create Block Theme plugin.
+Requires at least: 6.4
+Tested up to: 6.4
+Requires PHP: 7.0
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: test-locale-theme
+Tags: test, locale, theme
+*/
