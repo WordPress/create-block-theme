@@ -121,6 +121,7 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$request->set_param( 'uri', '' );
 		$request->set_param( 'author', '' );
 		$request->set_param( 'author_uri', '' );
+		$request->set_param( 'version', '' );
 		$request->set_param( 'tags_custom', '' );
 		$request->set_param( 'subfolder', '' );
 		$request->set_param( 'recommended_plugins', '' );
