@@ -16,6 +16,18 @@ class CBT_Theme_Locale_EscapeString extends CBT_Theme_Locale_UnitTestCase {
 		$this->assertEquals( "<?php echo __( 'This is a test text.', 'test-locale-theme' ); ?>", $escaped_string );
 	}
 
+	public function test_escape_string_with_single_quote() {
+		$string         = "This is a test text with a single quote '";
+		$escaped_string = CBT_Theme_Locale::escape_string( $string );
+		$this->assertEquals( "<?php echo __( 'This is a test text with a single quote \\'', 'test-locale-theme' ); ?>", $escaped_string );
+	}
+
+	public function test_escape_string_with_double_quote() {
+		$string         = 'This is a test text with a double quote "';
+		$escaped_string = CBT_Theme_Locale::escape_string( $string );
+		$this->assertEquals( "<?php echo __( 'This is a test text with a double quote \"', 'test-locale-theme' ); ?>", $escaped_string );
+	}
+
 	public function test_escape_string_with_html() {
 		$string         = '<p>This is a test text with HTML.</p>';
 		$escaped_string = CBT_Theme_Locale::escape_string( $string );
