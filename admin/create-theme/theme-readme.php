@@ -49,7 +49,7 @@ class CBT_Theme_Readme {
 		$author               = $theme['author'] ?? '';
 		$author_uri           = $theme['author_uri'] ?? '';
 		$copy_year            = $theme['copyright_year'] ?? gmdate( 'Y' );
-		$wp_version           = $theme['wp_version'] ?? get_bloginfo( 'version' );
+		$wp_version           = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$required_php_version = $theme['required_php_version'] ?? '5.7';
 		$license              = $theme['license'] ?? 'GPLv2 or later';
 		$license_uri          = $theme['license_uri'] ?? 'http://www.gnu.org/licenses/gpl-2.0.html';
@@ -201,7 +201,7 @@ GNU General Public License for more details.
 		// Theme data.
 		$description         = $theme['description'] ?? '';
 		$author              = $theme['author'] ?? '';
-		$wp_version          = $theme['wp_version'] ?? get_bloginfo( 'version' );
+		$wp_version          = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 
