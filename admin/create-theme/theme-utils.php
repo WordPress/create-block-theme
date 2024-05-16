@@ -215,10 +215,8 @@ class CBT_Theme_Utils {
 	 * Example: 6.5
 	 */
 	public static function get_current_wordpress_version() {
-		$wp_version = get_bloginfo( 'version' );
-		if ( preg_match( '/^\d+\.\d+/', $wp_version, $matches ) ) {
-			$wp_version = $matches[0];
-		}
-		return $wp_version;
+		$wp_version       = get_bloginfo( 'version' );
+		$wp_version_parts = explode( '.', $wp_version );
+		return $wp_version_parts[0] . '.' . $wp_version_parts[1];
 	}
 }
