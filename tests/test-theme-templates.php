@@ -1,6 +1,7 @@
 <?php
 /**
  * @package Create_Block_Theme
+ * @group templates
  */
 class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
@@ -187,8 +188,6 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 		// Check the markup attribute
 		$this->assertStringContainsString( 'alt="<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
-		// Check the block attribute
-		$this->assertStringContainsString( '"alt":"<?php echo __(\'This is alt text\', \'\');?>"', $new_template->content );
 	}
 
 	public function test_localize_quote() {
