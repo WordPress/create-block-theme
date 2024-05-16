@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,25 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.1.4 =
+* Fix template texts localizing/escaping (#641)
+* Use only major.minor version in 'Tested up to' field (#635)
+* Don't Clobber Metadata (#634)
+* Clean and complete the changelog (#636)
+* Add prefix to the names in the PHP global namespace. (#628)
+* Improve tags UI (#630)
+* Refactor Theme_Readme (readme.txt) PHP class (#626)
+* Metadata screenshot (#621)
+* Allow spaces in slugs.  Changed logic to correctly replace functions.  Updated tests. (#622)
+* Reset changelog and version on clone and theme creation (#623)
+* Use non-default port for wp-env (#611)
+* Update package-lock.json (#620)
+* Tests: use tests-wordpress wp-env for phpunit (#618)
+* Add Repository Management section to contributing docs (#614)
+* Update wp-env version (#619)
+* Update Node version to 20 (#617)
+* ESLint: Add new rules (#616)
 
 = 2.1.3 =
 * Editor Sidebar: Persist "Save Changes" panel settings (#607)
