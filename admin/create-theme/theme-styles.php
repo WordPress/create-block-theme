@@ -9,6 +9,14 @@ class CBT_Theme_Styles {
 	 */
 	public static function update_style_css( $style_css, $theme ) {
 
+		$style_data = get_file_data(
+			path_join( get_stylesheet_directory(), 'style.css' ),
+			array(
+				'License'    => 'License',
+				'LicenseURI' => 'License URI',
+			)
+		);
+
 		$current_theme = wp_get_theme();
 		$css_contents  = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
 		$name          = stripslashes( $theme['name'] );
@@ -22,19 +30,11 @@ class CBT_Theme_Styles {
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$template      = $current_theme->get( 'Template' );
 		$text_domain   = $theme['slug'];
-		$license       = 'GNU General Public License v2 or later';
-		$license_uri   = 'http://www.gnu.org/licenses/gpl-2.0.html';
+		$license       = $style_data['License'] ? $style_data['License'] : 'GNU General Public License v2 or later';
+		$license_uri   = $style_data['LicenseURI'] ? $style_data['LicenseURI'] : 'http://www.gnu.org/licenses/gpl-2.0.html';
 		$tags          = CBT_Theme_Tags::theme_tags_list( $theme );
 		$copyright     = '';
 
-		preg_match( '/License: (.+)/', $style_css, $matches );
-		if ( isset( $matches[1] ) ) {
-			$license = $matches[1];
-		}
-		preg_match( '/License URI: (.+)/', $style_css, $matches );
-		if ( isset( $matches[1] ) ) {
-			$license_uri = $matches[1];
-		}
 		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
 		if ( isset( $matches[1] ) ) {
 			$copyright = $matches[1];
