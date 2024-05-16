@@ -9,6 +9,14 @@ class CBT_Theme_Styles {
 	 */
 	public static function update_style_css( $style_css, $theme ) {
 
+		$style_data = get_file_data(
+			path_join( get_stylesheet_directory(), 'style.css' ),
+			array(
+				'License'    => 'License',
+				'LicenseURI' => 'License URI',
+			)
+		);
+
 		$current_theme = wp_get_theme();
 		$css_contents  = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
 		$name          = stripslashes( $theme['name'] );
@@ -17,39 +25,37 @@ class CBT_Theme_Styles {
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
 		$wp_version    = CBT_Theme_Utils::get_current_wordpress_version();
+		$wp_min        = $current_theme->get( 'RequiresWP' );
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
-		$template      = $current_theme->get( 'Template' );
 		$text_domain   = $theme['slug'];
+		$template      = $current_theme->get( 'Template' ) ? "\n" . 'Template: ' . $current_theme->get( 'Template' ) : '';
+		$license       = $style_data['License'] ? $style_data['License'] : 'GNU General Public License v2 or later';
+		$license_uri   = $style_data['LicenseURI'] ? $style_data['LicenseURI'] : 'http://www.gnu.org/licenses/gpl-2.0.html';
+		$tags          = CBT_Theme_Tags::theme_tags_list( $theme );
+		$css_contents  = $css_contents ? "\n\n" . $css_contents : '';
+		$copyright     = '';
+		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$copyright = "\n" . $matches[1];
+		}
 
-		//TODO: These items don't seem to be available via ->get('License') calls
-		$license      = 'GNU General Public License v2 or later';
-		$license_uri  = 'http://www.gnu.org/licenses/gpl-2.0.html';
-		$tags         = CBT_Theme_Tags::theme_tags_list( $theme );
-		$css_metadata = "/*
+		return "/*
 Theme Name: {$name}
 Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 6.0
+Requires at least: {$wp_min}
 Tested up to: {$wp_version}
 Requires PHP: {$requires_php}
 Version: {$version}
 License: {$license}
-License URI: {$license_uri}
-";
-
-		if ( ! empty( $template ) ) {
-			$css_metadata .= "Template: {$template}\n";
-		}
-
-		$css_metadata .= "Text Domain: {$text_domain}
+License URI: {$license_uri}{$template}
+Text Domain: {$text_domain}
 Tags: {$tags}
-*/
-
+{$copyright}*/{$css_contents}
 ";
-		return $css_metadata . $css_contents;
 	}
 
 	/**
