@@ -268,103 +268,18 @@ class CBT_Theme_Templates {
 		}
 	}
 
+	/**
+	 * Escape text in template content.
+	 *
+	 * @param object $template The template to escape text content in.
+	 * @return object The template with the content escaped.
+	 */
 	public static function escape_text_in_template( $template ) {
-
-		$template_blocks  = parse_blocks( $template->content );
-		$text_to_localize = array();
-
-		// Gather up all the strings that need to be localized
-		foreach ( $template_blocks as &$block ) {
-			$text_to_localize = array_merge( $text_to_localize, self::get_text_to_localize_from_block( $block ) );
-		}
-		$text_to_localize = array_unique( $text_to_localize );
-
-		// Localize the strings
-		foreach ( $text_to_localize as $text ) {
-			$template->content = str_replace( $text, self::escape_text( $text ), $template->content );
-		}
-
+		$template_blocks          = parse_blocks( $template->content );
+		$localized_blocks         = CBT_Theme_Locale::escape_text_content_of_blocks( $template_blocks );
+		$updated_template_content = serialize_blocks( $localized_blocks );
+		$template->content        = $updated_template_content;
 		return $template;
-	}
-
-	private static function get_text_to_localize_from_block( $block ) {
-
-		$text_to_localize = array();
-
-		// Text Blocks (paragraphs and headings)
-		if ( in_array( $block['blockName'], array( 'core/paragraph', 'core/heading', 'core/list-item', 'core/verse' ), true ) ) {
-			$markup = $block['innerContent'][0];
-			// remove the tags from the beginning and end of the markup
-			$markup             = substr( $markup, strpos( $markup, '>' ) + 1 );
-			$markup             = substr( $markup, 0, strrpos( $markup, '<' ) );
-			$text_to_localize[] = $markup;
-		}
-
-		// Quote Blocks
-		if ( in_array( $block['blockName'], array( 'core/quote', 'core/pullquote' ), true ) ) {
-			$markup = serialize_blocks( array( $block ) );
-			// Grab paragraph tag content
-			if ( preg_match( '/<p[^>]*>(.*?)<\/p>/', $markup, $matches ) ) {
-				$text_to_localize[] = $matches[1];
-			}
-			// Grab cite tag content
-			if ( preg_match( '/<cite[^>]*>(.*?)<\/cite>/', $markup, $matches ) ) {
-				$text_to_localize[] = $matches[1];
-			}
-		}
-
-		// Button Blocks
-		if ( in_array( $block['blockName'], array( 'core/button' ), true ) ) {
-			$markup = $block['innerContent'][0];
-			if ( preg_match( '/<a[^>]*>(.*?)<\/a>/', $markup, $matches ) ) {
-				$text_to_localize[] = $matches[1];
-			}
-		}
-
-		// Alt text in Image and Cover Blocks
-		if ( in_array( $block['blockName'], array( 'core/image', 'core/cover', 'core/media-text' ), true ) ) {
-			$markup = $block['innerContent'][0];
-			if ( preg_match( '/alt="(.*?)"/', $markup, $matches ) ) {
-				$text_to_localize[] = $matches[1];
-			}
-			if ( array_key_exists( 'alt', $block['attrs'] ) ) {
-				$text_to_localize[] = $block['attrs']['alt'];
-			}
-		}
-
-		// Table Blocks
-		if ( in_array( $block['blockName'], array( 'core/table' ), true ) ) {
-			$markup = serialize_blocks( array( $block ) );
-			// Grab table cell content
-			if ( preg_match_all( '/<td[^>]*>(.*?)<\/td>/', $markup, $matches ) ) {
-				$text_to_localize = array_merge( $text_to_localize, $matches[1] );
-			}
-			// Grab table header content
-			if ( preg_match_all( '/<th[^>]*>(.*?)<\/th>/', $markup, $matches ) ) {
-				$text_to_localize = array_merge( $text_to_localize, $matches[1] );
-			}
-			// Grab the caption
-			if ( preg_match_all( '/<figcaption[^>]*>(.*?)<\/figcaption>/', $markup, $matches ) ) {
-				$text_to_localize = array_merge( $text_to_localize, $matches[1] );
-			}
-		}
-
-		// process inner blocks
-		if ( ! empty( $block['innerBlocks'] ) ) {
-			foreach ( $block['innerBlocks'] as $inner_block ) {
-				$text_to_localize = array_merge( $text_to_localize, self::get_text_to_localize_from_block( $inner_block ) );
-			}
-		}
-
-		return $text_to_localize;
-	}
-
-	public static function escape_text( $text ) {
-		if ( ! $text ) {
-			return $text;
-		}
-		$text = addcslashes( $text, "'" );
-		return "<?php echo __('" . $text . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
 	private static function eliminate_environment_specific_content_from_block( $block, $options = null ) {

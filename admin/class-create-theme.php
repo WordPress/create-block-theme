@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/resolver_additions.php';
+require_once __DIR__ . '/create-theme/theme-locale.php';
 require_once __DIR__ . '/create-theme/theme-tags.php';
 require_once __DIR__ . '/create-theme/theme-zip.php';
 require_once __DIR__ . '/create-theme/theme-media.php';
