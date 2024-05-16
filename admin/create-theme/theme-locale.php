@@ -29,9 +29,9 @@ class CBT_Theme_Locale {
 	 * Get a replacement pattern for escaping the text from the html content of a block.
 	 *
 	 * @param string $block_name The block name.
-	 * @return string|array|null The regex pattern to match the content that needs to be escaped.
+	 * @return array|null The regex patterns to match the content that needs to be escaped.
 	 *      Returns null if the block is not supported.
-	 *      Returns an array if the block has multiple html elements that need to be escaped.
+	 *      Returns an array of regex patterns if the block has html elements that need to be escaped.
 	 */
 	private static function get_text_replacement_patterns_for_html( $block_name ) {
 		switch ( $block_name ) {
