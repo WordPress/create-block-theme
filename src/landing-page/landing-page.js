@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	// eslint-disable-next-line
@@ -9,9 +10,23 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
+import {
+	CreateThemeModal
+} from './create-modal';
+
 export default function LandingPage() {
+
+	const [ createModalType, setCreateModalType ] = useState( false );
+
 	return (
+
 		<VStack alignment="center">
+			{ createModalType && (
+				<CreateThemeModal
+					creationType={ createModalType }
+					onRequestClose={ () => setCreateModalType( false ) }
+				/>
+			) }
 			<img src="/wp-content/plugins/create-block-theme/.wordpress-org/banner-772x250.png" alt="Create Block Theme Logo" />
 
 			<VStack alignment="left" style={{ maxWidth: "700px"}}>
@@ -32,17 +47,17 @@ export default function LandingPage() {
 			</HStack>
 
 			<HStack alignment="left">
-				<Button variant="secondary">Create a new Blank Theme</Button>
+				<Button variant="secondary" onClick={()=>setCreateModalType('blank')}>Create a new Blank Theme</Button>
 				<p>Start from scratch!  Create a blank theme to get started with your own design ideas.</p>
 			</HStack>
 
 			<HStack alignment="left">
-				<Button variant="secondary">Create a Clone of This Theme</Button><br/>
+				<Button variant="secondary" onClick={()=>setCreateModalType('clone')}>Create a Clone of This Theme</Button><br/>
 				<p>Use the currently activated theme as a starting point.</p>
 			</HStack>
 
 			<HStack alignment="left">
-				<Button variant="secondary">Create a Child of This Theme</Button>
+				<Button variant="secondary" onClick={()=>setCreateModalType('child')}>Create a Child of This Theme</Button>
 				<p>Make a theme that uses the currently activated theme as a parent.</p>
 			</HStack>
 
@@ -52,7 +67,7 @@ export default function LandingPage() {
 				Found a bug? <a href="https://github.com/WordPress/create-block-theme/issues/new">Report it on GitHub</a>.<br/>
 				Want to contribute? Check out the <a href="https://github.com/WordPress/create-block-theme">project on GitHub</a>.<br/>
 			</p>
-			<p>
+			<div>
 				<strong>Yes, but how do I...?</strong><br/>
 				<details>
 					<summary>How do I save the changes I made in the Site Editor to my Theme?</summary>
@@ -67,7 +82,7 @@ export default function LandingPage() {
 					You have to follow the law of equivalent exchange.  For more information please ask the Elric brothers.
 					</p>
 				</details>
-			</p>
+			</div>
 			</VStack>
 		</VStack>
 	);
