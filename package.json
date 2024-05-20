@@ -56,7 +56,7 @@
 		"test:php:watch": "wp-env run cli --env-cwd='wp-content/plugins/create-block-theme' composer run-script test:watch",
 		"test:php:setup": "wp-env start",
 		"packages-update": "wp-scripts packages-update",
-		"start": "wp-scripts start src/plugin-sidebar.js src/wp-org-theme-directory.js",
+		"start": "wp-scripts start src/admin-landing-page.js src/plugin-sidebar.js",
 		"composer": "wp-env run cli --env-cwd=wp-content/plugins/create-block-theme composer",
 		"update-version": "node update-version-and-changelog.js",
 		"prepare": "husky install",

@@ -7,9 +7,10 @@ import { render, createRoot } from '@wordpress/element';
  * Internal dependencies
  */
 import './index.scss';
+import LandingPage from './landing-page/landing-page';
 
 function App() {
-	return <>Landing Page Goes Here.</>;
+	return <LandingPage />;
 }
 
 window.addEventListener(
