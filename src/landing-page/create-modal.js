@@ -125,8 +125,10 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 
 				<Spacer />
 				<Text variant="muted">
-					(Tip: You can edit all of this and more in the Editor
-					later.)
+					{ __(
+						'(Tip: You can edit all of this and more in the Editor later.)',
+						'create-block-theme'
+					) }
 				</Text>
 				<Spacer />
 				<TextareaControl
@@ -158,7 +160,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 						disabled={ ! theme.name }
 						onClick={ () => createBlockTheme() }
 					>
-						Create Block Theme
+						{ __( 'Create Block Theme', 'create-block-theme' ) }
 					</Button>
 				</HStack>
 			</VStack>

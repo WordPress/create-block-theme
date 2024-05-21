@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -147,21 +147,46 @@ export default function LandingPage() {
 						{ __( 'Do you need some help?', 'create-block-theme' ) }
 					</h4>
 					<p>
-						Have a question? Ask for some help in the{ ' ' }
-						<a href="https://wordpress.org/support/plugin/create-block-theme/">
-							forums
-						</a>
-						.<br />
-						Found a bug?{ ' ' }
-						<a href="https://github.com/WordPress/create-block-theme/issues/new">
-							Report it on GitHub
-						</a>
-						.<br />
-						Want to contribute? Check out the{ ' ' }
-						<a href="https://github.com/WordPress/create-block-theme">
-							project on GitHub
-						</a>
-						.<br />
+						{ createInterpolateElement(
+							__(
+								'Have a question? Ask for some help in the <a>forums</a>.',
+								'create-block-theme'
+							),
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="https://wordpress.org/support/plugin/create-block-theme/" />
+								),
+							}
+						) }
+					</p>
+					<p>
+						{ createInterpolateElement(
+							__(
+								'Found a bug? Report it on <a>GitHub</a>.',
+								'create-block-theme'
+							),
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="https://github.com/WordPress/create-block-theme/issues/new" />
+								),
+							}
+						) }
+					</p>
+					<p>
+						{ createInterpolateElement(
+							__(
+								'Want to contribute? Check out the <a>project on GitHub</a>',
+								'create-block-theme'
+							),
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="https://github.com/WordPress/create-block-theme" />
+								),
+							}
+						) }
 					</p>
 					<div className="cbt-lp-faq">
 						<h4>{ __( "FAQ's", 'create-block-theme' ) }</h4>
