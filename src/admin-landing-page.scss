@@ -1,25 +1,53 @@
 @import "../node_modules/@wordpress/base-styles/mixins";
 @include wordpress-admin-schemes();
 
-.create-block-theme.landing-page{
-	.cbt-lp-body{
+.create-block-theme.landing-page {
+	background-color: #fff;
+	margin-left: -20px;
+	a,
+	button {
+		color: #3858e9;
+	}
+	.cbt-lp-header {
+		width: 100%;
+		background-color: #2d59f2;
+	}
+	.cbt-lp-body {
 		font-weight: 200;
 		padding-top: 40px;
-		p{
+		padding-bottom: 40px;
+		p {
 			margin-top: 0;
 		}
-		h1,h2,h3,h4,h5,h6{
-			margin-bottom: .3em;
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			margin-bottom: 0.3em;
 		}
-		.cbt-lp-left-column{
+		.cbt-lp-left-column {
 			max-width: 620px;
-			padding: 0 40px;
+			padding: 0 60px;
 			button {
 				font-size: 22px;
 			}
 		}
-		.cbt-lp-right-column{
- 			width: 330px;
+		.cbt-lp-right-column {
+			width: 330px;
+		}
+		.cbt-lp-faq {
+			img {
+				max-width: 100%;
+			}
+			p {
+				padding: 10px;
+				font-style: italic;
+			}
+			details {
+				padding-bottom: 20px;
+			}
 		}
 	}
 }

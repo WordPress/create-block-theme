@@ -41,14 +41,7 @@ export default function LandingPage() {
 				/>
 			) }
 
-			<div
-				style={ {
-					width: '100%',
-					backgroundColor: '#2D59F2',
-					marginLeft: '-20px',
-					paddingRight: '20px',
-				} }
-			>
+			<div className="cbt-lp-header">
 				<img
 					src="/wp-content/plugins/create-block-theme/assets/header_logo.png"
 					alt="Create Block Theme Logo"
@@ -170,27 +163,61 @@ export default function LandingPage() {
 						</a>
 						.<br />
 					</p>
-					<div>
+					<div className="cbt-lp-faq">
 						<h4>{ __( "FAQ's", 'create-block-theme' ) }</h4>
 						<details>
 							<summary>
-								How do I save the changes I made in the Site
-								Editor to my Theme?
+								{ __(
+									'How do I access the features of Create Block Theme from within the editor?',
+									'create-block-theme'
+								) }
 							</summary>
 							<p>
-								You click the Save button in the Site Editor.
-								Seriously, we will put some more instructions. I
-								am just typing stuff to have stuff typed here
-								right now.
+								{ __(
+									'There is a new panel accessible from the WordPress Editor which you can open by clicking on a new icon to the right of the “Save” button, at the top of the Editor.',
+									'create-block-theme'
+								) }
 							</p>
+							<img
+								src="/wp-content/plugins/create-block-theme/assets/faq_icon.png"
+								alt="A screenshot of the Create Block Theme icon in the editor"
+							/>
 						</details>
 						<details>
-							<summary>How do I convert lead into gold?</summary>
+							<summary>
+								{ __(
+									'How do I save the customizations I made with the Editor to the Theme?',
+									'create-block-theme'
+								) }
+							</summary>
 							<p>
-								You have to follow the law of equivalent
-								exchange. For more information please ask the
-								Elric brothers.
+								{ __(
+									'In the Create Block Theme Panel click "Save Changes to Theme". You will be presented with a number of options of which things you want to be saved to your theme. Make your choices and then click "Save Changes".',
+									'create-block-theme'
+								) }
 							</p>
+							<img
+								src="/wp-content/plugins/create-block-theme/assets/faq_save.png"
+								alt="A screenshot of the Create Block Theme save changes panel"
+							/>
+						</details>
+						<details>
+							<summary>
+								{ __(
+									'How do I install and remove fonts?',
+									'create-block-theme'
+								) }
+							</summary>
+							<p>
+								{ __(
+									'First Install and activate a font from any source using the WordPress Font Library. Then, using the Create Block Theme Panel select “Save Changes To Theme” and select “Save Fonts” before saving the theme. All of the active fonts will be activated in the theme and deactivated in the system (and may be safely deleted from the system). Any fonts that are installed in the theme that have been deactivated with the WordPress Font Library will be removed from the theme.',
+									'create-block-theme'
+								) }
+							</p>
+							<img
+								src="/wp-content/plugins/create-block-theme/assets/faq_fonts.png"
+								alt="A screenshot of the WordPress Font Library modal window"
+							/>
 						</details>
 					</div>
 				</VStack>
