@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	// eslint-disable-next-line
@@ -10,6 +11,9 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
 import { fetchThemeStyleData, downloadExportedTheme } from '../resolvers';
 import { downloadFile } from '../utils';
 import {
@@ -21,13 +25,9 @@ export default function LandingPage() {
 	const [ themeStyleData, setThemeStyleData ] = useState( '' );
 	const [ createModalType, setCreateModalType ] = useState(false);
 
-	const loadThemeStyleData = async () => {
+	useSelect( async () => {
 		setThemeStyleData( await fetchThemeStyleData() );
-	}
-
-	useEffect( () => {
-		loadThemeStyleData();
-	} );
+	}, [] );
 
 	const handleExportClick = async () => {
 		try {

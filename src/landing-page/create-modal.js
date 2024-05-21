@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	// eslint-disable-next-line
 	__experimentalHStack as HStack,
@@ -19,7 +18,16 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 
-export const CreateThemeModal = ( { onRequestClose, createModalType } ) => {
+/**
+ * Internal dependencies
+ */
+import { createBlankTheme, createClonedTheme, createChildTheme } from '../resolvers';
+
+
+
+export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
+
+	const [ errorMessage, setErrorMessage ] = useState( null );
 
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -28,16 +36,61 @@ export const CreateThemeModal = ( { onRequestClose, createModalType } ) => {
 	} );
 
 	const createBlockTheme = async () => {
-		if ( createModalType === 'blank' ) {
-			// Do something with the theme data
+		let constructionFunction = null;
+		switch ( creationType ) {
+			case 'blank':
+				constructionFunction = createBlankTheme;
+				break;
+			case 'clone':
+				constructionFunction = createClonedTheme;
+				break;
+			case 'child':
+				constructionFunction = createChildTheme;
+				break;
 		}
-		else if ( createModalType === 'clone' ) {
-			// Do something with the theme data
+
+		if (!constructionFunction) {
+			return;
 		}
-		else if ( createModalType === 'child' ) {
-			// Do something with the theme data
-		}
-		onRequestClose();
+		constructionFunction( theme )
+			.then( () => {
+				// eslint-disable-next-line
+				alert(
+					__(
+						'Theme created successfully. The editor will now load.',
+						'create-block-theme'
+					)
+				);
+				window.location = '/wp-admin/site-editor.php?canvas=edit';
+			} )
+			.catch( ( error ) => {
+				const errorMessage =
+					error.message ||
+					__(
+						'An error occurred while attempting to create the theme.',
+						'create-block-theme'
+					);
+				setErrorMessage( errorMessage );
+			} );
+	}
+
+	if (errorMessage) {
+		return (
+			<Modal
+				title={ __('Create Block Theme', 'creat-block-theme') }
+				onRequestClose={ onRequestClose }
+			>
+				<p>
+					<Text>{errorMessage}</Text>
+				</p>
+				<br/>
+				<HStack>
+				<Button variant='primary' disabled={!theme.name} onClick={()=>onRequestClose()}>
+					Close
+				</Button>
+				</HStack>
+			</Modal>
+		);
 	}
 
 	return (

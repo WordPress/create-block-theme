@@ -28,6 +28,7 @@ import { addCard, copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import ScreenHeader from './screen-header';
+import { createBlankTheme, createClonedTheme, createChildTheme } from '../resolvers';
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -65,14 +66,7 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateBlankClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-blank',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createBlankTheme( theme )
 			.then( () => {
 				// eslint-disable-next-line
 				alert(
@@ -95,14 +89,7 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCloneClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/clone',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createClonedTheme( theme )
 			.then( () => {
 				// eslint-disable-next-line
 				alert(
@@ -125,14 +112,7 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateChildClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-child',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createChildTheme( theme )
 			.then( () => {
 				// eslint-disable-next-line
 				alert(
