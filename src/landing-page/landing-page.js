@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
 	// eslint-disable-next-line
@@ -10,13 +10,24 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
+import { fetchThemeStyleData } from '../resolvers';
+
 import {
 	CreateThemeModal
 } from './create-modal';
 
 export default function LandingPage() {
 
-	const [createModalType, setCreateModalType] = useState(false);
+	const [ themeStyleData, setThemeStyleData ] = useState( '' );
+	const [ createModalType, setCreateModalType ] = useState(false);
+
+	const loadThemeStyleData = async () => {
+		setThemeStyleData( await fetchThemeStyleData() );
+	}
+
+	useEffect( () => {
+		loadThemeStyleData();
+	} );
 
 	return (
 
@@ -38,16 +49,16 @@ export default function LandingPage() {
 					<h1>What would you like to do?</h1>
 					<p>You can do everything from within the Editor but here are a few things you can do to get started.</p>
 
-					<Button variant="link">Export this theme as a Zip File.</Button>
+					<Button variant="link">Export { themeStyleData?.name } as a Zip File.</Button>
 					<p>Export a zip file ready to be imported into another WordPress environment.</p>
 
 					<Button variant="link" onClick={() => setCreateModalType('blank')}>Create a new Blank Theme</Button>
 					<p>Start from scratch!  Create a blank theme to get started with your own design ideas.</p>
 
-					<Button variant="link" onClick={() => setCreateModalType('clone')}>Create a Clone of This Theme</Button>
+					<Button variant="link" onClick={() => setCreateModalType('clone')}>Create a Clone of { themeStyleData?.name }</Button>
 					<p>Use the currently activated theme as a starting point.</p>
 
-					<Button variant="link" onClick={() => setCreateModalType('child')}>Create a Child of This Theme</Button>
+					<Button variant="link" onClick={() => setCreateModalType('child')}>Create a Child of { themeStyleData?.name }</Button>
 					<p>Make a theme that uses the currently activated theme as a parent.</p>
 
 				</VStack>

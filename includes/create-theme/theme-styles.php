@@ -4,6 +4,47 @@ require_once( __DIR__ . '/theme-tags.php' );
 
 class CBT_Theme_Styles {
 
+	public static function get_style_data() {
+
+		$theme_data = array();
+
+		$style_css = file_get_contents( get_stylesheet_directory() . '/style.css' );
+
+		$current_theme_data = wp_get_theme();
+
+		$additional_data = get_file_data(
+			path_join( get_stylesheet_directory(), 'style.css' ),
+			array(
+				'License'    => 'License',
+				'LicenseURI' => 'License URI',
+			)
+		);
+
+		$css_contents = trim( substr( $style_css, strpos( $style_css, '*/' ) + 2 ) );
+		$copyright    = '';
+		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
+		if ( isset( $matches[1] ) ) {
+			$copyright = "\n" . $matches[1];
+		}
+
+		$theme_data['name']         = $current_theme_data->get( 'Name' );
+		$theme_data['description']  = $current_theme_data->get( 'Description' );
+		$theme_data['author']       = $current_theme_data->get( 'Author' );
+		$theme_data['author_uri']   = $current_theme_data->get( 'AuthorURI' );
+		$theme_data['version']      = $current_theme_data->get( 'Version' );
+		$theme_data['requires_wp']  = $current_theme_data->get( 'RequiresWP' );
+		$theme_data['requires_php'] = $current_theme_data->get( 'RequiresPHP' );
+		$theme_data['text-domain']  = $current_theme_data->get( 'TextDomain' );
+		$theme_data['template']     = $current_theme_data->get( 'Template' );
+		$theme_data['tags']         = CBT_Theme_Tags::theme_tags_list( $current_theme_data );
+		$theme_data['license']      = $additional_data['License'];
+		$theme_data['license_uri']  = $additional_data['LicenseURI'];
+		$theme_data['css_contents'] = $css_contents ? "\n\n" . $css_contents : '';
+		$theme_data['copyright']    = $copyright;
+
+		return $theme_data;
+	}
+
 	/**
 	 * Update a style CSS file with given values
 	 */

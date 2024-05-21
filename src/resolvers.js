@@ -29,6 +29,30 @@ export async function fetchThemeJson() {
 	}
 }
 
+export async function fetchThemeStyleData() {
+	const fetchOptions = {
+		path: '/create-block-theme/v1/get-style-data',
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	};
+
+	try {
+		const response = await apiFetch( fetchOptions );
+		if ( ! response?.data || 'SUCCESS' !== response?.status ) {
+			throw new Error(
+				`Failed to fetch style data: ${
+					response?.message || response?.status
+				}`
+			);
+		}
+		return response?.data;
+	} catch ( e ) {
+		// @todo: handle error
+	}
+}
+
 export async function fetchReadmeData() {
 	const fetchOptions = {
 		path: '/create-block-theme/v1/get-readme-data',
