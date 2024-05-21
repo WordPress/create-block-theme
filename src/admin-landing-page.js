@@ -6,7 +6,7 @@ import { render, createRoot } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './index.scss';
+import './admin-landing-page.scss';
 import LandingPage from './landing-page/landing-page';
 
 function App() {
