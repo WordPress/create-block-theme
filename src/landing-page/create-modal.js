@@ -21,12 +21,13 @@ import {
 /**
  * Internal dependencies
  */
-import { createBlankTheme, createClonedTheme, createChildTheme } from '../resolvers';
-
-
+import {
+	createBlankTheme,
+	createClonedTheme,
+	createChildTheme,
+} from '../resolvers';
 
 export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
-
 	const [ errorMessage, setErrorMessage ] = useState( null );
 
 	const [ theme, setTheme ] = useState( {
@@ -49,7 +50,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 				break;
 		}
 
-		if (!constructionFunction) {
+		if ( ! constructionFunction ) {
 			return;
 		}
 		constructionFunction( theme )
@@ -64,30 +65,34 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 				window.location = '/wp-admin/site-editor.php?canvas=edit';
 			} )
 			.catch( ( error ) => {
-				const errorMessage =
+				setErrorMessage(
 					error.message ||
-					__(
-						'An error occurred while attempting to create the theme.',
-						'create-block-theme'
-					);
-				setErrorMessage( errorMessage );
+						__(
+							'An error occurred while attempting to create the theme.',
+							'create-block-theme'
+						)
+				);
 			} );
-	}
+	};
 
-	if (errorMessage) {
+	if ( errorMessage ) {
 		return (
 			<Modal
-				title={ __('Create Block Theme', 'creat-block-theme') }
+				title={ __( 'Create Block Theme', 'create-block-theme' ) }
 				onRequestClose={ onRequestClose }
 			>
 				<p>
-					<Text>{errorMessage}</Text>
+					<Text>{ errorMessage }</Text>
 				</p>
-				<br/>
+				<br />
 				<HStack>
-				<Button variant='primary' disabled={!theme.name} onClick={()=>onRequestClose()}>
-					Close
-				</Button>
+					<Button
+						variant="primary"
+						disabled={ ! theme.name }
+						onClick={ () => onRequestClose() }
+					>
+						Close
+					</Button>
 				</HStack>
 			</Modal>
 		);
@@ -95,61 +100,66 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 
 	return (
 		<Modal
-			title={ __('Create Block Theme', 'creat-block-theme') }
+			title={ __( 'Create Block Theme', 'create-block-theme' ) }
 			onRequestClose={ onRequestClose }
 		>
 			<VStack>
 				<Text>
 					{ __(
-						'Let\'s get started creating a new Block Theme.',
+						"Let's get started creating a new Block Theme.",
 						'create-block-theme'
 					) }
 				</Text>
 				<Spacer />
 				<TextControl
-					label={ __( 'Theme name (required)', 'create-block-theme' ) }
+					label={ __(
+						'Theme name (required)',
+						'create-block-theme'
+					) }
 					value={ theme.name }
-					required={ true }
+					required
 					onChange={ ( value ) =>
 						setTheme( { ...theme, name: value } )
 					}
 				/>
 
-					<Spacer />
-					<Text variant="muted">
-					(Tip: You can edit all of this and more in the Editor later.)
-					</Text>
-					<Spacer />
-					<TextareaControl
-						label={ __(
-							'Theme description',
-							'create-block-theme'
-						) }
-						value={ theme.description }
-						onChange={ ( value ) =>
-							setTheme( { ...theme, description: value } )
-						}
-						placeholder={ __(
-							'A short description of the theme',
-							'create-block-theme'
-						) }
-					/>
-					<TextControl
-						label={ __( 'Author', 'create-block-theme' ) }
-						value={ theme.author }
-						onChange={ ( value ) =>
-							setTheme( { ...theme, author: value } )
-						}
-						placeholder={ __(
-							'the WordPress team',
-							'create-block-theme'
-						) }
-					/>
+				<Spacer />
+				<Text variant="muted">
+					(Tip: You can edit all of this and more in the Editor
+					later.)
+				</Text>
+				<Spacer />
+				<TextareaControl
+					label={ __( 'Theme description', 'create-block-theme' ) }
+					value={ theme.description }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, description: value } )
+					}
+					placeholder={ __(
+						'A short description of the theme',
+						'create-block-theme'
+					) }
+				/>
+				<TextControl
+					label={ __( 'Author', 'create-block-theme' ) }
+					value={ theme.author }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, author: value } )
+					}
+					placeholder={ __(
+						'the WordPress team',
+						'create-block-theme'
+					) }
+				/>
 				<br />
 				<HStack>
-				<Button variant='primary' disabled={!theme.name} onClick={()=>createBlockTheme()}>
-					Create Block Theme
-				</Button>
+					<Button
+						variant="primary"
+						disabled={ ! theme.name }
+						onClick={ () => createBlockTheme() }
+					>
+						Create Block Theme
+					</Button>
 				</HStack>
 			</VStack>
 		</Modal>

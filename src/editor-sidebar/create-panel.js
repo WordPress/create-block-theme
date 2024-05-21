@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line
@@ -28,7 +27,11 @@ import { addCard, copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import ScreenHeader from './screen-header';
-import { createBlankTheme, createClonedTheme, createChildTheme } from '../resolvers';
+import {
+	createBlankTheme,
+	createClonedTheme,
+	createChildTheme,
+} from '../resolvers';
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
