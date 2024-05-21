@@ -177,7 +177,7 @@ export default function LandingPage() {
 					<p>
 						{ createInterpolateElement(
 							__(
-								'Want to contribute? Check out the <a>project on GitHub</a>',
+								'Want to contribute? Check out the <a>project on GitHub</a>.',
 								'create-block-theme'
 							),
 							{
