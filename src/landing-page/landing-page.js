@@ -44,7 +44,7 @@ export default function LandingPage() {
 					<Button variant="link" onClick={() => setCreateModalType('blank')}>Create a new Blank Theme</Button>
 					<p>Start from scratch!  Create a blank theme to get started with your own design ideas.</p>
 
-					<Button variant="link" onClick={() => setCreateModalType('clone')}>Create a Clone of This Theme</Button><br />
+					<Button variant="link" onClick={() => setCreateModalType('clone')}>Create a Clone of This Theme</Button>
 					<p>Use the currently activated theme as a starting point.</p>
 
 					<Button variant="link" onClick={() => setCreateModalType('child')}>Create a Child of This Theme</Button>
