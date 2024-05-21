@@ -43,7 +43,7 @@ export default function LandingPage() {
 
 			<div className="cbt-lp-header">
 				<img
-					src="/wp-content/plugins/create-block-theme/assets/header_logo.png"
+					src="/wp-content/plugins/create-block-theme/assets/header_logo.webp"
 					alt="Create Block Theme Logo"
 				/>
 			</div>
@@ -179,7 +179,7 @@ export default function LandingPage() {
 								) }
 							</p>
 							<img
-								src="/wp-content/plugins/create-block-theme/assets/faq_icon.png"
+								src="/wp-content/plugins/create-block-theme/assets/faq_icon.webp"
 								alt="A screenshot of the Create Block Theme icon in the editor"
 							/>
 						</details>
@@ -197,7 +197,7 @@ export default function LandingPage() {
 								) }
 							</p>
 							<img
-								src="/wp-content/plugins/create-block-theme/assets/faq_save.png"
+								src="/wp-content/plugins/create-block-theme/assets/faq_save.webp"
 								alt="A screenshot of the Create Block Theme save changes panel"
 							/>
 						</details>
@@ -215,7 +215,7 @@ export default function LandingPage() {
 								) }
 							</p>
 							<img
-								src="/wp-content/plugins/create-block-theme/assets/faq_fonts.png"
+								src="/wp-content/plugins/create-block-theme/assets/faq_fonts.webp"
 								alt="A screenshot of the WordPress Font Library modal window"
 							/>
 						</details>
