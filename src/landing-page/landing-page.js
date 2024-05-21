@@ -10,8 +10,8 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
-import { fetchThemeStyleData } from '../resolvers';
-
+import { fetchThemeStyleData, downloadExportedTheme } from '../resolvers';
+import { downloadFile } from '../utils';
 import {
 	CreateThemeModal
 } from './create-modal';
@@ -28,6 +28,23 @@ export default function LandingPage() {
 	useEffect( () => {
 		loadThemeStyleData();
 	} );
+
+	const handleExportClick = async () => {
+		try {
+			const response = await downloadExportedTheme();
+			downloadFile( response );
+		} catch ( errorResponse ) {
+			const error = await errorResponse.json();
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __(
+							'An error occurred while attempting to export the theme.',
+							'create-block-theme'
+					  );
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
+	};
 
 	return (
 
@@ -49,7 +66,7 @@ export default function LandingPage() {
 					<h1>What would you like to do?</h1>
 					<p>You can do everything from within the Editor but here are a few things you can do to get started.</p>
 
-					<Button variant="link">Export { themeStyleData?.name } as a Zip File.</Button>
+					<Button variant="link" onClick={() => handleExportClick() }>Export { themeStyleData?.name } as a Zip File.</Button>
 					<p>Export a zip file ready to be imported into another WordPress environment.</p>
 
 					<Button variant="link" onClick={() => setCreateModalType('blank')}>Create a new Blank Theme</Button>
