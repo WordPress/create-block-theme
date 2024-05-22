@@ -7,7 +7,7 @@
  * @subpackage Create_Block_Theme/includes
  * @author     WordPress.org
  */
-class Create_Block_Theme_Editor_Tools {
+class CBT_Editor_Tools {
 
 	public function __construct() {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_sidebar_enqueue' ) );
