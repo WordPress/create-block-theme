@@ -6,6 +6,7 @@ import { useState, createInterpolateElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
+	ExternalLink,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
@@ -171,8 +172,7 @@ export default function LandingPage() {
 							),
 							{
 								a: (
-									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="https://wordpress.org/support/plugin/create-block-theme/" />
+									<ExternalLink href="https://wordpress.org/support/plugin/create-block-theme/" />
 								),
 							}
 						) }
@@ -185,8 +185,7 @@ export default function LandingPage() {
 							),
 							{
 								a: (
-									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="https://github.com/WordPress/create-block-theme/issues/new" />
+									<ExternalLink href="https://github.com/WordPress/create-block-theme/issues/new" />
 								),
 							}
 						) }
@@ -199,8 +198,7 @@ export default function LandingPage() {
 							),
 							{
 								a: (
-									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="https://github.com/WordPress/create-block-theme" />
+									<ExternalLink href="https://github.com/WordPress/create-block-theme" />
 								),
 							}
 						) }
