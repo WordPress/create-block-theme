@@ -54,9 +54,8 @@ class CBT_WP_Admin {
 		wp_enqueue_style(
 			'create-block-theme-styles',
 			plugins_url( 'build/plugin-sidebar.css', dirname( __FILE__ ) ),
-			false,
-			$asset_file['version'],
-			'all'
+			array(),
+			$asset_file['version']
 		);
 		wp_enqueue_script(
 			'create-block-theme-slot-fill',
