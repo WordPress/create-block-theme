@@ -60,7 +60,6 @@ class CBT_WP_Admin {
 		);
 		wp_enqueue_script(
 			'create-block-theme-slot-fill',
-			'create-block-theme-styles'
 		);
 
 		// Enable localization in the plugin sidebar.

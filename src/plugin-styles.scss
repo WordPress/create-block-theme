@@ -3,7 +3,6 @@ $modal-footer-height: 70px;
 
 .#{$plugin-prefix} {
 	&__metadata-editor-modal {
-		width: 65vw !important;
 		padding-bottom: $modal-footer-height;
 
 		&__footer {
@@ -22,9 +21,5 @@ $modal-footer-height: 70px;
 			aspect-ratio: 4 / 3;
 			object-fit: cover;
 		}
-	}
-
-	&__theme-json-modal {
-		width: 65vw !important;
 	}
 }

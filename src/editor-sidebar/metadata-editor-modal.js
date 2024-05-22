@@ -108,7 +108,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 
 	return (
 		<Modal
-			isFullScreen
+			size="large"
 			title={ sprintf(
 				// translators: %s: theme name.
 				__( 'Metadata for %s', 'create-block-theme' ),
