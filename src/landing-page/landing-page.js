@@ -234,7 +234,10 @@ export default function LandingPage() {
 							</p>
 							<img
 								src="/wp-content/plugins/create-block-theme/assets/faq_save.webp"
-								alt="A screenshot of the Create Block Theme save changes panel"
+								alt={ __(
+									'A screenshot of the Create Block Theme save changes panel',
+									'create-block-theme'
+								) }
 							/>
 						</details>
 						<details>
