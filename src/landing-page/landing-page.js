@@ -6,9 +6,9 @@ import { useState, createInterpolateElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
