@@ -55,6 +55,7 @@ class CBT_Theme_Readme {
 		$license_uri          = $theme['license_uri'] ?? 'http://www.gnu.org/licenses/gpl-2.0.html';
 		$image_credits        = $theme['image_credits'] ?? '';
 		$recommended_plugins  = $theme['recommended_plugins'] ?? '';
+		$font_credits         = $theme['font_credits'] ?? '';
 		$is_child_theme       = $theme['is_child_theme'] ?? false;
 
 		// Generates the copyright section text.
@@ -86,6 +87,9 @@ License URI: {$license_uri}
 
 		// Adds the recommended plugins section
 		$readme_content = self::add_or_update_section( 'Recommended Plugins', $recommended_plugins, $readme_content );
+
+		// Adds the font credits section
+		$readme_content = self::add_or_update_section( 'Fonts', $font_credits, $readme_content );
 
 		// Adds the Copyright section
 		$readme_content = self::add_or_update_section( 'Copyright', $copyright_section_content, $readme_content );
@@ -193,6 +197,7 @@ GNU General Public License for more details.
 	 *   @type string $author The theme author.
 	 *   @type string $image_credits The image credits.
 	 *   @type string $recommended_plugins The recommended plugins.
+	 *   @type string $font_credits The font credits.
 	 * }
 	 * @param string $readme_content readme.txt content.
 	 * @return string
@@ -204,6 +209,7 @@ GNU General Public License for more details.
 		$wp_version          = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
+		$font_credits        = $theme['font_credits'] ?? '';
 
 		// Update description.
 		$readme_content = self::add_or_update_section( 'Description', $description, $readme_content );
@@ -216,6 +222,9 @@ GNU General Public License for more details.
 
 		// Update recommended plugins section.
 		$readme_content = self::add_or_update_section( 'Recommended Plugins', $recommended_plugins, $readme_content );
+
+		// Update font credits section.
+		$readme_content = self::add_or_update_section( 'Fonts', $font_credits, $readme_content );
 
 		// Update image credits section.
 		$readme_content = self::add_or_update_section( 'Images', $image_credits, $readme_content );
