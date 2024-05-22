@@ -47,19 +47,25 @@ class CBT_Theme_Fonts {
 				continue;
 			}
 			foreach ( $font_family['fontFace'] as &$font_face ) {
-				$font_filename = basename( $font_face['src'] );
-				$font_dir      = wp_get_font_dir();
-				if ( str_contains( $font_face['src'], $font_dir['url'] ) ) {
-					// If the file is hosted on this server then copy it to the theme
-					copy( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_filename );
-				} else {
-					// otherwise download it from wherever it is hosted
-					$tmp_file = download_url( $font_face['src'] );
-					copy( $tmp_file, $theme_font_asset_location . $font_filename );
-					unlink( $tmp_file );
+				// src can be a string or an array
+				// if it is a string, cast it to an array
+				if ( ! is_array( $font_face['src'] ) ) {
+					$font_face['src'] = array( $font_face['src'] );
 				}
-
-				$font_face['src'] = 'file:./assets/fonts/' . $font_filename;
+				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+					$font_filename = basename( $font_src );
+					$font_dir      = wp_get_font_dir();
+					if ( str_contains( $font_src, $font_dir['url'] ) ) {
+						// If the file is hosted on this server then copy it to the theme
+						copy( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_filename );
+					} else {
+						// otherwise download it from wherever it is hosted
+						$tmp_file = download_url( $font_src );
+						copy( $tmp_file, $theme_font_asset_location . $font_filename );
+						unlink( $tmp_file );
+					}
+					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . $font_filename;
+				}
 			}
 		}
 
@@ -114,9 +120,16 @@ class CBT_Theme_Fonts {
 		foreach ( $font_families_to_remove as $font_family ) {
 			if ( isset( $font_family['fontFace'] ) ) {
 				foreach ( $font_family['fontFace'] as $font_face ) {
-					$font_filename = basename( $font_face['src'] );
-					if ( file_exists( $theme_font_asset_location . $font_filename ) ) {
-						unlink( $theme_font_asset_location . $font_filename );
+					// src can be a string or an array
+					// if it is a string, cast it to an array
+					if ( ! is_array( $font_face['src'] ) ) {
+						$font_face['src'] = array( $font_face['src'] );
+					}
+					foreach ( $font_face['src'] as $font_src ) {
+						$font_filename = basename( $font_src );
+						if ( file_exists( $theme_font_asset_location . $font_filename ) ) {
+							unlink( $theme_font_asset_location . $font_filename );
+						}
 					}
 				}
 			}

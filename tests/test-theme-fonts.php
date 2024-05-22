@@ -52,7 +52,7 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertEquals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][1]['slug'] );
 
 		// Ensure that the URL was changed to a local file and that it was copied to where it should be
-		$this->assertEquals( 'file:./assets/fonts/open-sans-normal-400.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'] );
+		$this->assertEquals( 'file:./assets/fonts/open-sans-normal-400.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'][0] );
 		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' ) );
 
 		$this->uninstall_theme( $test_theme_slug );
@@ -103,10 +103,6 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 	private function save_theme() {
 		CBT_Theme_Fonts::persist_font_settings();
-		// CBT_Theme_Templates::add_templates_to_local( 'all' );
-		// CBT_Theme_JSON::add_theme_json_to_local( 'all' );
-		// CBT_Theme_Styles::clear_user_styles_customizations();
-		// CBT_Theme_Templates::clear_user_templates_customizations();
 	}
 
 	private function create_blank_theme() {
@@ -197,7 +193,10 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 					'fontFamily' => 'Open Sans',
 					'fontStyle'  => 'normal',
 					'fontWeight' => '400',
-					'src'        => 'file:./assets/fonts/open-sans-normal-400.ttf',
+					'src'        => array(
+						'file:./assets/fonts/open-sans-normal-400.ttf',
+						'file:./assets/fonts/open-sans-normal-400.ttf',
+					),
 				),
 			),
 		);
