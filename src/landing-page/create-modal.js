@@ -91,14 +91,13 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 			title={ __( 'Create Block Theme', 'create-block-theme' ) }
 			onRequestClose={ onRequestClose }
 		>
-			<VStack>
+			<VStack style={{gap:"20px"}}>
 				<Text>
 					{ __(
 						"Let's get started creating a new Block Theme.",
 						'create-block-theme'
 					) }
 				</Text>
-				<Spacer />
 				<TextControl
 					label={ __(
 						'Theme name (required)',
@@ -111,14 +110,12 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 					}
 				/>
 
-				<Spacer />
 				<Text variant="muted">
 					{ __(
 						'(Tip: You can edit all of this and more in the Editor later.)',
 						'create-block-theme'
 					) }
 				</Text>
-				<Spacer />
 				<TextareaControl
 					label={ __( 'Theme description', 'create-block-theme' ) }
 					value={ theme.description }
@@ -141,7 +138,6 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 						'create-block-theme'
 					) }
 				/>
-				<br />
 				<HStack>
 					<Button
 						variant="primary"
