@@ -20,8 +20,7 @@
 		}
 		&__body {
 			font-weight: 200;
-			padding-top: 40px;
-			padding-bottom: 40px;
+			padding: 40px 0;
 			p {
 				margin-top: 0;
 			}
@@ -31,6 +30,7 @@
 			h4,
 			h5,
 			h6 {
+				margin-top: 0.3em;
 				margin-bottom: 0.3em;
 			}
 			h2 {
@@ -39,16 +39,25 @@
 			h3 {
 				font-size: 1em;
 			}
+			@media screen and (max-width: 775px) {
+				flex-direction: column;
+				h2 {
+					font-size: 1.5em;
+				}
+			}
 			&__left-column {
 				flex: 1;
-				padding: 0 60px;
+				margin: 0 60px;
 				button {
-					font-size: 22px;
+					font-size: 1.75em;
+					@media screen and (max-width: 775px) {
+						font-size: 1.25em;
+					}
 				}
 			}
 			&__right-column {
-				width: 330px;
-				padding-right: 60px;
+				max-width: 330px;
+				margin: 0 60px;
 				p {
 					margin-bottom: 0;
 				}
