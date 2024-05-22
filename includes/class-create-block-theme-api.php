@@ -141,6 +141,18 @@ class CBT_Theme_API {
 				},
 			),
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/font-families',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'rest_get_font_families' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+				'permission_callback' => '__return_true',
+			),
+		);
 	}
 
 	function rest_get_theme_data( $request ) {
@@ -481,6 +493,33 @@ class CBT_Theme_API {
 		);
 	}
 
+	/**
+	 * Get a list of all the font families used in the theme.
+	 *
+	 * It includes the font families from the theme.json data (theme.json file + global styles) and the theme style variations.
+	 * The font families with font faces containing src urls relative to the theme folder are converted to absolute urls.
+	 */
+	function rest_get_font_families( $request ) {
+		$font_families = CBT_Theme_Fonts::get_all_fonts();
+
+		// Iterates through the font families and makes the urls absolute to use in the frontend code.
+		foreach ( $font_families as &$font_family ) {
+			if ( isset( $font_family['fontFace'] ) ) {
+				foreach ( $font_family['fontFace'] as &$font_face ) {
+					$font_face['src'] = CBT_Theme_Fonts::make_theme_font_src_absolute( $font_face['src'] );
+				}
+			}
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Font Families retrieved.', 'create-block-theme' ),
+				'data'    => $font_families,
+			)
+		);
+	}
+
 	private function sanitize_theme_data( $theme ) {
 		$sanitized_theme['name']                = sanitize_text_field( $theme['name'] );
 		$sanitized_theme['description']         = sanitize_text_field( $theme['description'] ?? '' );
@@ -492,6 +531,7 @@ class CBT_Theme_API {
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
+		$sanitized_theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] ?? '' );
 		$sanitized_theme['template']            = '';
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
