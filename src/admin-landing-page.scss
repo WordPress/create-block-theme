@@ -28,7 +28,7 @@
 			margin-bottom: 0.3em;
 		}
 		.cbt-lp-left-column {
-			max-width: 620px;
+			flex: 1;
 			padding: 0 60px;
 			button {
 				font-size: 22px;
@@ -36,7 +36,7 @@
 		}
 		.cbt-lp-right-column {
 			width: 330px;
-
+			padding-right: 60px;
 			p {
 				margin-bottom: 0;
 			}
