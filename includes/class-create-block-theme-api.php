@@ -150,7 +150,6 @@ class CBT_Theme_API {
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
-				'permission_callback' => '__return_true',
 			),
 		);
 	}
