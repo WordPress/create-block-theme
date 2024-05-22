@@ -81,19 +81,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 				title={ __( 'Create Block Theme', 'create-block-theme' ) }
 				onRequestClose={ onRequestClose }
 			>
-				<p>
-					<Text>{ errorMessage }</Text>
-				</p>
-				<br />
-				<HStack>
-					<Button
-						variant="primary"
-						disabled={ ! theme.name }
-						onClick={ () => onRequestClose() }
-					>
-						Close
-					</Button>
-				</HStack>
+				<p>{ errorMessage }</p>
 			</Modal>
 		);
 	}
