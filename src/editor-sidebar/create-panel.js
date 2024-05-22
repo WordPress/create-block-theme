@@ -71,8 +71,8 @@ export const CreateThemePanel = ( { createType } ) => {
 	const handleCreateBlankClick = () => {
 		createBlankTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme created successfully. The editor will now reload.',
 						'create-block-theme'
@@ -94,8 +94,8 @@ export const CreateThemePanel = ( { createType } ) => {
 	const handleCloneClick = () => {
 		createClonedTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme cloned successfully. The editor will now reload.',
 						'create-block-theme'
@@ -117,8 +117,8 @@ export const CreateThemePanel = ( { createType } ) => {
 	const handleCreateChildClick = () => {
 		createChildTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Child theme created successfully. The editor will now reload.',
 						'create-block-theme'

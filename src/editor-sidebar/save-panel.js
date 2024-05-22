@@ -65,8 +65,8 @@ export const SaveThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme saved successfully. The editor will now reload.',
 						'create-block-theme'
