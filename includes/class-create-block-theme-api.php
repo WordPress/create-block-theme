@@ -492,6 +492,7 @@ class CBT_Theme_API {
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
+		$sanitized_theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] ?? '' );
 		$sanitized_theme['template']            = '';
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
