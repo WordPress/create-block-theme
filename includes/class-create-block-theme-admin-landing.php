@@ -41,6 +41,15 @@ class CBT_Admin_Landing {
 		array_push( $asset_file['dependencies'], 'wp-i18n' );
 		wp_enqueue_script( 'create-block-theme-app', plugins_url( 'build/admin-landing-page.js', __DIR__ ), $asset_file['dependencies'], $asset_file['version'] );
 
+		wp_localize_script(
+			'create-block-theme-app',
+			'cbt_landingpage_variables',
+			array(
+				'assets_url' => plugins_url( 'create-block-theme/assets/' ),
+				'editor_url' => admin_url( 'site-editor.php?canvas=edit' ),
+			)
+		);
+
 		// Enable localization in the app.
 		wp_set_script_translations( 'create-block-theme-app', 'create-block-theme' );
 

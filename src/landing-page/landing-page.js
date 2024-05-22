@@ -44,7 +44,10 @@ export default function LandingPage() {
 
 			<div className="create-block-theme__landing-page__header">
 				<img
-					src="/wp-content/plugins/create-block-theme/assets/header_logo.webp"
+					src={
+						window.cbt_landingpage_variables.assets_url +
+						'header_logo.webp'
+					}
 					alt={ __(
 						'Create Block Theme Logo',
 						'create-block-theme'
@@ -75,7 +78,12 @@ export default function LandingPage() {
 							{
 								a: (
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="/wp-admin/site-editor.php?canvas=edit" />
+									<a
+										href={
+											window.cbt_landingpage_variables
+												.editor_url
+										}
+									/>
 								),
 							}
 						) }
@@ -219,7 +227,10 @@ export default function LandingPage() {
 								) }
 							</p>
 							<img
-								src="/wp-content/plugins/create-block-theme/assets/faq_icon.webp"
+								src={
+									window.cbt_landingpage_variables
+										.assets_url + 'faq_icon.webp'
+								}
 								alt={ __(
 									'A screenshot of the Create Block Theme icon in the editor',
 									'create-block-theme'
@@ -240,7 +251,10 @@ export default function LandingPage() {
 								) }
 							</p>
 							<img
-								src="/wp-content/plugins/create-block-theme/assets/faq_save.webp"
+								src={
+									window.cbt_landingpage_variables
+										.assets_url + 'faq_save.webp'
+								}
 								alt={ __(
 									'A screenshot of the Create Block Theme save changes panel',
 									'create-block-theme'
@@ -261,7 +275,10 @@ export default function LandingPage() {
 								) }
 							</p>
 							<img
-								src="/wp-content/plugins/create-block-theme/assets/faq_fonts.webp"
+								src={
+									window.cbt_landingpage_variables
+										.assets_url + 'faq_fonts.webp'
+								}
 								alt={ __(
 									'A screenshot of the WordPress Font Library modal window',
 									'create-block-theme'
