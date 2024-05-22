@@ -9,8 +9,6 @@ import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
 	Modal,
 	Button,
@@ -35,6 +33,20 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 		description: '',
 		author: '',
 	} );
+
+	const renderCreateButtonText = ( type ) => {
+		switch ( type ) {
+			case 'blank':
+				return __(
+					'Create and Activate Blank Theme',
+					'create-block-theme'
+				);
+			case 'clone':
+				return __( 'Clone Block Theme', 'create-block-theme' );
+			case 'child':
+				return __( 'Create Child Theme', 'create-block-theme' );
+		}
+	};
 
 	const createBlockTheme = async () => {
 		let constructionFunction = null;
@@ -91,7 +103,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 			title={ __( 'Create Block Theme', 'create-block-theme' ) }
 			onRequestClose={ onRequestClose }
 		>
-			<VStack style={{gap:"20px"}}>
+			<VStack style={ { gap: '20px' } }>
 				<Text>
 					{ __(
 						"Let's get started creating a new Block Theme.",
@@ -144,7 +156,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 						disabled={ ! theme.name }
 						onClick={ () => createBlockTheme() }
 					>
-						{ __( 'Create Block Theme', 'create-block-theme' ) }
+						{ renderCreateButtonText( creationType ) }
 					</Button>
 				</HStack>
 			</VStack>
