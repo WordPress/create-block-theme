@@ -135,6 +135,7 @@ class CBT_WP_Admin {
 		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
 		$theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] );
 		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] );
 		$theme['slug']                = $theme_slug;
 		$theme['template']            = wp_get_theme()->get( 'Template' );
 		$theme['text_domain']         = $theme_slug;
@@ -197,6 +198,7 @@ class CBT_WP_Admin {
 		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
 		$theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] );
 		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] );
 		$theme['slug']                = $theme_slug;
 		$theme['template']            = '';
 		$theme['text_domain']         = $theme_slug;
@@ -267,6 +269,7 @@ class CBT_WP_Admin {
 		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
 		$theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] );
 		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] );
 		$theme['is_child_theme']      = true;
 		$theme['text_domain']         = $child_theme_slug;
 		$theme['template']            = $parent_theme_slug;
@@ -345,6 +348,7 @@ class CBT_WP_Admin {
 		$theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] );
 		$theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] );
 		$theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] );
+		$theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] );
 		$theme['template']            = '';
 		$theme['slug']                = $theme_slug;
 		$theme['text_domain']         = $theme_slug;
