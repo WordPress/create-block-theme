@@ -10,10 +10,6 @@ import {
 	__experimentalVStack as VStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalHeading as Heading,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	PanelBody,
 	Button,
 	TextControl,

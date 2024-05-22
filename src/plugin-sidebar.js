@@ -19,13 +19,9 @@ import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalNavigatorButton as NavigatorButton,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalHeading as Heading,
 	Button,
 	Icon,
 	FlexItem,

@@ -5,8 +5,6 @@ import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalVStack as VStack,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHeading as Heading,
