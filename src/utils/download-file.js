@@ -4,7 +4,7 @@
  * @param {Response} response The response object from a fetch request.
  * @return {void}
  */
-export async function downloadFile( response ) {
+export default async function downloadFile( response ) {
 	const blob = await response.blob();
 	const filename = response.headers
 		.get( 'Content-Disposition' )
