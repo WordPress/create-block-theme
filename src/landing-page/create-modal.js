@@ -4,13 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
 	Modal,
 	Button,
