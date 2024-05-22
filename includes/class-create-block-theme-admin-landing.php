@@ -35,7 +35,7 @@ class CBT_Admin_Landing {
 		}
 
 		// Enqueue CSS of the app
-		wp_enqueue_style( 'create-block-theme-app', plugins_url( 'build/admin-landing-page.css', __DIR__ ), array(), $asset_file['version'] );
+		wp_enqueue_style( 'create-block-theme-app', plugins_url( 'build/admin-landing-page.css', __DIR__ ), array( 'wp-components' ), $asset_file['version'] );
 
 		// Load our app.js.
 		array_push( $asset_file['dependencies'], 'wp-i18n' );
