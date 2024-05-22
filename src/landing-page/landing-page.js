@@ -44,7 +44,10 @@ export default function LandingPage() {
 			<div className="cbt-lp-header">
 				<img
 					src="/wp-content/plugins/create-block-theme/assets/header_logo.webp"
-					alt="Create Block Theme Logo"
+					alt={ __(
+						'Create Block Theme Logo',
+						'create-block-theme'
+					) }
 				/>
 			</div>
 
