@@ -55,8 +55,8 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 		}
 		constructionFunction( theme )
 			.then( () => {
-				// eslint-disable-next-line no-undef, no-alert
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme created successfully. The editor will now load.',
 						'create-block-theme'
