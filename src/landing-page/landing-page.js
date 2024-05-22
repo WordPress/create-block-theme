@@ -189,7 +189,7 @@ export default function LandingPage() {
 						) }
 					</p>
 					<div className="cbt-lp-faq">
-						<h4>{ __( "FAQ", 'create-block-theme' ) }</h4>
+						<h4>{ __( 'FAQ', 'create-block-theme' ) }</h4>
 						<details>
 							<summary>
 								{ __(
