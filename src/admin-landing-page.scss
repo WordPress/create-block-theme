@@ -1,67 +1,70 @@
 @import "../node_modules/@wordpress/base-styles/mixins";
 @include wordpress-admin-schemes();
 
-.create-block-theme.landing-page {
-	background-color: #fff;
-	margin-left: -20px;
-	a,
-	button {
-		color: #3858e9;
-	}
-	.cbt-lp-header {
-		width: 100%;
-		background-color: #2d59f2;
 
-		img {
-			vertical-align: top;
+.create-block-theme {
+	&__landing-page {
+		background-color: #fff;
+		margin-left: -20px;
+		a,
+		button {
+			color: #3858e9;
 		}
-	}
-	.cbt-lp-body {
-		font-weight: 200;
-		padding-top: 40px;
-		padding-bottom: 40px;
-		p {
-			margin-top: 0;
-		}
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6 {
-			margin-bottom: 0.3em;
-		}
-		h2 {
-			font-size: 2em;
-		}
-		h3 {
-			font-size: 1em;
-		}
-		.cbt-lp-left-column {
-			flex: 1;
-			padding: 0 60px;
-			button {
-				font-size: 22px;
-			}
-		}
-		.cbt-lp-right-column {
-			width: 330px;
-			padding-right: 60px;
-			p {
-				margin-bottom: 0;
-			}
-		}
+		&__header {
+			width: 100%;
+			background-color: #2d59f2;
 
-		.cbt-lp-faq {
 			img {
-				max-width: 100%;
+				vertical-align: top;
 			}
+		}
+		&__body {
+			font-weight: 200;
+			padding-top: 40px;
+			padding-bottom: 40px;
 			p {
-				padding: 10px;
-				font-style: italic;
+				margin-top: 0;
 			}
-			details {
-				padding-bottom: 20px;
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				margin-bottom: 0.3em;
+			}
+			h2 {
+				font-size: 2em;
+			}
+			h3 {
+				font-size: 1em;
+			}
+			&__left-column {
+				flex: 1;
+				padding: 0 60px;
+				button {
+					font-size: 22px;
+				}
+			}
+			&__right-column {
+				width: 330px;
+				padding-right: 60px;
+				p {
+					margin-bottom: 0;
+				}
+			}
+
+			&__faq {
+				img {
+					max-width: 100%;
+				}
+				p {
+					padding: 10px;
+					font-style: italic;
+				}
+				details {
+					padding-bottom: 20px;
+				}
 			}
 		}
 	}

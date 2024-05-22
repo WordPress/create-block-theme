@@ -33,7 +33,7 @@ export default function LandingPage() {
 	};
 
 	return (
-		<div className="create-block-theme landing-page">
+		<div className="create-block-theme__landing-page">
 			{ createModalType && (
 				<CreateThemeModal
 					creationType={ createModalType }
@@ -41,7 +41,7 @@ export default function LandingPage() {
 				/>
 			) }
 
-			<div className="cbt-lp-header">
+			<div className="create-block-theme__landing-page__header">
 				<img
 					src="/wp-content/plugins/create-block-theme/assets/header_logo.webp"
 					alt={ __(
@@ -51,8 +51,14 @@ export default function LandingPage() {
 				/>
 			</div>
 
-			<HStack alignment="topLeft" className="cbt-lp-body">
-				<VStack alignment="left" className="cbt-lp-left-column">
+			<HStack
+				alignment="topLeft"
+				className="create-block-theme__landing-page__body"
+			>
+				<VStack
+					alignment="left"
+					className="create-block-theme__landing-page__body__left-column"
+				>
 					<h2>
 						{ __(
 							'What would you like to do?',
@@ -146,7 +152,7 @@ export default function LandingPage() {
 						) }
 					</p>
 				</VStack>
-				<VStack className="cbt-lp-right-column">
+				<VStack className="create-block-theme__landing-page__body__right-column">
 					<h3>{ __( 'About the Plugin', 'create-block-theme' ) }</h3>
 					<p>
 						{ __(
@@ -199,7 +205,7 @@ export default function LandingPage() {
 							}
 						) }
 					</p>
-					<div className="cbt-lp-faq">
+					<div className="create-block-theme__landing-page__body__faq">
 						<h3>{ __( 'FAQ', 'create-block-theme' ) }</h3>
 						<details>
 							<summary>
