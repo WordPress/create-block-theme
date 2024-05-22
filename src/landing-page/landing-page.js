@@ -53,12 +53,12 @@ export default function LandingPage() {
 
 			<HStack alignment="topLeft" className="cbt-lp-body">
 				<VStack alignment="left" className="cbt-lp-left-column">
-					<h1>
+					<h2>
 						{ __(
 							'What would you like to do?',
 							'create-block-theme'
 						) }
-					</h1>
+					</h2>
 					<p>
 						{ createInterpolateElement(
 							__(
@@ -147,16 +147,16 @@ export default function LandingPage() {
 					</p>
 				</VStack>
 				<VStack className="cbt-lp-right-column">
-					<h4>{ __( 'About the Plugin', 'create-block-theme' ) }</h4>
+					<h3>{ __( 'About the Plugin', 'create-block-theme' ) }</h3>
 					<p>
 						{ __(
 							"Create Block Theme is a tool to help you make Block Themes using the WordPress Editor. It does this by adding tools to the Editor to help you create and manage your theme. Themes created with Create Block Theme don't require Create Block Theme to be installed on the site where the theme is used.",
 							'create-block-theme'
 						) }
 					</p>
-					<h4>
+					<h3>
 						{ __( 'Do you need some help?', 'create-block-theme' ) }
-					</h4>
+					</h3>
 					<p>
 						{ createInterpolateElement(
 							__(
@@ -200,7 +200,7 @@ export default function LandingPage() {
 						) }
 					</p>
 					<div className="cbt-lp-faq">
-						<h4>{ __( 'FAQ', 'create-block-theme' ) }</h4>
+						<h3>{ __( 'FAQ', 'create-block-theme' ) }</h3>
 						<details>
 							<summary>
 								{ __(
