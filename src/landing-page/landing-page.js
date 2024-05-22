@@ -249,7 +249,10 @@ export default function LandingPage() {
 							</p>
 							<img
 								src="/wp-content/plugins/create-block-theme/assets/faq_fonts.webp"
-								alt="A screenshot of the WordPress Font Library modal window"
+								alt={ __(
+									'A screenshot of the WordPress Font Library modal window',
+									'create-block-theme'
+								) }
 							/>
 						</details>
 					</div>
