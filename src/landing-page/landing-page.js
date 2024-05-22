@@ -213,7 +213,10 @@ export default function LandingPage() {
 							</p>
 							<img
 								src="/wp-content/plugins/create-block-theme/assets/faq_icon.webp"
-								alt="A screenshot of the Create Block Theme icon in the editor"
+								alt={ __(
+									'A screenshot of the Create Block Theme icon in the editor',
+									'create-block-theme'
+								) }
 							/>
 						</details>
 						<details>
