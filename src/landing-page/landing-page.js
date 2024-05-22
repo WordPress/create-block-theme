@@ -57,9 +57,17 @@ export default function LandingPage() {
 						) }
 					</h1>
 					<p>
-						{ __(
-							'You can do everything from within the Editor but here are a few things you can do to get started.',
-							'create-block-theme'
+						{ createInterpolateElement(
+							__(
+								'You can do everything from within the <a>Editor</a> but here are a few things you can do to get started.',
+								'create-block-theme'
+							),
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="/wp-admin/site-editor.php?canvas=edit" />
+								),
+							}
 						) }
 					</p>
 					<Button
@@ -139,7 +147,7 @@ export default function LandingPage() {
 					<h4>{ __( 'About the Plugin', 'create-block-theme' ) }</h4>
 					<p>
 						{ __(
-							"Create Block Theme is a tool to help you make Block Themes using the WordPress Editor. It adds tools to the Editor to help you create and manage your theme. Themes created with Create Block Theme are built using the WordPress Editor and are compatible with the Full Site Editing features in WordPress. Themes created with Create Block Theme don't require Create Block Theme to be installed on the site where the theme is used.",
+							"Create Block Theme is a tool to help you make Block Themes using the WordPress Editor. It does this by adding tools to the Editor to help you create and manage your theme. Themes created with Create Block Theme don't require Create Block Theme to be installed on the site where the theme is used.",
 							'create-block-theme'
 						) }
 					</p>
