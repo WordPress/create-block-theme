@@ -28,6 +28,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
+import { getFontsCreditsText } from '../utils/fonts';
 
 const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/png',
@@ -48,6 +49,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		author_uri: '',
 		tags_custom: '',
 		recommended_plugins: '',
+		font_credits: '',
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -55,6 +57,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	useSelect( async ( select ) => {
 		const themeData = select( 'core' ).getCurrentTheme();
 		const readmeData = await fetchReadmeData();
+
 		setTheme( {
 			name: themeData.name.raw,
 			description: themeData.description.raw,
@@ -65,6 +68,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			tags_custom: themeData.tags.rendered,
 			screenshot: themeData.screenshot,
 			recommended_plugins: readmeData.recommended_plugins,
+			font_credits: readmeData.fonts,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
@@ -96,6 +100,11 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					);
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			} );
+	};
+
+	const updateFontCredits = async () => {
+		const credits = await getFontsCreditsText();
+		setTheme( { ...theme, font_credits: credits } );
 	};
 
 	const onChangeTags = ( newTags ) => {
@@ -230,6 +239,45 @@ Plugin Description`,
 						setTheme( { ...theme, recommended_plugins: value } )
 					}
 				/>
+
+				<TextareaControl
+					label={ __( 'Font credits', 'create-block-theme' ) }
+					help={
+						<>
+							<Button
+								variant="secondary"
+								onClick={ updateFontCredits }
+							>
+								{ __(
+									'Get updated font credits',
+									'create-block-theme'
+								) }
+							</Button>
+							<br />
+							{ __(
+								'Credits and licensing information for fonts used in the theme.',
+								'create-block-theme'
+							) }
+							<br />
+							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#1-licensing-copyright">
+								{ __( 'Read more.', 'create-block-theme' ) }
+							</ExternalLink>
+						</>
+					}
+					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+					placeholder={ __(
+						`Font Name
+Copyright
+License
+Source`,
+						'create-block-theme'
+					) }
+					value={ theme.font_credits }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, font_credits: value } )
+					}
+				/>
+
 				<BaseControl>
 					<BaseControl.VisualLabel>
 						{ __( 'Screenshot', 'create-block-theme' ) }

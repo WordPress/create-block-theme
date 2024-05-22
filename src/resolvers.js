@@ -85,3 +85,20 @@ export async function downloadExportedTheme() {
 		parse: false,
 	} );
 }
+
+export async function getFontFamilies() {
+	try {
+		const response = await apiFetch( {
+			path: '/create-block-theme/v1/font-families',
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		} );
+		return response.data;
+	} catch ( e ) {
+		// eslint-disable-next-line no-console
+		console.error( e );
+		return [];
+	}
+}
