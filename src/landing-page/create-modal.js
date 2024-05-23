@@ -103,7 +103,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 			title={ __( 'Create Block Theme', 'create-block-theme' ) }
 			onRequestClose={ onRequestClose }
 		>
-			<VStack style={ { gap: '20px' } }>
+			<VStack spacing="5">
 				<Text>
 					{ __(
 						"Let's get started creating a new Block Theme.",
