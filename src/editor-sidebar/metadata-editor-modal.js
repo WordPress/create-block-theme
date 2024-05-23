@@ -48,6 +48,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		author_uri: '',
 		tags_custom: '',
 		recommended_plugins: '',
+		subfolder: '',
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
