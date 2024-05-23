@@ -11,18 +11,12 @@ import { Font } from '../lib/lib-font/lib-font.browser';
  * @return {Promise<ArrayBuffer>} The file as an ArrayBuffer.
  */
 async function fetchFileAsArrayBuffer( url ) {
-	try {
-		const response = await fetch( url );
-		if ( ! response.ok ) {
-			throw new Error( 'Network response was not ok.' );
-		}
-		const arrayBuffer = await response.arrayBuffer();
-		return arrayBuffer;
-	} catch ( error ) {
-		throw new Error(
-			`Failed to fetch file from the URL ${ url }. ${ error }`
-		);
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( 'Network response was not ok.' );
 	}
+	const arrayBuffer = await response.arrayBuffer();
+	return arrayBuffer;
 }
 
 /**
@@ -31,7 +25,7 @@ async function fetchFileAsArrayBuffer( url ) {
  * This function fetches the file as an ArrayBuffer, initializes a font object, and extracts licensing details from the font's OpenType tables.
  *
  * @param {string} url - The URL pointing directly to the font file. The URL should be a direct link to the file and publicly accessible.
- * @return {Promise<Object|null>} A promise that resolves to an object containing the font's licensing details if successful. return null if the font license cannot be fetched or an error occurs.
+ * @return {Promise<Object>} A promise that resolves to an object containing the font's licensing details.
  *
  * The returned object includes the following properties (if available in the font's OpenType tables):
  *   - fontName: The full font name.
@@ -41,35 +35,29 @@ async function fetchFileAsArrayBuffer( url ) {
  *   - licenseURL: URL to the full license text.
  */
 async function getFontFileLicenseFromUrl( url ) {
-	try {
-		const buffer = await fetchFileAsArrayBuffer( url );
-		const fontObj = new Font( 'Uploaded Font' );
-		fontObj.fromDataBuffer( buffer, url );
-		// Assuming that fromDataBuffer triggers onload event and returning a Promise
-		const onloadEvent = await new Promise(
-			( resolve ) => ( fontObj.onload = resolve )
-		);
-		const font = onloadEvent.detail.font;
-		const { name: nameTable } = font.opentype.tables;
-		return {
-			fontName: nameTable.get( 16 ) || nameTable.get( 1 ),
-			copyright: nameTable.get( 0 ),
-			source: nameTable.get( 11 ),
-			license: nameTable.get( 13 ),
-			licenseURL: nameTable.get( 14 ),
-		};
-	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error( 'Failed to get font license for font file.', error );
-		return null;
-	}
+	const buffer = await fetchFileAsArrayBuffer( url );
+	const fontObj = new Font( 'Uploaded Font' );
+	fontObj.fromDataBuffer( buffer, url );
+	// Assuming that fromDataBuffer triggers onload event and returning a Promise
+	const onloadEvent = await new Promise(
+		( resolve ) => ( fontObj.onload = resolve )
+	);
+	const font = onloadEvent.detail.font;
+	const { name: nameTable } = font.opentype.tables;
+	return {
+		fontName: nameTable.get( 16 ) || nameTable.get( 1 ),
+		copyright: nameTable.get( 0 ),
+		source: nameTable.get( 11 ),
+		license: nameTable.get( 13 ),
+		licenseURL: nameTable.get( 14 ),
+	};
 }
 
 /**
  * Get the license for a font family.
  *
  * @param {Object} fontFamily The font family in theme.json format.
- * @return {Promise<Object|null>} A promise that resolved to the font license object if sucessful or null if the font family does not have a fontFace property or the font license could not be fetched.
+ * @return {Promise<Object|null>} A promise that resolved to the font license object if sucessful or null if the font family does not have a fontFace property.
  */
 async function getFamilyLicense( fontFamily ) {
 	// If the font family does not have a fontFace property, return an empty string.
@@ -83,13 +71,8 @@ async function getFamilyLicense( fontFamily ) {
 		? fontFace.src[ 0 ]
 		: fontFace.src;
 
-	try {
-		// Get the license from the font face url.
-		return await getFontFileLicenseFromUrl( faceUrl );
-	} catch ( error ) {
-		
-		return null;
-	}
+	// Get the license from the font face url.
+	return await getFontFileLicenseFromUrl( faceUrl );
 }
 
 /**
@@ -127,7 +110,6 @@ async function getFontsCreditsArray() {
  */
 export async function getFontsCreditsText() {
 	const creditsArray = await getFontsCreditsArray();
-
 	const credits = creditsArray
 		.reduce( ( acc, credit ) => {
 			// skip if fontName is not available
@@ -155,6 +137,5 @@ export async function getFontsCreditsText() {
 			return acc;
 		}, [] )
 		.join( '\n' );
-
 	return credits;
 }

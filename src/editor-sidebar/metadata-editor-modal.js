@@ -103,8 +103,23 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	};
 
 	const updateFontCredits = async () => {
-		const credits = await getFontsCreditsText();
-		setTheme( { ...theme, font_credits: credits } );
+		try {
+			const credits = await getFontsCreditsText();
+			setTheme( { ...theme, font_credits: credits } );
+		} catch ( error ) {
+			// eslint-disable-next-line
+			alert(
+				sprintf(
+					/* translators: %1: error code, %2: error message */
+					__(
+						'Error getting font licenses. Code: %1$s. Message: %2$s',
+						'create-block-theme'
+					),
+					error.code,
+					error.message
+				)
+			);
+		}
 	};
 
 	const onChangeTags = ( newTags ) => {
