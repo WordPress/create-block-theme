@@ -58,6 +58,9 @@
 			&__right-column {
 				max-width: 330px;
 				margin: 0 60px;
+				@media screen and (max-width: 775px) {
+					max-width: 100%;
+				}
 				p {
 					margin-bottom: 0;
 				}
