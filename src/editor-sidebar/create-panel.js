@@ -32,6 +32,14 @@ import ScreenHeader from './screen-header';
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
+	const subfolder = useSelect( ( select ) => {
+		const stylesheet = select( 'core' ).getCurrentTheme().stylesheet;
+		if ( stylesheet.lastIndexOf( '/' ) > 1 ) {
+			return stylesheet.substring( 0, stylesheet.lastIndexOf( '/' ) );
+		}
+		return '';
+	}, [] );
+
 	const [ theme, setTheme ] = useState( {
 		name: '',
 		description: '',
@@ -39,22 +47,8 @@ export const CreateThemePanel = ( { createType } ) => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
-		subfolder: '',
+		subfolder,
 	} );
-
-	useSelect( ( select ) => {
-		const themeData = select( 'core' ).getCurrentTheme();
-		setTheme( {
-			...theme,
-			subfolder:
-				themeData.stylesheet.lastIndexOf( '/' ) > 1
-					? themeData.stylesheet.substring(
-							0,
-							themeData.stylesheet.lastIndexOf( '/' )
-					  )
-					: '',
-		} );
-	}, [] );
 
 	const cloneTheme = () => {
 		if ( createType === 'createClone' ) {
