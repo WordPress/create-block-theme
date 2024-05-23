@@ -264,14 +264,10 @@ Plugin Description`,
 							</ExternalLink>
 						</>
 					}
-					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-					placeholder={ __(
-						`Font Name
-Copyright
-License
-Source`,
-						'create-block-theme'
-					) }
+					placeholder={ `${ __( 'Font Name', 'create-block-theme' ) }
+${ __( 'Copyright', 'create-block-theme' ) }
+${ __( 'License', 'create-block-theme' ) }
+${ __( 'Source', 'create-block-theme' ) }` }
 					value={ theme.font_credits }
 					onChange={ ( value ) =>
 						setTheme( { ...theme, font_credits: value } )
