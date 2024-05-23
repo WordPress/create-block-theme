@@ -501,15 +501,6 @@ class CBT_Theme_API {
 	function rest_get_font_families( $request ) {
 		$font_families = CBT_Theme_Fonts::get_all_fonts();
 
-		// Iterates through the font families and makes the urls absolute to use in the frontend code.
-		foreach ( $font_families as &$font_family ) {
-			if ( isset( $font_family['fontFace'] ) ) {
-				foreach ( $font_family['fontFace'] as &$font_face ) {
-					$font_face['src'] = CBT_Theme_Fonts::make_theme_font_src_absolute( $font_face['src'] );
-				}
-			}
-		}
-
 		return new WP_REST_Response(
 			array(
 				'status'  => 'SUCCESS',

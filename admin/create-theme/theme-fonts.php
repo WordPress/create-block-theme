@@ -15,7 +15,7 @@ class CBT_Theme_Fonts {
 	 * @param array|string $src
 	 * @return array|string
 	 */
-	public static function make_theme_font_src_absolute( $src ) {
+	private static function make_theme_font_src_absolute( $src ) {
 		$make_absolute = function ( $url ) {
 			if ( str_starts_with( $url, 'file:./' ) ) {
 				return str_replace( 'file:./', get_stylesheet_directory_uri() . '/', $url );
@@ -57,6 +57,15 @@ class CBT_Theme_Fonts {
 		foreach ( $variations as $variation ) {
 			if ( isset( $variation['settings']['typography']['fontFamilies']['theme'] ) ) {
 				$font_families = array_merge( $font_families, $variation['settings']['typography']['fontFamilies']['theme'] );
+			}
+		}
+
+		// Iterates through the font families and makes the urls absolute to use in the frontend code.
+		foreach ( $font_families as &$font_family ) {
+			if ( isset( $font_family['fontFace'] ) ) {
+				foreach ( $font_family['fontFace'] as &$font_face ) {
+					$font_face['src'] = CBT_Theme_Fonts::make_theme_font_src_absolute( $font_face['src'] );
+				}
 			}
 		}
 
