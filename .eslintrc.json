@@ -1,8 +1,7 @@
 {
 	"extends": "plugin:@wordpress/eslint-plugin/recommended",
-	"globals": {
-		"FileReader": true,
-		"FontFace": true
+	"env":{
+		"browser": true
 	},
 	"rules": {
 		"@wordpress/dependency-group": "error",
@@ -12,8 +11,15 @@
 				"allowedTextDomain": "create-block-theme"
 			}
 		],
-		"react/jsx-boolean-value": "error"
+		"react/jsx-boolean-value": "error",
+		"unicorn/no-abusive-eslint-disable": "error"
 	},
+	"ignorePatterns": [
+		"src/lib"
+	],
+	"plugins":[
+		"unicorn"
+	],
 	"overrides": [
 		{
 			"files": [ "**/test/**/*.js" ],

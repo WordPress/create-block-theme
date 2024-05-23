@@ -7,16 +7,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line
-	__experimentalHeading as Heading,
-	// eslint-disable-next-line
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	PanelBody,
 	Button,
 	TextControl,
@@ -74,7 +70,7 @@ export const CreateThemePanel = ( { createType } ) => {
 			},
 		} )
 			.then( () => {
-				// eslint-disable-next-line
+				// eslint-disable-next-line no-alert
 				alert(
 					__(
 						'Theme created successfully. The editor will now reload.',
@@ -104,7 +100,7 @@ export const CreateThemePanel = ( { createType } ) => {
 			},
 		} )
 			.then( () => {
-				// eslint-disable-next-line
+				// eslint-disable-next-line no-alert
 				alert(
 					__(
 						'Theme cloned successfully. The editor will now reload.',
@@ -134,7 +130,7 @@ export const CreateThemePanel = ( { createType } ) => {
 			},
 		} )
 			.then( () => {
-				// eslint-disable-next-line
+				// eslint-disable-next-line no-alert
 				alert(
 					__(
 						'Child theme created successfully. The editor will now reload.',

@@ -6,12 +6,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
-	__experimentalHeading as Heading,
-	// eslint-disable-next-line
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	PanelBody,
 	Button,
 	CheckboxControl,
@@ -65,7 +61,7 @@ export const SaveThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				// eslint-disable-next-line
+				// eslint-disable-next-line no-alert
 				alert(
 					__(
 						'Theme saved successfully. The editor will now reload.',
