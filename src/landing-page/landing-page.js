@@ -175,11 +175,11 @@ export default function LandingPage() {
 					<p>
 						{ createInterpolateElement(
 							__(
-								'Have a question? Ask for some help in the <a>forums</a>.',
+								'Have a question? Ask for some help in the <ExternalLink>forums</ExternalLink>.',
 								'create-block-theme'
 							),
 							{
-								a: (
+								ExternalLink: (
 									<ExternalLink href="https://wordpress.org/support/plugin/create-block-theme/" />
 								),
 							}
@@ -188,11 +188,11 @@ export default function LandingPage() {
 					<p>
 						{ createInterpolateElement(
 							__(
-								'Found a bug? Report it on <a>GitHub</a>.',
+								'Found a bug? Report it on <ExternalLink>GitHub</ExternalLink>.',
 								'create-block-theme'
 							),
 							{
-								a: (
+								ExternalLink: (
 									<ExternalLink href="https://github.com/WordPress/create-block-theme/issues/new" />
 								),
 							}
@@ -201,11 +201,11 @@ export default function LandingPage() {
 					<p>
 						{ createInterpolateElement(
 							__(
-								'Want to contribute? Check out the <a>project on GitHub</a>.',
+								'Want to contribute? Check out the <ExternalLink>project on GitHub</ExternalLink>.',
 								'create-block-theme'
 							),
 							{
-								a: (
+								ExternalLink: (
 									<ExternalLink href="https://github.com/WordPress/create-block-theme" />
 								),
 							}
