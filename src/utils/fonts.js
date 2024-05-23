@@ -87,12 +87,7 @@ async function getFamilyLicense( fontFamily ) {
 		// Get the license from the font face url.
 		return await getFontFileLicenseFromUrl( faceUrl );
 	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error(
-			'Failed to get font license for font family: ',
-			fontFamily,
-			error
-		);
+		
 		return null;
 	}
 }
