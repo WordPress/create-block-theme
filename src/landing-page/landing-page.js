@@ -52,18 +52,15 @@ export default function LandingPage() {
 				/>
 			) }
 
-			<div className="create-block-theme__landing-page__header">
+			<h1 className="create-block-theme__landing-page__header">
 				<img
 					src={
 						window.cbt_landingpage_variables.assets_url +
 						'header_logo.webp'
 					}
-					alt={ __(
-						'Create Block Theme Logo',
-						'create-block-theme'
-					) }
+					alt={ __( 'Create Block Theme', 'create-block-theme' ) }
 				/>
-			</div>
+			</h1>
 
 			<HStack
 				alignment="topLeft"
