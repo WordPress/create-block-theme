@@ -29,11 +29,6 @@ class CBT_Admin_Landing {
 
 		$asset_file = include plugin_dir_path( __DIR__ ) . 'build/admin-landing-page.asset.php';
 
-		// Enqueue CSS dependencies of the scripts included in the build.
-		foreach ( $asset_file['dependencies'] as $style ) {
-			wp_enqueue_style( $style );
-		}
-
 		// Enqueue CSS of the app
 		wp_enqueue_style( 'create-block-theme-app', plugins_url( 'build/admin-landing-page.css', __DIR__ ), array( 'wp-components' ), $asset_file['version'] );
 
