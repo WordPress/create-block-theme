@@ -6,13 +6,13 @@ import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
 	BaseControl,
 	FormTokenField,
@@ -48,6 +48,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		author_uri: '',
 		tags_custom: '',
 		recommended_plugins: '',
+		subfolder: '',
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );

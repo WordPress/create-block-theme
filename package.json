@@ -36,6 +36,7 @@
 		"@wordpress/scripts": "^26.16.0",
 		"@wordpress/stylelint-config": "^21.16.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
+		"eslint-plugin-unicorn": "^53.0.0",
 		"husky": "^8.0.3",
 		"lint-staged": "^13.2.2",
 		"prettier": "npm:wp-prettier@3.0.3",
