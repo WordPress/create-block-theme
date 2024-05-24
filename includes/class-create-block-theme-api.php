@@ -148,17 +148,6 @@ class CBT_Theme_API {
 		);
 		register_rest_route(
 			'create-block-theme/v1',
-			'/get-style-data',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( $this, 'rest_get_style_data' ),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
-				},
-			)
-		);
-		register_rest_route(
-			'create-block-theme/v1',
 			'/get-theme-data',
 			array(
 				'methods'             => 'GET',
@@ -190,25 +179,6 @@ class CBT_Theme_API {
 		}
 	}
 
-	function rest_get_style_data( $request ) {
-		try {
-			$readme_data = CBT_Theme_Styles::get_style_data();
-			return new WP_REST_Response(
-				array(
-					'status'  => 'SUCCESS',
-					'message' => __( 'Readme file data retrieved.', 'create-block-theme' ),
-					'data'    => $readme_data,
-				)
-			);
-		} catch ( Exception $error ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'FAILURE',
-					'message' => $error->getMessage(),
-				)
-			);
-		}
-	}
 	function rest_get_readme_data( $request ) {
 		try {
 			$readme_data = CBT_Theme_Readme::get_sections();

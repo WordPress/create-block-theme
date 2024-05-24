@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import { useState, createInterpolateElement } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	createInterpolateElement,
+} from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -16,7 +21,7 @@ import {
 /**
  * Internal dependencies
  */
-import { fetchThemeStyleData, downloadExportedTheme } from '../resolvers';
+import { downloadExportedTheme } from '../resolvers';
 import { downloadFile } from '../utils';
 import { CreateThemeModal } from './create-modal';
 
@@ -103,7 +108,7 @@ export default function LandingPage() {
 								'Export "%s" as a Zip File',
 								'create-block-theme'
 							),
-							themeStyleData?.name
+							themeName
 						) }
 					</Button>
 					<p>
@@ -137,7 +142,7 @@ export default function LandingPage() {
 								'Create a Clone of "%s"',
 								'create-block-theme'
 							),
-							themeStyleData?.name
+							themeName
 						) }
 					</Button>
 					<p>
@@ -156,7 +161,7 @@ export default function LandingPage() {
 								'Create a Child of "%s"',
 								'create-block-theme'
 							),
-							themeStyleData?.name
+							themeName
 						) }
 					</Button>
 					<p>
