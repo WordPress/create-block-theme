@@ -21,12 +21,17 @@ import { downloadFile } from '../utils';
 import { CreateThemeModal } from './create-modal';
 
 export default function LandingPage() {
-	const [ themeStyleData, setThemeStyleData ] = useState( '' );
+	const [ themeName, setThemeName ] = useState( '' );
 	const [ createModalType, setCreateModalType ] = useState( false );
 
-	useSelect( async () => {
-		setThemeStyleData( await fetchThemeStyleData() );
-	}, [] );
+	const currentTheme = useSelect( ( select ) =>
+		select( coreStore ).getCurrentTheme()
+	);
+
+	useEffect( () => {
+		const name = currentTheme?.name?.raw || '';
+		setThemeName( name );
+	}, [ currentTheme ] );
 
 	const handleExportClick = async () => {
 		const response = await downloadExportedTheme();
