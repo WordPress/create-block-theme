@@ -30,11 +30,27 @@ class CBT_ThemeReadme_Update extends CBT_Theme_Readme_UnitTestCase {
 		$this->assertStringContainsString( $expected_wp_version, $readme_without_newlines, 'The expected WP version is missing.' );
 		$this->assertStringContainsString( $expected_image_credits, $readme_without_newlines, 'The expected image credits are missing.' );
 		$this->assertStringContainsString( $expected_recommended_plugins, $readme_without_newlines, 'The expected recommended plugins are missing.' );
+
+		// Assertion specific to font credits.
+		if ( isset( $data['font_credits'] ) ) {
+			$expected_font_credits = '== Fonts ==' . $data['font_credits'];
+			$this->assertStringContainsString( $expected_font_credits, $readme_without_newlines, 'The expected font credits are missing.' );
+		}
 	}
 
 	public function data_test_update() {
 		return array(
-			'complete data' => array(
+			'complete data'        => array(
+				'data' => array(
+					'description'         => 'New theme description',
+					'author'              => 'New theme author',
+					'wp_version'          => '12.12',
+					'image_credits'       => 'New image credits',
+					'recommended_plugins' => 'New recommended plugins',
+					'font_credits'        => 'Example font credits text',
+				),
+			),
+			'missing font credits' => array(
 				'data' => array(
 					'description'         => 'New theme description',
 					'author'              => 'New theme author',

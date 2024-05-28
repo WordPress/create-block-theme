@@ -1,5 +1,21 @@
 <?php
 
+require_once __DIR__ . '/create-theme/resolver_additions.php';
+require_once __DIR__ . '/create-theme/theme-locale.php';
+require_once __DIR__ . '/create-theme/theme-tags.php';
+require_once __DIR__ . '/create-theme/theme-zip.php';
+require_once __DIR__ . '/create-theme/theme-media.php';
+require_once __DIR__ . '/create-theme/theme-patterns.php';
+require_once __DIR__ . '/create-theme/theme-templates.php';
+require_once __DIR__ . '/create-theme/theme-styles.php';
+require_once __DIR__ . '/create-theme/theme-json.php';
+require_once __DIR__ . '/create-theme/theme-utils.php';
+require_once __DIR__ . '/create-theme/theme-readme.php';
+require_once __DIR__ . '/create-theme/theme-form.php';
+require_once __DIR__ . '/create-theme/form-messages.php';
+require_once __DIR__ . '/create-theme/theme-fonts.php';
+require_once __DIR__ . '/create-theme/theme-create.php';
+
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
  *
@@ -492,6 +508,7 @@ class CBT_Theme_API {
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
+		$sanitized_theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] ?? '' );
 		$sanitized_theme['template']            = '';
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];

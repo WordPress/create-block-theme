@@ -4,19 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line
-	__experimentalHeading as Heading,
-	// eslint-disable-next-line
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	PanelBody,
 	Button,
 	TextControl,
@@ -28,9 +23,22 @@ import { addCard, copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import ScreenHeader from './screen-header';
+import {
+	createBlankTheme,
+	createClonedTheme,
+	createChildTheme,
+} from '../resolvers';
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const subfolder = useSelect( ( select ) => {
+		const stylesheet = select( 'core' ).getCurrentTheme().stylesheet;
+		if ( stylesheet.lastIndexOf( '/' ) > 1 ) {
+			return stylesheet.substring( 0, stylesheet.lastIndexOf( '/' ) );
+		}
+		return '';
+	}, [] );
 
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -39,22 +47,8 @@ export const CreateThemePanel = ( { createType } ) => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
-		subfolder: '',
+		subfolder,
 	} );
-
-	useSelect( ( select ) => {
-		const themeData = select( 'core' ).getCurrentTheme();
-		setTheme( {
-			...theme,
-			subfolder:
-				themeData.stylesheet.lastIndexOf( '/' ) > 1
-					? themeData.stylesheet.substring(
-							0,
-							themeData.stylesheet.lastIndexOf( '/' )
-					  )
-					: '',
-		} );
-	}, [] );
 
 	const cloneTheme = () => {
 		if ( createType === 'createClone' ) {
@@ -65,17 +59,10 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateBlankClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-blank',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createBlankTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme created successfully. The editor will now reload.',
 						'create-block-theme'
@@ -95,17 +82,10 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCloneClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/clone',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createClonedTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme cloned successfully. The editor will now reload.',
 						'create-block-theme'
@@ -125,17 +105,10 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateChildClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-child',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createChildTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Child theme created successfully. The editor will now reload.',
 						'create-block-theme'
