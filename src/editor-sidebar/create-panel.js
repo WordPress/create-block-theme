@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
@@ -24,6 +23,11 @@ import { addCard, copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import ScreenHeader from './screen-header';
+import {
+	createBlankTheme,
+	createClonedTheme,
+	createChildTheme,
+} from '../resolvers';
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -55,17 +59,10 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateBlankClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-blank',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createBlankTheme( theme )
 			.then( () => {
 				// eslint-disable-next-line no-alert
-				alert(
+				window.alert(
 					__(
 						'Theme created successfully. The editor will now reload.',
 						'create-block-theme'
@@ -85,17 +82,10 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCloneClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/clone',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createClonedTheme( theme )
 			.then( () => {
 				// eslint-disable-next-line no-alert
-				alert(
+				window.alert(
 					__(
 						'Theme cloned successfully. The editor will now reload.',
 						'create-block-theme'
@@ -115,17 +105,10 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	const handleCreateChildClick = () => {
-		apiFetch( {
-			path: '/create-block-theme/v1/create-child',
-			method: 'POST',
-			data: theme,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		} )
+		createChildTheme( theme )
 			.then( () => {
 				// eslint-disable-next-line no-alert
-				alert(
+				window.alert(
 					__(
 						'Child theme created successfully. The editor will now reload.',
 						'create-block-theme'

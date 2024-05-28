@@ -80,7 +80,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		postUpdateThemeMetadata( theme )
 			.then( () => {
 				// eslint-disable-next-line no-alert
-				alert(
+				window.alert(
 					__(
 						'Theme updated successfully. The editor will now reload.',
 						'create-block-theme'

@@ -1,6 +1,6 @@
 {
 	"extends": "plugin:@wordpress/eslint-plugin/recommended",
-	"env":{
+	"env": {
 		"browser": true
 	},
 	"rules": {
@@ -14,12 +14,8 @@
 		"react/jsx-boolean-value": "error",
 		"unicorn/no-abusive-eslint-disable": "error"
 	},
-	"ignorePatterns": [
-		"src/lib"
-	],
-	"plugins":[
-		"unicorn"
-	],
+	"ignorePatterns": [ "src/lib" ],
+	"plugins": [ "unicorn" ],
 	"overrides": [
 		{
 			"files": [ "**/test/**/*.js" ],

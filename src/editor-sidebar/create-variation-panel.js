@@ -33,7 +33,7 @@ export const CreateVariationPanel = () => {
 		postCreateThemeVariation( theme.name )
 			.then( () => {
 				// eslint-disable-next-line no-alert
-				alert(
+				window.alert(
 					__(
 						'Theme variation created successfully. The editor will now reload.',
 						'create-block-theme'
