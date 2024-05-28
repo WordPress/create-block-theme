@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import {
-	useState,
-	useEffect,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
