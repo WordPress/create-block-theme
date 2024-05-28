@@ -6,14 +6,10 @@ import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line
-	__experimentalHeading as Heading,
-	// eslint-disable-next-line
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	PanelBody,
 	Button,
 	TextControl,
@@ -36,8 +32,8 @@ export const CreateVariationPanel = () => {
 	const handleCreateVariationClick = () => {
 		postCreateThemeVariation( theme.name )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme variation created successfully. The editor will now reload.',
 						'create-block-theme'

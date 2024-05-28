@@ -55,6 +55,12 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 				'The expected reference to the parent theme is missing.'
 			);
 		}
+
+		// Assertion specific to font credits.
+		if ( isset( $data['font_credits'] ) ) {
+			$expected_font_credits = '== Fonts ==' . $data['font_credits'];
+			$this->assertStringContainsString( $expected_font_credits, $readme_without_newlines, 'The expected font credits are missing.' );
+		}
 	}
 
 	public function data_test_create() {
@@ -73,6 +79,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
 					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
+					'font_credits'         => 'Font credit example text',
 				),
 			),
 			'complete data for a child theme'  => array(
@@ -90,6 +97,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
 					'is_child_theme'       => true,
+					'font_credits'         => 'Font credit example text',
 				),
 			),
 			'complete data for a cloned theme' => array(
@@ -107,6 +115,23 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
 					'is_cloned_theme'      => true,
+					'font_credits'         => 'Font credit example text',
+				),
+			),
+			'missing font credits'             => array(
+				'data' => array(
+					'name'                 => 'My Theme',
+					'description'          => 'New theme description',
+					'uri'                  => 'https://example.com',
+					'author'               => 'New theme author',
+					'author_uri'           => 'https://example.com/author',
+					'copyright_year'       => '2077',
+					'wp_version'           => '12.12',
+					'required_php_version' => '10.0',
+					'license'              => 'GPLv2 or later',
+					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
+					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
+					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
 				),
 			),
 			// TODO: Add more test cases.
