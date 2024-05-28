@@ -26,17 +26,11 @@ import { downloadFile } from '../utils';
 import { CreateThemeModal } from './create-modal';
 
 export default function LandingPage() {
-	const [ themeName, setThemeName ] = useState( '' );
 	const [ createModalType, setCreateModalType ] = useState( false );
 
-	const currentTheme = useSelect( ( select ) =>
+	const themeName = useSelect( ( select ) =>
 		select( coreStore ).getCurrentTheme()
-	);
-
-	useEffect( () => {
-		const name = currentTheme?.name?.raw || '';
-		setThemeName( name );
-	}, [ currentTheme ] );
+	)?.name?.raw;
 
 	const handleExportClick = async () => {
 		const response = await downloadExportedTheme();
