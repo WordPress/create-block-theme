@@ -382,7 +382,6 @@ class CBT_Theme_API {
 		}
 
 		$zip->close();
-		wp_cache_flush();
 
 		wp_cache_flush();
 
