@@ -133,3 +133,14 @@ export async function downloadExportedTheme() {
 		parse: false,
 	} );
 }
+
+export async function getFontFamilies() {
+	const response = await apiFetch( {
+		path: '/create-block-theme/v1/font-families',
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} );
+	return response.data;
+}

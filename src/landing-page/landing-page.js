@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import { downloadExportedTheme } from '../resolvers';
-import { downloadFile } from '../utils';
+import downloadFile from '../utils/download-file';
 import { CreateThemeModal } from './create-modal';
 
 export default function LandingPage() {
