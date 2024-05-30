@@ -157,6 +157,17 @@ class CBT_Theme_API {
 				},
 			),
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/font-families',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'rest_get_font_families' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			),
+		);
 	}
 
 	function rest_get_theme_data( $request ) {
@@ -512,6 +523,24 @@ class CBT_Theme_API {
 			array(
 				'status'  => 'SUCCESS',
 				'message' => __( 'Theme Saved.', 'create-block-theme' ),
+			)
+		);
+	}
+
+	/**
+	 * Get a list of all the font families used in the theme.
+	 *
+	 * It includes the font families from the theme.json data (theme.json file + global styles) and the theme style variations.
+	 * The font families with font faces containing src urls relative to the theme folder are converted to absolute urls.
+	 */
+	function rest_get_font_families( $request ) {
+		$font_families = CBT_Theme_Fonts::get_all_fonts();
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Font Families retrieved.', 'create-block-theme' ),
+				'data'    => $font_families,
 			)
 		);
 	}
