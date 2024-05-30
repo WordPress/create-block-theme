@@ -48,7 +48,7 @@ import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
 import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
 import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
-import { downloadFile } from './utils';
+import downloadFile from './utils/download-file';
 import './plugin-styles.scss';
 
 const CreateBlockThemePlugin = () => {
