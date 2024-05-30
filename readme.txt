@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.1.4
+Stable tag: 2.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,19 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.2.0 =
+* Update modal width to 65vw (#638)
+* Fixed font utilities to work with font sources as an (optional) array. (#645)
+* Handle font licenses when editing theme metadata (#649)
+* Adds an endpoints that returns a list of font families used by a theme (#648)
+* Flush cache after creating new themes (#654)
+* Replace/admin interface (#637)
+* Added subfolder to initial theme state to eliminate render error (#652)
+* Fix the jslint warning (or infinate loop error when fixed) from useSelect usage (#651)
+* Enforce specifying which eslint rule is disabled when using eslint disable comments (#650)
+* Handle font credits in the backend (#647)
+* Move lib-font and add GPL license text (#646)
 
 = 2.1.4 =
 * Fix template texts localizing/escaping (#641)
