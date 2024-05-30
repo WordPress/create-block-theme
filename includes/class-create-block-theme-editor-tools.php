@@ -28,6 +28,12 @@ class CBT_Editor_Tools {
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);
+		wp_enqueue_style(
+			'create-block-theme-styles',
+			plugins_url( 'build/plugin-sidebar.css', dirname( __FILE__ ) ),
+			array(),
+			$asset_file['version']
+		);
 		wp_enqueue_script(
 			'create-block-theme-slot-fill',
 		);

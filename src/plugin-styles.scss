@@ -1,0 +1,25 @@
+$plugin-prefix: "create-block-theme";
+$modal-footer-height: 70px;
+
+.#{$plugin-prefix} {
+	&__metadata-editor-modal {
+		padding-bottom: $modal-footer-height;
+
+		&__footer {
+			border-top: 1px solid #ddd;
+			background-color: #fff;
+			position: absolute;
+			bottom: 0;
+			margin: 0 -32px;
+			padding: 16px 32px;
+			height: $modal-footer-height;
+		}
+
+		&__screenshot {
+			max-width: 200px;
+			height: auto;
+			aspect-ratio: 4 / 3;
+			object-fit: cover;
+		}
+	}
+}

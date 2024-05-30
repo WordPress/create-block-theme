@@ -133,13 +133,14 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 
 	return (
 		<Modal
-			isFullScreen
+			size="large"
 			title={ sprintf(
 				// translators: %s: theme name.
 				__( 'Metadata for %s', 'create-block-theme' ),
 				theme?.name
 			) }
 			onRequestClose={ onRequestClose }
+			className="create-block-theme__metadata-editor-modal"
 		>
 			<VStack>
 				<Text>
@@ -305,12 +306,7 @@ ${ __( 'Source', 'create-block-theme' ) }` }
 										<VStack alignment="left">
 											<img
 												src={ theme.screenshot }
-												style={ {
-													maxWidth: '200px',
-													height: 'auto',
-													aspectRatio: '4 / 3',
-													objectFit: 'cover',
-												} }
+												className="create-block-theme__metadata-editor-modal__screenshot"
 												alt=""
 											/>
 											<Button
@@ -353,9 +349,14 @@ ${ __( 'Source', 'create-block-theme' ) }` }
 				/>
 			</VStack>
 			<Spacer />
-			<Button variant="primary" onClick={ handleUpdateClick }>
-				{ __( 'Update', 'create-block-theme' ) }
-			</Button>
+			<HStack
+				justify={ 'flex-end' }
+				className="create-block-theme__metadata-editor-modal__footer"
+			>
+				<Button variant="primary" onClick={ handleUpdateClick }>
+					{ __( 'Update', 'create-block-theme' ) }
+				</Button>
+			</HStack>
 		</Modal>
 	);
 };

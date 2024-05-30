@@ -33,13 +33,14 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 
 	return (
 		<Modal
-			isFullScreen
+			size="large"
 			title={ sprintf(
 				// translators: %s: theme name.
 				__( 'theme.json for %s', 'create-block-theme' ),
 				themeName
 			) }
 			onRequestClose={ onRequestClose }
+			className="create-block-theme__theme-json-modal"
 		>
 			<CodeMirror
 				extensions={ [ json() ] }
