@@ -8,24 +8,20 @@ import { __, _x } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalNavigatorProvider as NavigatorProvider,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalNavigatorScreen as NavigatorScreen,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalNavigatorButton as NavigatorButton,
-	// eslint-disable-next-line
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line
-	__experimentalHeading as Heading,
 	Button,
 	Icon,
 	FlexItem,

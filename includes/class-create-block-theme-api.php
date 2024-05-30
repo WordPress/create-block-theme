@@ -1,5 +1,21 @@
 <?php
 
+require_once __DIR__ . '/create-theme/resolver_additions.php';
+require_once __DIR__ . '/create-theme/theme-locale.php';
+require_once __DIR__ . '/create-theme/theme-tags.php';
+require_once __DIR__ . '/create-theme/theme-zip.php';
+require_once __DIR__ . '/create-theme/theme-media.php';
+require_once __DIR__ . '/create-theme/theme-patterns.php';
+require_once __DIR__ . '/create-theme/theme-templates.php';
+require_once __DIR__ . '/create-theme/theme-styles.php';
+require_once __DIR__ . '/create-theme/theme-json.php';
+require_once __DIR__ . '/create-theme/theme-utils.php';
+require_once __DIR__ . '/create-theme/theme-readme.php';
+require_once __DIR__ . '/create-theme/theme-form.php';
+require_once __DIR__ . '/create-theme/form-messages.php';
+require_once __DIR__ . '/create-theme/theme-fonts.php';
+require_once __DIR__ . '/create-theme/theme-create.php';
+
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
  *
@@ -141,6 +157,17 @@ class CBT_Theme_API {
 				},
 			),
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/font-families',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'rest_get_font_families' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			),
+		);
 	}
 
 	function rest_get_theme_data( $request ) {
@@ -187,6 +214,8 @@ class CBT_Theme_API {
 
 		$response = CBT_Theme_Create::clone_current_theme( $this->sanitize_theme_data( $request->get_params() ) );
 
+		wp_cache_flush();
+
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -208,6 +237,8 @@ class CBT_Theme_API {
 
 		$response = CBT_Theme_Create::create_child_theme( $theme, $screenshot );
 
+		wp_cache_flush();
+
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -223,6 +254,8 @@ class CBT_Theme_API {
 	function rest_create_variation( $request ) {
 
 		$response = CBT_Theme_JSON::add_theme_json_variation_to_local( 'variation', $this->sanitize_theme_data( $request->get_params() ) );
+
+		wp_cache_flush();
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -243,6 +276,8 @@ class CBT_Theme_API {
 		$screenshot = null;
 
 		$response = CBT_Theme_Create::create_blank_theme( $theme, $screenshot );
+
+		wp_cache_flush();
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -304,6 +339,8 @@ class CBT_Theme_API {
 
 		$zip->close();
 
+		wp_cache_flush();
+
 		header( 'Content-Type: application/zip' );
 		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
 		header( 'Content-Length: ' . filesize( $filename ) );
@@ -357,6 +394,8 @@ class CBT_Theme_API {
 
 		$zip->close();
 
+		wp_cache_flush();
+
 		header( 'Content-Type: application/zip' );
 		header( 'Content-Disposition: attachment; filename=' . $theme['slug'] . '.zip' );
 		header( 'Content-Length: ' . filesize( $filename ) );
@@ -374,7 +413,7 @@ class CBT_Theme_API {
 				__( 'Unable to create a zip file. ZipArchive not available.', 'create-block-theme' ),
 			);
 		}
-
+		wp_cache_flush();
 		$theme_slug = wp_get_theme()->get( 'TextDomain' );
 
 		// Create ZIP file in the temporary directory.
@@ -384,6 +423,7 @@ class CBT_Theme_API {
 		$zip = CBT_Theme_Zip::copy_theme_to_zip( $zip, null, null );
 
 		if ( is_child_theme() ) {
+			wp_cache_flush();
 			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'current', $theme_slug );
 			$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'current' );
 		} else {
@@ -396,6 +436,8 @@ class CBT_Theme_API {
 		$zip = CBT_Theme_Zip::add_theme_json_to_zip( $zip, $theme_json );
 
 		$zip->close();
+
+		wp_cache_flush();
 
 		header( 'Content-Type: application/zip' );
 		header( 'Content-Disposition: attachment; filename=' . $theme_slug . '.zip' );
@@ -431,6 +473,8 @@ class CBT_Theme_API {
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
+
+		wp_cache_flush();
 
 		return new WP_REST_Response(
 			array(
@@ -473,10 +517,30 @@ class CBT_Theme_API {
 			CBT_Theme_Styles::clear_user_styles_customizations();
 		}
 
+		wp_cache_flush();
+
 		return new WP_REST_Response(
 			array(
 				'status'  => 'SUCCESS',
 				'message' => __( 'Theme Saved.', 'create-block-theme' ),
+			)
+		);
+	}
+
+	/**
+	 * Get a list of all the font families used in the theme.
+	 *
+	 * It includes the font families from the theme.json data (theme.json file + global styles) and the theme style variations.
+	 * The font families with font faces containing src urls relative to the theme folder are converted to absolute urls.
+	 */
+	function rest_get_font_families( $request ) {
+		$font_families = CBT_Theme_Fonts::get_all_fonts();
+
+		return new WP_REST_Response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Font Families retrieved.', 'create-block-theme' ),
+				'data'    => $font_families,
 			)
 		);
 	}
@@ -492,6 +556,7 @@ class CBT_Theme_API {
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
+		$sanitized_theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] ?? '' );
 		$sanitized_theme['template']            = '';
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];

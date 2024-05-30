@@ -6,13 +6,13 @@ import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
 	BaseControl,
 	FormTokenField,
@@ -50,6 +50,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		tags_custom: '',
 		recommended_plugins: '',
 		font_credits: '',
+		subfolder: '',
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -82,8 +83,8 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	const handleUpdateClick = () => {
 		postUpdateThemeMetadata( theme )
 			.then( () => {
-				// eslint-disable-next-line
-				alert(
+				// eslint-disable-next-line no-alert
+				window.alert(
 					__(
 						'Theme updated successfully. The editor will now reload.',
 						'create-block-theme'
@@ -107,7 +108,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			const credits = await getFontsCreditsText();
 			setTheme( { ...theme, font_credits: credits } );
 		} catch ( error ) {
-			// eslint-disable-next-line
+			// eslint-disable-next-line no-alert
 			alert(
 				sprintf(
 					/* translators: %1: error code, %2: error message */
