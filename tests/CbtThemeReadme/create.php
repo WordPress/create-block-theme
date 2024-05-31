@@ -29,13 +29,15 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 		$expected_php_version         = 'Requires PHP: ' . $data['required_php_version'];
 		$expected_license             = 'License: ' . $data['license'];
 		$expected_license_uri         = 'License URI: ' . $data['license_uri'];
-		$expected_image_credits       = '== Images ==' . $data['image_credits'];
+		$expected_font_credits        = '== Fonts ==' .
+			( isset( $data['font_credits'] ) ? $data['font_credits'] : '' );
+		$expected_image_credits       = '== Images ==' .
+			( isset( $data['image_credits'] ) ? $data['image_credits'] : '' );
 		$expected_recommended_plugins = '== Recommended Plugins ==' . $data['recommended_plugins'];
 
 		$this->assertStringContainsString( $expected_name, $readme_without_newlines, 'The expected name is missing.' );
 		$this->assertStringContainsString( $expected_author, $readme_without_newlines, 'The expected author is missing.' );
 		$this->assertStringContainsString( $expected_wp_version, $readme_without_newlines, 'The expected WP version is missing.' );
-		$this->assertStringContainsString( $expected_image_credits, $readme_without_newlines, 'The expected image credits are missing.' );
 		$this->assertStringContainsString( $expected_recommended_plugins, $readme_without_newlines, 'The expected recommended plugins are missing.' );
 
 		// Assetion specific to child themes.
@@ -58,8 +60,17 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 
 		// Assertion specific to font credits.
 		if ( isset( $data['font_credits'] ) ) {
-			$expected_font_credits = '== Fonts ==' . $data['font_credits'];
 			$this->assertStringContainsString( $expected_font_credits, $readme_without_newlines, 'The expected font credits are missing.' );
+		} else {
+			$this->assertStringNotContainsString( $expected_font_credits, $readme_without_newlines, 'The font credits title should not be present if font credits were not defined.' );
+		}
+
+		// Assertion specific to imagee credits.
+		if ( isset( $data['image_credits'] ) ) {
+			$this->assertStringContainsString( $expected_image_credits, $readme_without_newlines, 'The expected image credits are missing.' );
+		} else {
+			$this->assertStringNotContainsString( $expected_image_credits, $readme_without_newlines, 'The image credits title should not be present if image_credits were not defined.' );
+
 		}
 	}
 
@@ -130,8 +141,24 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'required_php_version' => '10.0',
 					'license'              => 'GPLv2 or later',
 					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
-					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
+					'image_credits'        => 'The images were taken from https://example.org and have a CC0 license.',
+				),
+			),
+			'missing image credits'            => array(
+				'data' => array(
+					'name'                 => 'My Theme',
+					'description'          => 'New theme description',
+					'uri'                  => 'https://example.com',
+					'author'               => 'New theme author',
+					'author_uri'           => 'https://example.com/author',
+					'copyright_year'       => '2077',
+					'wp_version'           => '12.12',
+					'required_php_version' => '10.0',
+					'license'              => 'GPLv2 or later',
+					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
+					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
+					'font_credits'         => 'Font credit example text',
 				),
 			),
 			// TODO: Add more test cases.
