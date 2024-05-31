@@ -164,11 +164,11 @@ class CBT_Theme_Fonts {
 
 	}
 
-	private function remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families ) {
+	private static function remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families ) {
 		/* Bail if there are no theme font families, which can happen
 		 * if the theme.json file, missing, or if the theme is a child theme, in
 		 * which case the font families are inherited from the parent theme.
-		 */
+			*/
 		if ( null !== $theme_font_families ) {
 			return;
 		}
