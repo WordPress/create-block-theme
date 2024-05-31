@@ -22,7 +22,6 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		);
 	}
 
-
 	public function test_copy_activated_fonts_to_theme() {
 
 		wp_set_current_user( self::$admin_id );
@@ -214,6 +213,117 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 	}
 
+	public function test_non_array_font_src() {
+		wp_set_current_user( self::$admin_id );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Create a theme with a non-array font src
+		$theme_json = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json['settings']['typography']['fontFamilies'] = array(
+			array(
+				'slug'       => 'single-src-font',
+				'name'       => 'Single Src Font',
+				'fontFamily' => 'Single Src Font',
+				'fontFace'   => array(
+					array(
+						'fontFamily' => 'Single Src Font',
+						'fontStyle'  => 'normal',
+						'fontWeight' => '400',
+						'src'        => 'file:./assets/fonts/single-src-font.ttf',
+					),
+				),
+			),
+		);
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+
+		// Attempt to get all fonts
+		$fonts = CBT_Theme_Fonts::get_all_fonts();
+
+		// Verify that the src is correctly handled
+		$this->assertCount( 1, $fonts );
+		$this->assertEquals( 'single-src-font', $fonts[0]['slug'] );
+		$this->assertEquals( get_stylesheet_directory_uri() . '/assets/fonts/single-src-font.ttf', $fonts[0]['fontFace'][0]['src'] );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_array_font_src() {
+		wp_set_current_user( self::$admin_id );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Create a theme with an array font src
+		$theme_json = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json['settings']['typography']['fontFamilies'] = array(
+			array(
+				'slug'       => 'array-src-font',
+				'name'       => 'Array Src Font',
+				'fontFamily' => 'Array Src Font',
+				'fontFace'   => array(
+					array(
+						'fontFamily' => 'Array Src Font',
+						'fontStyle'  => 'normal',
+						'fontWeight' => '400',
+						'src'        => array(
+							'file:./assets/fonts/array-src-font.ttf',
+							'file:./assets/fonts/array-src-font-bold.ttf',
+						),
+					),
+				),
+			),
+		);
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+
+		// Attempt to get all fonts
+		$fonts = CBT_Theme_Fonts::get_all_fonts();
+
+		// Verify that the src is correctly handled
+		$this->assertCount( 1, $fonts );
+		$this->assertEquals( 'array-src-font', $fonts[0]['slug'] );
+		$this->assertIsArray( $fonts[0]['fontFace'][0]['src'] );
+		$this->assertCount( 2, $fonts[0]['fontFace'][0]['src'] );
+		$this->assertEquals( get_stylesheet_directory_uri() . '/assets/fonts/array-src-font.ttf', $fonts[0]['fontFace'][0]['src'][0] );
+		$this->assertEquals( get_stylesheet_directory_uri() . '/assets/fonts/array-src-font-bold.ttf', $fonts[0]['fontFace'][0]['src'][1] );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_absolute_url_handling() {
+		wp_set_current_user( self::$admin_id );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Create a theme with an absolute URL
+		$theme_json = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json['settings']['typography']['fontFamilies'] = array(
+			array(
+				'slug'       => 'absolute-url-font',
+				'name'       => 'Absolute URL Font',
+				'fontFamily' => 'Absolute URL Font',
+				'fontFace'   => array(
+					array(
+						'fontFamily' => 'Absolute URL Font',
+						'fontStyle'  => 'normal',
+						'fontWeight' => '400',
+						'src'        => 'http://example.com/fonts/absolute-url-font.ttf',
+					),
+				),
+			),
+		);
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+
+		// Attempt to get all fonts
+		$fonts = CBT_Theme_Fonts::get_all_fonts();
+
+		// Verify that the absolute URL remains unchanged
+		$this->assertCount( 1, $fonts );
+		$this->assertEquals( 'absolute-url-font', $fonts[0]['slug'] );
+		$this->assertEquals( 'http://example.com/fonts/absolute-url-font.ttf', $fonts[0]['fontFace'][0]['src'] );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
 	private function save_theme() {
 		CBT_Theme_Fonts::persist_font_settings();
 	}
@@ -324,5 +434,5 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		CBT_Theme_JSON_Resolver::write_user_settings( $settings );
 	}
 
-
 }
+
