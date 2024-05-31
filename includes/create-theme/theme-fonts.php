@@ -221,7 +221,7 @@ class CBT_Theme_Fonts {
 		$font_families_to_not_remove = $user_settings['typography']['fontFamilies']['theme'];
 
 		$theme_font_families = isset( $theme_json['settings']['typography']['fontFamilies'] ) ? $theme_json['settings']['typography']['fontFamilies'] : null;
-		$did_remove_assets   = static::remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families );
+		static::remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families );
 
 		if ( null !== $theme_font_families ) {
 			$theme_json['settings']['typography']['fontFamilies'] = array_values(
