@@ -1,8 +1,10 @@
 <?php
-
-
+/**
+ * Theme Fonts
+ *
+ * @package Create_Block_Theme
+ */
 class CBT_Theme_Fonts {
-
 
 	/**
 	 * Make the font face theme src urls absolute.
@@ -16,7 +18,7 @@ class CBT_Theme_Fonts {
 	 * @return array|string
 	 */
 	private static function make_theme_font_src_absolute( $src ) {
-		$make_absolute = function ( $url ) {
+		$make_absolute = function( $url ) {
 			if ( str_starts_with( $url, 'file:./' ) ) {
 				return str_replace( 'file:./', get_stylesheet_directory_uri() . '/', $url );
 			}
@@ -24,14 +26,10 @@ class CBT_Theme_Fonts {
 		};
 
 		if ( is_array( $src ) ) {
-			foreach ( $src as &$url ) {
-				$url = $make_absolute( $url );
-			}
-		} else {
-			$src = $make_absolute( $src );
+			return array_map( $make_absolute, $src );
 		}
 
-		return $src;
+		return $make_absolute( $src );
 	}
 
 	/**
@@ -64,7 +62,7 @@ class CBT_Theme_Fonts {
 		foreach ( $font_families as &$font_family ) {
 			if ( isset( $font_family['fontFace'] ) ) {
 				foreach ( $font_family['fontFace'] as &$font_face ) {
-					$font_face['src'] = CBT_Theme_Fonts::make_theme_font_src_absolute( $font_face['src'] );
+					$font_face['src'] = self::make_theme_font_src_absolute( $font_face['src'] );
 				}
 			}
 		}
@@ -74,43 +72,34 @@ class CBT_Theme_Fonts {
 
 	/**
 	 * Copy any ACTIVATED fonts from USER configuration to THEME configuration including any font face assets.
-	 * Remove any DEACTIVATED fronts from the THEME configuration.
+	 * Remove any DEACTIVATED fonts from the THEME configuration.
 	 */
 	public static function persist_font_settings() {
-		static::remove_deactivated_fonts_from_theme();
-		static::copy_activated_fonts_to_theme();
+		self::remove_deactivated_fonts_from_theme();
+		self::copy_activated_fonts_to_theme();
 	}
 
 	public static function get_user_activated_fonts() {
 		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
-		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
-			return null;
-		}
-
-		return $user_settings['typography']['fontFamilies']['custom'];
+		return $user_settings['typography']['fontFamilies']['custom'] ?? null;
 	}
 
 	public static function copy_activated_fonts_to_theme() {
-		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
-		if ( ! isset( $user_settings['typography']['fontFamilies']['custom'] ) ) {
-			return null;
-		}
+		$user_settings         = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
+		$font_families_to_copy = $user_settings['typography']['fontFamilies']['custom'] ?? null;
 
-		$font_families_to_copy = $user_settings['typography']['fontFamilies']['custom'];
-
-		// If there are no custom fonts, bounce out
 		if ( is_null( $font_families_to_copy ) ) {
 			return;
 		}
 
-		$theme_json = CBT_Theme_JSON_Resolver::get_theme_file_contents();
-
-		// copy font face assets to theme and change the src to the new location
-		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$theme_json                = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
 		if ( ! file_exists( $theme_font_asset_location ) ) {
-				mkdir( $theme_font_asset_location, 0777, true );
+			mkdir( $theme_font_asset_location, 0777, true );
 		}
+
 		foreach ( $font_families_to_copy as &$font_family ) {
 			if ( ! isset( $font_family['fontFace'] ) ) {
 				continue;
@@ -138,16 +127,11 @@ class CBT_Theme_Fonts {
 			}
 		}
 
-		// Copy user fonts to theme
-		if ( ! isset( $theme_json['settings']['typography']['fontFamilies'] ) ) {
-			$theme_json['settings']['typography']['fontFamilies'] = array();
-		}
 		$theme_json['settings']['typography']['fontFamilies'] = array_merge(
-			$theme_json['settings']['typography']['fontFamilies'],
+			$theme_json['settings']['typography']['fontFamilies'] ?? array(),
 			$font_families_to_copy
 		);
 
-		// Remove user fonts
 		unset( $user_settings['typography']['fontFamilies']['custom'] );
 		if ( empty( $user_settings['typography']['fontFamilies'] ) ) {
 			unset( $user_settings['typography']['fontFamilies'] );
@@ -156,12 +140,8 @@ class CBT_Theme_Fonts {
 			unset( $user_settings['typography'] );
 		}
 
-		// Update the user settings
 		CBT_Theme_JSON_Resolver::write_user_settings( $user_settings );
-
-		// Update theme.json
 		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
-
 	}
 
 	/**
@@ -175,19 +155,16 @@ class CBT_Theme_Fonts {
 		 * if the theme.json file, missing, or if the theme is a child theme, in
 		 * which case the font families are inherited from the parent theme.
 			*/
-		if ( null === $theme_font_families ) {
+		if ( is_null( $theme_font_families ) ) {
 			return;
 		}
 
-		// Remove font face assets from the theme that are not in the user configuration.
 		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
-		$font_families_to_remove   = array_values(
-			array_filter(
-				$theme_font_families,
-				function( $theme_font_family ) use ( $font_families_to_not_remove ) {
-					return ! in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
-				}
-			)
+		$font_families_to_remove   = array_filter(
+			$theme_font_families,
+			function( $theme_font_family ) use ( $font_families_to_not_remove ) {
+				return ! in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
+			}
 		);
 
 		foreach ( $font_families_to_remove as $font_family ) {
@@ -195,13 +172,12 @@ class CBT_Theme_Fonts {
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					// src can be a string or an array
 					// if it is a string, cast it to an array
-					if ( ! is_array( $font_face['src'] ) ) {
-						$font_face['src'] = array( $font_face['src'] );
-					}
-					foreach ( $font_face['src'] as $font_src ) {
+					$srcs = (array) $font_face['src'];
+					foreach ( $srcs as $font_src ) {
 						$font_filename = basename( $font_src );
-						if ( file_exists( $theme_font_asset_location . $font_filename ) ) {
-							unlink( $theme_font_asset_location . $font_filename );
+						$file_path     = $theme_font_asset_location . $font_filename;
+						if ( file_exists( $file_path ) ) {
+							unlink( $file_path );
 						}
 					}
 				}
@@ -217,35 +193,29 @@ class CBT_Theme_Fonts {
 	 * This is because the user may have deactivated a font, but still want to use it in the future.
 	 */
 	public static function remove_deactivated_fonts_from_theme() {
-
 		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 		$theme_json    = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 
-		// If there are no deactivated theme fonts, bounce out
 		if ( ! isset( $user_settings['typography']['fontFamilies']['theme'] ) ) {
 			return;
 		}
 
 		$font_families_to_not_remove = $user_settings['typography']['fontFamilies']['theme'];
+		$theme_font_families         = $theme_json['settings']['typography']['fontFamilies'] ?? null;
 
-		$theme_font_families = isset( $theme_json['settings']['typography']['fontFamilies'] ) ? $theme_json['settings']['typography']['fontFamilies'] : null;
-		static::remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families );
+		self::remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families );
 
-		// If there are font families in the theme, remove the deactivated ones
-		if ( null !== $theme_font_families ) {
-			$theme_json['settings']['typography']['fontFamilies'] = array_values(
-				array_filter(
-					$theme_font_families,
-					function( $theme_font_family ) use ( $font_families_to_not_remove ) {
-						return in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
-					}
-				)
+		if ( ! is_null( $theme_font_families ) ) {
+			$theme_json['settings']['typography']['fontFamilies'] = array_filter(
+				$theme_font_families,
+				function( $theme_font_family ) use ( $font_families_to_not_remove ) {
+					return in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
+				}
 			);
 		}
 
 		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
 
-		// Remove deactivated fonts from user settings
 		unset( $user_settings['typography']['fontFamilies']['theme'] );
 		if ( empty( $user_settings['typography']['fontFamilies'] ) ) {
 			unset( $user_settings['typography']['fontFamilies'] );
