@@ -164,6 +164,12 @@ class CBT_Theme_Fonts {
 
 	}
 
+	/**
+	 * Remove font face assets from the theme that are not in the user configuration.
+	 *
+	 * @param array $font_families_to_not_remove
+	 * @param array $theme_font_families
+	 */
 	private static function remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families ) {
 		/* Bail if there are no theme font families, which can happen
 		 * if the theme.json file, missing, or if the theme is a child theme, in
@@ -173,7 +179,7 @@ class CBT_Theme_Fonts {
 			return;
 		}
 
-		// Remove font assets from theme
+		// Remove font face assets from the theme that are not in the user configuration.
 		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
 		$font_families_to_remove   = array_values(
 			array_filter(
@@ -207,6 +213,8 @@ class CBT_Theme_Fonts {
 	 * Remove any deactivated fonts from the theme configuration.
 	 * This includes removing the font face assets from the theme,
 	 * but does not remove the font face assets from the user configuration.
+	 *
+	 * This is because the user may have deactivated a font, but still want to use it in the future.
 	 */
 	public static function remove_deactivated_fonts_from_theme() {
 
@@ -223,6 +231,7 @@ class CBT_Theme_Fonts {
 		$theme_font_families = isset( $theme_json['settings']['typography']['fontFamilies'] ) ? $theme_json['settings']['typography']['fontFamilies'] : null;
 		static::remove_deactivated_font_assets( $font_families_to_not_remove, $theme_font_families );
 
+		// If there are font families in the theme, remove the deactivated ones
 		if ( null !== $theme_font_families ) {
 			$theme_json['settings']['typography']['fontFamilies'] = array_values(
 				array_filter(
@@ -236,7 +245,7 @@ class CBT_Theme_Fonts {
 
 		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
 
-		// Remove user preferences for theme font activation
+		// Remove deactivated fonts from user settings
 		unset( $user_settings['typography']['fontFamilies']['theme'] );
 		if ( empty( $user_settings['typography']['fontFamilies'] ) ) {
 			unset( $user_settings['typography']['fontFamilies'] );
@@ -247,5 +256,4 @@ class CBT_Theme_Fonts {
 
 		CBT_Theme_JSON_Resolver::write_user_settings( $user_settings );
 	}
-
 }
