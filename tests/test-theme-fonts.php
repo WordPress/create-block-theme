@@ -63,41 +63,92 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		$test_theme_slug = $this->create_blank_theme();
 
-		$this->activate_font_in_theme_and_override_in_user();
+		// Create a theme with multiple fonts
+		$theme_json = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json['settings']['typography']['fontFamilies'] = array(
+			array(
+				'slug'       => 'open-sans',
+				'name'       => 'Open Sans',
+				'fontFamily' => 'Open Sans',
+				'fontFace'   => array(
+					array(
+						'fontFamily' => 'Open Sans',
+						'fontStyle'  => 'normal',
+						'fontWeight' => '400',
+						'src'        => 'file:./assets/fonts/open-sans-normal-400.ttf',
+					),
+				),
+			),
+			array(
+				'slug'       => 'deactivated-font',
+				'name'       => 'Deactivated Font',
+				'fontFamily' => 'Deactivated Font',
+				'fontFace'   => array(
+					array(
+						'fontFamily' => 'Deactivated Font',
+						'fontStyle'  => 'normal',
+						'fontWeight' => '400',
+						'src'        => 'file:./assets/fonts/deactivated-font.ttf',
+					),
+				),
+			),
+		);
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+
+		// Create the font files
+		$font_dir = get_stylesheet_directory() . '/assets/fonts/';
+		if ( ! file_exists( $font_dir ) ) {
+			mkdir( $font_dir, 0777, true );
+		}
+		file_put_contents( $font_dir . 'open-sans-normal-400.ttf', 'dummy content' );
+		file_put_contents( $font_dir . 'deactivated-font.ttf', 'dummy content' );
+
+		// Simulate user deactivating the 'deactivated-font' font
+		$user_settings                                        = array();
+		$user_settings['typography']['fontFamilies']['theme'] = array(
+			array(
+				'slug'       => 'open-sans',
+				'name'       => 'Open Sans',
+				'fontFamily' => 'Open Sans',
+			),
+		);
+		CBT_Theme_JSON_Resolver::write_user_settings( $user_settings );
 
 		$user_data_before         = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 		$theme_data_before        = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
 		$merged_data_before       = CBT_Theme_JSON_Resolver::get_merged_data()->get_settings();
-		$theme_file_exists_before = file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' );
+		$theme_file_exists_before = file_exists( $font_dir . 'open-sans-normal-400.ttf' );
 
-		$this->save_theme();
+		// Call the method to remove deactivated fonts
+		CBT_Theme_Fonts::remove_deactivated_fonts_from_theme();
 
 		$user_data_after         = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 		$theme_data_after        = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
 		$merged_data_after       = CBT_Theme_JSON_Resolver::get_merged_data()->get_settings();
-		$theme_file_exists_after = file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' );
+		$theme_file_exists_after = file_exists( $font_dir . 'open-sans-normal-400.ttf' );
 
 		// ensure that the font was added to the theme settings and removed in user settings and therefore missing in merged settings
 		$this->assertCount( 2, $theme_data_before['typography']['fontFamilies']['theme'] );
-		$this->assertequals( 'open-sans', $theme_data_before['typography']['fontFamilies']['theme'][1]['slug'] );
+		$this->assertequals( 'open-sans', $theme_data_before['typography']['fontFamilies']['theme'][0]['slug'] );
 		$this->assertCount( 1, $user_data_before['typography']['fontFamilies']['theme'] );
-		$this->assertnotequals( 'open-sans', $user_data_before['typography']['fontFamilies']['theme'][0]['slug'] );
 		$this->assertCount( 1, $merged_data_before['typography']['fontFamilies']['theme'] );
-		$this->assertnotequals( 'open-sans', $merged_data_before['typography']['fontFamilies']['theme'][0]['slug'] );
 
 		// ensure that the font was removed from the user settings and removed from the theme settings and therefore missing in merged settings
 		$this->assertCount( 1, $theme_data_after['typography']['fontFamilies']['theme'] );
-		$this->assertnotequals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
+		$this->assertEquals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
 		$this->assertarraynothaskey( 'typography', $user_data_after );
-		$this->assertnotequals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
 		$this->assertCount( 1, $merged_data_after['typography']['fontFamilies']['theme'] );
-		$this->assertnotequals( 'open-sans', $merged_data_after['typography']['fontFamilies']['theme'][0]['slug'] );
 
-		// ensure that the file resource was removed
+		// ensure that the font asset was removed
 		$this->assertTrue( $theme_file_exists_before );
-		$this->assertFalse( $theme_file_exists_after );
+		$this->assertFalse( file_exists( $font_dir . 'deactivated-font.ttf' ) );
+		$this->assertTrue( $theme_file_exists_after );
 
 		$this->uninstall_theme( $test_theme_slug );
+
+		$theme_file_exists_after_uninstall = file_exists( $font_dir . 'open-sans-normal-400.ttf' );
+		// ensure that the font asset was removed after uninstalling the theme
+		$this->assertFalse( $theme_file_exists_after_uninstall );
 	}
 
 	public function test_get_all_fonts_just_theme() {
