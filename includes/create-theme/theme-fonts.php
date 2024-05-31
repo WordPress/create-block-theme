@@ -107,9 +107,7 @@ class CBT_Theme_Fonts {
 			foreach ( $font_family['fontFace'] as &$font_face ) {
 				// src can be a string or an array
 				// if it is a string, cast it to an array
-				if ( ! is_array( $font_face['src'] ) ) {
-					$font_face['src'] = array( $font_face['src'] );
-				}
+				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
 					$font_filename = basename( $font_src );
 					$font_dir      = wp_get_font_dir();
