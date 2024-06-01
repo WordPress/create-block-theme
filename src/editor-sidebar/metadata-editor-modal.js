@@ -224,7 +224,10 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					} }
 				>
 					<ExternalLink
-						href="https://make.wordpress.org/themes/handbook/review/required/theme-tags/"
+						href={ __(
+							'https://make.wordpress.org/themes/handbook/review/required/theme-tags/',
+							'create-block-theme'
+						) }
 						style={ { fontSize: '12px' } }
 					>
 						{ __( 'Read more.', 'create-block-theme' ) }
@@ -239,7 +242,12 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 								'create-block-theme'
 							) }
 							<br />
-							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#6-plugins">
+							<ExternalLink
+								href={ __(
+									'https://make.wordpress.org/themes/handbook/review/required/#6-plugins',
+									'create-block-theme'
+								) }
+							>
 								{ __( 'Read more.', 'create-block-theme' ) }
 							</ExternalLink>
 						</>
@@ -276,7 +284,12 @@ Plugin Description`,
 								'create-block-theme'
 							) }
 							<br />
-							<ExternalLink href="https://make.wordpress.org/themes/handbook/review/required/#1-licensing-copyright">
+							<ExternalLink
+								href={ __(
+									'https://make.wordpress.org/themes/handbook/review/required/#1-licensing-copyright',
+									'create-block-theme'
+								) }
+							>
 								{ __( 'Read more.', 'create-block-theme' ) }
 							</ExternalLink>
 						</>
