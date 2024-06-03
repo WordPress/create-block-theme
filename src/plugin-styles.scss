@@ -22,4 +22,15 @@ $modal-footer-height: 70px;
 			object-fit: cover;
 		}
 	}
+
+	&__plugin-sidebar {
+		&__about-button {
+			color: #949494;
+			margin-top: 3rem;
+		}
+
+		&__about-button svg {
+			fill: #949494;
+		}
+	}
 }

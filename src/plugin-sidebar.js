@@ -36,6 +36,7 @@ import {
 	chevronRight,
 	addCard,
 	blockMeta,
+	help,
 } from '@wordpress/icons';
 
 /**
@@ -50,6 +51,7 @@ import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
 import downloadFile from './utils/download-file';
 import './plugin-styles.scss';
+import AboutPlugin from './editor-sidebar/about';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
@@ -183,6 +185,26 @@ const CreateBlockThemePlugin = () => {
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
+
+								<hr></hr>
+
+								<NavigatorButton
+									path="/about"
+									icon={ help }
+									className={
+										'create-block-theme__plugin-sidebar__about-button'
+									}
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Help',
+												'create-block-theme'
+											) }
+										</FlexItem>
+									</HStack>
+								</NavigatorButton>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
@@ -270,6 +292,10 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/save">
 						<SaveThemePanel />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/about">
+						<AboutPlugin />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
