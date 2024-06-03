@@ -22,6 +22,8 @@ import {
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalDivider as Divider,
 	Button,
 	Icon,
 	FlexItem,
@@ -36,6 +38,7 @@ import {
 	chevronRight,
 	addCard,
 	blockMeta,
+	help,
 } from '@wordpress/icons';
 
 /**
@@ -50,6 +53,7 @@ import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
 import downloadFile from './utils/download-file';
 import './plugin-styles.scss';
+import AboutPlugin from './editor-sidebar/about';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
@@ -155,7 +159,7 @@ const CreateBlockThemePlugin = () => {
 								>
 									{ __( 'Export Zip', 'create-block-theme' ) }
 								</Button>
-								<hr></hr>
+								<Divider />
 								<NavigatorButton
 									path="/create/blank"
 									icon={ addCard }
@@ -183,6 +187,26 @@ const CreateBlockThemePlugin = () => {
 										<Icon icon={ chevronRight } />
 									</HStack>
 								</NavigatorButton>
+
+								<Divider />
+
+								<NavigatorButton
+									path="/about"
+									icon={ help }
+									className={
+										'create-block-theme__plugin-sidebar__about-button'
+									}
+								>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Help',
+												'create-block-theme'
+											) }
+										</FlexItem>
+									</HStack>
+								</NavigatorButton>
 							</VStack>
 						</PanelBody>
 					</NavigatorScreen>
@@ -202,7 +226,7 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Divider />
 								<NavigatorButton
 									path="/clone/create"
 									icon={ copy }
@@ -227,7 +251,7 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Divider />
 								<NavigatorButton
 									path="/clone/create"
 									icon={ copy }
@@ -270,6 +294,10 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/save">
 						<SaveThemePanel />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/about">
+						<AboutPlugin />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
