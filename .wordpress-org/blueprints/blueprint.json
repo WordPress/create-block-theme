@@ -1,6 +1,6 @@
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"landingPage": "/wp-admin/themes.php?page=create-block-theme",
+	"landingPage": "/wp-admin/themes.php?page=create-block-theme-landing",
 	"features": {
 		"networking": true
 	},
