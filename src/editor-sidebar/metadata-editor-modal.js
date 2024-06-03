@@ -302,7 +302,12 @@ ${ __( 'Source', 'create-block-theme' ) }` }
 								'create-block-theme'
 							) }
 							<br />
-							<ExternalLink href="hhttps://make.wordpress.org/themes/handbook/review/required/#1-licensing-copyright">
+							<ExternalLink
+								href={ __(
+									'https://make.wordpress.org/themes/handbook/review/required/#1-licensing-copyright',
+									'create-block-theme'
+								) }
+							>
 								{ __( 'Read more.', 'create-block-theme' ) }
 							</ExternalLink>
 						</>
