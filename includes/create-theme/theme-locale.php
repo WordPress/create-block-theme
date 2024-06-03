@@ -17,11 +17,7 @@ class CBT_Theme_Locale {
 		}
 
 		// Check if the text is already escaped.
-		if (
-			str_starts_with( $string, '<?php echo' ) ||
-			str_starts_with( $string, '<?php esc_html_e' ) ||
-			str_starts_with( $string, '<?php esc_html' )
-		) {
+		if ( str_starts_with( $string, '<?php' ) ) {
 			return $string;
 		}
 
