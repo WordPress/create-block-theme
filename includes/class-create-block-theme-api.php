@@ -11,8 +11,6 @@ require_once __DIR__ . '/create-theme/theme-styles.php';
 require_once __DIR__ . '/create-theme/theme-json.php';
 require_once __DIR__ . '/create-theme/theme-utils.php';
 require_once __DIR__ . '/create-theme/theme-readme.php';
-require_once __DIR__ . '/create-theme/theme-form.php';
-require_once __DIR__ . '/create-theme/form-messages.php';
 require_once __DIR__ . '/create-theme/theme-fonts.php';
 require_once __DIR__ . '/create-theme/theme-create.php';
 
