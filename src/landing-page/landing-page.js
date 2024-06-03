@@ -177,7 +177,12 @@ export default function LandingPage() {
 							),
 							{
 								ExternalLink: (
-									<ExternalLink href="https://wordpress.org/support/plugin/create-block-theme/" />
+									<ExternalLink
+										href={ __(
+											'https://wordpress.org/support/plugin/create-block-theme/',
+											'create-block-theme'
+										) }
+									/>
 								),
 							}
 						) }
