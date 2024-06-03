@@ -50,6 +50,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		tags_custom: '',
 		recommended_plugins: '',
 		font_credits: '',
+		image_credits: '',
 		subfolder: '',
 	} );
 
@@ -70,6 +71,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			screenshot: themeData.screenshot,
 			recommended_plugins: readmeData.recommended_plugins,
 			font_credits: readmeData.fonts,
+			image_credits: readmeData.images,
 			subfolder:
 				themeData.stylesheet.lastIndexOf( '/' ) > 1
 					? themeData.stylesheet.substring(
@@ -288,6 +290,38 @@ ${ __( 'Source', 'create-block-theme' ) }` }
 					value={ theme.font_credits }
 					onChange={ ( value ) =>
 						setTheme( { ...theme, font_credits: value } )
+					}
+				/>
+
+				<TextareaControl
+					label={ __( 'Image Credits', 'create-block-theme' ) }
+					help={
+						<>
+							{ __(
+								'Credits for the images bundled with the theme.',
+								'create-block-theme'
+							) }
+							<br />
+							<ExternalLink
+								href={ __(
+									'https://make.wordpress.org/themes/handbook/review/required/#1-licensing-copyright',
+									'create-block-theme'
+								) }
+							>
+								{ __( 'Read more.', 'create-block-theme' ) }
+							</ExternalLink>
+						</>
+					}
+					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+					placeholder={ __(
+						`Image filename
+Image source URL
+Image license`,
+						'create-block-theme'
+					) }
+					value={ theme.image_credits }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, image_credits: value } )
 					}
 				/>
 
