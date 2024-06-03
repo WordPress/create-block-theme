@@ -1,3 +1,5 @@
+@import "~@wordpress/base-styles/colors";
+
 $plugin-prefix: "create-block-theme";
 $modal-footer-height: 70px;
 
@@ -25,12 +27,12 @@ $modal-footer-height: 70px;
 
 	&__plugin-sidebar {
 		&__about-button {
-			color: #949494;
+			color: $gray-600;
 			margin-top: 3rem;
 		}
 
 		&__about-button svg {
-			fill: #949494;
+			fill: $gray-600;
 		}
 	}
 }
