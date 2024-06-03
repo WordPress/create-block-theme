@@ -17,12 +17,12 @@ class CBT_Theme_Locale {
 		}
 
 		// Check if the text is already escaped.
-		if ( str_starts_with( $string, '<?php echo' ) ) {
+		if ( str_starts_with( $string, '<?php' ) ) {
 			return $string;
 		}
 
 		$string = addcslashes( $string, "'" );
-		return "<?php echo __('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
 	/**
