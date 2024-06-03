@@ -22,6 +22,8 @@ import {
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalDivider as Divider,
 	Button,
 	Icon,
 	FlexItem,
@@ -157,7 +159,7 @@ const CreateBlockThemePlugin = () => {
 								>
 									{ __( 'Export Zip', 'create-block-theme' ) }
 								</Button>
-								<hr></hr>
+								<Divider />
 								<NavigatorButton
 									path="/create/blank"
 									icon={ addCard }
@@ -186,7 +188,7 @@ const CreateBlockThemePlugin = () => {
 									</HStack>
 								</NavigatorButton>
 
-								<hr></hr>
+								<Divider />
 
 								<NavigatorButton
 									path="/about"
@@ -224,7 +226,7 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Divider />
 								<NavigatorButton
 									path="/clone/create"
 									icon={ copy }
@@ -249,7 +251,7 @@ const CreateBlockThemePlugin = () => {
 										'create-block-theme'
 									) }
 								</Text>
-								<hr></hr>
+								<Divider />
 								<NavigatorButton
 									path="/clone/create"
 									icon={ copy }

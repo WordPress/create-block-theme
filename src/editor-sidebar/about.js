@@ -7,6 +7,8 @@ import {
 	__experimentalVStack as VStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalDivider as Divider,
 	PanelBody,
 	ExternalLink,
 } from '@wordpress/components';
@@ -37,7 +39,7 @@ function AboutPlugin() {
 					) }
 				</Text>
 
-				<hr />
+				<Divider />
 
 				<Text weight="bold">
 					{ __( 'Help', 'create-block-theme' ) }
