@@ -17,12 +17,16 @@ class CBT_Theme_Locale {
 		}
 
 		// Check if the text is already escaped.
-		if ( str_starts_with( $string, '<?php echo' ) ) {
+		if (
+			str_starts_with( $string, '<?php echo' ) ||
+			str_starts_with( $string, '<?php esc_html_e' ) ||
+			str_starts_with( $string, '<?php esc_html' )
+		) {
 			return $string;
 		}
 
 		$string = addcslashes( $string, "'" );
-		return "<?php echo __('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
 	/**
