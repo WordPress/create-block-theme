@@ -129,6 +129,7 @@ class CBT_Theme_Fonts {
 			$font_families_to_copy
 		);
 
+		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
 		unset( $user_settings['typography']['fontFamilies']['custom'] );
 		if ( empty( $user_settings['typography']['fontFamilies'] ) ) {
 			unset( $user_settings['typography']['fontFamilies'] );
