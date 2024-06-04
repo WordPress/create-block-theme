@@ -129,7 +129,8 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		// ensure that the font was added to the theme settings and removed in user settings and therefore missing in merged settings
 		$this->assertCount( 2, $theme_data_before['typography']['fontFamilies']['theme'] );
-		$this->assertequals( 'open-sans', $theme_data_before['typography']['fontFamilies']['theme'][0]['slug'] );
+		$this->assertEquals( 'open-sans', $theme_data_before['typography']['fontFamilies']['theme'][0]['slug'] );
+		$this->assertEquals( 'deactivated-font', $theme_data_before['typography']['fontFamilies']['theme'][1]['slug'] );
 		$this->assertCount( 1, $user_data_before['typography']['fontFamilies']['theme'] );
 		$this->assertCount( 1, $merged_data_before['typography']['fontFamilies']['theme'] );
 
