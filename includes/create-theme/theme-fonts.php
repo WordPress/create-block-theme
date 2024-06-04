@@ -85,8 +85,7 @@ class CBT_Theme_Fonts {
 	}
 
 	public static function copy_activated_fonts_to_theme() {
-		$user_settings         = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
-		$font_families_to_copy = $user_settings['typography']['fontFamilies']['custom'] ?? null;
+		$font_families_to_copy = self::get_user_activated_fonts();
 
 		if ( is_null( $font_families_to_copy ) ) {
 			return;
