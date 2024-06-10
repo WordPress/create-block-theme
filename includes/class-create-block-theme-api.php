@@ -308,6 +308,7 @@ class CBT_Theme_API {
 		header( 'Content-Length: ' . filesize( $filename ) );
 		flush();
 		echo readfile( $filename );
+		exit;
 	}
 
 	/**
