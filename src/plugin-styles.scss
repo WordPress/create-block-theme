@@ -27,12 +27,8 @@ $modal-footer-height: 70px;
 
 	&__plugin-sidebar {
 		&__about-button {
-			color: $gray-600;
+			color: $gray-700;
 			margin-top: 3rem;
-		}
-
-		&__about-button svg {
-			fill: $gray-600;
 		}
 	}
 }
