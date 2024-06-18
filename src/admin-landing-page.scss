@@ -16,7 +16,6 @@
 			margin: 0;
 		}
 		&__body {
-			font-weight: 200;
 			padding: 40px 0;
 			p {
 				margin-top: 0;
@@ -73,6 +72,10 @@
 				}
 				details {
 					padding-bottom: 20px;
+
+					summary {
+						cursor: pointer;
+					}
 				}
 			}
 		}
