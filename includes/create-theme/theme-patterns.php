@@ -85,6 +85,11 @@ class CBT_Theme_Patterns {
 
 		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
 			$pattern = CBT_Theme_Media::make_template_images_local( $pattern );
+
+			// Write the media assets if there are any
+			if ( $pattern->media ) {
+				CBT_Theme_Media::add_media_to_local( $pattern->media );
+			}
 		}
 
 		return $pattern;
@@ -122,7 +127,6 @@ class CBT_Theme_Patterns {
 		}
 
 		// TODO:
-		// Copy media to the theme filesystem and replace media URLs.
 		// Replace any references to the custom patterns with the new theme patterns.
 	}
 }

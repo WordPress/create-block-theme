@@ -148,7 +148,7 @@ export const SaveThemePanel = () => {
 				<CheckboxControl
 					label={ __( 'Localize Text', 'create-block-theme' ) }
 					help={ __(
-						'Any text in a template will be copied to a pattern and localized.',
+						'Any text in a template or pattern will be localized in a pattern.',
 						'create-block-theme'
 					) }
 					disabled={
@@ -164,7 +164,7 @@ export const SaveThemePanel = () => {
 				<CheckboxControl
 					label={ __( 'Localize Images', 'create-block-theme' ) }
 					help={ __(
-						'Any images in a template will be copied to a local /assets folder and referenced from there via a pattern.',
+						'Any images in a template or pattern will be copied to a local /assets folder and referenced from there via a pattern.',
 						'create-block-theme'
 					) }
 					disabled={
