@@ -23,6 +23,7 @@ class CBT_Theme_Patterns {
 
 	public static function pattern_from_wp_block( $pattern_post ) {
 		$pattern          = new stdClass();
+		$pattern->id      = $pattern_post->ID;
 		$pattern->name    = sanitize_title_with_dashes( $pattern_post->post_title );
 		$theme_slug       = wp_get_theme()->get( 'TextDomain' );
 		$pattern->slug    = $theme_slug . '/' . $pattern->name;
@@ -66,6 +67,21 @@ class CBT_Theme_Patterns {
 		$block_attributes = array_filter( $attributes );
 		$attributes_json  = json_encode( $block_attributes, JSON_UNESCAPED_SLASHES );
 		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
+	}
+
+	public static function replace_local_pattern_references( $pattern ) {
+		// List all template and pattern files in the theme
+		$base_dir       = get_stylesheet_directory();
+		$patterns       = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
+		$templates      = glob( $base_dir . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . '*.html' );
+		$template_parts = glob( $base_dir . DIRECTORY_SEPARATOR . 'template-parts' . DIRECTORY_SEPARATOR . '*.html' );
+
+		// Replace references to the local patterns in the theme
+		foreach ( array_merge( $patterns, $templates, $template_parts ) as $file ) {
+			$file_content = file_get_contents( $file );
+			$file_content = str_replace( 'wp:block {"ref":' . $pattern->id . '}', 'wp:pattern {"slug":"' . $pattern->slug . '"}', $file_content );
+			file_put_contents( $file, $file_content );
+		}
 	}
 
 	public static function prepare_pattern_for_export( $pattern, $options = null ) {
@@ -123,10 +139,9 @@ class CBT_Theme_Patterns {
 					$patterns_dir . DIRECTORY_SEPARATOR . 'pattern-' . $pattern->name . '.php',
 					$pattern->content
 				);
+
+				self::replace_local_pattern_references( $pattern );
 			}
 		}
-
-		// TODO:
-		// Replace any references to the custom patterns with the new theme patterns.
 	}
 }
