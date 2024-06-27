@@ -383,7 +383,7 @@ class CBT_Theme_API {
 		}
 
 		if ( isset( $options['savePatterns'] ) && true === $options['savePatterns'] ) {
-			CBT_Theme_Patterns::add_patterns_to_theme();
+			CBT_Theme_Patterns::add_patterns_to_theme( $options );
 			// clear pattern customisations?
 		}
 

@@ -21,26 +21,24 @@ class CBT_Theme_Patterns {
 		);
 	}
 
-	public static function pattern_from_wp_block( $post ) {
-		$pattern_name    = sanitize_title_with_dashes( $post->post_title );
-		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
-		$pattern_slug    = $theme_slug . '/' . $pattern_name;
-		$pattern_content = (
+	public static function pattern_from_wp_block( $pattern_post ) {
+		$pattern          = new stdClass();
+		$pattern->name    = sanitize_title_with_dashes( $pattern_post->post_title );
+		$theme_slug       = wp_get_theme()->get( 'TextDomain' );
+		$pattern->slug    = $theme_slug . '/' . $pattern_name;
+		$pattern->content = (
 		'<?php
 /**
- * Title: ' . $post->post_title . '
+ * Title: ' . $pattern_post->post_title . '
  * Slug: ' . $pattern_slug . '
  * Categories: hidden
  * Inserter: no
  */
 ?>
-' . $post->post_content
+' . $pattern_post->post_content
 		);
-		return array(
-			'name'    => $pattern_name,
-			'slug'    => $pattern_slug,
-			'content' => $pattern_content,
-		);
+
+		return $pattern;
 	}
 
 	public static function escape_alt_for_pattern( $html ) {
@@ -70,10 +68,32 @@ class CBT_Theme_Patterns {
 		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
 	}
 
+	public static function prepare_pattern_for_export( $pattern, $options = null ) {
+		if ( ! $options ) {
+			$options = array(
+				'localizeText'   => false,
+				'removeNavRefs'  => true,
+				'localizeImages' => true,
+			);
+		}
+
+		$pattern = CBT_Theme_Templates::eliminate_environment_specific_content( $pattern, $options );
+
+		if ( array_key_exists( 'localizeText', $options ) && $options['localizeText'] ) {
+			$pattern = CBT_Theme_Templates::escape_text_in_template( $pattern );
+		}
+
+		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
+			$pattern = CBT_Theme_Media::make_template_images_local( $pattern );
+		}
+
+		return $pattern;
+	}
+
 	/**
 	 * Copy the local patterns as well as any media to the theme filesystem.
 	 */
-	public static function add_patterns_to_theme() {
+	public static function add_patterns_to_theme( $options = null ) {
 		$base_dir     = get_stylesheet_directory();
 		$patterns_dir = $base_dir . DIRECTORY_SEPARATOR . 'patterns';
 
@@ -92,10 +112,11 @@ class CBT_Theme_Patterns {
 
 			foreach ( $pattern_query->posts as $pattern ) {
 				$pattern      = self::pattern_from_wp_block( $pattern );
-				$pattern_file = $patterns_dir . 'pattern-' . $pattern['name'] . '.php';
+				$pattern      = self::prepare_pattern_for_export( $pattern, $options );
+				$pattern_file = $patterns_dir . 'pattern-' . $pattern->name . '.php';
 				file_put_contents(
-					$patterns_dir . DIRECTORY_SEPARATOR . 'pattern-' . $pattern['name'] . '.php',
-					$pattern['content']
+					$patterns_dir . DIRECTORY_SEPARATOR . 'pattern-' . $pattern->name . '.php',
+					$pattern->content
 				);
 			}
 		}
