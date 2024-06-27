@@ -25,12 +25,12 @@ class CBT_Theme_Patterns {
 		$pattern          = new stdClass();
 		$pattern->name    = sanitize_title_with_dashes( $pattern_post->post_title );
 		$theme_slug       = wp_get_theme()->get( 'TextDomain' );
-		$pattern->slug    = $theme_slug . '/' . $pattern_name;
+		$pattern->slug    = $theme_slug . '/' . $pattern->name;
 		$pattern->content = (
 		'<?php
 /**
  * Title: ' . $pattern_post->post_title . '
- * Slug: ' . $pattern_slug . '
+ * Slug: ' . $pattern->slug . '
  * Categories: hidden
  * Inserter: no
  */
