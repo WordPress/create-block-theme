@@ -32,6 +32,7 @@ export const SaveThemePanel = () => {
 		return {
 			saveStyle: _preference?.saveStyle ?? true,
 			saveTemplates: _preference?.saveTemplates ?? true,
+			savePatterns: _preference?.savePatterns ?? true,
 			processOnlySavedTemplates:
 				_preference?.processOnlySavedTemplates ?? true,
 			saveFonts: _preference?.saveFonts ?? true,
@@ -116,6 +117,15 @@ export const SaveThemePanel = () => {
 					) }
 					checked={ preference.saveTemplates }
 					onChange={ () => handleTogglePreference( 'saveTemplates' ) }
+				/>
+				<CheckboxControl
+					label={ __( 'Save My Patterns', 'create-block-theme' ) }
+					help={ __(
+						'Save custom patterns created in the Editor, listed under "My patterns", to the theme.',
+						'create-block-theme'
+					) }
+					checked={ preference.savePatterns }
+					onChange={ () => handleTogglePreference( 'savePatterns' ) }
 				/>
 				<CheckboxControl
 					label={ __(
