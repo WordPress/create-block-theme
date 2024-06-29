@@ -24,13 +24,13 @@ class CBT_Theme_Patterns {
 	public static function pattern_from_wp_block( $pattern_post ) {
 		$pattern          = new stdClass();
 		$pattern->id      = $pattern_post->ID;
+		$pattern->title   = $pattern_post->post_title;
 		$pattern->name    = sanitize_title_with_dashes( $pattern_post->post_title );
-		$theme_slug       = wp_get_theme()->get( 'TextDomain' );
-		$pattern->slug    = $theme_slug . '/' . $pattern->name;
+		$pattern->slug    = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
 		$pattern->content = (
 		'<?php
 /**
- * Title: ' . $pattern_post->post_title . '
+ * Title: ' . $pattern->title . '
  * Slug: ' . $pattern->slug . '
  * Categories: hidden
  * Inserter: no
