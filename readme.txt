@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.5
 Tested up to: 6.5
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,22 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.3.0 =
+* Persist font settings when cloning a theme (#678)
+* Landing Page: Improve design (#673)
+* Fix small readme typo (#674)
+* A11y: Improve color contrast for help button (#672)
+* Quality: Fix warning error when exporting theme (#671)
+* Remove unused REST API endpoint (#670)
+* Refactor theme fonts class for readability (#661)
+* Check if theme fonts present before removing (#660)
+* Add an about section in the editor (#667)
+* Update escaping function (#665)
+* Make external links translatable (#663)
+* Update url for blueprint (#658)
+* Add image credits edit capabilities to the edit theme modal (#662)
+* Quality: Remove unused PHP classes (#664)
 
 = 2.2.0 =
 * Update modal width to 65vw (#638)
