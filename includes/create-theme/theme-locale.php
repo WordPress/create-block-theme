@@ -22,7 +22,7 @@ class CBT_Theme_Locale {
 		}
 
 		$string = addcslashes( $string, "'" );
-		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		return "<?php echo wp_kses_post( __('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "') );?>";
 	}
 
 	/**
