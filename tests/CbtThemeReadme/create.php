@@ -17,8 +17,11 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 	public function test_create( $data ) {
 		$readme = CBT_Theme_Readme::create( $data );
 
+		// Check sanitazion before altering the content.
+		$this->assertStringNotContainsString( "\r\n", $readme, 'The readme content contains DOS newlines.' );
+
 		// Removes the newlines from the readme content to make it easier to search for strings.
-		$readme_without_newlines = str_replace( "\n", '', $readme );
+		$readme_without_newlines = $this->remove_newlines( $readme );
 
 		$expected_name                = '== ' . $data['name'] . ' ==';
 		$expected_description         = '== Description ==' . $data['description'];
@@ -30,10 +33,16 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 		$expected_license             = 'License: ' . $data['license'];
 		$expected_license_uri         = 'License URI: ' . $data['license_uri'];
 		$expected_font_credits        = '== Fonts ==' .
-			( isset( $data['font_credits'] ) ? $data['font_credits'] : '' );
+			( isset( $data['font_credits'] )
+				? $this->remove_newlines( $data['font_credits'] )
+				: ''
+			);
 		$expected_image_credits       = '== Images ==' .
-			( isset( $data['image_credits'] ) ? $data['image_credits'] : '' );
-		$expected_recommended_plugins = '== Recommended Plugins ==' . $data['recommended_plugins'];
+			( isset( $data['image_credits'] )
+				? $this->remove_newlines( $data['image_credits'] )
+				: ''
+			);
+		$expected_recommended_plugins = '== Recommended Plugins ==' . $this->remove_newlines( $data['recommended_plugins'] );
 
 		$this->assertStringContainsString( $expected_name, $readme_without_newlines, 'The expected name is missing.' );
 		$this->assertStringContainsString( $expected_author, $readme_without_newlines, 'The expected author is missing.' );
@@ -159,6 +168,27 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
 					'recommended_plugins'  => 'The theme is best used with the following plugins: Plugin 1, Plugin 2, Plugin 3.',
 					'font_credits'         => 'Font credit example text',
+				),
+			),
+			/*
+			 * This string contains DOS newlines.
+			 * It uses double quotes to make PHP interpret the newlines as newlines and not as string literals.
+			 */
+			'With DOS newlines'                => array(
+				'data' => array(
+					'name'                 => 'My Theme',
+					'description'          => 'New theme description',
+					'uri'                  => 'https://example.com',
+					'author'               => 'New theme author',
+					'author_uri'           => 'https://example.com/author',
+					'copyright_year'       => '2077',
+					'wp_version'           => '12.12',
+					'required_php_version' => '10.0',
+					'license'              => 'GPLv2 or later',
+					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
+					'image_credits'        => "New image credits \r\n New image credits 2",
+					'recommended_plugins'  => "Plugin1 \r\n Plugin2 \r\n Plugin3",
+					'font_credits'         => "Font1 \r\n Font2 \r\n Font3",
 				),
 			),
 			// TODO: Add more test cases.
