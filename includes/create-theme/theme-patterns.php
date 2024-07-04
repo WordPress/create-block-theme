@@ -38,7 +38,7 @@ class CBT_Theme_Patterns {
 	public static function escape_text_for_pattern( $text ) {
 		if ( $text && trim( $text ) !== '' ) {
 			$escaped_text = addslashes( $text );
-			return "<?php echo esc_attr_e( '" . $escaped_text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
+			return "<?php esc_attr_e( '" . $escaped_text . "', '" . wp_get_theme()->get( 'Name' ) . "' ); ?>";
 		}
 	}
 

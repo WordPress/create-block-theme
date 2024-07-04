@@ -130,7 +130,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:image -->',
 				'expected_markup' =>
 					'<!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"is-style-rounded"} -->
-                    <figure class="wp-block-image size-large is-style-rounded"><img src="http://localhost/wp1/wp-content/themes/twentytwentyfour/assets/images/windows.webp" alt="<?php echo wp_kses_post( __(\'Windows of a building in Nuremberg, Germany\', \'test-locale-theme\') );?>"/></figure>
+                    <figure class="wp-block-image size-large is-style-rounded"><img src="http://localhost/wp1/wp-content/themes/twentytwentyfour/assets/images/windows.webp" alt="<?php esc_attr_e( \'Windows of a building in Nuremberg, Germany\', \'test-locale-theme\' );?>"/></figure>
                     <!-- /wp:image -->',
 			),
 
@@ -143,7 +143,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:cover -->',
 				'expected_markup' =>
 					'<!-- wp:cover {"url":"http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg","id":39,"alt":"Alternative text for cover image","dimRatio":50,"customOverlayColor":"#1d2b2f","layout":{"type":"constrained"}} -->
-                    <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#1d2b2f"></span><img class="wp-block-cover__image-background wp-image-39" alt="<?php echo wp_kses_post( __(\'Alternative text for cover image\', \'test-locale-theme\') );?>" src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+                    <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#1d2b2f"></span><img class="wp-block-cover__image-background wp-image-39" alt="<?php esc_attr_e( \'Alternative text for cover image\', \'test-locale-theme\' );?>" src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
                     <p class="has-text-align-center has-large-font-size"><?php echo wp_kses_post( __(\'This is a cover caption\', \'test-locale-theme\') );?></p>
                     <!-- /wp:paragraph --></div></div>
                     <!-- /wp:cover -->',
@@ -158,7 +158,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:media-text -->',
 				'expected_markup' =>
 					'<!-- wp:media-text {"mediaId":39,"mediaLink":"http://localhost/wp1/image/","mediaType":"image"} -->
-                    <div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" alt="<?php echo wp_kses_post( __(\'This is alt text\', \'test-locale-theme\') );?>" class="wp-image-39 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
+                    <div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" alt="<?php esc_attr_e( \'This is alt text\', \'test-locale-theme\' );?>" class="wp-image-39 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
                     <p><?php echo wp_kses_post( __(\'Media text content test.\', \'test-locale-theme\') );?></p>
                     <!-- /wp:paragraph --></div></div>
                     <!-- /wp:media-text -->',

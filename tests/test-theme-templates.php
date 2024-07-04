@@ -167,7 +167,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<!-- /wp:image -->
 		';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( 'alt="<?php echo wp_kses_post( __(\'This is alt text\', \'\') );?>"', $new_template->content );
+		$this->assertStringContainsString( 'alt="<?php esc_attr_e( \'This is alt text\', \'\' );?>"', $new_template->content );
 	}
 
 	public function test_localize_alt_text_from_cover() {
@@ -176,7 +176,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<!-- wp:cover {"url":"http://example.com/file.jpg","alt":"This is alt text"} -->
 			<div class="wp-block-cover">
 			<span aria-hidden="true" class="wp-block-cover__background"></span>
-			<img class="wp-block-cover__image-background" alt="<?php echo wp_kses_post( __(\'This is alt text\', \'\') );?>" src="http://example.com/file.jpg" data-object-fit="cover"/>
+			<img class="wp-block-cover__image-background" alt="This is alt text" src="http://example.com/file.jpg" data-object-fit="cover"/>
 			<div class="wp-block-cover__inner-container">
 				<!-- wp:paragraph -->
 				<p></p>
@@ -187,7 +187,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 		// Check the markup attribute
-		$this->assertStringContainsString( 'alt="<?php echo wp_kses_post( __(\'This is alt text\', \'\') );?>"', $new_template->content );
+		$this->assertStringContainsString( 'alt="<?php esc_attr_e( \'This is alt text\', \'\' );?>"', $new_template->content );
 	}
 
 	public function test_localize_quote() {
@@ -296,7 +296,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		<!-- /wp:media-text -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 		$this->assertStringContainsString( "<?php echo wp_kses_post( __('Content to Localize', '') );?>", $new_template->content );
-		$this->assertStringContainsString( "<?php echo wp_kses_post( __('Alt Text Is Here', '') );?>", $new_template->content );
+		$this->assertStringContainsString( "<?php esc_attr_e( 'Alt Text Is Here', '' );?>", $new_template->content );
 	}
 
 	public function test_localize_cover_block_children() {
