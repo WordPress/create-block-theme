@@ -22,17 +22,19 @@ class CBT_Theme_Patterns {
 	}
 
 	public static function pattern_from_wp_block( $pattern_post ) {
-		$pattern          = new stdClass();
-		$pattern->id      = $pattern_post->ID;
-		$pattern->title   = $pattern_post->post_title;
-		$pattern->name    = sanitize_title_with_dashes( $pattern_post->post_title );
-		$pattern->slug    = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
-		$pattern->content = (
+		$pattern               = new stdClass();
+		$pattern->id           = $pattern_post->ID;
+		$pattern->title        = $pattern_post->post_title;
+		$pattern->name         = sanitize_title_with_dashes( $pattern_post->post_title );
+		$pattern->slug         = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
+		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
+		$pattern->categories   = join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) );
+		$pattern->content      = (
 		'<?php
 /**
  * Title: ' . $pattern->title . '
  * Slug: ' . $pattern->slug . '
- * Categories: hidden
+ * Categories: ' . $pattern->categories . '
  * Inserter: no
  */
 ?>
