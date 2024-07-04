@@ -28,7 +28,7 @@ class CBT_Theme_Patterns {
 		$pattern->name         = sanitize_title_with_dashes( $pattern_post->post_title );
 		$pattern->slug         = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
 		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
-		$pattern->categories   = join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) );
+		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
 		$pattern->content      = (
 		'<?php
 /**
