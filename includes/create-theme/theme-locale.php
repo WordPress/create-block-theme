@@ -16,13 +16,24 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
+		// Check if string is empty.
+		if ( '' === $string ) {
+			return $string;
+		}
+
 		// Check if the text is already escaped.
 		if ( str_starts_with( $string, '<?php' ) ) {
 			return $string;
 		}
 
 		$string = addcslashes( $string, "'" );
-		return "<?php echo wp_kses_post( __('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "') );?>";
+
+		// Check if string contains html.
+		if ( strip_tags( $string ) !== $string ) {
+			return "<?php echo wp_kses_post( __( '" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "' ) ); ?>";
+		}
+
+		return "<?php esc_html_e( '" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "' ); ?>";
 	}
 
 	/**
@@ -37,13 +48,18 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
+		// Check if string is empty.
+		if ( '' === $string ) {
+			return $string;
+		}
+
 		// Check if the text is already escaped.
 		if ( str_starts_with( $string, '<?php' ) ) {
 			return $string;
 		}
 
 		$string = addcslashes( $string, "'" );
-		return "<?php esc_attr_e( '" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "' );?>";
+		return "<?php esc_attr_e( '" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "' ); ?>";
 	}
 
 	/**
