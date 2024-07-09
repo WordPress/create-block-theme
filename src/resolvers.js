@@ -144,3 +144,23 @@ export async function getFontFamilies() {
 	} );
 	return response.data;
 }
+
+export async function resetTheme( preferences ) {
+	return apiFetch( {
+		path: '/create-block-theme/v1/reset-theme',
+		method: 'PATCH',
+		data: preferences,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} ).then( ( response ) => {
+		if ( 'SUCCESS' !== response?.status ) {
+			throw new Error(
+				`Failed to reset theme: ${
+					response?.message || response?.status
+				}`
+			);
+		}
+		return response;
+	} );
+}
