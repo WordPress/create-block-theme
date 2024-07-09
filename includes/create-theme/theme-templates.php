@@ -106,17 +106,22 @@ class CBT_Theme_Templates {
 	 * This will remove all user templates from the database.
 	 */
 	public static function clear_user_templates_customizations() {
-		//remove all user templates (they have been saved in the theme)
-		$templates      = get_block_templates();
-		$template_parts = get_block_templates( array(), 'wp_template_part' );
-		foreach ( $template_parts as $template ) {
+		$templates = get_block_templates();
+		foreach ( $templates as $template ) {
 			if ( 'custom' !== $template->source ) {
 				continue;
 			}
 			wp_delete_post( $template->wp_id, true );
 		}
+	}
 
-		foreach ( $templates as $template ) {
+	/**
+	 * Clear all user template-parts customizations.
+	 * This will remove all user template-parts from the database.
+	 */
+	public static function clear_user_template_parts_customizations() {
+		$template_parts = get_block_templates( array(), 'wp_template_part' );
+		foreach ( $template_parts as $template ) {
 			if ( 'custom' !== $template->source ) {
 				continue;
 			}
