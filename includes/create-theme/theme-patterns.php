@@ -29,7 +29,8 @@ class CBT_Theme_Patterns {
 		$pattern->slug         = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
 		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
 		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
-		$pattern->content      = (
+		// $pattern->sync_status  = get_post_meta( $pattern->id, 'wp_pattern_sync_status', true );
+		$pattern->content = (
 		'<?php
 /**
  * Title: ' . $pattern->title . '
