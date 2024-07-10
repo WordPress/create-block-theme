@@ -6,12 +6,15 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalConfirmDialog as ConfirmDialog,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
 	PanelBody,
 	Button,
 	CheckboxControl,
 } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -38,6 +41,7 @@ function ResetTheme() {
 
 	const { set: setPreferences } = useDispatch( preferencesStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const [ isConfirmDialogOpen, setIsConfirmDialogOpen ] = useState( false );
 
 	const handleTogglePreference = ( key ) => {
 		setPreferences( PREFERENCE_SCOPE, PREFERENCE_KEY, {
@@ -46,9 +50,14 @@ function ResetTheme() {
 		} );
 	};
 
+	const toggleConfirmDialog = () => {
+		setIsConfirmDialogOpen( ! isConfirmDialogOpen );
+	};
+
 	const handleResetTheme = async () => {
 		try {
 			await resetTheme( preferences );
+			toggleConfirmDialog();
 			// eslint-disable-next-line no-alert
 			window.alert(
 				__(
@@ -68,62 +77,83 @@ function ResetTheme() {
 	};
 
 	return (
-		<PanelBody>
-			<ScreenHeader title={ __( 'Reset Theme', 'create-block-theme' ) } />
-			<VStack>
-				<CheckboxControl
-					label={ __( 'Reset theme styles', 'create-block-theme' ) }
-					help={ __(
-						'Reset customizations to theme styles and settings.',
-						'create-block-theme'
-					) }
-					checked={ preferences.resetStyles }
-					onChange={ () => handleTogglePreference( 'resetStyles' ) }
+		<>
+			<ConfirmDialog
+				isOpen={ isConfirmDialogOpen }
+				confirmButtonText={ __( 'Reset', 'create-block-theme' ) }
+				onCancel={ toggleConfirmDialog }
+				onConfirm={ handleResetTheme }
+				size="medium"
+			>
+				{ __(
+					'Are you sure you want to reset the theme? This action cannot be undone.',
+					'create-block-theme'
+				) }
+			</ConfirmDialog>
+			<PanelBody>
+				<ScreenHeader
+					title={ __( 'Reset Theme', 'create-block-theme' ) }
 				/>
+				<VStack>
+					<CheckboxControl
+						label={ __(
+							'Reset theme styles',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Reset customizations to theme styles and settings.',
+							'create-block-theme'
+						) }
+						checked={ preferences.resetStyles }
+						onChange={ () =>
+							handleTogglePreference( 'resetStyles' )
+						}
+					/>
 
-				<CheckboxControl
-					label={ __(
-						'Reset theme templates',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Reset customizations to theme templates.',
-						'create-block-theme'
-					) }
-					checked={ preferences.resetTemplates }
-					onChange={ () =>
-						handleTogglePreference( 'resetTemplates' )
-					}
-				/>
+					<CheckboxControl
+						label={ __(
+							'Reset theme templates',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Reset customizations to theme templates.',
+							'create-block-theme'
+						) }
+						checked={ preferences.resetTemplates }
+						onChange={ () =>
+							handleTogglePreference( 'resetTemplates' )
+						}
+					/>
 
-				<CheckboxControl
-					label={ __(
-						'Reset theme template-parts',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Reset customizations to theme template-parts.',
-						'create-block-theme'
-					) }
-					checked={ preferences.resetTemplateParts }
-					onChange={ () =>
-						handleTogglePreference( 'resetTemplateParts' )
-					}
-				/>
+					<CheckboxControl
+						label={ __(
+							'Reset theme template-parts',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Reset customizations to theme template-parts.',
+							'create-block-theme'
+						) }
+						checked={ preferences.resetTemplateParts }
+						onChange={ () =>
+							handleTogglePreference( 'resetTemplateParts' )
+						}
+					/>
 
-				<Button
-					text={ __( 'Reset theme', 'create-block-theme' ) }
-					variant="primary"
-					icon={ trash }
-					disabled={
-						! preferences.resetStyles &&
-						! preferences.resetTemplates &&
-						! preferences.resetTemplateParts
-					}
-					onClick={ handleResetTheme }
-				/>
-			</VStack>
-		</PanelBody>
+					<Button
+						text={ __( 'Reset theme', 'create-block-theme' ) }
+						variant="primary"
+						icon={ trash }
+						disabled={
+							! preferences.resetStyles &&
+							! preferences.resetTemplates &&
+							! preferences.resetTemplateParts
+						}
+						onClick={ toggleConfirmDialog }
+					/>
+				</VStack>
+			</PanelBody>
+		</>
 	);
 }
 
