@@ -61,7 +61,7 @@ function ResetTheme() {
 			// eslint-disable-next-line no-alert
 			window.alert(
 				__(
-					'Theme reseted successfully. The editor will now reload.',
+					'Theme reset successfully. The editor will now reload.',
 					'create-block-theme'
 				)
 			);
@@ -69,7 +69,7 @@ function ResetTheme() {
 		} catch ( error ) {
 			createErrorNotice(
 				__(
-					'An error occurred while resetting theme.',
+					'An error occurred while resetting the theme.',
 					'create-block-theme'
 				)
 			);
@@ -141,7 +141,7 @@ function ResetTheme() {
 					/>
 
 					<Button
-						text={ __( 'Reset theme', 'create-block-theme' ) }
+						text={ __( 'Reset Theme', 'create-block-theme' ) }
 						variant="primary"
 						icon={ trash }
 						disabled={
