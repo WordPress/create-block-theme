@@ -150,10 +150,9 @@ class CBT_Theme_API {
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'rest_reset_theme' ),
-				// 'permission_callback' => function () {
-				// 	return current_user_can( 'edit_theme_options' );
-				// },
-				'permission_callback' => '__return_true',
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
 			),
 		);
 	}
