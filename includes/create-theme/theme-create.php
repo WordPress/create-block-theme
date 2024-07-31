@@ -25,6 +25,9 @@ class CBT_Theme_Create {
 
 		wp_mkdir_p( $new_theme_path );
 
+		// Persist font settings for cloned theme.
+		CBT_Theme_Fonts::persist_font_settings();
+
 		// Copy theme files.
 		$template_options = array(
 			'localizeText'   => false,

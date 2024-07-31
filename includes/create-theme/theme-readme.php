@@ -97,6 +97,9 @@ License URI: {$license_uri}
 		// Adds the Images section
 		$readme_content = self::add_or_update_section( 'Images', $image_credits, $readme_content );
 
+		// Sanitize the readme content
+		$readme_content = self::sanitize( $readme_content );
+
 		return $readme_content;
 	}
 
@@ -229,6 +232,9 @@ GNU General Public License for more details.
 		// Update image credits section.
 		$readme_content = self::add_or_update_section( 'Images', $image_credits, $readme_content );
 
+		// Sanitize the readme content.
+		$readme_content = self::sanitize( $readme_content );
+
 		return $readme_content;
 	}
 
@@ -337,6 +343,18 @@ GNU General Public License for more details.
 		}
 
 		return $sections;
+	}
+
+	/**
+	 * Sanitize the readme content.
+	 *
+	 * @param string $readme_content The readme content.
+	 * @return string The sanitized readme content.
+	 */
+	private static function sanitize( $readme_content ) {
+		// Replaces DOS line endings with Unix line endings
+		$readme_content = str_replace( "\r\n", '', $readme_content );
+		return $readme_content;
 	}
 
 }

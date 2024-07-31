@@ -61,4 +61,18 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 		// Restore the original active theme.
 		switch_theme( $this->orig_active_theme_slug );
 	}
+
+	/**
+	 * Removes the newlines from a string.
+	 *
+	 * This is useful to make it easier to search for strings in the readme content.
+	 * Removes both DOS and Unix newlines.
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	public function remove_newlines( $string ) {
+		return str_replace( array( "\r\n", "\n" ), '', $string );
+	}
+
 }
