@@ -144,6 +144,17 @@ class CBT_Theme_API {
 				},
 			),
 		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/reset-theme',
+			array(
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => array( $this, 'rest_reset_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			),
+		);
 	}
 
 	function rest_get_theme_data( $request ) {
@@ -371,6 +382,7 @@ class CBT_Theme_API {
 				}
 			}
 			CBT_Theme_Templates::clear_user_templates_customizations();
+			CBT_Theme_Templates::clear_user_template_parts_customizations();
 		}
 
 		if ( isset( $options['saveStyle'] ) && true === $options['saveStyle'] ) {
@@ -411,6 +423,32 @@ class CBT_Theme_API {
 				'status'  => 'SUCCESS',
 				'message' => __( 'Font Families retrieved.', 'create-block-theme' ),
 				'data'    => $font_families,
+			)
+		);
+	}
+
+	/**
+	 * Reset the theme to the default state.
+	 */
+	function rest_reset_theme( $request ) {
+		$options = $request->get_params();
+
+		if ( isset( $options['resetStyles'] ) && true === $options['resetStyles'] ) {
+			CBT_Theme_Styles::clear_user_styles_customizations();
+		}
+
+		if ( isset( $options['resetTemplates'] ) && true === $options['resetTemplates'] ) {
+			CBT_Theme_Templates::clear_user_templates_customizations();
+		}
+
+		if ( isset( $options['resetTemplateParts'] ) && true === $options['resetTemplateParts'] ) {
+			CBT_Theme_Templates::clear_user_template_parts_customizations();
+		}
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'SUCCESS',
+				'message' => __( 'Theme Reset.', 'create-block-theme' ),
 			)
 		);
 	}
