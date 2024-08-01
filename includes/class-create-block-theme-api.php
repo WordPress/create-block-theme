@@ -394,7 +394,7 @@ class CBT_Theme_API {
 			CBT_Theme_Styles::clear_user_styles_customizations();
 		}
 
-		wp_cache_flush();
+		wp_get_theme()->cache_delete();
 
 		return new WP_REST_Response(
 			array(
