@@ -39,6 +39,7 @@ import {
 	addCard,
 	blockMeta,
 	help,
+	trash,
 } from '@wordpress/icons';
 
 /**
@@ -52,8 +53,9 @@ import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal
 import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
 import downloadFile from './utils/download-file';
-import './plugin-styles.scss';
 import AboutPlugin from './editor-sidebar/about';
+import ResetTheme from './editor-sidebar/reset-theme';
+import './plugin-styles.scss';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
@@ -190,6 +192,21 @@ const CreateBlockThemePlugin = () => {
 
 								<Divider />
 
+								<NavigatorButton path="/reset" icon={ trash }>
+									<Spacer />
+									<HStack>
+										<FlexItem>
+											{ __(
+												'Reset Theme',
+												'create-block-theme'
+											) }
+										</FlexItem>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</NavigatorButton>
+
+								<Divider />
+
 								<NavigatorButton
 									path="/about"
 									icon={ help }
@@ -298,6 +315,10 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/about">
 						<AboutPlugin />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/reset">
+						<ResetTheme />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
