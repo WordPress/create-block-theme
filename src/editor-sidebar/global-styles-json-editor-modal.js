@@ -53,7 +53,10 @@ const GlobalStylesJsonEditorModal = ( { onRequestClose } ) => {
 			size="large"
 			title={ sprintf(
 				// translators: %s: theme name.
-				__( 'Global styles JSON data for %s', 'create-block-theme' ),
+				__(
+					'Global Styles Customizations for %s',
+					'create-block-theme'
+				),
 				themeName
 			) }
 			onRequestClose={ onRequestClose }
