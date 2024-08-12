@@ -165,7 +165,7 @@ const CreateBlockThemePlugin = () => {
 									}
 								>
 									{ __(
-										'View Global Styles Customizations',
+										'View Custom Styles',
 										'create-block-theme'
 									) }
 								</Button>
