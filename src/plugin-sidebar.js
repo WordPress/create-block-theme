@@ -47,6 +47,7 @@ import {
  */
 import { CreateThemePanel } from './editor-sidebar/create-panel';
 import ThemeJsonEditorModal from './editor-sidebar/json-editor-modal';
+import GlobalStylesJsonEditorModal from './editor-sidebar/global-styles-json-editor-modal';
 import { SaveThemePanel } from './editor-sidebar/save-panel';
 import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
 import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
@@ -59,6 +60,8 @@ import './plugin-styles.scss';
 
 const CreateBlockThemePlugin = () => {
 	const [ isEditorOpen, setIsEditorOpen ] = useState( false );
+	const [ isGlobalStylesEditorOpen, setIsGlobalStylesEditorOpen ] =
+		useState( false );
 
 	const [ isMetadataEditorOpen, setIsMetadataEditorOpen ] = useState( false );
 
@@ -152,6 +155,17 @@ const CreateBlockThemePlugin = () => {
 								>
 									{ __(
 										'View theme.json',
+										'create-block-theme'
+									) }
+								</Button>
+								<Button
+									icon={ code }
+									onClick={ () =>
+										setIsGlobalStylesEditorOpen( true )
+									}
+								>
+									{ __(
+										'View Custom Styles',
 										'create-block-theme'
 									) }
 								</Button>
@@ -326,6 +340,14 @@ const CreateBlockThemePlugin = () => {
 			{ isEditorOpen && (
 				<ThemeJsonEditorModal
 					onRequestClose={ () => setIsEditorOpen( false ) }
+				/>
+			) }
+
+			{ isGlobalStylesEditorOpen && (
+				<GlobalStylesJsonEditorModal
+					onRequestClose={ () =>
+						setIsGlobalStylesEditorOpen( false )
+					}
 				/>
 			) }
 

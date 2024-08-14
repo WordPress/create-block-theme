@@ -399,7 +399,7 @@ class CBT_Theme_API {
 			// clear pattern customisations?
 		}
 
-		wp_cache_flush();
+		wp_get_theme()->cache_delete();
 
 		return new WP_REST_Response(
 			array(
