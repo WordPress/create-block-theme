@@ -135,19 +135,44 @@ class CBT_Theme_Patterns {
 			}
 
 			foreach ( $pattern_query->posts as $pattern ) {
-				$pattern      = self::pattern_from_wp_block( $pattern );
-				$pattern      = self::prepare_pattern_for_export( $pattern, $options );
-				$pattern_file = $patterns_dir . 'pattern-' . $pattern->name . '.php';
-				file_put_contents(
-					$patterns_dir . DIRECTORY_SEPARATOR . 'pattern-' . $pattern->name . '.php',
-					$pattern->content
-				);
+				$pattern        = self::pattern_from_wp_block( $pattern );
+				$pattern        = self::prepare_pattern_for_export( $pattern, $options );
+				$pattern_exists = false;
 
-				self::replace_local_pattern_references( $pattern );
-
-				// If it's a synced pattern then remove it from the database.
-				// This is to ensure that these patterns are loaded from the theme.
+				// Check pattern is synced before adding to theme.
 				if ( 'unsynced' !== $pattern->sync_status ) {
+					// Check pattern name doesn't already exist before creating the file.
+					$existing_patterns = glob( $patterns_dir . DIRECTORY_SEPARATOR . '*.php' );
+					foreach ( $existing_patterns as $existing_pattern ) {
+						if ( strpos( $existing_pattern, 'pattern-' . $pattern->name . '.php' ) !== false ) {
+							$pattern_exists = true;
+						}
+					}
+
+					if ( $pattern_exists ) {
+						return new WP_Error(
+							'pattern_already_exists',
+							sprintf(
+								/* Translators: Pattern name. */
+								__(
+									'A pattern with this name already exists: "%s".',
+									'create-block-theme'
+								),
+								$pattern->name
+							)
+						);
+					}
+
+					// Create the pattern file.
+					$pattern_file = $patterns_dir . 'pattern-' . $pattern->name . '.php';
+					file_put_contents(
+						$patterns_dir . DIRECTORY_SEPARATOR . 'pattern-' . $pattern->name . '.php',
+						$pattern->content
+					);
+
+					self::replace_local_pattern_references( $pattern );
+
+					// Remove it from the database to ensure that these patterns are loaded from the theme.
 					wp_delete_post( $pattern->id, true );
 				}
 			}
