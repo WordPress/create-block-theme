@@ -144,6 +144,12 @@ class CBT_Theme_Patterns {
 				);
 
 				self::replace_local_pattern_references( $pattern );
+
+				// If it's a synced pattern then remove it from the database.
+				// This is to ensure that these patterns are loaded from the theme.
+				if ( 'unsynced' !== $pattern->sync_status ) {
+					wp_delete_post( $pattern->id, true );
+				}
 			}
 		}
 	}
