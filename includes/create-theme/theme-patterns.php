@@ -4,17 +4,18 @@ class CBT_Theme_Patterns {
 	public static function pattern_from_template( $template, $new_slug = null ) {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$pattern_slug    = $theme_slug . '/' . $template->slug;
-		$pattern_content = (
-		'<?php
-/**
- * Title: ' . $template->slug . '
- * Slug: ' . $pattern_slug . '
- * Categories: hidden
- * Inserter: no
- */
-?>
-' . $template->content
-		);
+		$pattern_content = <<<PHP
+		<?php
+		/**
+		 * Title: {$template->slug}
+		 * Slug: {$pattern_slug}
+		 * Categories: hidden
+		 * Inserter: no
+		 */
+		?>
+		{$template->content}
+		PHP;
+
 		return array(
 			'slug'    => $pattern_slug,
 			'content' => $pattern_content,
