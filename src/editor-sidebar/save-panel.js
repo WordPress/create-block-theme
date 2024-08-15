@@ -73,8 +73,9 @@ export const SaveThemePanel = () => {
 				const searchParams = new URLSearchParams(
 					window?.location?.search
 				);
-				// If user is editing a pattern, redirect back to the patterns page.
+				// If user is editing a pattern and savePatterns is true, redirect back to the patterns page.
 				if (
+					preference.savePatterns &&
 					searchParams.get( 'postType' ) === 'wp_block' &&
 					searchParams.get( 'postId' )
 				) {
