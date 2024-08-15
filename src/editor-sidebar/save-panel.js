@@ -69,7 +69,21 @@ export const SaveThemePanel = () => {
 						'create-block-theme'
 					)
 				);
-				window.location.reload();
+
+				const searchParams = new URLSearchParams(
+					window?.location?.search
+				);
+				// If user is editing a pattern, redirect back to the patterns page.
+				if (
+					searchParams.get( 'postType' ) === 'wp_block' &&
+					searchParams.get( 'postId' )
+				) {
+					window.location =
+						'/wp-admin/site-editor.php?postType=wp_block';
+				} else {
+					// If user is not editing a pattern, reload the editor.
+					window.location.reload();
+				}
 			} )
 			.catch( ( error ) => {
 				const errorMessage =
