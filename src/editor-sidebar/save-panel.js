@@ -137,9 +137,9 @@ export const SaveThemePanel = () => {
 					}
 				/>
 				<CheckboxControl
-					label={ __( 'Save My Patterns', 'create-block-theme' ) }
+					label={ __( 'Save Synced Patterns', 'create-block-theme' ) }
 					help={ __(
-						'Save custom patterns created in the Editor, listed under "My patterns", to the theme.',
+						'Save synced patterns created in the Editor, listed under "My patterns", to the theme. Note that this will delete synced patterns from the Editor and move them to the theme.',
 						'create-block-theme'
 					) }
 					checked={ preference.savePatterns }
