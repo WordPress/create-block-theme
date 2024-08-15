@@ -144,7 +144,7 @@ class CBT_Theme_Patterns {
 					// Check pattern name doesn't already exist before creating the file.
 					$existing_patterns = glob( $patterns_dir . DIRECTORY_SEPARATOR . '*.php' );
 					foreach ( $existing_patterns as $existing_pattern ) {
-						if ( strpos( $existing_pattern, 'pattern-' . $pattern->name . '.php' ) !== false ) {
+						if ( strpos( $existing_pattern, $pattern->name . '.php' ) !== false ) {
 							$pattern_exists = true;
 						}
 					}
@@ -164,9 +164,9 @@ class CBT_Theme_Patterns {
 					}
 
 					// Create the pattern file.
-					$pattern_file = $patterns_dir . 'pattern-' . $pattern->name . '.php';
+					$pattern_file = $patterns_dir . $pattern->name . '.php';
 					file_put_contents(
-						$patterns_dir . DIRECTORY_SEPARATOR . 'pattern-' . $pattern->name . '.php',
+						$patterns_dir . DIRECTORY_SEPARATOR . $pattern->name . '.php',
 						$pattern->content
 					);
 
