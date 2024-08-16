@@ -10,22 +10,22 @@ We welcome contributions in all forms, including code, design, documentation, an
 
 Contributors can be found in the [#core-editor](https://make.wordpress.org/chat/) and [#outreach](https://wordpress.slack.com/archives/C015GUFFC00) channels in [Make WordPress Slack](https://make.wordpress.org/chat).
 
-There is also a [GitHub project board](https://github.com/orgs/WordPress/projects/188/views/1) which is used to plan and track the progress of the plugin.
+There is also a [GitHub project board](https://github.com/orgs/WordPress/projects/188) which is used to plan and track the progress of the plugin.
 
 ### Development Setup
 
 The basic setup for development is:
 
--   Node/NPM Development Tools
--   WordPress Development Site
--   Code Editor
+- Node/NPM Development Tools
+- WordPress Development Site
+- Code Editor
 
 #### Prerequisites
 
--   [Node.js](https://nodejs.org/en/) (>= v20.10.0)
--   [Composer](https://getcomposer.org/) (used for linting PHP)
--   WordPress Development Site, such as [wp-env](https://github.com/WordPress/gutenberg/blob/trunk/packages/env/README.md) or [Local](https://localwp.com/)
--   We recommend using [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) to manage your Node.js versions
+- [Node.js](https://nodejs.org/en/) (>= v20.10.0)
+- [Composer](https://getcomposer.org/) (used for linting PHP)
+- WordPress Development Site, such as [wp-env](https://github.com/WordPress/gutenberg/blob/trunk/packages/env/README.md) or [Local](https://localwp.com/)
+- We recommend using [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) to manage your Node.js versions
 
 We recommend following the [Gutenberg code contribution guide](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/getting-started-with-code-contribution.md) for more details on setting up a development environment.
 
@@ -50,9 +50,9 @@ Run `npm run build` to build the plugin.
 
 There are several linter commands available to help ensure the plugin follows the WordPress coding standards:
 
--   CSS: `npm run lint:css` & `npm run lint:css:fix`
--   JS: `npm run lint:js` & `npm run lint:js:fix`
--   PHP: `npm run lint:php` & `npm run lint:php:fix`
+- CSS: `npm run lint:css` & `npm run lint:css:fix`
+- JS: `npm run lint:js` & `npm run lint:js:fix`
+- PHP: `npm run lint:php` & `npm run lint:php:fix`
 
 To test a WordPress plugin, you need to have WordPress itself installed. If you already have a WordPress environment setup, use the above Create Block Theme build as a standard WordPress plugin by putting the `create-block-theme` directory in your wp-content/plugins/ directory.
 
@@ -75,11 +75,9 @@ We have an automated process for the release of new versions of Create Block The
 
 To begin the release process, execute the [**Create new release PR**](https://github.com/WordPress/create-block-theme/actions/workflows/release-new-version.yml) workflow from the Actions tab. Choose the type of release — major, minor, or patch — from the "Run workflow" dropdown menu. This action triggers the creation of a new Release PR, such as [#592](https://github.com/WordPress/create-block-theme/pull/592/files), which includes an automated version bump and proposed changes to the Change Log.
 
-
 ### 2 - Update the Release PR
 
 Keep the Release PR current by incorporating any new changes from the `trunk` that are intended for this release. Use the `git cherry-pick [commit-hash]` command to add specific commits to the Release Branch associated with the Release PR. The Release Branch is named using the format: `release/[creation-date]/[release-type]-release`, where `[creation-date]` is the date the Release PR was created, and `[release-type]` is the type selected during the workflow initiation.
-
 
 ### 3 - Finalize the Release
 
@@ -87,8 +85,8 @@ Once the release is deemed complete and ready, it must be reviewed and approved 
 
 ## Guidelines
 
--   As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/).
+- As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/).
 
--   Contributors should follow WordPress' [coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/) and [accessibility coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/).
+- Contributors should follow WordPress' [coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/) and [accessibility coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/).
 
--   You maintain copyright over any contribution you make. By submitting a pull request you agree to release that code under the [plugin's License](/LICENSE.md).
+- You maintain copyright over any contribution you make. By submitting a pull request you agree to release that code under the [plugin's License](/LICENSE.md).
