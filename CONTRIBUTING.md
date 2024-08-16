@@ -10,7 +10,7 @@ We welcome contributions in all forms, including code, design, documentation, an
 
 Contributors can be found in the [#core-editor](https://make.wordpress.org/chat/) and [#outreach](https://wordpress.slack.com/archives/C015GUFFC00) channels in [Make WordPress Slack](https://make.wordpress.org/chat).
 
-There is also a [GitHub project board](https://github.com/orgs/WordPress/projects/188/views/1) which is used to plan and track the progress of the plugin.
+There is also a [GitHub project board](https://github.com/orgs/WordPress/projects/188) which is used to plan and track the progress of the plugin.
 
 ### Development Setup
 
