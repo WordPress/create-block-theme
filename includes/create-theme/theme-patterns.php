@@ -73,6 +73,25 @@ class CBT_Theme_Patterns {
 	}
 
 	public static function replace_local_pattern_references( $pattern ) {
+		// Find any references to pattern in templates
+		$templates_to_update = array();
+		$args                = array(
+			'post_type'      => array( 'wp_template', 'wp_template_part' ),
+			'posts_per_page' => -1,
+			's'              => 'wp:block {"ref":' . $pattern->id . '}',
+		);
+		$find_pattern_refs   = new WP_Query( $args );
+		if ( $find_pattern_refs->have_posts() ) {
+			foreach ( $find_pattern_refs->posts as $post ) {
+				$slug = $post->post_name;
+				array_push( $templates_to_update, $slug );
+			}
+		}
+		$templates_to_update = array_unique( $templates_to_update );
+
+		// Only update templates that reference the pattern
+		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
+
 		// List all template and pattern files in the theme
 		$base_dir       = get_stylesheet_directory();
 		$patterns       = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
@@ -85,6 +104,9 @@ class CBT_Theme_Patterns {
 			$file_content = str_replace( 'wp:block {"ref":' . $pattern->id . '}', 'wp:pattern {"slug":"' . $pattern->slug . '"}', $file_content );
 			file_put_contents( $file, $file_content );
 		}
+
+		CBT_Theme_Templates::clear_user_templates_customizations();
+		CBT_Theme_Templates::clear_user_template_parts_customizations();
 	}
 
 	public static function prepare_pattern_for_export( $pattern, $options = null ) {

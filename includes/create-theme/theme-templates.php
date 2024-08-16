@@ -10,12 +10,13 @@ class CBT_Theme_Templates {
 	 * based on the given export_type.
 	 *
 	 * @param string $export_type The type of export to perform. 'all', 'current', or 'user'.
+	 * @param array $templates_to_export List of specific templates to export.
 	 * @return object An object containing the templates and parts that should be exported.
 	 */
-	public static function get_theme_templates( $export_type ) {
+	public static function get_theme_templates( $export_type, $templates_to_export = null ) {
 
-		$templates          = get_block_templates();
-		$template_parts     = get_block_templates( array(), 'wp_template_part' );
+		$templates          = get_block_templates( array( 'slug__in' => $templates_to_export ) );
+		$template_parts     = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
 		$exported_templates = array();
 		$exported_parts     = array();
 
@@ -195,10 +196,12 @@ class CBT_Theme_Templates {
 	 * @param string $export_type The type of export to perform. 'all', 'current', or 'user'.
 	 * @param string $path The path to the theme folder. If null it is assumed to be the current theme.
 	 * @param string $slug The slug of the theme. If null it is assumed to be the current theme.
+	 * @param array $options An array of options to use when exporting the templates.
+	 * @param array $templates_to_export List of specific templates to export. If null it will be fetched.
 	 */
-	public static function add_templates_to_local( $export_type, $path = null, $slug = null, $options = null ) {
+	public static function add_templates_to_local( $export_type, $path = null, $slug = null, $options = null, $templates_to_export = null ) {
 
-		$theme_templates  = self::get_theme_templates( $export_type );
+		$theme_templates  = self::get_theme_templates( $export_type, $templates_to_export );
 		$template_folders = get_block_theme_folders();
 
 		$base_dir          = $path ? $path : get_stylesheet_directory();
