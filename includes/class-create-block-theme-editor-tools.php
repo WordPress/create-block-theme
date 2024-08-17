@@ -16,7 +16,7 @@ class CBT_Editor_Tools {
 	function create_block_theme_sidebar_enqueue() {
 		global $pagenow;
 
-		if ( 'site-editor.php' !== $pagenow ) {
+		if ( 'site-editor.php' !== $pagenow || ! wp_is_block_theme() ) {
 			return;
 		}
 
