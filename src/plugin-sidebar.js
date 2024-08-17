@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';

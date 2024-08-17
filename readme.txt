@@ -1,7 +1,7 @@
 === Create Block Theme ===
 Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu, egregor, vcanales, jeffikus, cwhitmore
 Tags: themes, theme, block-theme
-Requires at least: 6.5
+Requires at least: 6.6
 Tested up to: 6.6
 Stable tag: 2.3.0
 Requires PHP: 7.4
