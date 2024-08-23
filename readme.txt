@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.6
 Tested up to: 6.6
-Stable tag: 2.3.0
+Stable tag: 2.4.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,18 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.4.0 =
+* Bump minimum required WordPress version to 6.6 (#704)
+* Don't enable sidebar UI in classic theme (#705)
+* README markdown formatting (#702)
+* Update broken link in README (#701)
+* Update blank themes theme json version (#700)
+* Global Styles JSON data inspector (#697)
+* Delete only theme-related caches when saving changes (#685)
+* Update "Tested up to" version to 6.6 (#694)
+* Add theme reset section (#687)
+* Sanitize DOS (Windows) new line style on readme.txt (#681)
 
 = 2.3.0 =
 * Persist font settings when cloning a theme (#678)
