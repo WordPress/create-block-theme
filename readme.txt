@@ -29,7 +29,9 @@ This plugin also makes several changes to the contents of a theme, including:
 - Ensures the block markup used in templates and patterns is export-ready.
 - Ensures most strings used in templates and patterns are translate-ready.
 
-The plugin is development only — not intended for use on production websites, but used as a tool to create new themes.
+*Disclaimer:* The Create Block Theme plugin offers critical developer-friendly features; you can think of it as a Development Mode for WordPress, and you should *keep in mind that changes made through this plugin could change your site and/or theme permanently*.
+
+(Make sure you know what you're doing before hitting that 'Save' button 😉)
 
 = Step 1 – Setup =
 Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
