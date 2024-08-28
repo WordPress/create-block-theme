@@ -74,7 +74,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 						'create-block-theme'
 					)
 				);
-				window.location = '/wp-admin/site-editor.php?canvas=edit';
+				window.location = window.cbt_landingpage_variables.editor_url;
 			} )
 			.catch( ( error ) => {
 				setErrorMessage(
