@@ -84,6 +84,34 @@ class CBT_Theme_Fonts {
 		return $user_settings['typography']['fontFamilies']['custom'] ?? null;
 	}
 
+	/**
+	 * Make a pretty filename from a font face.
+	 *
+	 * The filename is based on the font family name, weight, style, unicode range and the source index.
+	 * Example:
+	 *     $font_face = [ 'fontFamily' => 'Open Sans', 'fontWeight' => '400', 'fontStyle' => 'normal' ]
+	 *     $src = 'https://example.com/assets/fonts/open-sans-regular.ttf'
+	 *     $src_index = 0
+	 *     Returns: 'open-sans-400-normal.ttf'
+	 *
+	 * @param array  $font_face
+	 * @param string $src
+	 * @param int    $src_index
+	 * @return string
+	 */
+	public static function make_filename_from_fontface( $font_face, $src, $src_index = 0 ) {
+		$font_extension = pathinfo( $src, PATHINFO_EXTENSION );
+		$font_filename  = sanitize_title( $font_face['fontFamily'] )
+			. ( isset( $font_face['fontWeight'] ) ? '-' . sanitize_title( $font_face['fontWeight'] ) : '' )
+			. ( isset( $font_face['fontStyle'] ) ? '-' . sanitize_title( $font_face['fontStyle'] ) : '' )
+			. ( isset( $font_face['unicodeRange'] ) ? '-' . sanitize_title( $font_face['unicodeRange'] ) : '' )
+			. ( 0 !== $src_index ? '-' . $src_index : '' )
+			. '.'
+			. $font_extension;
+
+		return $font_filename;
+	}
+
 	public static function copy_activated_fonts_to_theme() {
 		$font_families_to_copy = self::get_user_activated_fonts();
 
@@ -108,18 +136,19 @@ class CBT_Theme_Fonts {
 				// if it is a string, cast it to an array
 				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
-					$font_filename = basename( $font_src );
-					$font_dir      = wp_get_font_dir();
+					$font_filename        = basename( $font_src );
+					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
+					$font_dir             = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
 						// If the file is hosted on this server then copy it to the theme
-						copy( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_filename );
+						copy( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_pretty_filename );
 					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_src );
-						copy( $tmp_file, $theme_font_asset_location . $font_filename );
+						copy( $tmp_file, $theme_font_asset_location . $font_pretty_filename );
 						unlink( $tmp_file );
 					}
-					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . $font_filename;
+					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . $font_pretty_filename;
 				}
 			}
 		}
