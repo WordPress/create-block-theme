@@ -51,8 +51,8 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertEquals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][1]['slug'] );
 
 		// Ensure that the URL was changed to a local file and that it was copied to where it should be
-		$this->assertEquals( 'file:./assets/fonts/open-sans-normal-400.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'][0] );
-		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-normal-400.ttf' ) );
+		$this->assertEquals( 'file:./assets/fonts/open-sans-400-normal.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'][0] );
+		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-400-normal.ttf' ) );
 
 		$this->uninstall_theme( $test_theme_slug );
 
@@ -486,5 +486,18 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		CBT_Theme_JSON_Resolver::write_user_settings( $settings );
 	}
 
+	public function test_make_filename_from_fontface() {
+		$font_face = array(
+			'fontFamily'   => 'Open Sans',
+			'fontWeight'   => '400',
+			'fontStyle'    => 'normal',
+			'unicodeRange' => 'U+0000-00FF',
+		);
+		$src       = 'https://example.com/assets/fonts/open-sans-regular.ttf';
+		$src_index = 0;
+		$expected  = 'open-sans-400-normal-u0000-00ff.ttf';
+		$actual    = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $src, $src_index );
+		$this->assertEquals( $expected, $actual );
+	}
 }
 
