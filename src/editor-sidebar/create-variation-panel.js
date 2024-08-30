@@ -119,7 +119,7 @@ export const CreateVariationPanel = () => {
 									'create-block-theme'
 								) }
 								help={ __(
-									'Save active custom fonts to the style variation and copy the assets to the theme folder.',
+									'Copy the font assets to the theme folder.',
 									'create-block-theme'
 								) }
 								checked={ preference.saveFonts }
