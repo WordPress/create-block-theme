@@ -239,8 +239,15 @@ class CBT_Theme_API {
 	}
 
 	function rest_create_variation( $request ) {
+		$options = $request->get_params();
 
-		$response = CBT_Theme_JSON::add_theme_json_variation_to_local( 'variation', $this->sanitize_theme_data( $request->get_params() ) );
+		$save_fonts = isset( $options['saveFonts'] ) && true === $options['saveFonts'];
+
+		$response = CBT_Theme_JSON::add_theme_json_variation_to_local(
+			'variation',
+			$this->sanitize_theme_data( $options ),
+			$save_fonts
+		);
 
 		wp_cache_flush();
 

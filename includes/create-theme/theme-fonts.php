@@ -84,22 +84,22 @@ class CBT_Theme_Fonts {
 		return $user_settings['typography']['fontFamilies']['custom'] ?? null;
 	}
 
-	public static function copy_activated_fonts_to_theme() {
-		$font_families_to_copy = self::get_user_activated_fonts();
-
-		if ( is_null( $font_families_to_copy ) ) {
-			return;
-		}
-
-		$theme_json                = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+	/*
+	 * Copy the font assets to the theme.
+	 *
+	 * @param array $font_families The font families to copy.
+	 * @return array $font_families The font families with the font face src updated to the theme font asset location.
+	 */
+	public static function copy_font_assets_to_theme( $font_families ) {
 		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
 
 		require_once ABSPATH . 'wp-admin/includes/file.php';
+
 		if ( ! file_exists( $theme_font_asset_location ) ) {
 			mkdir( $theme_font_asset_location, 0777, true );
 		}
 
-		foreach ( $font_families_to_copy as &$font_family ) {
+		foreach ( $font_families as &$font_family ) {
 			if ( ! isset( $font_family['fontFace'] ) ) {
 				continue;
 			}
@@ -124,9 +124,22 @@ class CBT_Theme_Fonts {
 			}
 		}
 
+		return $font_families;
+	}
+
+	public static function copy_activated_fonts_to_theme() {
+		$font_families_to_copy = self::get_user_activated_fonts();
+
+		if ( is_null( $font_families_to_copy ) ) {
+			return;
+		}
+
+		$theme_json           = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$copied_font_families = self::copy_font_assets_to_theme( $font_families_to_copy );
+
 		$theme_json['settings']['typography']['fontFamilies'] = array_merge(
 			$theme_json['settings']['typography']['fontFamilies'] ?? array(),
-			$font_families_to_copy
+			$copied_font_families
 		);
 
 		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
