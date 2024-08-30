@@ -28,7 +28,7 @@ class CBT_Theme_Locale {
 
 		$string = addcslashes( $string, "'" );
 
-		return "<?php esc_html_e( '" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "' ); ?>";
+		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
 	/**
@@ -54,7 +54,7 @@ class CBT_Theme_Locale {
 		}
 
 		$string = addcslashes( $string, "'" );
-		return "<?php esc_attr_e( '" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "' ); ?>";
+		return "<?php esc_attr_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
 	/**

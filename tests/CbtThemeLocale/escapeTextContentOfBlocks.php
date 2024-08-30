@@ -30,7 +30,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 
 			'paragraph'                  => array(
 				'block_markup'    => '<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center">This is a test text.</p><!-- /wp:paragraph -->',
-				'expected_markup' => '<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center"><?php esc_html_e( \'This is a test text.\', \'test-locale-theme\' ); ?></p><!-- /wp:paragraph -->',
+				'expected_markup' => '<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center"><?php esc_html_e(\'This is a test text.\', \'test-locale-theme\');?></p><!-- /wp:paragraph -->',
 			),
 
 			'paragraph on nested groups' => array(
@@ -46,7 +46,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 					'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained","contentSize":"","wideSize":""}} -->
                     <div class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50)"><!-- wp:group {"style":{"spacing":{"blockGap":"0px"}},"layout":{"type":"constrained","contentSize":"565px"}} -->
                     <div class="wp-block-group"><!-- wp:paragraph {"align":"center"} -->
-                    <p class="has-text-align-center"><?php esc_html_e( \'This is a test text.\', \'test-locale-theme\' ); ?></p>
+                    <p class="has-text-align-center"><?php esc_html_e(\'This is a test text.\', \'test-locale-theme\');?></p>
                     <!-- /wp:paragraph --></div>
                     <!-- /wp:group --></div>
                     <!-- /wp:group -->',
@@ -59,7 +59,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:heading -->',
 				'expected_markup' =>
 					'<!-- wp:heading {"textAlign":"center","className":"is-style-asterisk"} -->
-                    <h1 class="wp-block-heading has-text-align-center is-style-asterisk"><?php esc_html_e( \'A passion for creating spaces\', \'test-locale-theme\' ); ?></h1>
+                    <h1 class="wp-block-heading has-text-align-center is-style-asterisk"><?php esc_html_e(\'A passion for creating spaces\', \'test-locale-theme\');?></h1>
                     <!-- /wp:heading -->',
 			),
 
@@ -70,7 +70,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:heading -->',
 				'expected_markup' =>
 					'<!-- wp:heading {"textAlign":"center","className":"is-style-asterisk"} -->
-                    <h2 class="wp-block-heading has-text-align-center is-style-asterisk"><?php esc_html_e( \'A passion for creating spaces\', \'test-locale-theme\' ); ?></h2>
+                    <h2 class="wp-block-heading has-text-align-center is-style-asterisk"><?php esc_html_e(\'A passion for creating spaces\', \'test-locale-theme\');?></h2>
                     <!-- /wp:heading -->',
 			),
 
@@ -90,13 +90,13 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 				'expected_markup' =>
 					'<!-- wp:list {"style":{"typography":{"lineHeight":"1.75"}},"className":"is-style-checkmark-list"} -->
                     <ul style="line-height:1.75" class="is-style-checkmark-list"><!-- wp:list-item -->
-                    <li><?php esc_html_e( \'Collaborate with fellow architects.\', \'test-locale-theme\' ); ?></li>
+                    <li><?php esc_html_e(\'Collaborate with fellow architects.\', \'test-locale-theme\');?></li>
                     <!-- /wp:list-item -->
                     <!-- wp:list-item -->
-                    <li><?php esc_html_e( \'Showcase your projects.\', \'test-locale-theme\' ); ?></li>
+                    <li><?php esc_html_e(\'Showcase your projects.\', \'test-locale-theme\');?></li>
                     <!-- /wp:list-item -->
                     <!-- wp:list-item -->
-                    <li><?php esc_html_e( \'Experience the world of architecture.\', \'test-locale-theme\' ); ?></li>
+                    <li><?php esc_html_e(\'Experience the world of architecture.\', \'test-locale-theme\');?></li>
                     <!-- /wp:list-item --></ul>
                     <!-- /wp:list -->',
 			),
@@ -108,7 +108,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:verse -->',
 				'expected_markup' =>
 					'<!-- wp:verse {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-                    <pre class="wp-block-verse"><?php esc_html_e( \'Ya somos el olvido que seremos.<br>El polvo elemental que nos ignora<br>y que fue el rojo Adán y que es ahora<br>todos los hombres, y que no veremos.\', \'test-locale-theme\' ); ?></pre>
+                    <pre class="wp-block-verse"><?php esc_html_e(\'Ya somos el olvido que seremos.<br>El polvo elemental que nos ignora<br>y que fue el rojo Adán y que es ahora<br>todos los hombres, y que no veremos.\', \'test-locale-theme\');?></pre>
                     <!-- /wp:verse -->',
 			),
 
@@ -119,7 +119,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:button -->',
 				'expected_markup' =>
 					'<!-- wp:button -->
-                    <div class="wp-block-button"><a class="wp-block-button__link wp-element-button"><?php esc_html_e( \'Sign up\', \'test-locale-theme\' ); ?></a></div>
+                    <div class="wp-block-button"><a class="wp-block-button__link wp-element-button"><?php esc_html_e(\'Sign up\', \'test-locale-theme\');?></a></div>
                     <!-- /wp:button -->',
 			),
 
@@ -130,7 +130,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:image -->',
 				'expected_markup' =>
 					'<!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"is-style-rounded"} -->
-                    <figure class="wp-block-image size-large is-style-rounded"><img src="http://localhost/wp1/wp-content/themes/twentytwentyfour/assets/images/windows.webp" alt="<?php esc_attr_e( \'Windows of a building in Nuremberg, Germany\', \'test-locale-theme\' ); ?>"/></figure>
+                    <figure class="wp-block-image size-large is-style-rounded"><img src="http://localhost/wp1/wp-content/themes/twentytwentyfour/assets/images/windows.webp" alt="<?php esc_attr_e(\'Windows of a building in Nuremberg, Germany\', \'test-locale-theme\');?>"/></figure>
                     <!-- /wp:image -->',
 			),
 
@@ -143,8 +143,8 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:cover -->',
 				'expected_markup' =>
 					'<!-- wp:cover {"url":"http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg","id":39,"alt":"Alternative text for cover image","dimRatio":50,"customOverlayColor":"#1d2b2f","layout":{"type":"constrained"}} -->
-                    <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#1d2b2f"></span><img class="wp-block-cover__image-background wp-image-39" alt="<?php esc_attr_e( \'Alternative text for cover image\', \'test-locale-theme\' ); ?>" src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
-                    <p class="has-text-align-center has-large-font-size"><?php esc_html_e( \'This is a cover caption\', \'test-locale-theme\' ); ?></p>
+                    <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#1d2b2f"></span><img class="wp-block-cover__image-background wp-image-39" alt="<?php esc_attr_e(\'Alternative text for cover image\', \'test-locale-theme\');?>" src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+                    <p class="has-text-align-center has-large-font-size"><?php esc_html_e(\'This is a cover caption\', \'test-locale-theme\');?></p>
                     <!-- /wp:paragraph --></div></div>
                     <!-- /wp:cover -->',
 			),
@@ -158,8 +158,8 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:media-text -->',
 				'expected_markup' =>
 					'<!-- wp:media-text {"mediaId":39,"mediaLink":"http://localhost/wp1/image/","mediaType":"image"} -->
-                    <div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" alt="<?php esc_attr_e( \'This is alt text\', \'test-locale-theme\' ); ?>" class="wp-image-39 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
-                    <p><?php esc_html_e( \'Media text content test.\', \'test-locale-theme\' ); ?></p>
+                    <div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" alt="<?php esc_attr_e(\'This is alt text\', \'test-locale-theme\');?>" class="wp-image-39 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
+                    <p><?php esc_html_e(\'Media text content test.\', \'test-locale-theme\');?></p>
                     <!-- /wp:paragraph --></div></div>
                     <!-- /wp:media-text -->',
 			),
@@ -171,7 +171,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:pullquote -->',
 				'expected_markup' =>
 					'<!-- wp:pullquote -->
-                    <figure class="wp-block-pullquote"><blockquote><p><?php esc_html_e( \'Yo me equivoqué y pagué, pero la pelota no se mancha.\', \'test-locale-theme\' ); ?></p><cite><?php esc_html_e( \'Diego Armando Maradona\', \'test-locale-theme\' ); ?></cite></blockquote></figure>
+                    <figure class="wp-block-pullquote"><blockquote><p><?php esc_html_e(\'Yo me equivoqué y pagué, pero la pelota no se mancha.\', \'test-locale-theme\');?></p><cite><?php esc_html_e(\'Diego Armando Maradona\', \'test-locale-theme\');?></cite></blockquote></figure>
                     <!-- /wp:pullquote -->',
 			),
 
@@ -182,7 +182,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:table -->',
 				'expected_markup' =>
 					'<!-- wp:table -->
-                    <figure class="wp-block-table"><table><tbody><tr><td><?php esc_html_e( \'Team\', \'test-locale-theme\' ); ?></td><td><?php esc_html_e( \'Points\', \'test-locale-theme\' ); ?></td></tr><tr><td><?php esc_html_e( \'Boca\', \'test-locale-theme\' ); ?></td><td><?php esc_html_e( \'74\', \'test-locale-theme\' ); ?></td></tr><tr><td><?php esc_html_e( \'River\', \'test-locale-theme\' ); ?></td><td><?php esc_html_e( \'2\', \'test-locale-theme\' ); ?></td></tr></tbody></table><figcaption class="wp-element-caption"><?php esc_html_e( \'Score table\', \'test-locale-theme\' ); ?></figcaption></figure>
+                    <figure class="wp-block-table"><table><tbody><tr><td><?php esc_html_e(\'Team\', \'test-locale-theme\');?></td><td><?php esc_html_e(\'Points\', \'test-locale-theme\');?></td></tr><tr><td><?php esc_html_e(\'Boca\', \'test-locale-theme\');?></td><td><?php esc_html_e(\'74\', \'test-locale-theme\');?></td></tr><tr><td><?php esc_html_e(\'River\', \'test-locale-theme\');?></td><td><?php esc_html_e(\'2\', \'test-locale-theme\');?></td></tr></tbody></table><figcaption class="wp-element-caption"><?php esc_html_e(\'Score table\', \'test-locale-theme\');?></figcaption></figure>
                     <!-- /wp:table -->',
 			),
 
