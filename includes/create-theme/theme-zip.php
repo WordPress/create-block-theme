@@ -53,7 +53,9 @@ class CBT_Theme_Zip {
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
 					$font_filename        = basename( $font_src );
 					$font_pretty_filename = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
-					$font_face_path       = path_join( $theme_font_asset_location, $font_pretty_filename );
+					$font_family_dir_name = sanitize_title( $font_family['name'] );
+					$font_family_dir_path = path_join( $theme_font_asset_location, $font_family_dir_name );
+					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
 
 					$font_dir = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
@@ -64,7 +66,7 @@ class CBT_Theme_Zip {
 						$zip->addFileToTheme( $tmp_file, $font_face_path );
 						unlink( $tmp_file );
 					}
-					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . $font_pretty_filename;
+					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . path_join( $font_family_dir_name, $font_pretty_filename );
 				}
 			}
 		}

@@ -51,8 +51,8 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertEquals( 'open-sans', $theme_data_after['typography']['fontFamilies']['theme'][1]['slug'] );
 
 		// Ensure that the URL was changed to a local file and that it was copied to where it should be
-		$this->assertEquals( 'file:./assets/fonts/open-sans-400-normal.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'][0] );
-		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans-400-normal.ttf' ) );
+		$this->assertEquals( 'file:./assets/fonts/open-sans/open-sans-400-normal.ttf', $theme_data_after['typography']['fontFamilies']['theme'][1]['fontFace'][0]['src'][0] );
+		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans/open-sans-400-normal.ttf' ) );
 
 		$this->uninstall_theme( $test_theme_slug );
 
