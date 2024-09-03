@@ -6,7 +6,7 @@
 class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
 	/**
-	 * Ensure that the string in a template is replaced with the appropraite PHP code
+	 * Ensure that the string in a template is replaced with the appropriate PHP code
 	 */
 	public function test_paragraphs_are_localized() {
 		$template          = new stdClass();
@@ -14,6 +14,14 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 		$this->assertStringContainsString( "<p><?php esc_html_e('This is text to localize', '');?></p>", $new_template->content );
 		$this->assertStringNotContainsString( '<p>This is text to localize</p>', $new_template->content );
+	}
+
+	public function test_empty_paragraphs_are_not_localized() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
+		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( '<p></p>', $new_template->content );
+		$this->assertStringNotContainsString( 'esc_html_e', $new_template->content );
 	}
 
 	/**
@@ -37,7 +45,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			</div>
 			<!-- /wp:group -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( 'This is text to localize', $new_template->content );
+		$this->assertStringContainsString( "<?php esc_html_e('This is text to localize', '');?>", $new_template->content );
 		$this->assertStringNotContainsString( '<p>This is text to localize</p>', $new_template->content );
 	}
 
@@ -49,7 +57,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 					</div>
 				<!-- /wp:button -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( 'This is text to localize', $new_template->content );
+		$this->assertStringContainsString( "<?php esc_html_e('This is text to localize', '');?>", $new_template->content );
 		$this->assertStringNotContainsString( '<a class="wp-block-button__link wp-element-button">This is text to localize</a>', $new_template->content );
 	}
 
@@ -61,7 +69,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<!-- /wp:heading -->
 		';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( 'This is a heading to localize.', $new_template->content );
+		$this->assertStringContainsString( "<?php esc_html_e('This is a heading to localize.', '');?>", $new_template->content );
 		$this->assertStringNotContainsString( '<h2 class="wp-block-heading">This is a heading to localize.</h2>', $new_template->content );
 	}
 
@@ -135,8 +143,8 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		<!-- /wp:heading -->';
 		$escaped_template  = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		/* That looks like a mess, but what it should look like for REAL is <?php echo esc_attr_e( '"This" is a \'test\'', '' ); ?> */
-		$this->assertStringContainsString( '<?php esc_html_e(\'"This" is a \\\'test\\\'\', \'\');?>', $escaped_template->content );
+		/* That looks like a mess, but what it should look like for REAL is <?php esc_html_e('"This" is a \'test\'', '');?> */
+		$this->assertStringContainsString( "<?php esc_html_e('\"This\" is a \\'test\\'', '');?>", $escaped_template->content );
 	}
 
 	public function test_properly_encode_lessthan_and_greaterthan() {
@@ -146,7 +154,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		<!-- /wp:heading -->';
 		$escaped_template  = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( '<?php esc_html_e(\'&lt;This> is a &lt;test&gt;\', \'\');?>', $escaped_template->content );
+		$this->assertStringContainsString( "<?php esc_html_e('&lt;This> is a &lt;test&gt;', '');?>", $escaped_template->content );
 	}
 
 	public function test_properly_encode_html_markup() {
@@ -156,7 +164,18 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<!-- /wp:paragraph -->';
 		$escaped_template  = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( '<?php esc_html_e(\'<strong>Bold</strong> text has feelings &lt;&gt; TOO\', \'\');?>', $escaped_template->content );
+		$this->assertStringContainsString( "<?php esc_html_e('<strong>Bold</strong> text has feelings &lt;&gt; TOO', '');?>", $escaped_template->content );
+	}
+
+	public function test_empty_alt_text_is_not_localized() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/file.jpg" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( 'alt=""', $new_template->content );
 	}
 
 	public function test_localize_alt_text_from_image() {
@@ -167,7 +186,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<!-- /wp:image -->
 		';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( 'alt="<?php esc_html_e(\'This is alt text\', \'\');?>"', $new_template->content );
+		$this->assertStringContainsString( 'alt="<?php esc_attr_e(\'This is alt text\', \'\');?>"', $new_template->content );
 	}
 
 	public function test_localize_alt_text_from_cover() {
@@ -187,7 +206,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 		// Check the markup attribute
-		$this->assertStringContainsString( 'alt="<?php esc_html_e(\'This is alt text\', \'\');?>"', $new_template->content );
+		$this->assertStringContainsString( 'alt="<?php esc_attr_e(\'This is alt text\', \'\');?>"', $new_template->content );
 	}
 
 	public function test_localize_quote() {
@@ -296,7 +315,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		<!-- /wp:media-text -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 		$this->assertStringContainsString( "<?php esc_html_e('Content to Localize', '');?>", $new_template->content );
-		$this->assertStringContainsString( "<?php esc_html_e('Alt Text Is Here', '');?>", $new_template->content );
+		$this->assertStringContainsString( "<?php esc_attr_e('Alt Text Is Here', '');?>", $new_template->content );
 	}
 
 	public function test_localize_cover_block_children() {
@@ -314,7 +333,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( '<p><?php esc_html_e(\'This is text to localize\', \'\');?></p>', $new_template->content );
+		$this->assertStringContainsString( "<p><?php esc_html_e('This is text to localize', '');?></p>", $new_template->content );
 	}
 
 	public function test_localize_nested_cover_block_children() {

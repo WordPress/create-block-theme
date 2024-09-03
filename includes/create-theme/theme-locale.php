@@ -5,14 +5,19 @@
 class CBT_Theme_Locale {
 
 	/**
-	 * Escape a string for localization.
+	 * Escape text for localization.
 	 *
 	 * @param string $string The string to escape.
 	 * @return string The escaped string.
 	 */
-	public static function escape_string( $string ) {
+	private static function escape_text_content( $string ) {
 		// Avoid escaping if the text is not a string.
 		if ( ! is_string( $string ) ) {
+			return $string;
+		}
+
+		// Check if string is empty.
+		if ( '' === $string ) {
 			return $string;
 		}
 
@@ -22,7 +27,34 @@ class CBT_Theme_Locale {
 		}
 
 		$string = addcslashes( $string, "'" );
+
 		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+	}
+
+	/**
+	 * Escape an html element attribute for localization.
+	 *
+	 * @param string $string The string to escape.
+	 * @return string The escaped string.
+	 */
+	private static function escape_attribute( $string ) {
+		// Avoid escaping if the text is not a string.
+		if ( ! is_string( $string ) ) {
+			return $string;
+		}
+
+		// Check if string is empty.
+		if ( '' === $string ) {
+			return $string;
+		}
+
+		// Check if the text is already escaped.
+		if ( str_starts_with( $string, '<?php' ) ) {
+			return $string;
+		}
+
+		$string = addcslashes( $string, "'" );
+		return "<?php esc_attr_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}
 
 	/**
@@ -109,7 +141,7 @@ class CBT_Theme_Locale {
 						return preg_replace_callback(
 							$pattern,
 							function( $matches ) {
-								return $matches[1] . self::escape_string( $matches[2] ) . $matches[3];
+								return $matches[1] . self::escape_text_content( $matches[2] ) . $matches[3];
 							},
 							$content
 						);
@@ -125,7 +157,7 @@ class CBT_Theme_Locale {
 						return preg_replace_callback(
 							$pattern,
 							function( $matches ) {
-								return 'alt="' . self::escape_string( $matches[1] ) . '"';
+								return 'alt="' . self::escape_attribute( $matches[1] ) . '"';
 							},
 							$content
 						);
