@@ -45,6 +45,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		description: '',
 		uri: '',
 		version: '',
+		wp_version: '',
 		author: '',
 		author_uri: '',
 		tags_custom: '',
@@ -65,6 +66,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			description: themeData.description.raw,
 			uri: themeData.theme_uri.raw,
 			version: themeData.version,
+			wp_version: themeData.requires_wp,
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
@@ -211,6 +213,18 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 						'Version of the theme',
 						'create-block-theme'
 					) }
+				/>
+				<TextControl
+					label={ __(
+						'Minimum WordPress version',
+						'create-block-theme'
+					) }
+					value={ theme.wp_version }
+					onChange={ ( value ) =>
+						setTheme( { ...theme, wp_version: value } )
+					}
+					/* translators: %s: minimum WordPress version required. */
+					placeholder={ __( '5.9', 'create-block-theme' ) }
 				/>
 				<FormTokenField
 					label={ __( 'Theme tags', 'create-block-theme' ) }
