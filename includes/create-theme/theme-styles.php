@@ -25,19 +25,17 @@ class CBT_Theme_Styles {
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
 		$wp_version    = CBT_Theme_Utils::get_current_wordpress_version();
-		$wp_min        = $current_theme->get( 'RequiresWP' );
-		if ( ! $wp_min ) {
-			$wp_min = '5.9';
-		}
-		$version      = $theme['version'];
-		$requires_php = $current_theme->get( 'RequiresPHP' );
-		$text_domain  = $theme['slug'];
-		$template     = $current_theme->get( 'Template' ) ? "\n" . 'Template: ' . $current_theme->get( 'Template' ) : '';
-		$license      = $style_data['License'] ? $style_data['License'] : 'GNU General Public License v2 or later';
-		$license_uri  = $style_data['LicenseURI'] ? $style_data['LicenseURI'] : 'http://www.gnu.org/licenses/gpl-2.0.html';
-		$tags         = CBT_Theme_Tags::theme_tags_list( $theme );
-		$css_contents = $css_contents ? "\n\n" . $css_contents : '';
-		$copyright    = '';
+		$wp_min        = $theme['requires_wp'];
+		$wp_min        = $wp_min ? $wp_min : '6.0';
+		$version       = $theme['version'];
+		$requires_php  = $current_theme->get( 'RequiresPHP' );
+		$text_domain   = $theme['slug'];
+		$template      = $current_theme->get( 'Template' ) ? "\n" . 'Template: ' . $current_theme->get( 'Template' ) : '';
+		$license       = $style_data['License'] ? $style_data['License'] : 'GNU General Public License v2 or later';
+		$license_uri   = $style_data['LicenseURI'] ? $style_data['LicenseURI'] : 'http://www.gnu.org/licenses/gpl-2.0.html';
+		$tags          = CBT_Theme_Tags::theme_tags_list( $theme );
+		$css_contents  = $css_contents ? "\n\n" . $css_contents : '';
+		$copyright     = '';
 		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
 		if ( isset( $matches[1] ) ) {
 			$copyright = "\n" . $matches[1];
