@@ -28,7 +28,36 @@ class CBT_Theme_Locale {
 
 		$string = addcslashes( $string, "'" );
 
-		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		$p = new WP_HTML_Tag_Processor( $string );
+
+		$text   = '';
+		$tokens = array();
+		while ( $p->next_token() ) {
+			switch ( $p->get_token_type() ) {
+				case '#tag':
+					if ( $p->is_tag_closer() ) {
+						$text .= '</' . strtolower( $p->get_token_name() ) . '>';
+					} else {
+						switch ( $p->get_token_name() ) {
+							case 'A':
+								$text .= '<a href="<?php esc_url( "' . $p->get_attribute( 'href' ) . '" );?>">';
+								break;
+							case 'IMG':
+								$text .= '<img style="<?php esc_attr_e( "' . $p->get_attribute( 'style' ) . '" )?>" src="' . CBT_Theme_Media::make_relative_media_url( $p->get_attribute( 'src' ) ) . '" alt="<?php esc_attr_e( "' . $p->get_attribute( 'alt' ) . '" );?>">';
+								break;
+							default:
+								$text .= '<' . strtolower( $p->get_token_name() ) . '>';
+								break;
+						}
+					}
+					break;
+				case '#text':
+					$text .= '<?php esc_html_e( "' . $p->get_modifiable_text() . '", wp_get_theme()->get( \'TextDomain\' ) ); ?>';
+					break;
+			}
+		}
+
+		return $text;
 	}
 
 	/**
