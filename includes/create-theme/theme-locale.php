@@ -43,6 +43,7 @@ class CBT_Theme_Locale {
 								$text .= '<a href="<?php esc_url( "' . $p->get_attribute( 'href' ) . '" );?>">';
 								break;
 							case 'IMG':
+								CBT_Theme_Media::add_media_to_local( array( $p->get_attribute( 'src' ) ) );
 								$text .= '<img style="<?php esc_attr_e( "' . $p->get_attribute( 'style' ) . '" )?>" src="' . CBT_Theme_Media::make_relative_media_url( $p->get_attribute( 'src' ) ) . '" alt="<?php esc_attr_e( "' . $p->get_attribute( 'alt' ) . '" );?>">';
 								break;
 							default:
