@@ -394,6 +394,14 @@ class CBT_Theme_API {
 			CBT_Theme_Styles::clear_user_styles_customizations();
 		}
 
+		if ( isset( $options['savePatterns'] ) && true === $options['savePatterns'] ) {
+			$response = CBT_Theme_Patterns::add_patterns_to_theme( $options );
+
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+		}
+
 		wp_get_theme()->cache_delete();
 
 		return new WP_REST_Response(
