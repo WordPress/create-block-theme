@@ -77,7 +77,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertContains( 'http://example.com/image.jpg', $new_template->media );
 
 		// The pattern is correctly encoded
-		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
+		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
 
 	}
 }
