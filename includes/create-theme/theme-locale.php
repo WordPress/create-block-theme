@@ -28,37 +28,71 @@ class CBT_Theme_Locale {
 
 		$string = addcslashes( $string, "'" );
 
+		// Process the string to avoid escaping inner HTML markup.
 		$p = new WP_HTML_Tag_Processor( $string );
 
 		$text   = '';
 		$tokens = array();
 		while ( $p->next_token() ) {
-			switch ( $p->get_token_type() ) {
-				case '#tag':
-					if ( $p->is_tag_closer() ) {
-						$text .= '</' . strtolower( $p->get_token_name() ) . '>';
-					} else {
-						switch ( $p->get_token_name() ) {
-							case 'A':
-								$text .= '<a href="<?php esc_url( "' . $p->get_attribute( 'href' ) . '" );?>">';
-								break;
-							case 'IMG':
-								CBT_Theme_Media::add_media_to_local( array( $p->get_attribute( 'src' ) ) );
-								$text .= '<img style="<?php esc_attr_e( "' . $p->get_attribute( 'style' ) . '" )?>" src="' . CBT_Theme_Media::make_relative_media_url( $p->get_attribute( 'src' ) ) . '" alt="<?php esc_attr_e( "' . $p->get_attribute( 'alt' ) . '" );?>">';
-								break;
-							default:
-								$text .= '<' . strtolower( $p->get_token_name() ) . '>';
-								break;
-						}
+			$token_type    = $p->get_token_type();
+			$token_name    = strtolower( $p->get_token_name() );
+			$is_tag_closer = $p->is_tag_closer();
+
+			if ( '#tag' === $token_type ) {
+				// Add a placeholder for the token.
+				$text .= '%s';
+				if ( $is_tag_closer ) {
+					$tokens[] = "</{$token_name}>";
+				} else {
+					// Depending on the HTML tag, we may need to process attributes so they are correctly added to the placeholder.
+					switch ( $token_name ) {
+						// Handle links.
+						case 'a':
+							$href     = esc_url( $p->get_attribute( 'href' ) );
+							$target   = empty( esc_attr( $p->get_attribute( 'target' ) ) ) ? '' : ' target="_blank"';
+							$rel      = empty( esc_attr( $p->get_attribute( 'rel' ) ) ) ? '' : ' rel="nofollow noopener noreferrer"';
+							$tokens[] = "<a href=\"{$href}\"{$target}{$rel}>";
+							break;
+						// Handle inline images.
+						case 'img':
+							$src   = esc_url( $p->get_attribute( 'src' ) );
+							$style = esc_attr( $p->get_attribute( 'style' ) );
+							$alt   = esc_attr( $p->get_attribute( 'alt' ) );
+
+							CBT_Theme_Media::add_media_to_local( array( $src ) );
+							$relative_src = CBT_Theme_Media::get_media_folder_path_from_url( $src ) . basename( $src );
+							$tokens[]     = "<img style=\"{$style}\" src=\"' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}\" alt=\"{$alt}\">";
+							break;
+						// Handle highlights.
+						case 'mark':
+							$style    = esc_attr( $p->get_attribute( 'style' ) );
+							$class    = esc_attr( $p->get_attribute( 'class' ) );
+							$tokens[] = "<mark style=\"{$style}\" class=\"{$class}\">";
+							break;
+						// Otherwise, just add the tag opener.
+						default:
+							$tokens[] = "<{$token_name}>";
+							break;
 					}
-					break;
-				case '#text':
-					$text .= '<?php esc_html_e( "' . $p->get_modifiable_text() . '", wp_get_theme()->get( \'TextDomain\' ) ); ?>';
-					break;
+				}
+			} else {
+				// If it's not a tag, just add the text content.
+				$text .= esc_html( $p->get_modifiable_text() );
 			}
 		}
 
-		return $text;
+		// Format the string, replacing the placeholders with the formatted tokens.
+		$mystring = "<?php\n/* Translators: %s are html tags */\necho sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+			', ',
+			array_map(
+				function( $token ) {
+					return "'$token'";
+				},
+				$tokens
+			)
+		) . '); ?>';
+
+		return $mystring;
 	}
 
 	/**
