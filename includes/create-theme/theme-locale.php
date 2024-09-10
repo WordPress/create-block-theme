@@ -80,19 +80,22 @@ class CBT_Theme_Locale {
 				$text .= esc_html( $p->get_modifiable_text() );
 			}
 		}
+		// If tokens is not empty, format the string using sprintf.
+		if ( ! empty( $tokens ) ) {
+			// Format the string, replacing the placeholders with the formatted tokens.
+			return "<?php\n/* Translators: %s are html tags */\necho sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+				', ',
+				array_map(
+					function( $token ) {
+						return "'$token'";
+					},
+					$tokens
+				)
+			) . '); ?>';
+		}
 
-		// Format the string, replacing the placeholders with the formatted tokens.
-		$mystring = "<?php\n/* Translators: %s are html tags */\necho sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
-			', ',
-			array_map(
-				function( $token ) {
-					return "'$token'";
-				},
-				$tokens
-			)
-		) . '); ?>';
+		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 
-		return $mystring;
 	}
 
 	/**
