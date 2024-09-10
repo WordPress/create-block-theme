@@ -15,7 +15,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		// The image should be replaced with a relative URL
 		$this->assertStringNotContainsString( 'http://example.com/image.jpg', $new_template->content );
-		$this->assertStringContainsString( 'get_stylesheet_directory_uri', $new_template->content );
+		$this->assertStringContainsString( 'get_template_directory_uri', $new_template->content );
 		$this->assertStringContainsString( '/assets/images', $new_template->content );
 
 	}
