@@ -94,7 +94,7 @@ class CBT_Theme_Media {
 	public static function make_relative_media_url( $absolute_url ) {
 		if ( ! empty( $absolute_url ) && CBT_Theme_Utils::is_absolute_url( $absolute_url ) ) {
 			$folder_path = self::get_media_folder_path_from_url( $absolute_url );
-			return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $folder_path . basename( $absolute_url );
+			return '<?php echo esc_url( get_template_directory_uri() ); ?>' . $folder_path . basename( $absolute_url );
 		}
 		return $absolute_url;
 	}
