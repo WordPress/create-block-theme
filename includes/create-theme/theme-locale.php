@@ -83,7 +83,7 @@ class CBT_Theme_Locale {
 		// If tokens is not empty, format the string using sprintf.
 		if ( ! empty( $tokens ) ) {
 			// Format the string, replacing the placeholders with the formatted tokens.
-			return "<?php\n/* Translators: %s are html tags */\necho sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+			return "<?php /* Translators: %s are html tags */ echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
 				', ',
 				array_map(
 					function( $token ) {
@@ -91,7 +91,7 @@ class CBT_Theme_Locale {
 					},
 					$tokens
 				)
-			) . '); ?>';
+			) . ' ); ?>';
 		}
 
 		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";

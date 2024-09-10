@@ -159,12 +159,12 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
 	public function test_properly_encode_html_markup() {
 		$template          = new stdClass();
-		$template->content = '<!-- wp:paragraph -->
-			<p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p>
-			<!-- /wp:paragraph -->';
+		$template->content = '<!-- wp:paragraph --><p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p><!-- /wp:paragraph -->';
 		$escaped_template  = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( "<?php esc_html_e('<strong>Bold</strong> text has feelings &lt;&gt; TOO', '');?>", $escaped_template->content );
+		$expected_output = '<!-- wp:paragraph --><p><?php /* Translators: %s are html tags */ echo sprintf( esc_html__( \'%sBold%s text has feelings &lt;&gt; TOO\', \'\' ), \'<strong>\', \'</strong>\' ); ?></p><!-- /wp:paragraph -->';
+
+		$this->assertStringContainsString( $expected_output, $escaped_template->content );
 	}
 
 	public function test_empty_alt_text_is_not_localized() {
@@ -262,7 +262,12 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<pre class="wp-block-verse">Here is some <strong>verse</strong> to localize</pre>
 		<!-- /wp:verse -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( "<?php esc_html_e('Here is some <strong>verse</strong> to localize', '');?>", $new_template->content );
+
+		$expected_output = '<!-- wp:verse -->
+			<pre class="wp-block-verse"><?php /* Translators: %s are html tags */ echo sprintf( esc_html__( \'Here is some %sverse%s to localize\', \'\' ), \'<strong>\', \'</strong>\' ); ?></pre>
+		<!-- /wp:verse -->';
+
+		$this->assertStringContainsString( $expected_output, $new_template->content );
 	}
 
 	public function test_localize_table() {

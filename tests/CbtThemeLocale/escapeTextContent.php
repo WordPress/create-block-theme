@@ -37,9 +37,10 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 	}
 
 	public function test_escape_text_content_with_html() {
-		$string         = '<p>This is a test text with HTML.</p>';
-		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
-		$this->assertEquals( "<?php esc_html_e('<p>This is a test text with HTML.</p>', 'test-locale-theme');?>", $escaped_string );
+		$string          = '<p>This is a test text with HTML.</p>';
+		$escaped_string  = $this->call_private_method( 'escape_text_content', array( $string ) );
+		$expected_output = "<?php /* Translators: %s are html tags */ echo sprintf( esc_html__( '%sThis is a test text with HTML.%s', 'test-locale-theme' ), '<p>', '</p>' ); ?>";
+		$this->assertEquals( $expected_output, $escaped_string );
 	}
 
 	public function test_escape_text_content_with_already_escaped_string() {
