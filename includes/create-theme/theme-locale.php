@@ -95,7 +95,6 @@ class CBT_Theme_Locale {
 		}
 
 		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
-
 	}
 
 	/**
