@@ -96,7 +96,7 @@ If you run into an issue, you should check the [Support forum](https://wordpress
 
 If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
 
-== General Troobleshooting ==
+== General Troubleshooting ==
 
 If you are having problems, please try the following:
 
