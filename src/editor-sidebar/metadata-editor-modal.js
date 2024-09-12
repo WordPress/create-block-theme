@@ -30,6 +30,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
  */
 import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
 import { getFontsCreditsText } from '../utils/fonts';
+import { generateWpVersions } from '../utils/generate-versions';
 
 const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/png',
@@ -40,17 +41,7 @@ const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/avif',
 ];
 
-const WP_MINIMUM_VERSIONS = [
-	'5.9',
-	'6.0',
-	'6.1',
-	'6.2',
-	'6.3',
-	'6.4',
-	'6.5',
-	'6.6',
-	'6.7',
-];
+const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
 
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	const [ theme, setTheme ] = useState( {
