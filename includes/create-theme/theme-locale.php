@@ -31,59 +31,57 @@ class CBT_Theme_Locale {
 		// Process the string to avoid escaping inner HTML markup.
 		$p = new WP_HTML_Tag_Processor( $string );
 
-		$text   = '';
-		$tokens = array();
+		$text             = '';
+		$tokens           = array();
+		$increment        = 0;
+		$translators_note = "\n/* Translators: ";
 		while ( $p->next_token() ) {
 			$token_type    = $p->get_token_type();
 			$token_name    = strtolower( $p->get_token_name() );
 			$is_tag_closer = $p->is_tag_closer();
 
 			if ( '#tag' === $token_type ) {
-				// Add a placeholder for the token.
-				$text .= '%s';
+				$increment++;
+				$text .= '%' . $increment . '$s';
+				if ( 1 !== $increment ) {
+					$translators_note .= ', ';
+				}
 				if ( $is_tag_closer ) {
-					$tokens[] = "</{$token_name}>";
+					$tokens[]          = "</{$token_name}>";
+					$translators_note .= '%' . $increment . "\$s is the end of a '" . $token_name . "' HTML element";
 				} else {
-					// Depending on the HTML tag, we may need to process attributes so they are correctly added to the placeholder.
-					switch ( $token_name ) {
-						// Handle links.
-						case 'a':
-							$href     = esc_url( $p->get_attribute( 'href' ) );
-							$target   = empty( esc_attr( $p->get_attribute( 'target' ) ) ) ? '' : ' target="_blank"';
-							$rel      = empty( esc_attr( $p->get_attribute( 'rel' ) ) ) ? '' : ' rel="nofollow noopener noreferrer"';
-							$tokens[] = "<a href=\"{$href}\"{$target}{$rel}>";
-							break;
-						// Handle inline images.
-						case 'img':
-							$src   = esc_url( $p->get_attribute( 'src' ) );
-							$style = esc_attr( $p->get_attribute( 'style' ) );
-							$alt   = esc_attr( $p->get_attribute( 'alt' ) );
+					$token = '<' . $token_name;
+					// Get all attributes of the tag.
+					$attributes = $p->get_attribute_names_with_prefix( '' );
 
-							CBT_Theme_Media::add_media_to_local( array( $src ) );
-							$relative_src = CBT_Theme_Media::get_media_folder_path_from_url( $src ) . basename( $src );
-							$tokens[]     = "<img style=\"{$style}\" src=\"' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}\" alt=\"{$alt}\">";
-							break;
-						// Handle highlights.
-						case 'mark':
-							$style    = esc_attr( $p->get_attribute( 'style' ) );
-							$class    = esc_attr( $p->get_attribute( 'class' ) );
-							$tokens[] = "<mark style=\"{$style}\" class=\"{$class}\">";
-							break;
-						// Otherwise, just add the tag opener.
-						default:
-							$tokens[] = "<{$token_name}>";
-							break;
+					// Add the attributes to the token, processing and escaping where necessary.
+					foreach ( $attributes as $attr_name ) {
+						$attr_value = $p->get_attribute( $attr_name );
+						if ( empty( $attr_value ) ) {
+							$token .= ' ' . $attr_name;
+							continue;
+						} elseif ( 'src' === $attr_name ) {
+							CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
+							$relative_src = CBT_Theme_Media::get_media_folder_path_from_url( $attr_value ) . basename( $attr_value );
+							$attr_value   = "' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}";
+						} elseif ( 'href' === $attr_name ) {
+							$attr_value = "' . esc_url( '$attr_value' ) . '";
+						}
+						$token .= ' ' . $attr_name . '="' . $attr_value . '"';
 					}
+					$token            .= '>';
+					$tokens[]          = $token;
+					$translators_note .= '%' . $increment . "\$s is the start of a '" . $token_name . "' HTML element";
 				}
 			} else {
-				// If it's not a tag, just add the text content.
-				$text .= esc_html( $p->get_modifiable_text() );
+				$text .= $p->get_modifiable_text();
 			}
 		}
-		// If tokens is not empty, format the string using sprintf.
+
 		if ( ! empty( $tokens ) ) {
-			// Format the string, replacing the placeholders with the formatted tokens.
-			return "<?php /* Translators: %s are html tags */ echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+			$translators_note .= ". */\n";
+			// Return the formatted text, substituting the placeholders with the tokens.
+			return "<?php $translators_note echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
 				', ',
 				array_map(
 					function( $token ) {
