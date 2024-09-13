@@ -2,6 +2,9 @@
 /*
 * Locale related functionality
 */
+
+require_once __DIR__ . '/theme-token-processor.php';
+
 class CBT_Theme_Locale {
 
 	/**
@@ -28,59 +31,13 @@ class CBT_Theme_Locale {
 
 		$string = addcslashes( $string, "'" );
 
-		// Process the string to avoid escaping inner HTML markup.
-		$p = new WP_HTML_Tag_Processor( $string );
-
-		$text             = '';
-		$tokens           = array();
-		$increment        = 0;
-		$translators_note = "\n/* Translators: ";
-		while ( $p->next_token() ) {
-			$token_type    = $p->get_token_type();
-			$token_name    = strtolower( $p->get_token_name() );
-			$is_tag_closer = $p->is_tag_closer();
-
-			if ( '#tag' === $token_type ) {
-				$increment++;
-				$text .= '%' . $increment . '$s';
-				if ( 1 !== $increment ) {
-					$translators_note .= ', ';
-				}
-				if ( $is_tag_closer ) {
-					$tokens[]          = "</{$token_name}>";
-					$translators_note .= '%' . $increment . "\$s is the end of a '" . $token_name . "' HTML element";
-				} else {
-					$token = '<' . $token_name;
-					// Get all attributes of the tag.
-					$attributes = $p->get_attribute_names_with_prefix( '' );
-
-					// Add the attributes to the token, processing and escaping where necessary.
-					foreach ( $attributes as $attr_name ) {
-						$attr_value = $p->get_attribute( $attr_name );
-						if ( empty( $attr_value ) ) {
-							$token .= ' ' . $attr_name;
-							continue;
-						} elseif ( 'src' === $attr_name ) {
-							CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
-							$relative_src = CBT_Theme_Media::get_media_folder_path_from_url( $attr_value ) . basename( $attr_value );
-							$attr_value   = "' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}";
-						} elseif ( 'href' === $attr_name ) {
-							$attr_value = "' . esc_url( '$attr_value' ) . '";
-						}
-						$token .= ' ' . $attr_name . '="' . $attr_value . '"';
-					}
-					$token            .= '>';
-					$tokens[]          = $token;
-					$translators_note .= '%' . $increment . "\$s is the start of a '" . $token_name . "' HTML element";
-				}
-			} else {
-				$text .= $p->get_modifiable_text();
-			}
-		}
+		$p = new CBT_Token_Processor( $string );
+		$p->process_tokens();
+		$text             = $p->get_text();
+		$tokens           = $p->get_tokens();
+		$translators_note = $p->get_translators_note();
 
 		if ( ! empty( $tokens ) ) {
-			$translators_note .= ". */\n";
-			// Return the formatted text, substituting the placeholders with the tokens.
 			return "<?php $translators_note echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
 				', ',
 				array_map(
