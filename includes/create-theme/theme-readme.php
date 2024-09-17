@@ -210,6 +210,7 @@ GNU General Public License for more details.
 		$description         = $theme['description'] ?? '';
 		$author              = $theme['author'] ?? '';
 		$wp_version          = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
+		$wp_min              = $theme['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 		$font_credits        = $theme['font_credits'] ?? '';
@@ -219,6 +220,9 @@ GNU General Public License for more details.
 
 		// Update Author/Contributors.
 		$readme_content = self::add_or_update_prop( 'Contributors', $author, $readme_content );
+
+		// Update Required WordPress version.
+		$readme_content = self::add_or_update_prop( 'Requires at least', $wp_min, $readme_content );
 
 		// Update "Tested up to" version.
 		$readme_content = self::add_or_update_prop( 'Tested up to', $wp_version, $readme_content );
