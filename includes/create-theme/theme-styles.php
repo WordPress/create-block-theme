@@ -67,6 +67,7 @@ Tags: {$tags}
 		$uri         = $theme['uri'];
 		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
+		$wp_min      = $theme['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$wp_version  = CBT_Theme_Utils::get_current_wordpress_version();
 		$text_domain = sanitize_title( $name );
 		if ( isset( $theme['template'] ) ) {
@@ -85,7 +86,7 @@ Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 6.0
+Requires at least: {$wp_min}
 Tested up to: {$wp_version}
 Requires PHP: 5.7
 Version: {$version}
