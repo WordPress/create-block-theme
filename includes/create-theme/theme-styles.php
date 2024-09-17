@@ -25,7 +25,7 @@ class CBT_Theme_Styles {
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
 		$wp_version    = CBT_Theme_Utils::get_current_wordpress_version();
-		$wp_min        = isset( $theme['requires_wp'] ) && $theme['requires_wp'] ? $theme['requires_wp'] : '6.0';
+		$wp_min        = $theme['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$text_domain   = $theme['slug'];
