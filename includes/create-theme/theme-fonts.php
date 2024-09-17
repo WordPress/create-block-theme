@@ -84,6 +84,34 @@ class CBT_Theme_Fonts {
 		return $user_settings['typography']['fontFamilies']['custom'] ?? null;
 	}
 
+	/**
+	 * Make a pretty filename from a font face.
+	 *
+	 * The filename is based on the font family name, weight, style, unicode range and the source index.
+	 * Example:
+	 *     $font_face = [ 'fontFamily' => 'Open Sans', 'fontWeight' => '400', 'fontStyle' => 'normal' ]
+	 *     $src = 'https://example.com/assets/fonts/open-sans-regular.ttf'
+	 *     $src_index = 0
+	 *     Returns: 'open-sans-400-normal.ttf'
+	 *
+	 * @param array  $font_face
+	 * @param string $src
+	 * @param int    $src_index
+	 * @return string
+	 */
+	public static function make_filename_from_fontface( $font_face, $src, $src_index = 0 ) {
+		$font_extension = pathinfo( $src, PATHINFO_EXTENSION );
+		$font_filename  = sanitize_title( $font_face['fontFamily'] )
+			. ( isset( $font_face['fontWeight'] ) ? '-' . sanitize_title( $font_face['fontWeight'] ) : '' )
+			. ( isset( $font_face['fontStyle'] ) ? '-' . sanitize_title( $font_face['fontStyle'] ) : '' )
+			. ( isset( $font_face['unicodeRange'] ) ? '-' . sanitize_title( $font_face['unicodeRange'] ) : '' )
+			. ( 0 !== $src_index ? '-' . $src_index : '' )
+			. '.'
+			. $font_extension;
+
+		return $font_filename;
+	}
+
 	/*
 	 * Copy the font assets to the theme.
 	 *
@@ -91,35 +119,40 @@ class CBT_Theme_Fonts {
 	 * @return array $font_families The font families with the font face src updated to the theme font asset location.
 	 */
 	public static function copy_font_assets_to_theme( $font_families ) {
-		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
-
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-
-		if ( ! file_exists( $theme_font_asset_location ) ) {
-			mkdir( $theme_font_asset_location, 0777, true );
-		}
+		$theme_font_asset_location = path_join( get_stylesheet_directory(), 'assets/fonts/' );
+		// Create the font asset directory if it does not exist.
+		wp_mkdir_p( $theme_font_asset_location );
 
 		foreach ( $font_families as &$font_family ) {
 			if ( ! isset( $font_family['fontFace'] ) ) {
 				continue;
 			}
+
+			$font_family_dir_name = sanitize_title( $font_family['name'] );
+			$font_family_dir_path = path_join( $theme_font_asset_location, $font_family_dir_name );
+			// Crete a font family specific directory if it does not exist.
+			wp_mkdir_p( $font_family_dir_path );
+
 			foreach ( $font_family['fontFace'] as &$font_face ) {
 				// src can be a string or an array
 				// if it is a string, cast it to an array
 				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
-					$font_filename = basename( $font_src );
-					$font_dir      = wp_get_font_dir();
+					$font_filename        = basename( $font_src );
+					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
+					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
+					$font_dir             = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
 						// If the file is hosted on this server then copy it to the theme
-						copy( $font_dir['path'] . '/' . $font_filename, $theme_font_asset_location . '/' . $font_filename );
+						copy( path_join( $font_dir['path'], $font_filename ), $font_face_path );
 					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_src );
-						copy( $tmp_file, $theme_font_asset_location . $font_filename );
+						copy( $tmp_file, $font_face_path );
 						unlink( $tmp_file );
 					}
-					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . $font_filename;
+					$font_face_family_path               = path_join( $font_family_dir_name, $font_pretty_filename );
+					$font_face['src'][ $font_src_index ] = path_join( 'file:./assets/fonts/', $font_face_family_path );
 				}
 			}
 		}

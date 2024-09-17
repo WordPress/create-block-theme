@@ -34,6 +34,7 @@ export const SaveThemePanel = () => {
 			saveTemplates: _preference?.saveTemplates ?? true,
 			processOnlySavedTemplates:
 				_preference?.processOnlySavedTemplates ?? true,
+			savePatterns: _preference?.savePatterns ?? true,
 			saveFonts: _preference?.saveFonts ?? true,
 			removeNavRefs: _preference?.removeNavRefs ?? false,
 			localizeText: _preference?.localizeText ?? false,
@@ -68,7 +69,22 @@ export const SaveThemePanel = () => {
 						'create-block-theme'
 					)
 				);
-				window.location.reload();
+
+				const searchParams = new URLSearchParams(
+					window?.location?.search
+				);
+				// If user is editing a pattern and savePatterns is true, redirect back to the patterns page.
+				if (
+					preference.savePatterns &&
+					searchParams.get( 'postType' ) === 'wp_block' &&
+					searchParams.get( 'postId' )
+				) {
+					window.location =
+						'/wp-admin/site-editor.php?postType=wp_block';
+				} else {
+					// If user is not editing a pattern, reload the editor.
+					window.location.reload();
+				}
 			} )
 			.catch( ( error ) => {
 				const errorMessage =
@@ -136,26 +152,43 @@ export const SaveThemePanel = () => {
 					}
 				/>
 				<CheckboxControl
-					label={ __( 'Localize Text', 'create-block-theme' ) }
+					label={ __( 'Save Synced Patterns', 'create-block-theme' ) }
 					help={ __(
-						'Any text in a template will be copied to a pattern and localized.',
+						'Any synced patterns created in the Editor will be moved to the theme. Note that this will delete all synced patterns from the Editor and any references in templates will be made relative to the theme.',
 						'create-block-theme'
 					) }
-					disabled={ ! preference.saveTemplates }
+					checked={ preference.savePatterns }
+					onChange={ () => handleTogglePreference( 'savePatterns' ) }
+				/>
+				<CheckboxControl
+					label={ __( 'Localize Text', 'create-block-theme' ) }
+					help={ __(
+						'Any text in a template or pattern will be localized in a pattern.',
+						'create-block-theme'
+					) }
+					disabled={
+						! preference.saveTemplates && ! preference.savePatterns
+					}
 					checked={
-						preference.saveTemplates && preference.localizeText
+						( preference.saveTemplates ||
+							preference.savePatterns ) &&
+						preference.localizeText
 					}
 					onChange={ () => handleTogglePreference( 'localizeText' ) }
 				/>
 				<CheckboxControl
 					label={ __( 'Localize Images', 'create-block-theme' ) }
 					help={ __(
-						'Any images in a template will be copied to a local /assets folder and referenced from there via a pattern.',
+						'Any images in a template or pattern will be copied to a local /assets folder and referenced from there via a pattern.',
 						'create-block-theme'
 					) }
-					disabled={ ! preference.saveTemplates }
+					disabled={
+						! preference.saveTemplates && ! preference.savePatterns
+					}
 					checked={
-						preference.saveTemplates && preference.localizeImages
+						( preference.saveTemplates ||
+							preference.savePatterns ) &&
+						preference.localizeImages
 					}
 					onChange={ () =>
 						handleTogglePreference( 'localizeImages' )
@@ -170,9 +203,13 @@ export const SaveThemePanel = () => {
 						'Remove Navigation Refs from the theme returning your navigation to the default state.',
 						'create-block-theme'
 					) }
-					disabled={ ! preference.saveTemplates }
+					disabled={
+						! preference.saveTemplates && ! preference.savePatterns
+					}
 					checked={
-						preference.saveTemplates && preference.removeNavRefs
+						( preference.saveTemplates ||
+							preference.savePatterns ) &&
+						preference.removeNavRefs
 					}
 					onChange={ () => handleTogglePreference( 'removeNavRefs' ) }
 				/>

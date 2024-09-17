@@ -9,7 +9,6 @@ class Test_Create_Block_Theme_Utils extends WP_UnitTestCase {
 /**
  * Title: index
  * Slug: old-slug/index
- * Categories: hidden
  * Inserter: no
  */
 ?>
