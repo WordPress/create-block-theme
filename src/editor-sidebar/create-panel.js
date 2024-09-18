@@ -14,6 +14,7 @@ import {
 	__experimentalText as Text,
 	PanelBody,
 	Button,
+	SelectControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
@@ -28,6 +29,9 @@ import {
 	createClonedTheme,
 	createChildTheme,
 } from '../resolvers';
+import { generateWpVersions } from '../utils/generate-versions';
+
+const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -47,6 +51,7 @@ export const CreateThemePanel = ( { createType } ) => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
+		requires_wp: '',
 		subfolder,
 	} );
 
@@ -194,6 +199,20 @@ export const CreateThemePanel = ( { createType } ) => {
 							'https://wordpress.org/',
 							'create-block-theme'
 						) }
+					/>
+					<SelectControl
+						label={ __(
+							'Minimum WordPress version',
+							'create-block-theme'
+						) }
+						value={ theme.requires_wp }
+						options={ WP_MINIMUM_VERSIONS.map( ( version ) => ( {
+							label: version,
+							value: version,
+						} ) ) }
+						onChange={ ( value ) => {
+							setTheme( { ...theme, requires_wp: value } );
+						} }
 					/>
 				</details>
 				<br />
