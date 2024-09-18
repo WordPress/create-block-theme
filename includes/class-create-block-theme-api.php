@@ -350,13 +350,6 @@ class CBT_Theme_API {
 			CBT_Theme_Utils::replace_screenshot( $theme['screenshot'] );
 		}
 
-		// Relocate the theme to a new folder
-		$response = CBT_Theme_Utils::relocate_theme( $theme['subfolder'] );
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
 		wp_cache_flush();
 
 		return new WP_REST_Response(
@@ -470,7 +463,6 @@ class CBT_Theme_API {
 		$sanitized_theme['author']              = sanitize_text_field( $theme['author'] ?? '' );
 		$sanitized_theme['author_uri']          = sanitize_text_field( $theme['author_uri'] ?? '' );
 		$sanitized_theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] ?? '' );
-		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] ?? '' );
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
 		$sanitized_theme['requires_wp']         = sanitize_text_field( $theme['requires_wp'] ?? '' );
