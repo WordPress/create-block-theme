@@ -25,7 +25,7 @@ class CBT_Theme_Styles {
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
 		$wp_version    = CBT_Theme_Utils::get_current_wordpress_version();
-		$requires_wp   = $theme['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
+		$requires_wp   = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$text_domain   = $theme['slug'];
@@ -67,7 +67,7 @@ Tags: {$tags}
 		$uri         = $theme['uri'];
 		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
-		$requires_wp = $theme['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
+		$requires_wp = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$wp_version  = CBT_Theme_Utils::get_current_wordpress_version();
 		$text_domain = sanitize_title( $name );
 		if ( isset( $theme['template'] ) ) {
