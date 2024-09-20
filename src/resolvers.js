@@ -101,11 +101,11 @@ export async function fetchReadmeData() {
 	} );
 }
 
-export async function postCreateThemeVariation( name ) {
+export async function postCreateThemeVariation( preferences ) {
 	return apiFetch( {
 		path: '/create-block-theme/v1/create-variation',
 		method: 'POST',
-		data: { name },
+		data: preferences,
 		headers: {
 			'Content-Type': 'application/json',
 		},

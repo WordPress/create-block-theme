@@ -112,19 +112,18 @@ class CBT_Theme_Fonts {
 		return $font_filename;
 	}
 
-	public static function copy_activated_fonts_to_theme() {
-		$font_families_to_copy = self::get_user_activated_fonts();
-
-		if ( is_null( $font_families_to_copy ) ) {
-			return;
-		}
-
-		$theme_json                = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+	/*
+	 * Copy the font assets to the theme.
+	 *
+	 * @param array $font_families The font families to copy.
+	 * @return array $font_families The font families with the font face src updated to the theme font asset location.
+	 */
+	public static function copy_font_assets_to_theme( $font_families ) {
 		$theme_font_asset_location = path_join( get_stylesheet_directory(), 'assets/fonts/' );
 		// Create the font asset directory if it does not exist.
 		wp_mkdir_p( $theme_font_asset_location );
 
-		foreach ( $font_families_to_copy as &$font_family ) {
+		foreach ( $font_families as &$font_family ) {
 			if ( ! isset( $font_family['fontFace'] ) ) {
 				continue;
 			}
@@ -139,6 +138,10 @@ class CBT_Theme_Fonts {
 				// if it is a string, cast it to an array
 				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+					if ( str_starts_with( $font_src, 'file:' ) ) {
+						// If the font source starts with 'file:' then it's already a theme asset.
+						continue;
+					}
 					$font_filename        = basename( $font_src );
 					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
@@ -158,9 +161,22 @@ class CBT_Theme_Fonts {
 			}
 		}
 
+		return $font_families;
+	}
+
+	public static function copy_activated_fonts_to_theme() {
+		$font_families_to_copy = self::get_user_activated_fonts();
+
+		if ( is_null( $font_families_to_copy ) ) {
+			return;
+		}
+
+		$theme_json           = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$copied_font_families = self::copy_font_assets_to_theme( $font_families_to_copy );
+
 		$theme_json['settings']['typography']['fontFamilies'] = array_merge(
 			$theme_json['settings']['typography']['fontFamilies'] ?? array(),
-			$font_families_to_copy
+			$copied_font_families
 		);
 
 		$user_settings = CBT_Theme_JSON_Resolver::get_user_data()->get_settings();
