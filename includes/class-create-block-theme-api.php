@@ -466,6 +466,7 @@ class CBT_Theme_API {
 		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] ?? '' );
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
+		$sanitized_theme['requires_wp']         = sanitize_text_field( $theme['requires_wp'] ?? '' );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
 		$sanitized_theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] ?? '' );
 		$sanitized_theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] ?? '' );

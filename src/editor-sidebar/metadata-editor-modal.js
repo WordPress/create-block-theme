@@ -18,6 +18,7 @@ import {
 	FormTokenField,
 	Modal,
 	Button,
+	SelectControl,
 	TextControl,
 	TextareaControl,
 	ExternalLink,
@@ -29,6 +30,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
  */
 import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
 import { getFontsCreditsText } from '../utils/fonts';
+import { generateWpVersions } from '../utils/generate-versions';
 
 const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/png',
@@ -39,12 +41,15 @@ const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/avif',
 ];
 
+const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
+
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	const [ theme, setTheme ] = useState( {
 		name: '',
 		description: '',
 		uri: '',
 		version: '',
+		requires_wp: '',
 		author: '',
 		author_uri: '',
 		tags_custom: '',
@@ -65,6 +70,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			description: themeData.description.raw,
 			uri: themeData.theme_uri.raw,
 			version: themeData.version,
+			requires_wp: themeData.requires_wp,
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
@@ -211,6 +217,20 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 						'Version of the theme',
 						'create-block-theme'
 					) }
+				/>
+				<SelectControl
+					label={ __(
+						'Minimum WordPress version',
+						'create-block-theme'
+					) }
+					value={ theme.requires_wp }
+					options={ WP_MINIMUM_VERSIONS.map( ( version ) => ( {
+						label: version,
+						value: version,
+					} ) ) }
+					onChange={ ( value ) => {
+						setTheme( { ...theme, requires_wp: value } );
+					} }
 				/>
 				<FormTokenField
 					label={ __( 'Theme tags', 'create-block-theme' ) }

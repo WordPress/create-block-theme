@@ -50,6 +50,7 @@ class CBT_Theme_Readme {
 		$author_uri           = $theme['author_uri'] ?? '';
 		$copy_year            = $theme['copyright_year'] ?? gmdate( 'Y' );
 		$wp_version           = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
+		$requires_wp          = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$required_php_version = $theme['required_php_version'] ?? '5.7';
 		$license              = $theme['license'] ?? 'GPLv2 or later';
 		$license_uri          = $theme['license_uri'] ?? 'http://www.gnu.org/licenses/gpl-2.0.html';
@@ -67,7 +68,7 @@ class CBT_Theme_Readme {
 		// Adds the Theme section.
 		$theme_section_content = "
 Contributors: {$author}
-Requires at least: 6.0
+Requires at least: {$requires_wp}
 Tested up to: {$wp_version}
 Requires PHP: {$required_php_version}
 License: {$license}
@@ -210,6 +211,7 @@ GNU General Public License for more details.
 		$description         = $theme['description'] ?? '';
 		$author              = $theme['author'] ?? '';
 		$wp_version          = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
+		$requires_wp         = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$image_credits       = $theme['image_credits'] ?? '';
 		$recommended_plugins = $theme['recommended_plugins'] ?? '';
 		$font_credits        = $theme['font_credits'] ?? '';
@@ -219,6 +221,9 @@ GNU General Public License for more details.
 
 		// Update Author/Contributors.
 		$readme_content = self::add_or_update_prop( 'Contributors', $author, $readme_content );
+
+		// Update Required WordPress version.
+		$readme_content = self::add_or_update_prop( 'Requires at least', $requires_wp, $readme_content );
 
 		// Update "Tested up to" version.
 		$readme_content = self::add_or_update_prop( 'Tested up to', $wp_version, $readme_content );
