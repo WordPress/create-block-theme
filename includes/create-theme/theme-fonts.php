@@ -138,6 +138,10 @@ class CBT_Theme_Fonts {
 				// if it is a string, cast it to an array
 				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+					if ( str_starts_with( $font_src, 'file:' ) ) {
+						// If the font source starts with 'file:' then it's already a theme asset.
+						continue;
+					}
 					$font_filename        = basename( $font_src );
 					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
