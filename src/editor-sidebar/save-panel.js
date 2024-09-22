@@ -102,8 +102,9 @@ export const SaveThemePanel = () => {
 			<ScreenHeader
 				title={ __( 'Save Changes', 'create-block-theme' ) }
 			/>
-			<VStack>
+			<VStack spacing={ 4 }>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Save Fonts', 'create-block-theme' ) }
 					help={ __(
 						'Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme.',
@@ -113,6 +114,7 @@ export const SaveThemePanel = () => {
 					onChange={ () => handleTogglePreference( 'saveFonts' ) }
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Save Style Changes', 'create-block-theme' ) }
 					help={ __(
 						'Save Global Styles values set in the Editor to the theme.',
@@ -122,6 +124,7 @@ export const SaveThemePanel = () => {
 					onChange={ () => handleTogglePreference( 'saveStyle' ) }
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __(
 						'Save Template Changes',
 						'create-block-theme'
@@ -134,6 +137,7 @@ export const SaveThemePanel = () => {
 					onChange={ () => handleTogglePreference( 'saveTemplates' ) }
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __(
 						'Process Only Modified Templates',
 						'create-block-theme'
@@ -152,6 +156,7 @@ export const SaveThemePanel = () => {
 					}
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Save Synced Patterns', 'create-block-theme' ) }
 					help={ __(
 						'Any synced patterns created in the Editor will be moved to the theme. Note that this will delete all synced patterns from the Editor and any references in templates will be made relative to the theme.',
@@ -161,6 +166,7 @@ export const SaveThemePanel = () => {
 					onChange={ () => handleTogglePreference( 'savePatterns' ) }
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Localize Text', 'create-block-theme' ) }
 					help={ __(
 						'Any text in a template or pattern will be localized in a pattern.',
@@ -177,6 +183,7 @@ export const SaveThemePanel = () => {
 					onChange={ () => handleTogglePreference( 'localizeText' ) }
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Localize Images', 'create-block-theme' ) }
 					help={ __(
 						'Any images in a template or pattern will be copied to a local /assets folder and referenced from there via a pattern.',
@@ -195,6 +202,7 @@ export const SaveThemePanel = () => {
 					}
 				/>
 				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __(
 						'Remove Navigation Refs',
 						'create-block-theme'
