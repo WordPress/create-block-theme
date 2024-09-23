@@ -101,8 +101,9 @@ export const CreateVariationPanel = () => {
 
 				<View>
 					<Spacer paddingY={ 4 }>
-						<VStack>
+						<VStack spacing={ 4 }>
 							<TextControl
+								__nextHasNoMarginBottom
 								label={ __(
 									'Variation name',
 									'create-block-theme'
@@ -114,6 +115,7 @@ export const CreateVariationPanel = () => {
 							/>
 
 							<CheckboxControl
+								__nextHasNoMarginBottom
 								label={ __(
 									'Save Fonts',
 									'create-block-theme'

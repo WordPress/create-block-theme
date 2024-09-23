@@ -150,7 +150,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			onRequestClose={ onRequestClose }
 			className="create-block-theme__metadata-editor-modal"
 		>
-			<VStack>
+			<VStack spacing={ 4 }>
 				<Text>
 					{ __(
 						'Edit Metadata properties of the current theme.',
@@ -159,11 +159,13 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				</Text>
 				<Spacer />
 				<TextControl
+					__nextHasNoMarginBottom
 					disabled
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
 				/>
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme description', 'create-block-theme' ) }
 					value={ theme.description }
 					onChange={ ( value ) =>
@@ -175,6 +177,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme URI', 'create-block-theme' ) }
 					value={ theme.uri }
 					onChange={ ( value ) =>
@@ -186,6 +189,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Author', 'create-block-theme' ) }
 					value={ theme.author }
 					onChange={ ( value ) =>
@@ -197,6 +201,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Author URI', 'create-block-theme' ) }
 					value={ theme.author_uri }
 					onChange={ ( value ) =>
@@ -208,6 +213,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Version', 'create-block-theme' ) }
 					value={ theme.version }
 					onChange={ ( value ) =>
@@ -219,6 +225,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __(
 						'Minimum WordPress version',
 						'create-block-theme'
@@ -233,6 +240,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					} }
 				/>
 				<FormTokenField
+					__nextHasNoMarginBottom
 					label={ __( 'Theme tags', 'create-block-theme' ) }
 					value={
 						theme.tags_custom ? theme.tags_custom.split( ', ' ) : []
@@ -242,7 +250,6 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				<HStack
 					style={ {
 						marginTop: '-20px',
-						marginBottom: '1rem',
 					} }
 				>
 					<ExternalLink
@@ -256,6 +263,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					</ExternalLink>
 				</HStack>
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
 					help={
 						<>
@@ -288,6 +296,7 @@ Plugin Description`,
 				/>
 
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Font credits', 'create-block-theme' ) }
 					help={
 						<>
@@ -327,6 +336,7 @@ ${ __( 'Source', 'create-block-theme' ) }` }
 				/>
 
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Image Credits', 'create-block-theme' ) }
 					help={
 						<>
@@ -358,7 +368,7 @@ Image license`,
 					}
 				/>
 
-				<BaseControl>
+				<BaseControl __nextHasNoMarginBottom>
 					<BaseControl.VisualLabel>
 						{ __( 'Screenshot', 'create-block-theme' ) }
 					</BaseControl.VisualLabel>
@@ -408,6 +418,7 @@ Image license`,
 					</MediaUploadCheck>
 				</BaseControl>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
 					value={ theme.subfolder }
 					onChange={ ( value ) =>
