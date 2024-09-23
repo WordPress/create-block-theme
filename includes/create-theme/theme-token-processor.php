@@ -55,8 +55,15 @@ class CBT_Token_Processor {
 					$this->translators_note .= '%' . $this->increment . "\$s is the start of a '" . $token_name . "' HTML element";
 				}
 			} else {
-				// Escape text content
-				$this->text .= esc_html( $this->p->get_modifiable_text() );
+				// Escape text content.
+				$temp_text = $this->p->get_modifiable_text();
+
+				// If the text contains a %, we need to escape it.
+				if ( false !== strpos( $temp_text, '%' ) ) {
+					$temp_text = str_replace( '%', '%%', $temp_text );
+				}
+
+				$this->text .= $temp_text;
 			}
 		}
 
