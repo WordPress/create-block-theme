@@ -111,6 +111,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 					) }
 				</Text>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __(
 						'Theme name (required)',
 						'create-block-theme'
@@ -120,15 +121,13 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 					onChange={ ( value ) =>
 						setTheme( { ...theme, name: value } )
 					}
-				/>
-
-				<Text variant="muted">
-					{ __(
+					help={ __(
 						'(Tip: You can edit all of this and more in the Editor later.)',
 						'create-block-theme'
 					) }
-				</Text>
+				/>
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme description', 'create-block-theme' ) }
 					value={ theme.description }
 					onChange={ ( value ) =>
@@ -140,6 +139,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Author', 'create-block-theme' ) }
 					value={ theme.author }
 					onChange={ ( value ) =>

@@ -25,7 +25,7 @@ class CBT_Theme_Styles {
 		$author        = stripslashes( $theme['author'] );
 		$author_uri    = $theme['author_uri'];
 		$wp_version    = CBT_Theme_Utils::get_current_wordpress_version();
-		$wp_min        = $current_theme->get( 'RequiresWP' );
+		$requires_wp   = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$version       = $theme['version'];
 		$requires_php  = $current_theme->get( 'RequiresPHP' );
 		$text_domain   = $theme['slug'];
@@ -46,7 +46,7 @@ Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: {$wp_min}
+Requires at least: {$requires_wp}
 Tested up to: {$wp_version}
 Requires PHP: {$requires_php}
 Version: {$version}
@@ -67,6 +67,7 @@ Tags: {$tags}
 		$uri         = $theme['uri'];
 		$author      = stripslashes( $theme['author'] );
 		$author_uri  = $theme['author_uri'];
+		$requires_wp = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$wp_version  = CBT_Theme_Utils::get_current_wordpress_version();
 		$text_domain = sanitize_title( $name );
 		if ( isset( $theme['template'] ) ) {
@@ -85,7 +86,7 @@ Theme URI: {$uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
-Requires at least: 6.0
+Requires at least: {$requires_wp}
 Tested up to: {$wp_version}
 Requires PHP: 5.7
 Version: {$version}

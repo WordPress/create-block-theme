@@ -94,8 +94,9 @@ function ResetTheme() {
 				<ScreenHeader
 					title={ __( 'Reset Theme', 'create-block-theme' ) }
 				/>
-				<VStack>
+				<VStack spacing={ 4 }>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={ __(
 							'Reset theme styles',
 							'create-block-theme'
@@ -111,6 +112,7 @@ function ResetTheme() {
 					/>
 
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={ __(
 							'Reset theme templates',
 							'create-block-theme'
@@ -126,6 +128,7 @@ function ResetTheme() {
 					/>
 
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={ __(
 							'Reset theme template-parts',
 							'create-block-theme'

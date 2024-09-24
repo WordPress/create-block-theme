@@ -38,6 +38,13 @@ class CBT_Editor_Tools {
 			'create-block-theme-slot-fill',
 		);
 
+		global $wp_version;
+		wp_add_inline_script(
+			'create-block-theme-slot-fill',
+			'const WP_VERSION = "' . $wp_version . '";',
+			'before'
+		);
+
 		// Enable localization in the plugin sidebar.
 		wp_set_script_translations( 'create-block-theme-slot-fill', 'create-block-theme' );
 	}

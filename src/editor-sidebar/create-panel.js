@@ -14,6 +14,7 @@ import {
 	__experimentalText as Text,
 	PanelBody,
 	Button,
+	SelectControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
@@ -28,6 +29,9 @@ import {
 	createClonedTheme,
 	createChildTheme,
 } from '../resolvers';
+import { generateWpVersions } from '../utils/generate-versions';
+
+const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
 
 export const CreateThemePanel = ( { createType } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -47,6 +51,7 @@ export const CreateThemePanel = ( { createType } ) => {
 		author: '',
 		author_uri: '',
 		tags_custom: '',
+		requires_wp: '',
 		subfolder,
 	} );
 
@@ -134,6 +139,7 @@ export const CreateThemePanel = ( { createType } ) => {
 			/>
 			<VStack>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
 					onChange={ ( value ) =>
@@ -148,53 +154,76 @@ export const CreateThemePanel = ( { createType } ) => {
 						) }
 					</summary>
 					<Spacer />
-					<TextareaControl
-						label={ __(
-							'Theme description',
-							'create-block-theme'
-						) }
-						value={ theme.description }
-						onChange={ ( value ) =>
-							setTheme( { ...theme, description: value } )
-						}
-						placeholder={ __(
-							'A short description of the theme',
-							'create-block-theme'
-						) }
-					/>
-					<TextControl
-						label={ __( 'Theme URI', 'create-block-theme' ) }
-						value={ theme.uri }
-						onChange={ ( value ) =>
-							setTheme( { ...theme, uri: value } )
-						}
-						placeholder={ __(
-							'https://github.com/wordpress/twentytwentythree/',
-							'create-block-theme'
-						) }
-					/>
-					<TextControl
-						label={ __( 'Author', 'create-block-theme' ) }
-						value={ theme.author }
-						onChange={ ( value ) =>
-							setTheme( { ...theme, author: value } )
-						}
-						placeholder={ __(
-							'the WordPress team',
-							'create-block-theme'
-						) }
-					/>
-					<TextControl
-						label={ __( 'Author URI', 'create-block-theme' ) }
-						value={ theme.author_uri }
-						onChange={ ( value ) =>
-							setTheme( { ...theme, author_uri: value } )
-						}
-						placeholder={ __(
-							'https://wordpress.org/',
-							'create-block-theme'
-						) }
-					/>
+					<VStack spacing={ 4 }>
+						<TextareaControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Theme description',
+								'create-block-theme'
+							) }
+							value={ theme.description }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, description: value } )
+							}
+							placeholder={ __(
+								'A short description of the theme',
+								'create-block-theme'
+							) }
+						/>
+						<TextControl
+							__nextHasNoMarginBottom
+							label={ __( 'Theme URI', 'create-block-theme' ) }
+							value={ theme.uri }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, uri: value } )
+							}
+							placeholder={ __(
+								'https://github.com/wordpress/twentytwentythree/',
+								'create-block-theme'
+							) }
+						/>
+						<TextControl
+							__nextHasNoMarginBottom
+							label={ __( 'Author', 'create-block-theme' ) }
+							value={ theme.author }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, author: value } )
+							}
+							placeholder={ __(
+								'the WordPress team',
+								'create-block-theme'
+							) }
+						/>
+						<TextControl
+							__nextHasNoMarginBottom
+							label={ __( 'Author URI', 'create-block-theme' ) }
+							value={ theme.author_uri }
+							onChange={ ( value ) =>
+								setTheme( { ...theme, author_uri: value } )
+							}
+							placeholder={ __(
+								'https://wordpress.org/',
+								'create-block-theme'
+							) }
+						/>
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Minimum WordPress version',
+								'create-block-theme'
+							) }
+							value={ theme.requires_wp }
+							options={ WP_MINIMUM_VERSIONS.map(
+								( version ) => ( {
+									label: version,
+									value: version,
+								} )
+							) }
+							onChange={ ( value ) => {
+								setTheme( { ...theme, requires_wp: value } );
+							} }
+						/>
+					</VStack>
 				</details>
 				<br />
 				{ createType === 'createClone' && (
