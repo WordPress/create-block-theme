@@ -15,7 +15,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		// The image should be replaced with a relative URL
 		$this->assertStringNotContainsString( 'http://example.com/image.jpg', $new_template->content );
-		$this->assertStringContainsString( 'get_stylesheet_directory_uri', $new_template->content );
+		$this->assertStringContainsString( 'get_template_directory_uri', $new_template->content );
 		$this->assertStringContainsString( '/assets/images', $new_template->content );
 
 	}
@@ -35,7 +35,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		// The image should be replaced with a relative URL
 		$this->assertStringNotContainsString( 'http://example.com/image.jpg', $new_template->content );
-		$this->assertStringContainsString( 'get_stylesheet_directory_uri', $new_template->content );
+		$this->assertStringContainsString( 'get_template_directory_uri', $new_template->content );
 		$this->assertStringContainsString( '/assets/images', $new_template->content );
 	}
 
@@ -56,7 +56,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertContains( 'http://example.com/image.jpg', $new_template->media );
 
 		// The pattern is correctly encoded
-		$this->assertStringContainsString( '<img src="<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
+		$this->assertStringContainsString( '<img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
 
 	}
 
@@ -77,7 +77,7 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertContains( 'http://example.com/image.jpg', $new_template->media );
 
 		// The pattern is correctly encoded
-		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo esc_url( get_stylesheet_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
+		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
 
 	}
 }
