@@ -15,10 +15,6 @@ class CBT_Theme_Create {
 		// Create theme directory.
 		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
 
-		if ( $theme['subfolder'] ) {
-			$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
-		}
-
 		if ( file_exists( $new_theme_path ) ) {
 			return new WP_Error( 'theme_already_exists', __( 'Theme already exists.', 'create-block-theme' ) );
 		}
@@ -40,21 +36,13 @@ class CBT_Theme_Create {
 		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::create( $theme ) );
 		file_put_contents( path_join( $new_theme_path, 'style.css' ), CBT_Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
 
-		if ( $theme['subfolder'] ) {
-			switch_theme( $theme['subfolder'] . '/' . $theme['slug'] );
-		} else {
-			switch_theme( $theme['slug'] );
-		}
+		switch_theme( $theme['slug'] );
 	}
 
 	public static function create_child_theme( $theme, $screenshot ) {
 
 		// Create theme directory.
 		$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
-
-		if ( $theme['subfolder'] ) {
-			$new_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
-		}
 
 		if ( file_exists( $new_theme_path ) ) {
 			return new WP_Error( 'theme_already_exists', __( 'Theme already exists.', 'create-block-theme' ) );
@@ -91,18 +79,14 @@ class CBT_Theme_Create {
 			copy( $source, $new_theme_path . DIRECTORY_SEPARATOR . 'screenshot.png' );
 		}
 
-		if ( $theme['subfolder'] ) {
-			switch_theme( $theme['subfolder'] . '/' . $theme['slug'] );
-		} else {
-			switch_theme( $theme['slug'] );
-		}
+		switch_theme( $theme['slug'] );
 	}
 
 	public static function create_blank_theme( $theme, $screenshot ) {
 
 		// Create theme directory.
 		$source           = plugin_dir_path( __DIR__ ) . '../assets/boilerplate';
-		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['subfolder'] . DIRECTORY_SEPARATOR . $theme['slug'];
+		$blank_theme_path = get_theme_root() . DIRECTORY_SEPARATOR . $theme['slug'];
 
 		if ( file_exists( $blank_theme_path ) ) {
 			return new WP_Error( 'theme_already_exists', __( 'Theme already exists.', 'create-block-theme' ) );
@@ -158,11 +142,7 @@ class CBT_Theme_Create {
 			file_put_contents( $theme_json_path, $theme_json_string );
 		}
 
-		if ( $theme['subfolder'] ) {
-			switch_theme( $theme['subfolder'] . '/' . $theme['slug'] );
-		} else {
-			switch_theme( $theme['slug'] );
-		}
+		switch_theme( $theme['slug'] );
 	}
 
 	private static function is_valid_screenshot( $file ) {

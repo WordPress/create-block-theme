@@ -56,7 +56,6 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 		recommended_plugins: '',
 		font_credits: '',
 		image_credits: '',
-		subfolder: '',
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -78,13 +77,6 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			recommended_plugins: readmeData.recommended_plugins,
 			font_credits: readmeData.fonts,
 			image_credits: readmeData.images,
-			subfolder:
-				themeData.stylesheet.lastIndexOf( '/' ) > 1
-					? themeData.stylesheet.substring(
-							0,
-							themeData.stylesheet.lastIndexOf( '/' )
-					  )
-					: '',
 		} );
 	}, [] );
 
@@ -417,14 +409,6 @@ Image license`,
 						/>
 					</MediaUploadCheck>
 				</BaseControl>
-				<TextControl
-					__nextHasNoMarginBottom
-					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
-					value={ theme.subfolder }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, subfolder: value } )
-					}
-				/>
 			</VStack>
 			<Spacer />
 			<HStack
