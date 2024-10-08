@@ -71,7 +71,7 @@ class CBT_Theme_Patterns {
 		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
 	}
 
-	public static function replace_local_pattern_references( $pattern ) {
+	public static function replace_local_synced_pattern_references( $pattern ) {
 		// Find any references to pattern in templates
 		$templates_to_update = array();
 		$args                = array(
@@ -139,9 +139,6 @@ class CBT_Theme_Patterns {
 	 * Copy the local patterns as well as any media to the theme filesystem.
 	 */
 	public static function add_patterns_to_theme( $options = null ) {
-		$base_dir     = get_stylesheet_directory();
-		$patterns_dir = $base_dir . DIRECTORY_SEPARATOR . 'patterns';
-
 		$pattern_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_block',
@@ -150,53 +147,58 @@ class CBT_Theme_Patterns {
 		);
 
 		if ( $pattern_query->have_posts() ) {
-			// If there is no patterns folder, create it.
-			if ( ! is_dir( $patterns_dir ) ) {
-				wp_mkdir_p( $patterns_dir );
-			}
-
 			foreach ( $pattern_query->posts as $pattern ) {
 				$pattern        = self::pattern_from_wp_block( $pattern );
 				$pattern        = self::prepare_pattern_for_export( $pattern, $options );
-				$pattern_exists = false;
 
 				// Check pattern is synced before adding to theme.
-				if ( 'unsynced' !== $pattern->sync_status ) {
-					// Check pattern name doesn't already exist before creating the file.
-					$existing_patterns = glob( $patterns_dir . DIRECTORY_SEPARATOR . '*.php' );
-					foreach ( $existing_patterns as $existing_pattern ) {
-						if ( strpos( $existing_pattern, $pattern->name . '.php' ) !== false ) {
-							$pattern_exists = true;
-						}
-					}
 
-					if ( $pattern_exists ) {
-						return new WP_Error(
-							'pattern_already_exists',
-							sprintf(
-								/* Translators: Pattern name. */
-								__(
-									'A pattern with this name already exists: "%s".',
-									'create-block-theme'
-								),
-								$pattern->name
-							)
-						);
-					}
+				if ( 'unsynced' === $pattern->sync_status ) {
+						self::add_unsynced_pattern_to_theme( $pattern );
+				}
+				else {
+						self::add_synced_pattern_to_theme( $pattern );
 
-					// Create the pattern file.
-					$pattern_file = $patterns_dir . $pattern->name . '.php';
-					file_put_contents(
-						$patterns_dir . DIRECTORY_SEPARATOR . $pattern->name . '.php',
-						$pattern->content
-					);
-
-					self::replace_local_pattern_references( $pattern );
-
-					// Remove it from the database to ensure that these patterns are loaded from the theme.
-					wp_delete_post( $pattern->id, true );
 				}
 			}
 		}
+	}
+
+	public static function add_synced_pattern_to_theme($pattern)
+	{
+		$patterns_dir = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'synced-patterns' . DIRECTORY_SEPARATOR;
+		$pattern_file = $patterns_dir . $pattern->name . '.php';
+
+		// If there is no patterns folder, create it.
+		if ( ! is_dir( $patterns_dir ) ) {
+			wp_mkdir_p( $patterns_dir );
+		}
+
+		// Create the pattern file.
+		file_put_contents( $pattern_file, $pattern->content);
+
+		// Replace references in the templates
+		self::replace_local_synced_pattern_references($pattern);
+
+		// Remove it from the database to ensure that these patterns are loaded from the theme.
+		// Don't remove it... we want to keep the synced patterns in the database too.
+		// wp_delete_post($pattern->id, true);
+	}
+
+	public static function add_unsynced_pattern_to_theme($pattern)
+	{
+		$patterns_dir = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR;
+		$pattern_file = $patterns_dir . $pattern->name . '.php';
+
+		// If there is no patterns folder, create it.
+		if ( ! is_dir( $patterns_dir ) ) {
+			wp_mkdir_p( $patterns_dir );
+		}
+
+		// Create the pattern file.
+		file_put_contents( $pattern_file, $pattern->content);
+
+		// Remove it from the database to ensure that these patterns are loaded from the theme.
+		wp_delete_post($pattern->id, true);
 	}
 }
