@@ -39,7 +39,8 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 	public function test_escape_text_content_with_html() {
 		$string          = '<p>This is a test text with HTML.</p>';
 		$escaped_string  = $this->call_private_method( 'escape_text_content', array( $string ) );
-		$expected_output = '<?php /* Translators: %1$s is the start of a \'p\' HTML element, %2$s is the end of a \'p\' HTML element */  echo sprintf( esc_html__( \'%1$sThis is a test text with HTML.%2$s\', \'test-locale-theme\' ), \'<p>\', \'</p>\' ); ?>';
+		$expected_output = '<?php /* Translators: 1. is the start of a \'p\' HTML element, 2. is the end of a \'p\' HTML element */
+		echo sprintf( esc_html__( \'%1$sThis is a test text with HTML.%2$s\', \'test-locale-theme\' ), \'<p>\', \'</p>\' ); ?>';
 		$this->assertEquals( $expected_output, $escaped_string );
 	}
 
