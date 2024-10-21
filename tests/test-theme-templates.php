@@ -162,7 +162,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$template->content = '<!-- wp:paragraph --><p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p><!-- /wp:paragraph -->';
 		$escaped_template  = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		$expected_output = '<!-- wp:paragraph --><p><?php /* Translators: %1$s is the start of a \'strong\' HTML element, %2$s is the end of a \'strong\' HTML element */  echo sprintf( esc_html__( \'%1$sBold%2$s text has feelings <> TOO\', \'\' ), \'<strong>\', \'</strong>\' ); ?></p><!-- /wp:paragraph -->';
+		$expected_output = '<!-- wp:paragraph --><p><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */  echo sprintf( esc_html__( \'%1$sBold%2$s text has feelings <> TOO\', \'\' ), \'<strong>\', \'</strong>\' ); ?></p><!-- /wp:paragraph -->';
 
 		$this->assertStringContainsString( $expected_output, $escaped_template->content );
 	}
@@ -264,7 +264,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
 
 		$expected_output = '<!-- wp:verse -->
-			<pre class="wp-block-verse"><?php /* Translators: %1$s is the start of a \'strong\' HTML element, %2$s is the end of a \'strong\' HTML element */  echo sprintf( esc_html__( \'Here is some %1$sverse%2$s to localize\', \'\' ), \'<strong>\', \'</strong>\' ); ?></pre>
+			<pre class="wp-block-verse"><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */  echo sprintf( esc_html__( \'Here is some %1$sverse%2$s to localize\', \'\' ), \'<strong>\', \'</strong>\' ); ?></pre>
 		<!-- /wp:verse -->';
 
 		$this->assertStringContainsString( $expected_output, $new_template->content );
@@ -276,7 +276,7 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<p>This is <strong>bold text</strong> with a %s placeholder</p>
 		<!-- /wp:paragraph -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( '<?php /* Translators: %1$s is the start of a \'strong\' HTML element, %2$s is the end of a \'strong\' HTML element */  echo sprintf( esc_html__( \'This is %1$sbold text%2$s with a %%s placeholder\', \'\' ), \'<strong>\', \'</strong>\' ); ?>', $new_template->content );
+		$this->assertStringContainsString( '<?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */  echo sprintf( esc_html__( \'This is %1$sbold text%2$s with a %%s placeholder\', \'\' ), \'<strong>\', \'</strong>\' ); ?>', $new_template->content );
 	}
 
 	public function test_localize_table() {
