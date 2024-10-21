@@ -26,9 +26,10 @@ class CBT_Token_Processor {
 	 */
 	public function process_tokens() {
 		while ( $this->p->next_token() ) {
-			$token_type    = $this->p->get_token_type();
-			$token_name    = strtolower( $this->p->get_token_name() );
-			$is_tag_closer = $this->p->is_tag_closer();
+			$token_type      = $this->p->get_token_type();
+			$token_name      = strtolower( $this->p->get_token_name() );
+			$is_tag_closer   = $this->p->is_tag_closer();
+			$has_self_closer = $this->p->has_self_closing_flag();
 
 			if ( '#tag' === $token_type ) {
 				$this->increment++;
@@ -51,9 +52,14 @@ class CBT_Token_Processor {
 						$token     .= $this->process_attribute( $attr_name, $attr_value );
 					}
 
-					$token                  .= '>';
-					$this->tokens[]          = $token;
-					$this->translators_note .= $token_label . " is the start of a '" . $token_name . "' HTML element";
+					$token         .= '>';
+					$this->tokens[] = $token;
+
+					if ( $has_self_closer || 'br' === $token_name ) {
+						$this->translators_note .= $token_label . " is a '" . $token_name . "' HTML element";
+					} else {
+						$this->translators_note .= $token_label . " is the start of a '" . $token_name . "' HTML element";
+					}
 				}
 			} else {
 				// Escape text content.
