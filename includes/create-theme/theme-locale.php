@@ -35,7 +35,7 @@ class CBT_Theme_Locale {
 		$p->process_tokens();
 		$text             = $p->get_text();
 		$tokens           = $p->get_tokens();
-		$translators_note = $p->get_translators_note();
+		$translators_note = $p->get_translators_note() . "\n";
 
 		if ( ! empty( $tokens ) ) {
 			return "<?php $translators_note echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(

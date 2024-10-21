@@ -69,7 +69,7 @@ class CBT_Token_Processor {
 		}
 
 		if ( ! empty( $this->tokens ) ) {
-			$this->translators_note .= ' */ ' . "\n";
+			$this->translators_note .= ' */ ';
 		}
 	}
 
