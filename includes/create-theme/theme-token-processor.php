@@ -33,6 +33,7 @@ class CBT_Token_Processor {
 			if ( '#tag' === $token_type ) {
 				$this->increment++;
 				$this->text .= '%' . $this->increment . '$s';
+				$token_label = $this->increment . '.';
 
 				if ( 1 !== $this->increment ) {
 					$this->translators_note .= ', ';
@@ -40,7 +41,7 @@ class CBT_Token_Processor {
 
 				if ( $is_tag_closer ) {
 					$this->tokens[]          = "</{$token_name}>";
-					$this->translators_note .= '%' . $this->increment . "\$s is the end of a '" . $token_name . "' HTML element";
+					$this->translators_note .= $token_label . " is the end of a '" . $token_name . "' HTML element";
 				} else {
 					$token      = '<' . $token_name;
 					$attributes = $this->p->get_attribute_names_with_prefix( '' );
@@ -52,7 +53,7 @@ class CBT_Token_Processor {
 
 					$token                  .= '>';
 					$this->tokens[]          = $token;
-					$this->translators_note .= '%' . $this->increment . "\$s is the start of a '" . $token_name . "' HTML element";
+					$this->translators_note .= $token_label . " is the start of a '" . $token_name . "' HTML element";
 				}
 			} else {
 				// Escape text content.
