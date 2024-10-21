@@ -35,10 +35,12 @@ class CBT_Theme_Locale {
 		$p->process_tokens();
 		$text             = $p->get_text();
 		$tokens           = $p->get_tokens();
-		$translators_note = $p->get_translators_note() . "\n";
+		$translators_note = $p->get_translators_note();
 
 		if ( ! empty( $tokens ) ) {
-			return "<?php $translators_note echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+			$php_tag  = '<?php ';
+			$php_tag .= $translators_note . "\n";
+			$php_tag .= "echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
 				', ',
 				array_map(
 					function( $token ) {
@@ -47,6 +49,7 @@ class CBT_Theme_Locale {
 					$tokens
 				)
 			) . ' ); ?>';
+			return $php_tag;
 		}
 
 		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
