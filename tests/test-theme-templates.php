@@ -159,12 +159,12 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 
 	public function test_properly_encode_html_markup() {
 		$template          = new stdClass();
-		$template->content = '<!-- wp:paragraph -->
-			<p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p>
-			<!-- /wp:paragraph -->';
+		$template->content = '<!-- wp:paragraph --><p><strong>Bold</strong> text has feelings &lt;&gt; TOO</p><!-- /wp:paragraph -->';
 		$escaped_template  = CBT_Theme_Templates::escape_text_in_template( $template );
 
-		$this->assertStringContainsString( "<?php esc_html_e('<strong>Bold</strong> text has feelings &lt;&gt; TOO', '');?>", $escaped_template->content );
+		$expected_output = '<!-- wp:paragraph --><p><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'%1$sBold%2$s text has feelings <> TOO\', \'\' ), \'<strong>\', \'</strong>\' ); ?></p><!-- /wp:paragraph -->';
+
+		$this->assertStringContainsString( $expected_output, $escaped_template->content );
 	}
 
 	public function test_empty_alt_text_is_not_localized() {
@@ -262,7 +262,21 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 			<pre class="wp-block-verse">Here is some <strong>verse</strong> to localize</pre>
 		<!-- /wp:verse -->';
 		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
-		$this->assertStringContainsString( "<?php esc_html_e('Here is some <strong>verse</strong> to localize', '');?>", $new_template->content );
+
+		$expected_output = '<!-- wp:verse -->
+			<pre class="wp-block-verse"><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'Here is some %1$sverse%2$s to localize\', \'\' ), \'<strong>\', \'</strong>\' ); ?></pre>
+		<!-- /wp:verse -->';
+
+		$this->assertStringContainsString( $expected_output, $new_template->content );
+	}
+
+	public function test_localize_text_with_placeholders() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:paragraph -->
+			<p>This is <strong>bold text</strong> with a %s placeholder</p>
+		<!-- /wp:paragraph -->';
+		$new_template      = CBT_Theme_Templates::escape_text_in_template( $template );
+		$this->assertStringContainsString( '<?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'This is %1$sbold text%2$s with a %%s placeholder\', \'\' ), \'<strong>\', \'</strong>\' ); ?>', $new_template->content );
 	}
 
 	public function test_localize_table() {

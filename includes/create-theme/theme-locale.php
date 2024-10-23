@@ -2,6 +2,9 @@
 /*
 * Locale related functionality
 */
+
+require_once __DIR__ . '/theme-token-processor.php';
+
 class CBT_Theme_Locale {
 
 	/**
@@ -27,6 +30,27 @@ class CBT_Theme_Locale {
 		}
 
 		$string = addcslashes( $string, "'" );
+
+		$p = new CBT_Token_Processor( $string );
+		$p->process_tokens();
+		$text             = $p->get_text();
+		$tokens           = $p->get_tokens();
+		$translators_note = $p->get_translators_note();
+
+		if ( ! empty( $tokens ) ) {
+			$php_tag  = '<?php ';
+			$php_tag .= $translators_note . "\n";
+			$php_tag .= "echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+				', ',
+				array_map(
+					function( $token ) {
+						return "'$token'";
+					},
+					$tokens
+				)
+			) . ' ); ?>';
+			return $php_tag;
+		}
 
 		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
 	}

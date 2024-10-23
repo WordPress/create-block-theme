@@ -108,7 +108,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:verse -->',
 				'expected_markup' =>
 					'<!-- wp:verse {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-                    <pre class="wp-block-verse"><?php esc_html_e(\'Ya somos el olvido que seremos.<br>El polvo elemental que nos ignora<br>y que fue el rojo Adán y que es ahora<br>todos los hombres, y que no veremos.\', \'test-locale-theme\');?></pre>
+                    <pre class="wp-block-verse"><?php /* Translators: 1. is a \'br\' HTML element, 2. is a \'br\' HTML element, 3. is a \'br\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'Ya somos el olvido que seremos.%1$sEl polvo elemental que nos ignora%2$sy que fue el rojo Adán y que es ahora%3$stodos los hombres, y que no veremos.\', \'test-locale-theme\' ), \'<br>\', \'<br>\', \'<br>\' ); ?></pre>
                     <!-- /wp:verse -->',
 			),
 
