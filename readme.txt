@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.6
 Tested up to: 6.6
-Stable tag: 2.5.0
+Stable tag: 2.6.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -124,6 +124,12 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.6.0 =
+* Process inner html of blocks when escaping text content (#719)
+* Removed all of the code relating to 'folder management' of a theme. (#723)
+* Fix Image URL Localization URI (#720)
+* Add __nextHasNoMarginBottom to BaseControl-based components (#729)
 
 = 2.5.0 =
 * Copy font assets to the local theme folder when creating a style variation (#713)
