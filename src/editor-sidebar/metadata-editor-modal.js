@@ -18,6 +18,7 @@ import {
 	FormTokenField,
 	Modal,
 	Button,
+	SelectControl,
 	TextControl,
 	TextareaControl,
 	ExternalLink,
@@ -29,6 +30,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
  */
 import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
 import { getFontsCreditsText } from '../utils/fonts';
+import { generateWpVersions } from '../utils/generate-versions';
 
 const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/png',
@@ -39,19 +41,21 @@ const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 	'image/avif',
 ];
 
+const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
+
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	const [ theme, setTheme ] = useState( {
 		name: '',
 		description: '',
 		uri: '',
 		version: '',
+		requires_wp: '',
 		author: '',
 		author_uri: '',
 		tags_custom: '',
 		recommended_plugins: '',
 		font_credits: '',
 		image_credits: '',
-		subfolder: '',
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -65,6 +69,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			description: themeData.description.raw,
 			uri: themeData.theme_uri.raw,
 			version: themeData.version,
+			requires_wp: themeData.requires_wp,
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
@@ -72,13 +77,6 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			recommended_plugins: readmeData.recommended_plugins,
 			font_credits: readmeData.fonts,
 			image_credits: readmeData.images,
-			subfolder:
-				themeData.stylesheet.lastIndexOf( '/' ) > 1
-					? themeData.stylesheet.substring(
-							0,
-							themeData.stylesheet.lastIndexOf( '/' )
-					  )
-					: '',
 		} );
 	}, [] );
 
@@ -144,7 +142,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			onRequestClose={ onRequestClose }
 			className="create-block-theme__metadata-editor-modal"
 		>
-			<VStack>
+			<VStack spacing={ 4 }>
 				<Text>
 					{ __(
 						'Edit Metadata properties of the current theme.',
@@ -153,11 +151,13 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				</Text>
 				<Spacer />
 				<TextControl
+					__nextHasNoMarginBottom
 					disabled
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
 				/>
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme description', 'create-block-theme' ) }
 					value={ theme.description }
 					onChange={ ( value ) =>
@@ -169,6 +169,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Theme URI', 'create-block-theme' ) }
 					value={ theme.uri }
 					onChange={ ( value ) =>
@@ -180,6 +181,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Author', 'create-block-theme' ) }
 					value={ theme.author }
 					onChange={ ( value ) =>
@@ -191,6 +193,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Author URI', 'create-block-theme' ) }
 					value={ theme.author_uri }
 					onChange={ ( value ) =>
@@ -202,6 +205,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					) }
 				/>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Version', 'create-block-theme' ) }
 					value={ theme.version }
 					onChange={ ( value ) =>
@@ -212,7 +216,23 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 						'create-block-theme'
 					) }
 				/>
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __(
+						'Minimum WordPress version',
+						'create-block-theme'
+					) }
+					value={ theme.requires_wp }
+					options={ WP_MINIMUM_VERSIONS.map( ( version ) => ( {
+						label: version,
+						value: version,
+					} ) ) }
+					onChange={ ( value ) => {
+						setTheme( { ...theme, requires_wp: value } );
+					} }
+				/>
 				<FormTokenField
+					__nextHasNoMarginBottom
 					label={ __( 'Theme tags', 'create-block-theme' ) }
 					value={
 						theme.tags_custom ? theme.tags_custom.split( ', ' ) : []
@@ -222,7 +242,6 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				<HStack
 					style={ {
 						marginTop: '-20px',
-						marginBottom: '1rem',
 					} }
 				>
 					<ExternalLink
@@ -236,6 +255,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 					</ExternalLink>
 				</HStack>
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Recommended Plugins', 'create-block-theme' ) }
 					help={
 						<>
@@ -268,6 +288,7 @@ Plugin Description`,
 				/>
 
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Font credits', 'create-block-theme' ) }
 					help={
 						<>
@@ -307,6 +328,7 @@ ${ __( 'Source', 'create-block-theme' ) }` }
 				/>
 
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Image Credits', 'create-block-theme' ) }
 					help={
 						<>
@@ -338,7 +360,7 @@ Image license`,
 					}
 				/>
 
-				<BaseControl>
+				<BaseControl __nextHasNoMarginBottom>
 					<BaseControl.VisualLabel>
 						{ __( 'Screenshot', 'create-block-theme' ) }
 					</BaseControl.VisualLabel>
@@ -387,13 +409,6 @@ Image license`,
 						/>
 					</MediaUploadCheck>
 				</BaseControl>
-				<TextControl
-					label={ __( 'Theme Subfolder', 'create-block-theme' ) }
-					value={ theme.subfolder }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, subfolder: value } )
-					}
-				/>
 			</VStack>
 			<Spacer />
 			<HStack

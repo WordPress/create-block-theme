@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.6
 Tested up to: 6.6
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -96,7 +96,7 @@ If you run into an issue, you should check the [Support forum](https://wordpress
 
 If you have a bug to report, please submit it to the [GitHub repository](https://github.com/WordPress/create-block-theme/issues) as an issue. Please search prior to creating a new bug to confirm its not a duplicate.
 
-== General Troobleshooting ==
+== General Troubleshooting ==
 
 If you are having problems, please try the following:
 
@@ -124,6 +124,19 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.5.0 =
+* Copy font assets to the local theme folder when creating a style variation (#713)
+* Adds minimum WordPress version to theme metadata (#715)
+* Add a main tag wrapper around the query loop (#726)
+* Remove "Categories: hidden" from default pattern header (#718)
+* Fix "troobleshooting" typo in readme.txt (#721)
+* Update node dependencies (#717)
+* Try: Add synced patterns to theme on save (#675)
+* Rename font assets when theme is saved and/or exported (#712)
+* Update escaping function (#683)
+* Redirect to proper editor_url (#708)
+* Update README.md disclaimer wording and formatting (#703)
 
 = 2.4.0 =
 * Bump minimum required WordPress version to 6.6 (#704)

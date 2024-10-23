@@ -65,11 +65,7 @@ function cbt_augment_resolver_with_utilities() {
 			}
 
 			// Merge the User Data
-			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
-				$theme->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
-			} else {
-				$theme->merge( static::get_user_data() );
-			}
+			$theme->merge( static::get_user_data() );
 
 			// Merge the extra theme data received as a parameter
 			if ( ! empty( $extra_theme_data ) ) {
@@ -93,8 +89,33 @@ function cbt_augment_resolver_with_utilities() {
 				$schema = 'https://schemas.wp.org/' . $theme_json_version . '/theme.json';
 			}
 			$data['$schema'] = $schema;
-			$theme_json      = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-			return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json );
+			return static::stringify( $data );
+		}
+
+		/**
+		 * Get the user data.
+		 *
+		 * This is a copy of the parent function with the addition of the Gutenberg resolver.
+		 *
+		 * @return array
+		 */
+		public static function get_user_data() {
+			// Determine the correct method to retrieve user data
+			return class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' )
+				? WP_Theme_JSON_Resolver_Gutenberg::get_user_data()
+				: parent::get_user_data();
+		}
+
+		/**
+		 * Stringify the array data.
+		 *
+		 * $data is an array of data to be converted to a JSON string.
+		 * @return string JSON string.
+		 */
+		public static function stringify( $data ) {
+			$data = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			// Convert spaces to tabs
+			return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $data );
 		}
 
 		public static function get_theme_file_contents() {

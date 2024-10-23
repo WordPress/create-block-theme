@@ -28,6 +28,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 		$expected_uri                 = 'Theme URI: ' . $data['uri'];
 		$expected_author              = 'Contributors: ' . $data['author'];
 		$expected_author_uri          = 'Author URI: ' . $data['author_uri'];
+		$expected_requires_wp         = 'Requires at least: ' . $data['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$expected_wp_version          = 'Tested up to: ' . $data['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$expected_php_version         = 'Requires PHP: ' . $data['required_php_version'];
 		$expected_license             = 'License: ' . $data['license'];
@@ -46,6 +47,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 
 		$this->assertStringContainsString( $expected_name, $readme_without_newlines, 'The expected name is missing.' );
 		$this->assertStringContainsString( $expected_author, $readme_without_newlines, 'The expected author is missing.' );
+		$this->assertStringContainsString( $expected_requires_wp, $readme_without_newlines, 'The expected Requires at least version is missing.' );
 		$this->assertStringContainsString( $expected_wp_version, $readme_without_newlines, 'The expected WP version is missing.' );
 		$this->assertStringContainsString( $expected_recommended_plugins, $readme_without_newlines, 'The expected recommended plugins are missing.' );
 
@@ -94,6 +96,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'author_uri'           => 'https://example.com/author',
 					'copyright_year'       => '2077',
 					'wp_version'           => '12.12',
+					'requires_wp'          => '12.12',
 					'required_php_version' => '10.0',
 					'license'              => 'GPLv2 or later',
 					'license_uri'          => 'https://www.gnu.org/licenses/gpl-2.0.html',
@@ -110,6 +113,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'author'               => 'New theme author',
 					'author_uri'           => 'https://example.com/author',
 					'copyright_year'       => '2078',
+					'requires_wp'          => '12.12',
 					'wp_version'           => '13.13',
 					'required_php_version' => '11.0',
 					'license'              => 'GPLv2 or later',
@@ -128,6 +132,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'author'               => 'New theme author',
 					'author_uri'           => 'https://example.com/author',
 					'copyright_year'       => '2079',
+					'requires_wp'          => '12.12',
 					'wp_version'           => '14.14',
 					'required_php_version' => '12.0',
 					'license'              => 'GPLv2 or later',
@@ -146,6 +151,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'author'               => 'New theme author',
 					'author_uri'           => 'https://example.com/author',
 					'copyright_year'       => '2077',
+					'requires_wp'          => '12.12',
 					'wp_version'           => '12.12',
 					'required_php_version' => '10.0',
 					'license'              => 'GPLv2 or later',
@@ -162,6 +168,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'author'               => 'New theme author',
 					'author_uri'           => 'https://example.com/author',
 					'copyright_year'       => '2077',
+					'requires_wp'          => '12.12',
 					'wp_version'           => '12.12',
 					'required_php_version' => '10.0',
 					'license'              => 'GPLv2 or later',
@@ -182,6 +189,7 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 					'author'               => 'New theme author',
 					'author_uri'           => 'https://example.com/author',
 					'copyright_year'       => '2077',
+					'requires_wp'          => '12.12',
 					'wp_version'           => '12.12',
 					'required_php_version' => '10.0',
 					'license'              => 'GPLv2 or later',

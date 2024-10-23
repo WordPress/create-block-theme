@@ -239,8 +239,15 @@ class CBT_Theme_API {
 	}
 
 	function rest_create_variation( $request ) {
+		$options = $request->get_params();
 
-		$response = CBT_Theme_JSON::add_theme_json_variation_to_local( 'variation', $this->sanitize_theme_data( $request->get_params() ) );
+		$save_fonts = isset( $options['saveFonts'] ) && true === $options['saveFonts'];
+
+		$response = CBT_Theme_JSON::add_theme_json_variation_to_local(
+			'variation',
+			$this->sanitize_theme_data( $options ),
+			$save_fonts
+		);
 
 		wp_cache_flush();
 
@@ -341,13 +348,6 @@ class CBT_Theme_API {
 		// Replace Screenshot
 		if ( wp_get_theme()->get_screenshot() !== $theme['screenshot'] ) {
 			CBT_Theme_Utils::replace_screenshot( $theme['screenshot'] );
-		}
-
-		// Relocate the theme to a new folder
-		$response = CBT_Theme_Utils::relocate_theme( $theme['subfolder'] );
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
 		}
 
 		wp_cache_flush();
@@ -463,9 +463,9 @@ class CBT_Theme_API {
 		$sanitized_theme['author']              = sanitize_text_field( $theme['author'] ?? '' );
 		$sanitized_theme['author_uri']          = sanitize_text_field( $theme['author_uri'] ?? '' );
 		$sanitized_theme['tags_custom']         = sanitize_text_field( $theme['tags_custom'] ?? '' );
-		$sanitized_theme['subfolder']           = sanitize_text_field( $theme['subfolder'] ?? '' );
 		$sanitized_theme['version']             = sanitize_text_field( $theme['version'] ?? '' );
 		$sanitized_theme['screenshot']          = sanitize_text_field( $theme['screenshot'] ?? '' );
+		$sanitized_theme['requires_wp']         = sanitize_text_field( $theme['requires_wp'] ?? '' );
 		$sanitized_theme['recommended_plugins'] = sanitize_textarea_field( $theme['recommended_plugins'] ?? '' );
 		$sanitized_theme['font_credits']        = sanitize_textarea_field( $theme['font_credits'] ?? '' );
 		$sanitized_theme['image_credits']       = sanitize_textarea_field( $theme['image_credits'] ?? '' );

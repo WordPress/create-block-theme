@@ -9,7 +9,6 @@ class CBT_Theme_Patterns {
 		/**
 		 * Title: {$template->slug}
 		 * Slug: {$pattern_slug}
-		 * Categories: hidden
 		 * Inserter: no
 		 */
 		?>
