@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -60,25 +60,47 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	useSelect( async ( select ) => {
-		const themeData = select( 'core' ).getCurrentTheme();
-		const readmeData = await fetchReadmeData();
+	const themeData = useSelect(
+		( select ) => select( 'core' ).getCurrentTheme(),
+		[]
+	);
 
-		setTheme( {
-			name: themeData.name.raw,
-			description: themeData.description.raw,
-			uri: themeData.theme_uri.raw,
-			version: themeData.version,
-			requires_wp: themeData.requires_wp,
-			author: themeData.author.raw,
-			author_uri: themeData.author_uri.raw,
-			tags_custom: themeData.tags.rendered,
-			screenshot: themeData.screenshot,
-			recommended_plugins: readmeData.recommended_plugins,
-			font_credits: readmeData.fonts,
-			image_credits: readmeData.images,
-		} );
-	}, [] );
+	useEffect( () => {
+		if ( ! themeData ) {
+			return;
+		}
+
+		const fetchData = async () => {
+			try {
+				const readmeData = await fetchReadmeData();
+				setTheme( {
+					name: themeData.name.raw,
+					description: themeData.description.raw,
+					uri: themeData.theme_uri.raw,
+					version: themeData.version,
+					requires_wp: themeData.requires_wp,
+					author: themeData.author.raw,
+					author_uri: themeData.author_uri.raw,
+					tags_custom: themeData.tags.rendered,
+					screenshot: themeData.screenshot,
+					recommended_plugins: readmeData.recommended_plugins,
+					font_credits: readmeData.fonts,
+					image_credits: readmeData.images,
+				} );
+			} catch ( error ) {
+				createErrorNotice(
+					error.message ||
+						__(
+							'Failed to fetch theme data.',
+							'create-block-theme'
+						),
+					{ type: 'snackbar' }
+				);
+			}
+		};
+
+		fetchData();
+	}, [ themeData, createErrorNotice ] );
 
 	const handleUpdateClick = () => {
 		postUpdateThemeMetadata( theme )
@@ -152,6 +174,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				<Spacer />
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					disabled
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
@@ -170,6 +193,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				/>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Theme URI', 'create-block-theme' ) }
 					value={ theme.uri }
 					onChange={ ( value ) =>
@@ -182,6 +206,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				/>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Author', 'create-block-theme' ) }
 					value={ theme.author }
 					onChange={ ( value ) =>
@@ -194,6 +219,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				/>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Author URI', 'create-block-theme' ) }
 					value={ theme.author_uri }
 					onChange={ ( value ) =>
@@ -206,6 +232,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				/>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Version', 'create-block-theme' ) }
 					value={ theme.version }
 					onChange={ ( value ) =>
@@ -218,6 +245,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				/>
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __(
 						'Minimum WordPress version',
 						'create-block-theme'
@@ -233,6 +261,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 				/>
 				<FormTokenField
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Theme tags', 'create-block-theme' ) }
 					value={
 						theme.tags_custom ? theme.tags_custom.split( ', ' ) : []

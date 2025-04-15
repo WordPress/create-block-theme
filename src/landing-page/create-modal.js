@@ -112,6 +112,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 				</Text>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __(
 						'Theme name (required)',
 						'create-block-theme'
@@ -140,6 +141,7 @@ export const CreateThemeModal = ( { onRequestClose, creationType } ) => {
 				/>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Author', 'create-block-theme' ) }
 					value={ theme.author }
 					onChange={ ( value ) =>

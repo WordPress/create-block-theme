@@ -131,6 +131,7 @@ export const CreateThemePanel = ( { createType } ) => {
 			<VStack>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Theme name', 'create-block-theme' ) }
 					value={ theme.name }
 					onChange={ ( value ) =>
@@ -163,6 +164,7 @@ export const CreateThemePanel = ( { createType } ) => {
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Theme URI', 'create-block-theme' ) }
 							value={ theme.uri }
 							onChange={ ( value ) =>
@@ -175,6 +177,7 @@ export const CreateThemePanel = ( { createType } ) => {
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Author', 'create-block-theme' ) }
 							value={ theme.author }
 							onChange={ ( value ) =>
@@ -187,6 +190,7 @@ export const CreateThemePanel = ( { createType } ) => {
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Author URI', 'create-block-theme' ) }
 							value={ theme.author_uri }
 							onChange={ ( value ) =>
@@ -199,6 +203,7 @@ export const CreateThemePanel = ( { createType } ) => {
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __(
 								'Minimum WordPress version',
 								'create-block-theme'
