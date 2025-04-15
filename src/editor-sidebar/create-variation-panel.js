@@ -104,6 +104,7 @@ export const CreateVariationPanel = () => {
 						<VStack spacing={ 4 }>
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __(
 									'Variation name',
 									'create-block-theme'
