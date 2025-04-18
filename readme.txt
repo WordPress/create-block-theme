@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.6
 Tested up to: 6.7
-Stable tag: 2.6.0
+Stable tag: 3.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -124,6 +124,16 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 3.0.0 =
+* Update wp-env configuration to use 'development mode' and to store themes in an accessible place for development (#764)
+* Code Quality: fix browser deprecation warning (#762)
+* PHPCS: Remove unused files and adjust release files (#754)
+* GitHub Actions: Install Subversion (#761)
+* Polish plugin sidebar buttons (#755)
+* Clean up package.json and update @wordpress/env (#753)
+* Tested up to: 6.7 (#751)
+* Add figcaption escaping for image and video blocks (#745)
 
 = 2.6.0 =
 * Process inner html of blocks when escaping text content (#719)
