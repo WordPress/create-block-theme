@@ -17,7 +17,7 @@ import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 const ScreenHeader = ( { title, onBack } ) => {
 	// TODO: Remove the fallback component when the minimum supported WordPress
-	// version was increased to 6.7.
+	// version was increased to 6.8.
 	const BackButton = Navigator?.BackButton || NavigatorToParentButton;
 	return (
 		<Spacer marginBottom={ 0 } paddingBottom={ 4 }>
