@@ -10,9 +10,6 @@
 		"WP_ENVIRONMENT_TYPE": "development",
 		"WP_DEVELOPMENT_MODE": "all"
 	},
-	"mappings": {
-		"wp-content/themes": "./dev-env/themes"
-	},
 	"env": {
 		"development": {
 			"phpmyadminPort": 9000
