@@ -78,6 +78,9 @@ jobs:
             - name: Run JavaScript unit tests
               run: npm run test:unit
 
+            - name: Install Subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
+
             - name: Run PHP tests
               run: |
                   mysql -uroot -h127.0.0.1 -e 'SELECT version()' \

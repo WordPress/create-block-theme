@@ -10,11 +10,11 @@ class CBT_Theme_Media {
 		$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' );
 		$video_extensions = array( 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'ogv', '3gp', '3g2' );
 		if ( in_array( $extension, $image_extensions, true ) ) {
-			$folder_path = '/assets/images/';
+			$folder_path = apply_filters( 'cbt_media_folder_path_images', '/assets/images/' );
 		} elseif ( in_array( $extension, $video_extensions, true ) ) {
-			$folder_path = '/assets/videos/';
+			$folder_path = apply_filters( 'cbt_media_folder_path_videos', '/assets/videos/' );
 		} else {
-			$folder_path = '/assets/';
+			$folder_path = apply_filters( 'cbt_media_folder_path_others', '/assets/' );
 		}
 		return $folder_path;
 	}

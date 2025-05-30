@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Navigator,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
@@ -15,10 +16,13 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 const ScreenHeader = ( { title, onBack } ) => {
+	// TODO: Remove the fallback component when the minimum supported WordPress
+	// version was increased to 6.7.
+	const BackButton = Navigator?.BackButton || NavigatorToParentButton;
 	return (
 		<Spacer marginBottom={ 0 } paddingBottom={ 4 }>
 			<HStack spacing={ 2 }>
-				<NavigatorToParentButton
+				<BackButton
 					style={ { minWidth: 24, padding: 0 } }
 					icon={ isRTL() ? chevronRight : chevronLeft }
 					size="small"
