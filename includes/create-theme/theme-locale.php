@@ -123,6 +123,8 @@ class CBT_Theme_Locale {
 			case 'core/cover':
 			case 'core/media-text':
 				return array( '/(alt=")(.*?)(")/' );
+			case 'core/details':
+				return array( '/(<summary[^>]*>)(.*?)(<\/summary>)/' );
 			default:
 				return null;
 		}
@@ -168,6 +170,7 @@ class CBT_Theme_Locale {
 				case 'core/image':
 				case 'core/cover':
 				case 'core/media-text':
+				case 'core/details':
 					$replace_content_callback = function ( $content, $pattern ) {
 						if ( empty( $content ) ) {
 							return;
