@@ -124,6 +124,13 @@ class CBT_Theme_Create {
 			}
 		}
 
+		// Ensure functions.php is present to enqueue style.css
+		$functions_src  = $source . DIRECTORY_SEPARATOR . 'functions.php';
+		$functions_dest = $blank_theme_path . DIRECTORY_SEPARATOR . 'functions.php';
+		if ( file_exists( $functions_src ) ) {
+			copy( $functions_src, $functions_dest );
+		}
+
 		// Overwrite default screenshot if one is provided.
 		if ( static::is_valid_screenshot( $screenshot ) ) {
 			file_put_contents(
