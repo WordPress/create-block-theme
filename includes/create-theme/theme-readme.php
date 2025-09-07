@@ -32,7 +32,6 @@ class CBT_Theme_Readme {
 	*     @type string $name The theme name.
 	*     @type string $description The theme description.
 	*     @type string $author The theme author.
-	*     @type string $copyright_year The copyright year.
 	*     @type string $image_credits The image credits.
 	*     @type string $recommended_plugins The recommended plugins.
 	* }
