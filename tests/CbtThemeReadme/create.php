@@ -24,15 +24,9 @@ class CBT_ThemeReadme_Create extends CBT_Theme_Readme_UnitTestCase {
 		$readme_without_newlines = $this->remove_newlines( $readme );
 
 		$expected_name                = '== ' . $data['name'] . ' ==';
-		$expected_description         = '== Description ==' . $data['description'];
-		$expected_uri                 = 'Theme URI: ' . $data['uri'];
 		$expected_author              = 'Contributors: ' . $data['author'];
-		$expected_author_uri          = 'Author URI: ' . $data['author_uri'];
 		$expected_requires_wp         = 'Requires at least: ' . $data['requires_wp'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$expected_wp_version          = 'Tested up to: ' . $data['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
-		$expected_php_version         = 'Requires PHP: ' . $data['required_php_version'];
-		$expected_license             = 'License: ' . $data['license'];
-		$expected_license_uri         = 'License URI: ' . $data['license_uri'];
 		$expected_font_credits        = '== Fonts ==' .
 			( isset( $data['font_credits'] )
 				? $this->remove_newlines( $data['font_credits'] )

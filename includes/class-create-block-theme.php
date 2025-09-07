@@ -56,9 +56,9 @@ class CBT_Plugin {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
-		$plugin_api    = new CBT_Theme_API();
-		$editor_tools  = new CBT_Editor_Tools();
-		$admin_landing = new CBT_Admin_Landing();
+		new CBT_Theme_API();
+		new CBT_Editor_Tools();
+		new CBT_Admin_Landing();
 	}
 
 	/**

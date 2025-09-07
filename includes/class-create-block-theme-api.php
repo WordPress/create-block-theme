@@ -157,7 +157,7 @@ class CBT_Theme_API {
 		);
 	}
 
-	function rest_get_theme_data( $request ) {
+	function rest_get_theme_data() {
 		try {
 			$theme_data = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 			return new WP_REST_Response(
@@ -177,7 +177,7 @@ class CBT_Theme_API {
 		}
 	}
 
-	function rest_get_readme_data( $request ) {
+	function rest_get_readme_data() {
 		try {
 			$readme_data = CBT_Theme_Readme::get_sections();
 			return new WP_REST_Response(
@@ -288,7 +288,7 @@ class CBT_Theme_API {
 	/**
 	 * Export the theme as a ZIP file.
 	 */
-	function rest_export_theme( $request ) {
+	function rest_export_theme() {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error(
 				'missing_zip_package',
@@ -306,10 +306,10 @@ class CBT_Theme_API {
 
 		if ( is_child_theme() ) {
 			wp_cache_flush();
-			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'current', $theme_slug );
+			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'current' );
 			$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'current' );
 		} else {
-			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'all', null );
+			$zip        = CBT_Theme_Zip::add_templates_to_zip( $zip, 'all' );
 			$theme_json = CBT_Theme_JSON_Resolver::export_theme_data( 'all' );
 		}
 
@@ -418,7 +418,7 @@ class CBT_Theme_API {
 	 * It includes the font families from the theme.json data (theme.json file + global styles) and the theme style variations.
 	 * The font families with font faces containing src urls relative to the theme folder are converted to absolute urls.
 	 */
-	function rest_get_font_families( $request ) {
+	function rest_get_font_families() {
 		$font_families = CBT_Theme_Fonts::get_all_fonts();
 
 		return new WP_REST_Response(
@@ -457,6 +457,7 @@ class CBT_Theme_API {
 	}
 
 	private function sanitize_theme_data( $theme ) {
+		$sanitized_theme                        = array();
 		$sanitized_theme['name']                = sanitize_text_field( $theme['name'] );
 		$sanitized_theme['description']         = sanitize_text_field( $theme['description'] ?? '' );
 		$sanitized_theme['uri']                 = sanitize_text_field( $theme['uri'] ?? '' );

@@ -110,7 +110,7 @@ class CBT_Theme_Zip {
 		);
 
 		// Add all the files (except for templates)
-		foreach ( $files as $name => $file ) {
+		foreach ( $files as $file ) {
 
 			// Skip directories (they would be added automatically)
 			if ( ! $file->isDir() ) {
@@ -162,7 +162,7 @@ class CBT_Theme_Zip {
 	 *                      user = only user edited templates
 	 *                      all = all templates no matter what
 	 */
-	public static function add_templates_to_zip( $zip, $export_type, $new_slug ) {
+	public static function add_templates_to_zip( $zip, $export_type ) {
 
 		$theme_templates  = CBT_Theme_Templates::get_theme_templates( $export_type );
 		$template_folders = get_block_theme_folders();
