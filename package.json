@@ -19,27 +19,23 @@
 		"npm": ">=10.2.3"
 	},
 	"dependencies": {
-		"@codemirror/lang-json": "^6.0.1",
-		"@uiw/react-codemirror": "^4.23.1",
-		"@wordpress/icons": "^10.7.0",
+		"@codemirror/lang-json": "^6.0.2",
+		"@uiw/react-codemirror": "^4.25.1",
+		"@wordpress/icons": "^10.30.0",
 		"lib-font": "^2.4.3"
 	},
 	"devDependencies": {
-		"@actions/core": "^1.10.0",
-		"@emotion/babel-plugin": "^11.12.0",
-		"@wordpress/base-styles": "^5.7.0",
-		"@wordpress/browserslist-config": "^6.7.0",
-		"@wordpress/env": "^10.14.0",
-		"@wordpress/eslint-plugin": "^21.0.0",
-		"@wordpress/prettier-config": "^4.7.0",
-		"@wordpress/scripts": "^29.0.0",
-		"@wordpress/stylelint-config": "^22.7.0",
+		"@actions/core": "^1.11.1",
+		"@emotion/babel-plugin": "^11.13.5",
+		"@wordpress/base-styles": "^6.6.0",
+		"@wordpress/env": "^10.30.0",
+		"@wordpress/scripts": "^30.23.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
-		"eslint-plugin-unicorn": "^55.0.0",
-		"husky": "^9.1.5",
-		"lint-staged": "^15.2.10",
+		"eslint-plugin-unicorn": "^56.0.1",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.1.6",
 		"prettier": "npm:wp-prettier@3.0.3",
-		"simple-git": "^3.26.0"
+		"simple-git": "^3.28.0"
 	},
 	"scripts": {
 		"build": "wp-scripts build src/admin-landing-page.js src/plugin-sidebar.js",
