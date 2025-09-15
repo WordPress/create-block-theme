@@ -53,7 +53,7 @@ class CBT_Theme_Utils {
 		);
 
 		// Add all the files (except for templates)
-		foreach ( $files as $name => $file ) {
+		foreach ( $files as $file ) {
 
 			// Get real and relative path for current file
 			$file_path     = wp_normalize_path( $file );

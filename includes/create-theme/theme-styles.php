@@ -115,7 +115,7 @@ Tags: {$tags}
 		$update_request->set_param( 'id', $user_custom_post_type_id );
 		$update_request->set_param( 'settings', array() );
 		$update_request->set_param( 'styles', array() );
-		$updated_global_styles = $global_styles_controller->update_item( $update_request );
+		$global_styles_controller->update_item( $update_request );
 		delete_transient( 'global_styles' );
 		delete_transient( 'global_styles_' . get_stylesheet() );
 		delete_transient( 'gutenberg_global_styles' );

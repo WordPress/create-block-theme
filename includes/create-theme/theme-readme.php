@@ -31,13 +31,9 @@ class CBT_Theme_Readme {
 	* {
 	*     @type string $name The theme name.
 	*     @type string $description The theme description.
-	*     @type string $uri The theme URI.
 	*     @type string $author The theme author.
-	*     @type string $author_uri The theme author URI.
-	*     @type string $copyright_year The copyright year.
 	*     @type string $image_credits The image credits.
 	*     @type string $recommended_plugins The recommended plugins.
-	*     @type bool $is_child_theme Whether the theme is a child theme.
 	* }
 	*
 	* @return string The readme content.
@@ -45,10 +41,7 @@ class CBT_Theme_Readme {
 	public static function create( $theme ) {
 		$name                 = $theme['name'];
 		$description          = $theme['description'] ?? '';
-		$uri                  = $theme['uri'] ?? '';
 		$author               = $theme['author'] ?? '';
-		$author_uri           = $theme['author_uri'] ?? '';
-		$copy_year            = $theme['copyright_year'] ?? gmdate( 'Y' );
 		$wp_version           = $theme['wp_version'] ?? CBT_Theme_Utils::get_current_wordpress_version();
 		$requires_wp          = ( '' === $theme['requires_wp'] ) ? CBT_Theme_Utils::get_current_wordpress_version() : $theme['requires_wp'];
 		$required_php_version = $theme['required_php_version'] ?? '5.7';
@@ -57,7 +50,6 @@ class CBT_Theme_Readme {
 		$image_credits        = $theme['image_credits'] ?? '';
 		$recommended_plugins  = $theme['recommended_plugins'] ?? '';
 		$font_credits         = $theme['font_credits'] ?? '';
-		$is_child_theme       = $theme['is_child_theme'] ?? false;
 
 		// Generates the copyright section text.
 		$copyright_section_content = self::get_copyright_text( $theme );

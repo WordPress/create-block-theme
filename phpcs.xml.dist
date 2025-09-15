@@ -24,6 +24,13 @@
 		</properties>
 	</rule>
 
+	<!-- Detect unused PHP variables -->
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+		</properties>
+	</rule>
+
 	<!-- Strip the filepaths down to the relevant bit. -->
 	<arg name="basepath" value="./"/>
 

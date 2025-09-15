@@ -89,7 +89,7 @@ class CBT_Theme_Patterns {
 		$templates_to_update = array_unique( $templates_to_update );
 
 		// Only update templates that reference the pattern
-		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
+		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, null, $templates_to_update );
 
 		// List all template and pattern files in the theme
 		$base_dir       = get_stylesheet_directory();
@@ -185,7 +185,6 @@ class CBT_Theme_Patterns {
 					}
 
 					// Create the pattern file.
-					$pattern_file = $patterns_dir . $pattern->name . '.php';
 					file_put_contents(
 						$patterns_dir . DIRECTORY_SEPARATOR . $pattern->name . '.php',
 						$pattern->content
