@@ -130,6 +130,30 @@ class CBT_Theme_Locale {
 		}
 	}
 
+	/**
+	 * Get the list of block attributes that should be localized.
+	 *
+	 * @param string $block_name The block name.
+	 * @return array|null The array of attribute names to localize.
+	 *      Returns null if the block does not have localizable attributes.
+	 */
+	private static function get_localizable_block_attributes( $block_name ) {
+		switch ( $block_name ) {
+			case 'core/search':
+				return array( 'label', 'placeholder', 'buttonText' );
+			case 'core/query-pagination-previous':
+			case 'core/query-pagination-next':
+			case 'core/comments-pagination-previous':
+			case 'core/comments-pagination-next':
+			case 'core/post-navigation-link':
+				return array( 'label' );
+			case 'core/post-excerpt':
+				return array( 'moreText' );
+			default:
+				return null;
+		}
+	}
+
 	/*
 	 * Localize text in text blocks.
 	 *
@@ -210,6 +234,25 @@ class CBT_Theme_Locale {
 				}
 			}
 		}
+
+		// Process block attributes for localization.
+		foreach ( $blocks as &$block ) {
+			// Get the list of localizable attributes for this block type.
+			$localizable_attrs = self::get_localizable_block_attributes( $block['blockName'] );
+
+			// If the block does not have any localizable attributes, continue to the next block.
+			if ( ! $localizable_attrs || empty( $block['attrs'] ) ) {
+				continue;
+			}
+
+			// Localize each attribute that exists in the block.
+			foreach ( $localizable_attrs as $attr_name ) {
+				if ( isset( $block['attrs'][ $attr_name ] ) && is_string( $block['attrs'][ $attr_name ] ) ) {
+					$block['attrs'][ $attr_name ] = self::escape_attribute( $block['attrs'][ $attr_name ] );
+				}
+			}
+		}
+
 		return $blocks;
 	}
 }
