@@ -21,6 +21,8 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
 		// Serialize the blocks to get the markup.
 		$escaped_markup = serialize_blocks( $escaped_blocks );
+		// Process block attributes after serialization to avoid JSON encoding of PHP tags.
+		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
 
 		$this->assertEquals( $expected_markup, $escaped_markup, 'The markup result is not as the expected one.' );
 	}
