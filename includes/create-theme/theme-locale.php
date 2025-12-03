@@ -249,136 +249,59 @@ class CBT_Theme_Locale {
 	 * @return string The content with localized attribute values.
 	 */
 	public static function escape_block_attribute_strings( $content ) {
-		// Pattern to match block comments: <!-- wp:block/name (space before {)
-		// We'll manually extract the JSON to handle nested braces
-		$pattern = '/<!--\s+wp:([a-z0-9\/-]+)\s+(?=\{)/';
+		// Pattern to match block comments with JSON attributes.
+		// This captures: <!-- wp:block/name {...attributes...} --> or <!-- wp:block/name {...attributes...} /-->
+		// Using .*? to lazily match everything until we hit the closing -->
+		$pattern = '/<!--\s+wp:([a-z0-9\/-]+)\s+(\{.*?\})\s*(\/)?-->/s';
 
-		$offset = 0;
-		$result = '';
+		return preg_replace_callback(
+			$pattern,
+			function ( $matches ) {
+				$block_name  = $matches[1];
+				$attrs_json  = $matches[2];
+				$self_closer = isset( $matches[3] ) ? $matches[3] : '';
 
-		while ( preg_match( $pattern, $content, $matches, PREG_OFFSET_CAPTURE, $offset ) ) {
-			$block_name   = $matches[1][0];
-			$json_start   = $matches[0][1] + strlen( $matches[0][0] ); // Position after the matched text.
-			$before_block = substr( $content, $offset, $matches[0][1] - $offset );
-			$result      .= $before_block . $matches[0][0];
-
-			// Find the matching closing brace for the JSON
-			$json_end = self::find_json_end( $content, $json_start );
-
-			if ( false === $json_end ) {
-				// Couldn't find end of JSON, skip this block
-				$offset = $json_start + 1;
-				continue;
-			}
-
-			$attrs_json = substr( $content, $json_start, $json_end - $json_start + 1 );
-
-			// Find if this is a self-closing block or not.
-			$after_json_pos        = $json_end + 1;
-			$closing_comment_match = array();
-			if ( preg_match( '/\s*(\/)?-->/', $content, $closing_comment_match, PREG_OFFSET_CAPTURE, $after_json_pos ) ) {
-				$spaces = $closing_comment_match[0][0];
-
-				// Get localizable attributes for this block
+				// Get localizable attributes for this block.
 				$localizable_attrs = self::get_localizable_block_attributes( 'core/' . $block_name );
 
-				// If no localizable attributes for this block, keep original
+				// If no localizable attributes for this block, return unchanged.
 				if ( ! $localizable_attrs ) {
-					$result .= $attrs_json . $spaces;
-					$offset  = $closing_comment_match[0][1] + strlen( $closing_comment_match[0][0] );
-					continue;
+					return $matches[0];
 				}
 
-				// Decode the JSON attributes
+				// Decode the JSON attributes.
 				$attrs = json_decode( $attrs_json, true );
 
-				// If JSON decode failed, keep original
+				// If JSON decode failed, return unchanged.
 				if ( ! is_array( $attrs ) ) {
-					$result .= $attrs_json . $spaces;
-					$offset  = $closing_comment_match[0][1] + strlen( $closing_comment_match[0][0] );
-					continue;
+					return $matches[0];
 				}
 
-				// Process each localizable attribute
+				// Process each localizable attribute.
 				$modified = false;
 				foreach ( $localizable_attrs as $attr_name ) {
 					if ( isset( $attrs[ $attr_name ] ) && is_string( $attrs[ $attr_name ] ) ) {
-						// Skip if already escaped
+						// Skip if already escaped.
 						if ( str_starts_with( $attrs[ $attr_name ], '<?php' ) ) {
 							continue;
 						}
 
-						// Escape the attribute value
+						// Escape the attribute value.
 						$attrs[ $attr_name ] = self::escape_attribute( $attrs[ $attr_name ] );
 						$modified            = true;
 					}
 				}
 
+				// If we modified any attributes, re-encode to JSON.
 				if ( $modified ) {
-					// Re-encode to JSON
 					$new_attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-					$result        .= $new_attrs_json . $spaces;
-				} else {
-					$result .= $attrs_json . $spaces;
+					return '<!-- wp:' . $block_name . ' ' . $new_attrs_json . ' ' . $self_closer . '-->';
 				}
 
-				$offset = $closing_comment_match[0][1] + strlen( $closing_comment_match[0][0] );
-			} else {
-				// Couldn't find closing comment, skip
-				$result .= $attrs_json;
-				$offset  = $json_end + 1;
-			}
-		}
-
-		// Add any remaining content
-		$result .= substr( $content, $offset );
-
-		return $result;
-	}
-
-	/**
-	 * Find the position of the closing brace that matches an opening brace in JSON.
-	 *
-	 * @param string $content The content to search in.
-	 * @param int    $start The position of the opening brace.
-	 * @return int|false The position of the matching closing brace, or false if not found.
-	 */
-	private static function find_json_end( $content, $start ) {
-		$length      = strlen( $content );
-		$brace_count = 0;
-		$in_string   = false;
-		$escape_next = false;
-
-		for ( $i = $start; $i < $length; $i++ ) {
-			$char = $content[ $i ];
-
-			if ( $escape_next ) {
-				$escape_next = false;
-				continue;
-			}
-
-			if ( '\\' === $char && $in_string ) {
-				$escape_next = true;
-				continue;
-			}
-
-			if ( '"' === $char ) {
-				$in_string = ! $in_string;
-				continue;
-			}
-
-			if ( ! $in_string ) {
-				if ( '{' === $char ) {
-					$brace_count++;
-				} elseif ( '}' === $char ) {
-					$brace_count--;
-					if ( 0 === $brace_count ) {
-						return $i;
-					}
-				}
-			}
-		}
-
-		return false;
+				// Return original if nothing was modified.
+				return $matches[0];
+			},
+			$content
+		);
 	}
 }
