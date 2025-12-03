@@ -130,6 +130,30 @@ class CBT_Theme_Locale {
 		}
 	}
 
+	/**
+	 * Get the list of block attributes that should be localized.
+	 *
+	 * @param string $block_name The block name.
+	 * @return array|null The array of attribute names to localize.
+	 *      Returns null if the block does not have localizable attributes.
+	 */
+	private static function get_localizable_block_attributes( $block_name ) {
+		switch ( $block_name ) {
+			case 'core/search':
+				return array( 'label', 'placeholder', 'buttonText' );
+			case 'core/query-pagination-previous':
+			case 'core/query-pagination-next':
+			case 'core/comments-pagination-previous':
+			case 'core/comments-pagination-next':
+			case 'core/post-navigation-link':
+				return array( 'label' );
+			case 'core/post-excerpt':
+				return array( 'moreText' );
+			default:
+				return null;
+		}
+	}
+
 	/*
 	 * Localize text in text blocks.
 	 *
@@ -210,6 +234,74 @@ class CBT_Theme_Locale {
 				}
 			}
 		}
+
 		return $blocks;
+	}
+
+	/**
+	 * Escape block attribute strings for localization in serialized block markup.
+	 *
+	 * This method processes the serialized block markup string to add localization
+	 * to attribute values. It must be called AFTER serialize_blocks() because
+	 * PHP tags in attributes would be JSON-encoded during serialization.
+	 *
+	 * @param string $content The serialized block markup string.
+	 * @return string The content with localized attribute values.
+	 */
+	public static function escape_block_attribute_strings( $content ) {
+		// Pattern to match block comments with JSON attributes.
+		// This captures: <!-- wp:block/name {...attributes...} --> or <!-- wp:block/name {...attributes...} /-->
+		// Using .*? to lazily match everything until we hit the closing -->
+		$pattern = '/<!--\s+wp:([a-z0-9\/-]+)\s+(\{.*?\})\s*(\/)?-->/s';
+
+		return preg_replace_callback(
+			$pattern,
+			function ( $matches ) {
+				$block_name  = $matches[1];
+				$attrs_json  = $matches[2];
+				$self_closer = isset( $matches[3] ) ? $matches[3] : '';
+
+				// Get localizable attributes for this block.
+				$localizable_attrs = self::get_localizable_block_attributes( 'core/' . $block_name );
+
+				// If no localizable attributes for this block, return unchanged.
+				if ( ! $localizable_attrs ) {
+					return $matches[0];
+				}
+
+				// Decode the JSON attributes.
+				$attrs = json_decode( $attrs_json, true );
+
+				// If JSON decode failed, return unchanged.
+				if ( ! is_array( $attrs ) ) {
+					return $matches[0];
+				}
+
+				// Process each localizable attribute.
+				$modified = false;
+				foreach ( $localizable_attrs as $attr_name ) {
+					if ( isset( $attrs[ $attr_name ] ) && is_string( $attrs[ $attr_name ] ) ) {
+						// Skip if already escaped.
+						if ( str_starts_with( $attrs[ $attr_name ], '<?php' ) ) {
+							continue;
+						}
+
+						// Escape the attribute value.
+						$attrs[ $attr_name ] = self::escape_attribute( $attrs[ $attr_name ] );
+						$modified            = true;
+					}
+				}
+
+				// If we modified any attributes, re-encode to JSON.
+				if ( $modified ) {
+					$new_attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+					return '<!-- wp:' . $block_name . ' ' . $new_attrs_json . ' ' . $self_closer . '-->';
+				}
+
+				// Return original if nothing was modified.
+				return $matches[0];
+			},
+			$content
+		);
 	}
 }

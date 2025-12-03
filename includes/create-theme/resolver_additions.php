@@ -88,7 +88,17 @@ function cbt_augment_resolver_with_utilities() {
 				}
 				$schema = 'https://schemas.wp.org/' . $theme_json_version . '/theme.json';
 			}
-			$data['$schema'] = $schema;
+			// Ensure $schema is the first property and version is second in the JSON output.
+			$ordered_data = array( '$schema' => $schema );
+
+			// Add version as the second property if it exists.
+			if ( isset( $data['version'] ) ) {
+				$ordered_data['version'] = $data['version'];
+				unset( $data['version'] );
+			}
+
+			// Merge the remaining data.
+			$data = array_merge( $ordered_data, $data );
 			return static::stringify( $data );
 		}
 
