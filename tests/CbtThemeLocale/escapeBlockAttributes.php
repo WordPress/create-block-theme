@@ -7,6 +7,7 @@ require_once __DIR__ . '/base.php';
  *
  * @package Create_Block_Theme
  * @covers CBT_Theme_Locale::escape_text_content_of_blocks
+ * @covers CBT_Theme_Locale::escape_block_attribute_strings
  * @group locale
  */
 class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCase {
