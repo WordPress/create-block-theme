@@ -30,7 +30,14 @@ class CBT_Theme_Patterns {
 		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
 		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
 		$pattern->sync_status  = get_post_meta( $pattern->id, 'wp_pattern_sync_status', true );
-		$pattern->content      = <<<PHP
+		// Store the raw content separately for processing
+		$pattern->content = $pattern_post->post_content;
+
+		return $pattern;
+	}
+
+	public static function wrap_pattern_in_php_file( $pattern ) {
+		$pattern_content  = <<<PHP
 		<?php
 		/**
 		 * Title: {$pattern->title}
@@ -38,9 +45,9 @@ class CBT_Theme_Patterns {
 		 * Categories: {$pattern->categories}
 		 */
 		?>
-		{$pattern_post->post_content}
+		{$pattern->content}
 		PHP;
-
+		$pattern->content = $pattern_content;
 		return $pattern;
 	}
 
@@ -71,7 +78,7 @@ class CBT_Theme_Patterns {
 		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
 	}
 
-	public static function replace_local_pattern_references( $pattern ) {
+	public static function replace_local_pattern_references( $pattern, $options = null ) {
 		// Find any references to pattern in templates
 		$templates_to_update = array();
 		$args                = array(
@@ -89,7 +96,7 @@ class CBT_Theme_Patterns {
 		$templates_to_update = array_unique( $templates_to_update );
 
 		// Only update templates that reference the pattern
-		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, null, $templates_to_update );
+		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
 
 		// List all template and pattern files in the theme
 		$base_dir       = get_stylesheet_directory();
@@ -132,6 +139,9 @@ class CBT_Theme_Patterns {
 			}
 		}
 
+		// Wrap the pattern content in the PHP file structure with metadata header
+		$pattern = self::wrap_pattern_in_php_file( $pattern );
+
 		return $pattern;
 	}
 
@@ -160,41 +170,38 @@ class CBT_Theme_Patterns {
 				$pattern        = self::prepare_pattern_for_export( $pattern, $options );
 				$pattern_exists = false;
 
-				// Check pattern is synced before adding to theme.
-				if ( 'unsynced' !== $pattern->sync_status ) {
-					// Check pattern name doesn't already exist before creating the file.
-					$existing_patterns = glob( $patterns_dir . DIRECTORY_SEPARATOR . '*.php' );
-					foreach ( $existing_patterns as $existing_pattern ) {
-						if ( strpos( $existing_pattern, $pattern->name . '.php' ) !== false ) {
-							$pattern_exists = true;
-						}
+				// Check pattern name doesn't already exist before creating the file.
+				$existing_patterns = glob( $patterns_dir . DIRECTORY_SEPARATOR . '*.php' );
+				foreach ( $existing_patterns as $existing_pattern ) {
+					if ( strpos( $existing_pattern, $pattern->name . '.php' ) !== false ) {
+						$pattern_exists = true;
 					}
-
-					if ( $pattern_exists ) {
-						return new WP_Error(
-							'pattern_already_exists',
-							sprintf(
-								/* Translators: Pattern name. */
-								__(
-									'A pattern with this name already exists: "%s".',
-									'create-block-theme'
-								),
-								$pattern->name
-							)
-						);
-					}
-
-					// Create the pattern file.
-					file_put_contents(
-						$patterns_dir . DIRECTORY_SEPARATOR . $pattern->name . '.php',
-						$pattern->content
-					);
-
-					self::replace_local_pattern_references( $pattern );
-
-					// Remove it from the database to ensure that these patterns are loaded from the theme.
-					wp_delete_post( $pattern->id, true );
 				}
+
+				if ( $pattern_exists ) {
+					return new WP_Error(
+						'pattern_already_exists',
+						sprintf(
+							/* Translators: Pattern name. */
+							__(
+								'A pattern with this name already exists: "%s".',
+								'create-block-theme'
+							),
+							$pattern->name
+						)
+					);
+				}
+
+				// Create the pattern file.
+				file_put_contents(
+					$patterns_dir . DIRECTORY_SEPARATOR . $pattern->name . '.php',
+					$pattern->content
+				);
+
+				self::replace_local_pattern_references( $pattern, $options );
+
+				// Remove it from the database to ensure that these patterns are loaded from the theme.
+				wp_delete_post( $pattern->id, true );
 			}
 		}
 	}
