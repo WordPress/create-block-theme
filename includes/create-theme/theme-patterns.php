@@ -30,14 +30,7 @@ class CBT_Theme_Patterns {
 		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
 		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
 		$pattern->sync_status  = get_post_meta( $pattern->id, 'wp_pattern_sync_status', true );
-		// Store the raw content separately for processing
-		$pattern->content = $pattern_post->post_content;
-
-		return $pattern;
-	}
-
-	public static function wrap_pattern_in_php_file( $pattern ) {
-		$pattern_content  = <<<PHP
+		$pattern->content      = <<<PHP
 		<?php
 		/**
 		 * Title: {$pattern->title}
@@ -45,9 +38,9 @@ class CBT_Theme_Patterns {
 		 * Categories: {$pattern->categories}
 		 */
 		?>
-		{$pattern->content}
+		{$pattern_post->post_content}
 		PHP;
-		$pattern->content = $pattern_content;
+
 		return $pattern;
 	}
 
@@ -138,9 +131,6 @@ class CBT_Theme_Patterns {
 				CBT_Theme_Media::add_media_to_local( $pattern->media );
 			}
 		}
-
-		// Wrap the pattern content in the PHP file structure with metadata header
-		$pattern = self::wrap_pattern_in_php_file( $pattern );
 
 		return $pattern;
 	}
