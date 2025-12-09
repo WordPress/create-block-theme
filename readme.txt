@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.7
 Tested up to: 6.9
-Stable tag: 2.7.0
+Stable tag: 2.8.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -124,6 +124,19 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.8.0 =
+* Update "Tested up to" version to 6.9 (#793)
+* Save all patterns (#790)
+* I18n: Makes it possible to translate text strings in HTML comments (#788)
+* Move  and version attributes to the start of the theme.json file as this helps editing in IDEs (#787)
+* Localize Details block summary text (#778)
+* PHPCS: enalbe VariableAnalysis.CodeAnalysis.VariableAnalysis rule (#782)
+* Clean up package.json and update libraries (#781)
+* Bump minimum required WordPress version to 6.7 (#775)
+* Added filters for changing paths (#771)
+* Add option to remove taxonomy query from query block attributes (#734) (#743)
+* Wp-env: remove mappings field (#774)
 
 = 2.7.0 =
 * Update "Tested up to" version to 6.8 (#768)
