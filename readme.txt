@@ -2,7 +2,7 @@
 Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiiaass, jffng, madhudollu, egregor, vcanales, jeffikus, cwhitmore
 Tags: themes, theme, block-theme
 Requires at least: 6.7
-Tested up to: 6.8
+Tested up to: 6.9
 Stable tag: 2.8.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -126,6 +126,7 @@ If you are having problems, please try the following:
 == Changelog ==
 
 = 2.8.0 =
+* Update "Tested up to" version to 6.9 (#793)
 * Save all patterns (#790)
 * I18n: Makes it possible to translate text strings in HTML comments (#788)
 * Move  and version attributes to the start of the theme.json file as this helps editing in IDEs (#787)
