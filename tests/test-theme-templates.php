@@ -372,4 +372,20 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'This is text to localize', $new_template->content );
 	}
 
+	public function test_localize_cover_repeated_background_via_attrs() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:cover {"style":{"background":{"backgroundImage":{"url":"http://example.com/bg.png","repeat":"repeat"}}}} -->\n'
+			. '<div class="wp-block-cover"><div class="wp-block-cover__inner-container"></div></div><!-- /wp:cover -->';
+		$new_template      = CBT_Theme_Templates::prepare_template_for_export( $template, null, array( 'localizeMedia' => true ) );
+		$this->assertStringContainsString( '<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/bg.png', $new_template->content );
+	}
+
+	public function test_localize_cover_repeated_background_inline_style() {
+		$template          = new stdClass();
+		$template->content = '<!-- wp:cover -->\n'
+			. '<div class="wp-block-cover" style="background-image:url(\'http://example.com/pattern.webp\');background-repeat:repeat"></div><!-- /wp:cover -->';
+		$new_template      = CBT_Theme_Templates::prepare_template_for_export( $template, null, array( 'localizeMedia' => true ) );
+		$this->assertStringContainsString( '<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/pattern.webp', $new_template->content );
+	}
+
 }
