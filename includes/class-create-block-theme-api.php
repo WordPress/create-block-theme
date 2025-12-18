@@ -13,6 +13,7 @@ require_once __DIR__ . '/create-theme/theme-utils.php';
 require_once __DIR__ . '/create-theme/theme-readme.php';
 require_once __DIR__ . '/create-theme/theme-fonts.php';
 require_once __DIR__ . '/create-theme/theme-create.php';
+require_once __DIR__ . '/create-theme/theme-fluid-typography.php';
 
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
