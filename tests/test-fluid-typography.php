@@ -53,7 +53,7 @@ class Test_Create_Block_Theme_Fluid_Typography extends WP_UnitTestCase {
 	 * Test that global styles filter works correctly
 	 */
 	public function test_sync_global_styles_fluid_typography() {
-		$prepared_post           = new stdClass();
+		$prepared_post                = new stdClass();
 		$prepared_post->post_content = wp_json_encode(
 			array(
 				'settings' => array(
@@ -118,7 +118,7 @@ class Test_Create_Block_Theme_Fluid_Typography extends WP_UnitTestCase {
 	 * Test that invalid JSON in global styles filter is handled gracefully
 	 */
 	public function test_sync_global_styles_with_invalid_json() {
-		$prepared_post           = new stdClass();
+		$prepared_post                = new stdClass();
 		$prepared_post->post_content = 'invalid json';
 
 		$result = CBT_Theme_Fluid_Typography::sync_global_styles_fluid_typography( $prepared_post );
