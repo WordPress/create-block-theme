@@ -43,10 +43,9 @@ class CBT_Theme_Fluid_Typography {
 	 * Sync fluid typography in global styles before saving.
 	 *
 	 * @param stdClass $prepared_post The prepared post object.
-	 * @param WP_REST_Request $request The REST request object.
 	 * @return stdClass The modified prepared post object.
 	 */
-	public static function sync_global_styles_fluid_typography( $prepared_post, $request ) {
+	public static function sync_global_styles_fluid_typography( $prepared_post ) {
 		if ( ! isset( $prepared_post->post_content ) ) {
 			return $prepared_post;
 		}
