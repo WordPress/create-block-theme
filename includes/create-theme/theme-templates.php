@@ -18,7 +18,7 @@ class CBT_Theme_Templates {
 		$include_inactive = ( 'all' === $export_type );
 
 		// Check if template activation is enabled.
-		$active_templates = get_option( 'active_templates', null );
+		$active_templates            = get_option( 'active_templates', null );
 		$template_activation_enabled = ( null !== $active_templates );
 
 		if ( $include_inactive && $template_activation_enabled ) {
@@ -34,21 +34,21 @@ class CBT_Theme_Templates {
 				$query_args['post_name__in'] = $templates_to_export;
 			}
 
-			$posts = get_posts( $query_args );
+			$posts     = get_posts( $query_args );
 			$templates = array();
 			foreach ( $posts as $post ) {
 				$template = get_block_template( get_stylesheet() . '//' . $post->post_name, 'wp_template' );
 				if ( ! $template || ( isset( $template->wp_id ) && $template->wp_id !== $post->ID ) ) {
 					// Create a template object from post data for custom templates.
 					$template = (object) array(
-						'wp_id'    => $post->ID,
-						'id'       => get_stylesheet() . '//' . $post->post_name,
-						'slug'     => $post->post_name,
-						'source'   => 'custom',
-						'content'  => $post->post_content,
-						'title'    => $post->post_title,
-						'type'     => 'wp_template',
-						'status'   => $post->post_status,
+						'wp_id'   => $post->ID,
+						'id'      => get_stylesheet() . '//' . $post->post_name,
+						'slug'    => $post->post_name,
+						'source'  => 'custom',
+						'content' => $post->post_content,
+						'title'   => $post->post_title,
+						'type'    => 'wp_template',
+						'status'  => $post->post_status,
 					);
 				}
 				if ( $template ) {
@@ -58,7 +58,7 @@ class CBT_Theme_Templates {
 
 			// Get theme templates.
 			$theme_templates = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template' );
-			$template_slugs = array();
+			$template_slugs  = array();
 			foreach ( $templates as $template ) {
 				$template_slugs[ $template->slug ] = true;
 			}
@@ -85,21 +85,21 @@ class CBT_Theme_Templates {
 				$query_args['post_name__in'] = $templates_to_export;
 			}
 
-			$posts = get_posts( $query_args );
+			$posts          = get_posts( $query_args );
 			$template_parts = array();
 			foreach ( $posts as $post ) {
 				$template = get_block_template( get_stylesheet() . '//' . $post->post_name, 'wp_template_part' );
 				if ( ! $template || ( isset( $template->wp_id ) && $template->wp_id !== $post->ID ) ) {
 					// Create a template object from post data for custom template parts.
 					$template = (object) array(
-						'wp_id'    => $post->ID,
-						'id'       => get_stylesheet() . '//' . $post->post_name,
-						'slug'     => $post->post_name,
-						'source'   => 'custom',
-						'content'  => $post->post_content,
-						'title'    => $post->post_title,
-						'type'     => 'wp_template_part',
-						'status'   => $post->post_status,
+						'wp_id'   => $post->ID,
+						'id'      => get_stylesheet() . '//' . $post->post_name,
+						'slug'    => $post->post_name,
+						'source'  => 'custom',
+						'content' => $post->post_content,
+						'title'   => $post->post_title,
+						'type'    => 'wp_template_part',
+						'status'  => $post->post_status,
 					);
 				}
 				if ( $template ) {
@@ -109,7 +109,7 @@ class CBT_Theme_Templates {
 
 			// Get theme template parts.
 			$theme_template_parts = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
-			$part_slugs = array();
+			$part_slugs           = array();
 			foreach ( $template_parts as $part ) {
 				$part_slugs[ $part->slug ] = true;
 			}
