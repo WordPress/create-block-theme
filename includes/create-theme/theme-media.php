@@ -56,25 +56,36 @@ class CBT_Theme_Media {
 				}
 			}
 
-			// Gets the absolute URLs of background images in these blocks
+			// Gets the absolute URLs of background images in Cover blocks
 			if ( 'core/cover' === $block['blockName'] ) {
+				// 1) Parse inline styles for background-image
 				$html = new WP_HTML_Tag_Processor( $block['innerHTML'] );
 				while ( $html->next_tag( 'div' ) ) {
 					$style = $html->get_attribute( 'style' );
 					if ( $style ) {
 						$matches = array();
-						preg_match( '/background-image: url\((.*)\)/', $style, $matches );
+						// Match url(...) with or without quotes
+						preg_match( '/background-image:\s*url\(("|\')?(.*?)(\1)\)/i', $style, $matches );
 						if ( isset( $matches[1] ) ) {
-							$url = $matches[1];
+							// In quoted match, the URL is in group 2; otherwise group 2 also holds the URL
+							$url = isset( $matches[2] ) ? $matches[2] : $matches[1];
 							if ( CBT_Theme_Utils::is_absolute_url( $url ) ) {
 								$media[] = $url;
 							}
 						}
 					}
 				}
+
+				// 2) Handle repeated background set via block attributes
+				if ( isset( $block['attrs']['style']['background']['backgroundImage']['url'] ) ) {
+					$cover_bg_url = $block['attrs']['style']['background']['backgroundImage']['url'];
+					if ( CBT_Theme_Utils::is_absolute_url( $cover_bg_url ) ) {
+						$media[] = $cover_bg_url;
+					}
+				}
 			}
 
-			// Gets the absolute URLs of background images in these blocks
+			// Gets the absolute URLs of background images in Group blocks
 			if ( 'core/group' === $block['blockName'] ) {
 				if ( isset( $block['attrs']['style']['background']['backgroundImage']['url'] ) && CBT_Theme_Utils::is_absolute_url( $block['attrs']['style']['background']['backgroundImage']['url'] ) ) {
 					$media[] = $block['attrs']['style']['background']['backgroundImage']['url'];
