@@ -58,7 +58,7 @@ npm run lint:css
 
 ## Common Pitfalls
 
-- Always keep in mind that anything in this plugin should eventually be migrated to the WordPress Editor (Gutenberg).
+- Always keep in mind that anything in this plugin could be migrated to the WordPress Editor (Gutenberg).
 - This plugin can be run on sites with or without the Gutenberg plugin installed.
 
 ## PR instructions
