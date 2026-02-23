@@ -24,8 +24,11 @@ See @CONTRIBUTING.md for more details on the tech stack and development setup.
 ## Commands
 
 ```bash
-# Install dependencies
+# Install Node dependencies
 npm install
+
+# Install Composer dependencies
+composer install
 
 # Build the plugin
 npm run build
