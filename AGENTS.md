@@ -23,8 +23,11 @@ See @CONTRIBUTING.md for more details on the tech stack and development setup.
 ## Directory Structure
 
 - `src/`: Source code for the plugin, including the main JavaScript files and utilities.
+  - `plugin-sidebar.js`: Entry point for the Block Editor plugin sidebar (loads in the Site Editor only).
+  - `admin-landing-page.js`: Entry point for the React app under Appearance > Create Block Theme.
 - `assets/`: Assets for the plugin, e.g. screenshots for documentation.
 - `includes/`: Includes for the plugin. This is where the main plugin code is located.
+  - `includes/create-theme/`: All main PHP logic, organised as `CBT_`-prefixed static utility classes (e.g. `CBT_Theme_JSON`, `CBT_Theme_Templates`, `CBT_Theme_Fonts`).
 - `test/`: JavaScript Jest test setup for the plugin.
 - `tests/`: PHP unit tests for the plugin.
 - `vendor/`: Vendor files for the plugin, including PHP dependencies.
@@ -68,6 +71,8 @@ npm run lint:css
 
 - Always keep in mind that anything in this plugin could be migrated to the WordPress Editor (Gutenberg).
 - This plugin can be run on sites with or without the Gutenberg plugin installed.
+- The plugin UI is gated using `wp_is_block_theme()`, which means nothing will appear on non-block themes.
+- PHP code that touches theme.json must check for the `IS_GUTENBERG_PLUGIN` constant and use `WP_Theme_JSON_Gutenberg` when available, falling back to core `WP_Theme_JSON`.
 
 ## PR instructions
 
