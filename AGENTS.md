@@ -60,8 +60,8 @@ npm run lint:css
 
 ## PR instructions
 
--   Ensure build passes.
--   Fix all formatting and linting issues; these are enforced through CI in PRs.
+- Ensure build passes.
+- Fix all formatting and linting issues; these are enforced through CI in PRs.
 
 ## Documentation and Links
 
