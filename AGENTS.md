@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This is a WordPress plugin that allows you to create block themes from within the WordPress Editor. The main purpose of the plugin is to provide additional functionality on top of the existing theme features in the Editor. See @README.md for more details.
+This is a WordPress plugin that allows you to create block themes from within the WordPress Editor. The main purpose of the plugin is to provide additional functionality on top of the existing theme features in the Editor. See README.md for more details.
 
 The main features include:
 
@@ -18,7 +18,7 @@ The main features include:
 - HTML
 - CSS
 
-See @CONTRIBUTING.md for more details on the tech stack and development setup.
+See CONTRIBUTING.md for more details on the tech stack and development setup.
 
 ## Directory Structure
 
@@ -81,8 +81,8 @@ npm run lint:css
 
 ## Documentation and Links
 
-- @README.md for the plugin README.
-- @CONTRIBUTING.md for the plugin contributing guidelines.
+- README.md for the plugin README.
+- CONTRIBUTING.md for the plugin contributing guidelines.
 - [Plugin Documentation](https://wordpress.org/plugins/create-block-theme/)
 - [Plugin Repository](https://github.com/WordPress/create-block-theme)
 - [Plugin Support](https://wordpress.org/support/plugin/create-block-theme/)
