@@ -58,6 +58,11 @@ npm run lint:css
 - Always keep in mind that anything in this plugin should eventually be migrated to the WordPress Editor (Gutenberg).
 - This plugin can be run on sites with or without the Gutenberg plugin installed.
 
+## PR instructions
+
+-   Ensure build passes.
+-   Fix all formatting and linting issues; these are enforced through CI in PRs.
+
 ## Documentation and Links
 
 - @README.md for the plugin README.
