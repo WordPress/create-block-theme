@@ -1,6 +1,14 @@
 # AGENTS.md
 
-This is a WordPress plugin that allows you to create block themes from within the WordPress Editor. See @README.md for more details.
+This is a WordPress plugin that allows you to create block themes from within the WordPress Editor. The main purpose of the plugin is to provide additional functionality on top of the existing theme features in the Editor. See @README.md for more details.
+
+The main features include:
+
+- Export the activated theme with all the user's changes made in the Editor.
+- Create a new theme, blank theme, child theme, or style variation from the Editor.
+- Option to add all images used in templates to the theme's `assets` folder.
+- Option to ensure the block markup used in templates and patterns is export-ready.
+- Option to make most strings used in templates and patterns translate-ready.
 
 ## Tech Stack
 
