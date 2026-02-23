@@ -28,7 +28,7 @@
 		"@actions/core": "^3.0.0",
 		"@emotion/babel-plugin": "^11.13.5",
 		"@wordpress/base-styles": "^6.16.0",
-		"@wordpress/env": "^11.0.0",
+		"@wordpress/env": "^10.0.0",
 		"@wordpress/scripts": "^31.5.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
 		"eslint-plugin-unicorn": "^63.0.0",
