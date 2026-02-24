@@ -27,7 +27,9 @@
 	"devDependencies": {
 		"@actions/core": "^1.11.1",
 		"@emotion/babel-plugin": "^11.13.5",
+		"@playwright/test": "^1.49.0",
 		"@wordpress/base-styles": "^6.6.0",
+		"@wordpress/e2e-test-utils-playwright": "^1.0.0",
 		"@wordpress/env": "^10.30.0",
 		"@wordpress/scripts": "^30.23.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
@@ -57,7 +59,9 @@
 		"update-version": "node update-version-and-changelog.js",
 		"prepare": "husky install",
 		"wp-env": "wp-env",
-		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js"
+		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui"
 	},
 	"lint-staged": {
 		"*.{js,json,yml}": [
