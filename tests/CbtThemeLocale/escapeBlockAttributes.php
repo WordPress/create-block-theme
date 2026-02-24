@@ -84,6 +84,11 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 <!-- /wp:query-pagination -->',
 			),
 
+			'read-more with content'                  => array(
+				'block_markup'    => '<!-- wp:read-more {"content":"View more"} /-->',
+				'expected_markup' => '<!-- wp:read-more {"content":"<?php esc_attr_e(\'View more\', \'test-locale-theme\');?>"} /-->',
+			),
+
 			'block without attributes should remain unchanged' => array(
 				'block_markup'    => '<!-- wp:search /-->',
 				'expected_markup' => '<!-- wp:search /-->',
