@@ -20,7 +20,7 @@ const ScreenHeader = ( { title, onBack, description } ) => {
 		<Spacer marginBottom={ 0 } paddingX={ 4 } paddingY={ 3 }>
 			<VStack>
 				<HStack spacing={ 2 }>
-					<BackButton
+					<Navigator.BackButton
 						style={ { minWidth: 24, padding: 0 } }
 						icon={ isRTL() ? chevronRight : chevronLeft }
 						size="small"
