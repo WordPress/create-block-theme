@@ -1,5 +1,9 @@
 # AGENTS.md
 
+This file provides guidance to AI coding agents working in this repository.
+
+## Repository Overview
+
 This is a WordPress plugin that allows you to create block themes from within the WordPress Editor. The main purpose of the plugin is to provide additional functionality on top of the existing theme features in the Editor. See README.md for more details.
 
 The main features include:
