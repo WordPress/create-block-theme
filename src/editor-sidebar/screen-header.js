@@ -11,16 +11,11 @@ import {
 	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalHeading as Heading,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 const ScreenHeader = ( { title, onBack, description } ) => {
-	// TODO: Remove the fallback component when the minimum supported WordPress
-	// version was increased to 6.8.
-	const BackButton = Navigator?.BackButton || NavigatorToParentButton;
 	return (
 		<Spacer marginBottom={ 0 } paddingX={ 4 } paddingY={ 3 }>
 			<VStack>

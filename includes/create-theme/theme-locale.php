@@ -149,6 +149,8 @@ class CBT_Theme_Locale {
 				return array( 'label' );
 			case 'core/post-excerpt':
 				return array( 'moreText' );
+			case 'core/read-more':
+				return array( 'content' );
 			default:
 				return null;
 		}

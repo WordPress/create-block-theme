@@ -3,6 +3,22 @@
 	"env": {
 		"browser": true
 	},
+	"settings": {
+		"import/core-modules": [
+			"@wordpress/api-fetch",
+			"@wordpress/blob",
+			"@wordpress/block-editor",
+			"@wordpress/components",
+			"@wordpress/core-data",
+			"@wordpress/data",
+			"@wordpress/editor",
+			"@wordpress/element",
+			"@wordpress/i18n",
+			"@wordpress/notices",
+			"@wordpress/plugins",
+			"@wordpress/preferences"
+		]
+	},
 	"rules": {
 		"@wordpress/dependency-group": "error",
 		"@wordpress/i18n-text-domain": [
