@@ -32,7 +32,8 @@ See CONTRIBUTING.md for more details on the tech stack and development setup.
 - `assets/`: Assets for the plugin, e.g. screenshots for documentation.
 - `includes/`: Includes for the plugin. This is where the main plugin code is located.
     - `includes/create-theme/`: All main PHP logic, organised as `CBT_`-prefixed static utility classes (e.g. `CBT_Theme_JSON`, `CBT_Theme_Templates`, `CBT_Theme_Fonts`).
-- `test/`: JavaScript Jest test setup for the plugin.
+- `src/test/`: JavaScript unit tests.
+- `test/`: JavaScript Jest configuration.
 - `tests/`: PHP unit tests for the plugin.
 - `vendor/`: Vendor files for the plugin, including PHP dependencies.
 
@@ -51,20 +52,24 @@ npm run build
 # Watch for changes and rebuild the plugin
 npm run start
 
-# Run the test setup
+# Run the PHP unit tests (requires Docker; test:php:setup must succeed first)
 npm run test:php:setup
-
-# Run the PHP unit tests
 npm run test:php
 
 # Run the JavaScript unit tests
 npm run test:unit
 
-# Run the linter
+# Run the linters
 npm run lint:php
 npm run lint:js
 npm run lint:css
+npm run lint:md-docs
+
+# Format code
+npm run format
 ```
+
+Before committing, run all linters and format. These are all enforced in CI.
 
 ## Conventions to Follow
 
