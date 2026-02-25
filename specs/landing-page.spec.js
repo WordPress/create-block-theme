@@ -66,8 +66,9 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 			.click();
 		await page.getByLabel( /Theme name/i ).fill( 'E2E Test Theme' );
 		await page
-			.getByRole( 'button', { name: /Create/i } )
-			.last()
+			.getByRole( 'button', {
+				name: 'Create and Activate Blank Theme',
+			} )
 			.click();
 
 		await page.waitForURL( /site-editor/ );
