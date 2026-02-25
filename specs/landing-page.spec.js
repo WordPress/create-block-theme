@@ -59,7 +59,7 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		);
 
 		// Accept the alert dialog that fires on successful theme creation.
-		page.on( 'dialog', ( dialog ) => dialog.accept() );
+		page.once( 'dialog', ( dialog ) => dialog.accept() );
 
 		await page
 			.getByRole( 'button', { name: /Create a new Blank Theme/i } )
