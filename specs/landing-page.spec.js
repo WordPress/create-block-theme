@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+const { execSync } = require( 'child_process' );
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+const E2E_THEME_SLUG = 'e2e-test-theme';
 
 test.describe( 'Create Block Theme — Admin Landing Page', () => {
 	let originalThemeSlug;
@@ -15,6 +22,14 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		if ( originalThemeSlug ) {
 			await requestUtils.activateTheme( originalThemeSlug );
+		}
+		try {
+			execSync(
+				`npx wp-env run cli wp theme delete ${ E2E_THEME_SLUG }`,
+				{ stdio: 'ignore' }
+			);
+		} catch {
+			// Theme may not exist if the test was skipped or failed early.
 		}
 	} );
 
