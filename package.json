@@ -27,6 +27,7 @@
 	"devDependencies": {
 		"@actions/core": "^3.0.0",
 		"@emotion/babel-plugin": "^11.13.5",
+		"@playwright/test": "^1.58.2",
 		"@wordpress/base-styles": "^6.16.0",
 		"@wordpress/e2e-test-utils-playwright": "^1.40.0",
 		"@wordpress/env": "^10.0.0",
