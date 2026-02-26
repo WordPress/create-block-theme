@@ -17,6 +17,15 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		const themes = await requestUtils.rest( { path: '/wp/v2/themes' } );
 		const active = themes.find( ( { status } ) => status === 'active' );
 		originalThemeSlug = active?.stylesheet;
+
+		try {
+			execSync(
+				`npx wp-env run cli wp theme delete ${ E2E_THEME_SLUG }`,
+				{ stdio: 'ignore' }
+			);
+		} catch {
+			// Theme doesn't exist, which is expected on a clean environment.
+		}
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
