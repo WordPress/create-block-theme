@@ -76,7 +76,11 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		await expect( page.getByLabel( /Theme name/i ) ).toBeVisible();
 	} );
 
-	test( 'create blank theme end-to-end', async ( { admin, page } ) => {
+	test( 'create blank theme end-to-end', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
 		await admin.visitAdminPage(
 			'themes.php',
 			'page=create-block-theme-landing'
@@ -96,5 +100,9 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 			.click();
 
 		await page.waitForURL( /site-editor/ );
+
+		const themes = await requestUtils.rest( { path: '/wp/v2/themes' } );
+		const active = themes.find( ( { status } ) => status === 'active' );
+		expect( active?.stylesheet ).toBe( E2E_THEME_SLUG );
 	} );
 } );
