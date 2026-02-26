@@ -52,14 +52,16 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		).toBeVisible();
 	} );
 
-	test( 'export button is visible', async ( { admin, page } ) => {
+	test( 'clicking export downloads a zip file', async ( { admin, page } ) => {
 		await admin.visitAdminPage(
 			'themes.php',
 			'page=create-block-theme-landing'
 		);
-		await expect(
-			page.getByRole( 'button', { name: /Export/ } )
-		).toBeVisible();
+		const [ download ] = await Promise.all( [
+			page.waitForEvent( 'download' ),
+			page.getByRole( 'button', { name: /Export/ } ).click(),
+		] );
+		expect( download.suggestedFilename() ).toMatch( /\.zip$/ );
 	} );
 
 	test( 'create blank theme modal opens with name field', async ( {
