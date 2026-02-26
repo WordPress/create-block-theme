@@ -20,7 +20,7 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 
 		try {
 			execSync(
-				`npx wp-env run cli wp theme delete ${ E2E_THEME_SLUG }`,
+				`npx wp-env run tests-cli wp theme delete ${ E2E_THEME_SLUG }`,
 				{ stdio: 'ignore' }
 			);
 		} catch {
@@ -34,7 +34,7 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		}
 		try {
 			execSync(
-				`npx wp-env run cli wp theme delete ${ E2E_THEME_SLUG }`,
+				`npx wp-env run tests-cli wp theme delete ${ E2E_THEME_SLUG }`,
 				{ stdio: 'ignore' }
 			);
 		} catch {
@@ -99,7 +99,7 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 			} )
 			.click();
 
-		await page.waitForURL( /site-editor/ );
+		await page.waitForURL( /site-editor/, { waitUntil: 'commit' } );
 
 		const themes = await requestUtils.rest( { path: '/wp/v2/themes' } );
 		const active = themes.find( ( { status } ) => status === 'active' );
