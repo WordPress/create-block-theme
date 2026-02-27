@@ -123,3 +123,38 @@ jobs:
 
             - name: Run PHP tests
               run: npm run test:unit:php:base
+    e2e:
+        name: E2E Tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install Node Dependencies
+              run: npm i
+
+            - name: Build JavaScript
+              run: npm run build
+
+            - name: Install Playwright browsers
+              run: npx playwright install --with-deps chromium
+
+            - name: Start wp-env
+              run: npm run test:unit:php:setup
+
+            - name: Run E2E tests
+              run: npm run test:e2e
+
+            - name: Upload test artifacts on failure
+              uses: actions/upload-artifact@v4
+              if: failure()
+              with:
+                  name: playwright-artifacts
+                  path: artifacts/
+                  if-no-files-found: ignore

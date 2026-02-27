@@ -37,3 +37,6 @@ build/
 *.result.*
 
 dev-env/
+
+# Playwright e2e test artifacts (screenshots, traces, test results)
+artifacts/
