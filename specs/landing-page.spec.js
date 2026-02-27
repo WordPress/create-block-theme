@@ -95,11 +95,19 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 			.getByRole( 'button', { name: /Create a new Blank Theme/i } )
 			.click();
 		await page.getByLabel( /Theme name/i ).fill( 'E2E Test Theme' );
-		await page
-			.getByRole( 'button', {
-				name: 'Create and Activate Blank Theme',
-			} )
-			.click();
+		const createThemeButton = page.getByRole( 'button', {
+			name: 'Create and Activate Blank Theme',
+		} );
+
+		await createThemeButton.click();
+
+		await expect( createThemeButton ).toBeHidden();
+
+		await expect(
+			page.getByText(
+				'Theme created successfully. The editor will now load.'
+			)
+		).toBeVisible();
 
 		await page.waitForURL( /site-editor/, { waitUntil: 'commit' } );
 
