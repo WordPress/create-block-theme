@@ -18,13 +18,13 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		const active = themes.find( ( { status } ) => status === 'active' );
 		originalThemeSlug = active?.stylesheet;
 
-		try {
+		if (
+			themes.some( ( { stylesheet } ) => stylesheet === E2E_THEME_SLUG )
+		) {
 			execSync(
 				`npx wp-env run tests-cli wp theme delete ${ E2E_THEME_SLUG }`,
 				{ stdio: 'ignore' }
 			);
-		} catch {
-			// Theme doesn't exist, which is expected on a clean environment.
 		}
 	} );
 
@@ -32,13 +32,15 @@ test.describe( 'Create Block Theme — Admin Landing Page', () => {
 		if ( originalThemeSlug ) {
 			await requestUtils.activateTheme( originalThemeSlug );
 		}
-		try {
+
+		const themes = await requestUtils.rest( { path: '/wp/v2/themes' } );
+		if (
+			themes.some( ( { stylesheet } ) => stylesheet === E2E_THEME_SLUG )
+		) {
 			execSync(
 				`npx wp-env run tests-cli wp theme delete ${ E2E_THEME_SLUG }`,
 				{ stdio: 'ignore' }
 			);
-		} catch {
-			// Theme may not exist if the test was skipped or failed early.
 		}
 	} );
 
