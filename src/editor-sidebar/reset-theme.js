@@ -9,9 +9,10 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	PanelBody,
 	Button,
 	CheckboxControl,
+	Card,
+	CardBody,
 } from '@wordpress/components';
 import { trash } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
@@ -90,72 +91,70 @@ function ResetTheme() {
 					'create-block-theme'
 				) }
 			</ConfirmDialog>
-			<PanelBody>
-				<ScreenHeader
-					title={ __( 'Reset Theme', 'create-block-theme' ) }
-				/>
-				<VStack spacing={ 4 }>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __(
-							'Reset theme styles',
-							'create-block-theme'
-						) }
-						help={ __(
-							'Reset customizations to theme styles and settings.',
-							'create-block-theme'
-						) }
-						checked={ preferences.resetStyles }
-						onChange={ () =>
-							handleTogglePreference( 'resetStyles' )
-						}
-					/>
-
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __(
-							'Reset theme templates',
-							'create-block-theme'
-						) }
-						help={ __(
-							'Reset customizations to theme templates.',
-							'create-block-theme'
-						) }
-						checked={ preferences.resetTemplates }
-						onChange={ () =>
-							handleTogglePreference( 'resetTemplates' )
-						}
-					/>
-
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __(
-							'Reset theme template-parts',
-							'create-block-theme'
-						) }
-						help={ __(
-							'Reset customizations to theme template-parts.',
-							'create-block-theme'
-						) }
-						checked={ preferences.resetTemplateParts }
-						onChange={ () =>
-							handleTogglePreference( 'resetTemplateParts' )
-						}
-					/>
-
-					<Button
-						text={ __( 'Reset Theme', 'create-block-theme' ) }
-						variant="primary"
-						icon={ trash }
-						disabled={
-							! preferences.resetStyles &&
-							! preferences.resetTemplates &&
-							! preferences.resetTemplateParts
-						}
-						onClick={ toggleConfirmDialog }
-					/>
-				</VStack>
-			</PanelBody>
+			<ScreenHeader title={ __( 'Reset Theme', 'create-block-theme' ) } />
+			<Card size="small" isBorderless>
+				<CardBody>
+					<VStack spacing={ 4 }>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Reset theme styles',
+								'create-block-theme'
+							) }
+							help={ __(
+								'Reset customizations to theme styles and settings.',
+								'create-block-theme'
+							) }
+							checked={ preferences.resetStyles }
+							onChange={ () =>
+								handleTogglePreference( 'resetStyles' )
+							}
+						/>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Reset theme templates',
+								'create-block-theme'
+							) }
+							help={ __(
+								'Reset customizations to theme templates.',
+								'create-block-theme'
+							) }
+							checked={ preferences.resetTemplates }
+							onChange={ () =>
+								handleTogglePreference( 'resetTemplates' )
+							}
+						/>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __(
+								'Reset theme template-parts',
+								'create-block-theme'
+							) }
+							help={ __(
+								'Reset customizations to theme template-parts.',
+								'create-block-theme'
+							) }
+							checked={ preferences.resetTemplateParts }
+							onChange={ () =>
+								handleTogglePreference( 'resetTemplateParts' )
+							}
+						/>
+						<Button
+							variant="primary"
+							icon={ trash }
+							disabled={
+								! preferences.resetStyles &&
+								! preferences.resetTemplates &&
+								! preferences.resetTemplateParts
+							}
+							onClick={ toggleConfirmDialog }
+						>
+							{ __( 'Reset Theme', 'create-block-theme' ) }
+						</Button>
+					</VStack>
+				</CardBody>
+			</Card>
 		</>
 	);
 }
