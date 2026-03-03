@@ -80,9 +80,9 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			author_uri: themeData.author_uri.raw,
 			tags_custom: themeData.tags.rendered,
 			screenshot: themeData.screenshot,
-			recommended_plugins: themeData.readme.recommended_plugins || '',
-			font_credits: themeData.readme.fonts || '',
-			image_credits: themeData.readme.images || '',
+			recommended_plugins: themeData.readme?.recommended_plugins || '',
+			font_credits: themeData.readme?.fonts || '',
+			image_credits: themeData.readme?.images || '',
 		} );
 	}, [ themeData ] );
 
