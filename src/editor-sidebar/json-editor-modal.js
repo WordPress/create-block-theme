@@ -35,7 +35,7 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 			title={ sprintf(
 				// translators: %s: theme name.
 				__( 'theme.json for %s', 'create-block-theme' ),
-				themeJsonData.name.raw
+				themeJsonData?.name?.raw ?? ''
 			) }
 			onRequestClose={ onRequestClose }
 			className="create-block-theme__theme-json-modal"
