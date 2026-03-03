@@ -45,9 +45,45 @@ jobs:
               if: success() || failure()
               run: npm run lint:pkg-json
 
-    tests:
-        name: Test Suite
+    compute-previous-wordpress-version:
+        name: Compute previous WordPress version
         runs-on: ubuntu-latest
+        permissions: {}
+        outputs:
+            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
+
+        steps:
+            - name: Get previous WordPress version
+              id: get-previous-wordpress-version
+              run: |
+                  curl \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "http://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST_WP_VERSION="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)"
+                  # shellcheck disable=SC2034
+                  IFS='.' read -r LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ "${LATEST_WP_MINOR}" == "0" ]]; then
+                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
+                  else
+                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
+                  fi
+                  PREVIOUS_WP_VERSION="$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)"
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> "$GITHUB_OUTPUT"
+                  rm versions.json
+
+    tests:
+        name: PHP ${{ matrix.php }}${{ matrix.wordpress != '' && format( ' (WP {0})', matrix.wordpress ) || '' }}
+        needs: [compute-previous-wordpress-version]
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+                wordpress: ['', 'previous major version']
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
         steps:
             - name: Checkout
               uses: actions/checkout@v3
@@ -66,23 +102,59 @@ jobs:
             - name: Install Node Dependencies
               run: npm i
 
-            - name: Compile JavaScript App
-              run: npm run build
-
-            - name: Setup MySQL
-              if: success() || failure()
-              uses: shogo82148/actions-setup-mysql@v1
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
               with:
-                  mysql-version: '8.0'
+                  php-version: '${{ matrix.php }}'
+                  ini-file: development
+                  coverage: none
 
-            - name: Run JavaScript unit tests
-              run: npm run test:unit
+            - name: Docker debug information
+              run: docker -v
 
-            - name: Install Subversion
-              run: sudo apt-get update -y && sudo apt-get install -y subversion
+            - name: Start Docker environment
+              run: npm run wp-env start
+
+            - name: Docker container debug information
+              run: npm run wp-env run tests-cli wp core version
+
+            - name: Log running Docker containers
+              run: docker ps -a
 
             - name: Run PHP tests
-              run: |
-                  mysql -uroot -h127.0.0.1 -e 'SELECT version()' \
-                  && ./bin/install-wp-tests.sh --wp-version=trunk --recreate-db wordpress_test root ''  > /dev/null \
-                  && composer run-script test
+              run: npm run test:unit:php:base
+    e2e:
+        name: E2E Tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install Node Dependencies
+              run: npm i
+
+            - name: Build JavaScript
+              run: npm run build
+
+            - name: Install Playwright browsers
+              run: npx playwright install --with-deps chromium
+
+            - name: Start wp-env
+              run: npm run test:unit:php:setup
+
+            - name: Run E2E tests
+              run: npm run test:e2e
+
+            - name: Upload test artifacts on failure
+              uses: actions/upload-artifact@v4
+              if: failure()
+              with:
+                  name: playwright-artifacts
+                  path: artifacts/
+                  if-no-files-found: ignore

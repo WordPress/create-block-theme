@@ -36,6 +36,18 @@
 		{
 			"files": [ "**/test/**/*.js" ],
 			"extends": [ "plugin:@wordpress/eslint-plugin/test-unit" ]
+		},
+		{
+			"files": [ "specs/**/*.js" ],
+			"rules": {
+				"import/no-extraneous-dependencies": [
+					"error",
+					{
+						"peerDependencies": true,
+						"devDependencies": true
+					}
+				]
+			}
 		}
 	]
 }

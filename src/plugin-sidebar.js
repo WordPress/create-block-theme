@@ -20,13 +20,12 @@ import {
 	__experimentalHStack as HStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalDivider as Divider,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	Button,
+	Card,
+	CardBody,
+	CardDivider,
 	Icon,
 	FlexItem,
-	PanelBody,
 } from '@wordpress/components';
 import {
 	tool,
@@ -58,10 +57,10 @@ import AboutPlugin from './editor-sidebar/about';
 import ResetTheme from './editor-sidebar/reset-theme';
 import './plugin-styles.scss';
 
-function PluginSidebarItem( { icon, path, children, ...props } ) {
+function PluginSidebarItem( { icon, path, children, onClick } ) {
 	const ItemWrapper = path ? NavigatorButton : Button;
 	return (
-		<ItemWrapper { ...props } path={ path }>
+		<ItemWrapper onClick={ onClick } path={ path }>
 			<HStack justify="flex-start">
 				<HStack justify="flex-start">
 					<Icon icon={ icon } />
@@ -123,153 +122,188 @@ const CreateBlockThemePlugin = () => {
 					'UI String',
 					'create-block-theme'
 				) }
+				className="create-block-theme-sidebar"
 			>
 				<NavigatorProvider initialPath="/">
 					<NavigatorScreen path="/">
-						<PanelBody>
-							<VStack spacing={ 0 }>
-								<PluginSidebarItem path="/save" icon={ copy }>
-									{ __(
-										'Save Changes to Theme',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<PluginSidebarItem
-									path="/create/variation"
-									icon={ blockMeta }
-								>
-									{ __(
-										'Create Theme Variation',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<PluginSidebarItem
-									icon={ edit }
-									onClick={ () =>
-										setIsMetadataEditorOpen( true )
-									}
-								>
-									{ __(
-										'Edit Theme Metadata',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<PluginSidebarItem
-									icon={ code }
-									onClick={ () => setIsEditorOpen( true ) }
-								>
-									{ __(
-										'View theme.json',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<PluginSidebarItem
-									icon={ code }
-									onClick={ () =>
-										setIsGlobalStylesEditorOpen( true )
-									}
-								>
-									{ __(
-										'View Custom Styles',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<PluginSidebarItem
-									icon={ download }
-									onClick={ () => handleExportClick() }
-								>
-									{ __( 'Export Zip', 'create-block-theme' ) }
-								</PluginSidebarItem>
-								<Divider />
-								<PluginSidebarItem
-									path="/create/blank"
-									icon={ addCard }
-								>
-									{ __(
-										'Create Blank Theme',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<PluginSidebarItem path="/clone" icon={ copy }>
-									{ __(
-										'Create Theme',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-
-								<Divider />
-
-								<PluginSidebarItem path="/reset" icon={ trash }>
-									{ __(
-										'Reset Theme',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-
-								<Divider />
-
-								<PluginSidebarItem path="/about" icon={ help }>
-									{ __( 'Help', 'create-block-theme' ) }
-								</PluginSidebarItem>
-							</VStack>
-						</PanelBody>
+						<Card size="small" isBorderless>
+							<CardBody>
+								<VStack spacing={ 0 }>
+									<PluginSidebarItem
+										path="/save"
+										icon={ copy }
+									>
+										{ __(
+											'Save Changes to Theme',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										path="/create/variation"
+										icon={ blockMeta }
+									>
+										{ __(
+											'Create Theme Variation',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										icon={ edit }
+										onClick={ () =>
+											setIsMetadataEditorOpen( true )
+										}
+									>
+										{ __(
+											'Edit Theme Metadata',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										icon={ code }
+										onClick={ () =>
+											setIsEditorOpen( true )
+										}
+									>
+										{ __(
+											'View theme.json',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										icon={ code }
+										onClick={ () =>
+											setIsGlobalStylesEditorOpen( true )
+										}
+									>
+										{ __(
+											'View Custom Styles',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										icon={ download }
+										onClick={ () => handleExportClick() }
+									>
+										{ __(
+											'Export Zip',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+								</VStack>
+							</CardBody>
+							<CardDivider />
+							<CardBody>
+								<VStack spacing={ 0 }>
+									<PluginSidebarItem
+										path="/create/blank"
+										icon={ addCard }
+									>
+										{ __(
+											'Create Blank Theme',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										path="/clone"
+										icon={ copy }
+									>
+										{ __(
+											'Create Theme',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+								</VStack>
+							</CardBody>
+							<CardDivider />
+							<CardBody>
+								<VStack spacing={ 0 }>
+									<PluginSidebarItem
+										path="/reset"
+										icon={ trash }
+									>
+										{ __(
+											'Reset Theme',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+								</VStack>
+							</CardBody>
+							<CardDivider />
+							<CardBody>
+								<VStack spacing={ 0 }>
+									<PluginSidebarItem
+										path="/about"
+										icon={ help }
+									>
+										{ __( 'Help', 'create-block-theme' ) }
+									</PluginSidebarItem>
+								</VStack>
+							</CardBody>
+						</Card>
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/clone">
-						<PanelBody>
-							<ScreenHeader
-								title={ __(
-									'Create Block Theme',
-									'create-block-theme'
-								) }
-							/>
-							<VStack>
+						<ScreenHeader
+							title={ __(
+								'Create Block Theme',
+								'create-block-theme'
+							) }
+							description={
 								<Text>
 									{ __(
 										'Would you like to clone this Theme or create a Child Theme?',
 										'create-block-theme'
 									) }
 								</Text>
-								<Divider />
-								<PluginSidebarItem
-									path="/clone/create"
-									icon={ copy }
-									onClick={ () => {
-										setCloneCreateType( 'createClone' );
-									} }
-								>
-									{ __(
-										'Clone Theme',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<Text variant="muted">
-									{ __(
-										'Create a clone of this theme with a new name. The user changes will be preserved in the new theme.',
-										'create-block-theme'
-									) }
-								</Text>
-								<Divider />
-								<PluginSidebarItem
-									path="/clone/create"
-									icon={ copy }
-									onClick={ () => {
-										setCloneCreateType( 'createChild' );
-									} }
-								>
-									{ __(
-										'Create Child Theme',
-										'create-block-theme'
-									) }
-								</PluginSidebarItem>
-								<Text variant="muted">
-									{ __(
-										'Create a child theme that uses this theme as a parent. This theme will remain unchanged and the user changes will be preserved in the new child theme.',
-										'create-block-theme'
-									) }
-								</Text>
-							</VStack>
-						</PanelBody>
+							}
+						/>
+						<Card size="small" isBorderless>
+							<CardBody>
+								<VStack>
+									<PluginSidebarItem
+										path="/clone/create"
+										icon={ copy }
+										onClick={ () => {
+											setCloneCreateType( 'createClone' );
+										} }
+									>
+										{ __(
+											'Clone Theme',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<Text variant="muted">
+										{ __(
+											'Create a clone of this theme with a new name. The user changes will be preserved in the new theme.',
+											'create-block-theme'
+										) }
+									</Text>
+								</VStack>
+							</CardBody>
+							<CardDivider />
+							<CardBody>
+								<VStack>
+									<PluginSidebarItem
+										path="/clone/create"
+										icon={ copy }
+										onClick={ () => {
+											setCloneCreateType( 'createChild' );
+										} }
+									>
+										{ __(
+											'Create Child Theme',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<Text variant="muted">
+										{ __(
+											'Create a child theme that uses this theme as a parent. This theme will remain unchanged and the user changes will be preserved in the new child theme.',
+											'create-block-theme'
+										) }
+									</Text>
+								</VStack>
+							</CardBody>
+						</Card>
 					</NavigatorScreen>
 
 					<NavigatorScreen path="/create/blank">

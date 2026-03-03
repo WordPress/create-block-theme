@@ -10,12 +10,9 @@ import {
 	__experimentalVStack as VStack,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalSpacer as Spacer,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalView as View,
-	PanelBody,
 	Button,
+	Card,
+	CardBody,
 	TextControl,
 	CheckboxControl,
 } from '@wordpress/components';
@@ -86,65 +83,61 @@ export const CreateVariationPanel = () => {
 	};
 
 	return (
-		<PanelBody>
+		<>
 			<ScreenHeader
 				title={ __( 'Create Variation', 'create-block-theme' ) }
+				description={
+					<Text>
+						{ __(
+							'Save the Global Styles changes as a theme variation.',
+							'create-block-theme'
+						) }
+					</Text>
+				}
 			/>
-
-			<VStack>
-				<Text as="p">
-					{ __(
-						'Save the Global Styles changes as a theme variation.',
-						'create-block-theme'
-					) }
-				</Text>
-
-				<View>
-					<Spacer paddingY={ 4 }>
-						<VStack spacing={ 4 }>
-							<TextControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								label={ __(
-									'Variation name',
-									'create-block-theme'
-								) }
-								value={ theme.name }
-								onChange={ ( value ) =>
-									setTheme( { ...theme, name: value } )
-								}
-							/>
-
-							<CheckboxControl
-								__nextHasNoMarginBottom
-								label={ __(
-									'Save Fonts',
-									'create-block-theme'
-								) }
-								help={ __(
-									'Copy the font assets to the theme folder.',
-									'create-block-theme'
-								) }
-								checked={ preference.saveFonts }
-								onChange={ () =>
-									handleTogglePreference( 'saveFonts' )
-								}
-							/>
-
-							<Button
-								icon={ copy }
-								variant="primary"
-								onClick={ handleCreateVariationClick }
-							>
-								{ __(
-									'Create Theme Variation',
-									'create-block-theme'
-								) }
-							</Button>
-						</VStack>
-					</Spacer>
-				</View>
-			</VStack>
-		</PanelBody>
+			<Card size="small" isBorderless>
+				<CardBody>
+					<VStack spacing={ 4 }>
+						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __(
+								'Variation name',
+								'create-block-theme'
+							) }
+							value={ theme.name }
+							onChange={ ( value ) =>
+								setTheme( {
+									...theme,
+									name: value,
+								} )
+							}
+						/>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __( 'Save Fonts', 'create-block-theme' ) }
+							help={ __(
+								'Copy the font assets to the theme folder.',
+								'create-block-theme'
+							) }
+							checked={ preference.saveFonts }
+							onChange={ () =>
+								handleTogglePreference( 'saveFonts' )
+							}
+						/>
+						<Button
+							icon={ copy }
+							variant="primary"
+							onClick={ handleCreateVariationClick }
+						>
+							{ __(
+								'Create Theme Variation',
+								'create-block-theme'
+							) }
+						</Button>
+					</VStack>
+				</CardBody>
+			</Card>
+		</>
 	);
 };

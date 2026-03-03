@@ -8,8 +8,9 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	PanelBody,
 	Button,
+	Card,
+	CardBody,
 	CheckboxControl,
 } from '@wordpress/components';
 import { archive } from '@wordpress/icons';
@@ -99,155 +100,174 @@ export const SaveThemePanel = () => {
 	};
 
 	return (
-		<PanelBody>
+		<Card size="small" isBorderless>
 			<ScreenHeader
 				title={ __( 'Save Changes', 'create-block-theme' ) }
 			/>
-			<VStack spacing={ 4 }>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Save Fonts', 'create-block-theme' ) }
-					help={ __(
-						'Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme.',
-						'create-block-theme'
-					) }
-					checked={ preference.saveFonts }
-					onChange={ () => handleTogglePreference( 'saveFonts' ) }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Save Style Changes', 'create-block-theme' ) }
-					help={ __(
-						'Save Global Styles values set in the Editor to the theme.',
-						'create-block-theme'
-					) }
-					checked={ preference.saveStyle }
-					onChange={ () => handleTogglePreference( 'saveStyle' ) }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __(
-						'Save Template Changes',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Save Template and Template Part changes made in the Editor to the theme.',
-						'create-block-theme'
-					) }
-					checked={ preference.saveTemplates }
-					onChange={ () => handleTogglePreference( 'saveTemplates' ) }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __(
-						'Process Only Modified Templates',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Process only templates you have modified in the Editor. Any templates you have not modified will be left as is.',
-						'create-block-theme'
-					) }
-					disabled={ ! preference.saveTemplates }
-					checked={
-						preference.saveTemplates &&
-						preference.processOnlySavedTemplates
-					}
-					onChange={ () =>
-						handleTogglePreference( 'processOnlySavedTemplates' )
-					}
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Save Patterns', 'create-block-theme' ) }
-					help={ __(
-						'All patterns created in the Editor will be moved to the theme. Note that this will delete all patterns from the Editor and any references in templates will be made relative to the theme.',
-						'create-block-theme'
-					) }
-					checked={ preference.savePatterns }
-					onChange={ () => handleTogglePreference( 'savePatterns' ) }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Localize Text', 'create-block-theme' ) }
-					help={ __(
-						'Any text in a template or pattern will be localized in a pattern.',
-						'create-block-theme'
-					) }
-					disabled={
-						! preference.saveTemplates && ! preference.savePatterns
-					}
-					checked={
-						( preference.saveTemplates ||
-							preference.savePatterns ) &&
-						preference.localizeText
-					}
-					onChange={ () => handleTogglePreference( 'localizeText' ) }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Localize Images', 'create-block-theme' ) }
-					help={ __(
-						'Any images in a template or pattern will be copied to a local /assets folder and referenced from there via a pattern.',
-						'create-block-theme'
-					) }
-					disabled={
-						! preference.saveTemplates && ! preference.savePatterns
-					}
-					checked={
-						( preference.saveTemplates ||
-							preference.savePatterns ) &&
-						preference.localizeImages
-					}
-					onChange={ () =>
-						handleTogglePreference( 'localizeImages' )
-					}
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __(
-						'Remove Navigation Refs',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Remove Navigation Refs from the theme returning your navigation to the default state.',
-						'create-block-theme'
-					) }
-					disabled={
-						! preference.saveTemplates && ! preference.savePatterns
-					}
-					checked={
-						( preference.saveTemplates ||
-							preference.savePatterns ) &&
-						preference.removeNavRefs
-					}
-					onChange={ () => handleTogglePreference( 'removeNavRefs' ) }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __(
-						'Remove Taxonomy Query',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Remove the taxonomy query from the query loop block attributes.',
-						'create-block-theme'
-					) }
-					disabled={
-						! preference.saveTemplates && ! preference.savePatterns
-					}
-					checked={ preference.removeTaxQuery }
-					onChange={ () =>
-						handleTogglePreference( 'removeTaxQuery' )
-					}
-				/>
-				<Button
-					variant="primary"
-					icon={ archive }
-					onClick={ handleSaveClick }
-				>
-					{ __( 'Save Changes', 'create-block-theme' ) }
-				</Button>
-			</VStack>
-		</PanelBody>
+			<CardBody>
+				<VStack spacing={ 4 }>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __( 'Save Fonts', 'create-block-theme' ) }
+						help={ __(
+							'Save activated fonts in the Font Library to the theme. Remove deactivated theme fonts from the theme.',
+							'create-block-theme'
+						) }
+						checked={ preference.saveFonts }
+						onChange={ () => handleTogglePreference( 'saveFonts' ) }
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Save Style Changes',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Save Global Styles values set in the Editor to the theme.',
+							'create-block-theme'
+						) }
+						checked={ preference.saveStyle }
+						onChange={ () => handleTogglePreference( 'saveStyle' ) }
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Save Template Changes',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Save Template and Template Part changes made in the Editor to the theme.',
+							'create-block-theme'
+						) }
+						checked={ preference.saveTemplates }
+						onChange={ () =>
+							handleTogglePreference( 'saveTemplates' )
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Process Only Modified Templates',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Process only templates you have modified in the Editor. Any templates you have not modified will be left as is.',
+							'create-block-theme'
+						) }
+						disabled={ ! preference.saveTemplates }
+						checked={
+							preference.saveTemplates &&
+							preference.processOnlySavedTemplates
+						}
+						onChange={ () =>
+							handleTogglePreference(
+								'processOnlySavedTemplates'
+							)
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __( 'Save Patterns', 'create-block-theme' ) }
+						help={ __(
+							'All patterns created in the Editor will be moved to the theme. Note that this will delete all patterns from the Editor and any references in templates will be made relative to the theme.',
+							'create-block-theme'
+						) }
+						checked={ preference.savePatterns }
+						onChange={ () =>
+							handleTogglePreference( 'savePatterns' )
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __( 'Localize Text', 'create-block-theme' ) }
+						help={ __(
+							'Any text in a template or pattern will be localized in a pattern.',
+							'create-block-theme'
+						) }
+						disabled={
+							! preference.saveTemplates &&
+							! preference.savePatterns
+						}
+						checked={
+							( preference.saveTemplates ||
+								preference.savePatterns ) &&
+							preference.localizeText
+						}
+						onChange={ () =>
+							handleTogglePreference( 'localizeText' )
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __( 'Localize Images', 'create-block-theme' ) }
+						help={ __(
+							'Any images in a template or pattern will be copied to a local /assets folder and referenced from there via a pattern.',
+							'create-block-theme'
+						) }
+						disabled={
+							! preference.saveTemplates &&
+							! preference.savePatterns
+						}
+						checked={
+							( preference.saveTemplates ||
+								preference.savePatterns ) &&
+							preference.localizeImages
+						}
+						onChange={ () =>
+							handleTogglePreference( 'localizeImages' )
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Remove Navigation Refs',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Remove Navigation Refs from the theme returning your navigation to the default state.',
+							'create-block-theme'
+						) }
+						disabled={
+							! preference.saveTemplates &&
+							! preference.savePatterns
+						}
+						checked={
+							( preference.saveTemplates ||
+								preference.savePatterns ) &&
+							preference.removeNavRefs
+						}
+						onChange={ () =>
+							handleTogglePreference( 'removeNavRefs' )
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Remove Taxonomy Query',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Remove the taxonomy query from the query loop block attributes.',
+							'create-block-theme'
+						) }
+						disabled={
+							! preference.saveTemplates &&
+							! preference.savePatterns
+						}
+						checked={ preference.removeTaxQuery }
+						onChange={ () =>
+							handleTogglePreference( 'removeTaxQuery' )
+						}
+					/>
+					<Button
+						variant="primary"
+						icon={ archive }
+						onClick={ handleSaveClick }
+					>
+						{ __( 'Save Changes', 'create-block-theme' ) }
+					</Button>
+				</VStack>
+			</CardBody>
+		</Card>
 	);
 };

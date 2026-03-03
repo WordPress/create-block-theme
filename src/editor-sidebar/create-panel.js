@@ -12,8 +12,9 @@ import {
 	__experimentalSpacer as Spacer,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalText as Text,
-	PanelBody,
 	Button,
+	Card,
+	CardBody,
 	SelectControl,
 	TextControl,
 	TextareaControl,
@@ -124,145 +125,178 @@ export const CreateThemePanel = ( { createType } ) => {
 	};
 
 	return (
-		<PanelBody>
+		<>
 			<ScreenHeader
 				title={ __( 'Create Theme', 'create-block-theme' ) }
 			/>
-			<VStack>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Theme name', 'create-block-theme' ) }
-					value={ theme.name }
-					onChange={ ( value ) =>
-						setTheme( { ...theme, name: value } )
-					}
-				/>
-				<details>
-					<summary>
-						{ __(
-							'Additional Theme MetaData',
-							'create-block-theme'
-						) }
-					</summary>
-					<Spacer />
+			<Card size="small" isBorderless>
+				<CardBody>
 					<VStack spacing={ 4 }>
-						<TextareaControl
-							__nextHasNoMarginBottom
-							label={ __(
-								'Theme description',
-								'create-block-theme'
-							) }
-							value={ theme.description }
-							onChange={ ( value ) =>
-								setTheme( { ...theme, description: value } )
-							}
-							placeholder={ __(
-								'A short description of the theme',
-								'create-block-theme'
-							) }
-						/>
 						<TextControl
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize
-							label={ __( 'Theme URI', 'create-block-theme' ) }
-							value={ theme.uri }
+							label={ __( 'Theme name', 'create-block-theme' ) }
+							value={ theme.name }
 							onChange={ ( value ) =>
-								setTheme( { ...theme, uri: value } )
+								setTheme( { ...theme, name: value } )
 							}
-							placeholder={ __(
-								'https://github.com/wordpress/twentytwentythree/',
-								'create-block-theme'
-							) }
 						/>
-						<TextControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Author', 'create-block-theme' ) }
-							value={ theme.author }
-							onChange={ ( value ) =>
-								setTheme( { ...theme, author: value } )
-							}
-							placeholder={ __(
-								'the WordPress team',
-								'create-block-theme'
-							) }
-						/>
-						<TextControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Author URI', 'create-block-theme' ) }
-							value={ theme.author_uri }
-							onChange={ ( value ) =>
-								setTheme( { ...theme, author_uri: value } )
-							}
-							placeholder={ __(
-								'https://wordpress.org/',
-								'create-block-theme'
-							) }
-						/>
-						<SelectControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __(
-								'Minimum WordPress version',
-								'create-block-theme'
-							) }
-							value={ theme.requires_wp }
-							options={ WP_MINIMUM_VERSIONS.map(
-								( version ) => ( {
-									label: version,
-									value: version,
-								} )
-							) }
-							onChange={ ( value ) => {
-								setTheme( { ...theme, requires_wp: value } );
-							} }
-						/>
+						<details>
+							<summary>
+								{ __(
+									'Additional Theme MetaData',
+									'create-block-theme'
+								) }
+							</summary>
+							<Spacer paddingTop={ 4 } marginBottom={ 0 }>
+								<VStack spacing={ 4 }>
+									<TextareaControl
+										__nextHasNoMarginBottom
+										label={ __(
+											'Theme description',
+											'create-block-theme'
+										) }
+										value={ theme.description }
+										onChange={ ( value ) =>
+											setTheme( {
+												...theme,
+												description: value,
+											} )
+										}
+										placeholder={ __(
+											'A short description of the theme',
+											'create-block-theme'
+										) }
+									/>
+									<TextControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __(
+											'Theme URI',
+											'create-block-theme'
+										) }
+										value={ theme.uri }
+										onChange={ ( value ) =>
+											setTheme( { ...theme, uri: value } )
+										}
+										placeholder={ __(
+											'https://github.com/wordpress/twentytwentythree/',
+											'create-block-theme'
+										) }
+									/>
+									<TextControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __(
+											'Author',
+											'create-block-theme'
+										) }
+										value={ theme.author }
+										onChange={ ( value ) =>
+											setTheme( {
+												...theme,
+												author: value,
+											} )
+										}
+										placeholder={ __(
+											'the WordPress team',
+											'create-block-theme'
+										) }
+									/>
+									<TextControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __(
+											'Author URI',
+											'create-block-theme'
+										) }
+										value={ theme.author_uri }
+										onChange={ ( value ) =>
+											setTheme( {
+												...theme,
+												author_uri: value,
+											} )
+										}
+										placeholder={ __(
+											'https://wordpress.org/',
+											'create-block-theme'
+										) }
+									/>
+									<SelectControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __(
+											'Minimum WordPress version',
+											'create-block-theme'
+										) }
+										value={ theme.requires_wp }
+										options={ WP_MINIMUM_VERSIONS.map(
+											( version ) => ( {
+												label: version,
+												value: version,
+											} )
+										) }
+										onChange={ ( value ) => {
+											setTheme( {
+												...theme,
+												requires_wp: value,
+											} );
+										} }
+									/>
+								</VStack>
+							</Spacer>
+						</details>
+						{ createType === 'createClone' && (
+							<>
+								<Button
+									icon={ copy }
+									variant="primary"
+									onClick={ () => cloneTheme() }
+								>
+									{ __(
+										'Create Theme',
+										'create-block-theme'
+									) }
+								</Button>
+							</>
+						) }
+						{ createType === 'createChild' && (
+							<>
+								<Button
+									icon={ copy }
+									variant="primary"
+									onClick={ () => cloneTheme() }
+								>
+									{ __(
+										'Create Child Theme',
+										'create-block-theme'
+									) }
+								</Button>
+							</>
+						) }
+						{ createType === 'createBlank' && (
+							<>
+								<Button
+									icon={ addCard }
+									variant="primary"
+									onClick={ handleCreateBlankClick }
+								>
+									{ __(
+										'Create Blank Theme',
+										'create-block-theme'
+									) }
+								</Button>
+								<Text variant="muted">
+									{ __(
+										'Create a blank theme with no styles or templates.',
+										'create-block-theme'
+									) }
+								</Text>
+							</>
+						) }
 					</VStack>
-				</details>
-				<br />
-				{ createType === 'createClone' && (
-					<>
-						<Button
-							icon={ copy }
-							variant="primary"
-							onClick={ () => cloneTheme() }
-						>
-							{ __( 'Create Theme', 'create-block-theme' ) }
-						</Button>
-					</>
-				) }
-				{ createType === 'createChild' && (
-					<>
-						<Button
-							icon={ copy }
-							variant="primary"
-							onClick={ () => cloneTheme() }
-						>
-							{ __( 'Create Child Theme', 'create-block-theme' ) }
-						</Button>
-					</>
-				) }
-				{ createType === 'createBlank' && (
-					<>
-						<Button
-							icon={ addCard }
-							variant="primary"
-							onClick={ handleCreateBlankClick }
-						>
-							{ __( 'Create Blank Theme', 'create-block-theme' ) }
-						</Button>
-						<Spacer />
-						<Text variant="muted">
-							{ __(
-								'Create a blank theme with no styles or templates.',
-								'create-block-theme'
-							) }
-						</Text>
-					</>
-				) }
-			</VStack>
-		</PanelBody>
+				</CardBody>
+			</Card>
+		</>
 	);
 };
