@@ -28,6 +28,7 @@ class CBT_Theme_API {
 	 */
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		add_filter( 'rest_prepare_theme', array( $this, 'add_additional_data_to_theme_response' ), 10, 2 );
 	}
 
 	/**
@@ -113,28 +114,6 @@ class CBT_Theme_API {
 		);
 		register_rest_route(
 			'create-block-theme/v1',
-			'/get-readme-data',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( $this, 'rest_get_readme_data' ),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
-				},
-			)
-		);
-		register_rest_route(
-			'create-block-theme/v1',
-			'/get-theme-data',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( $this, 'rest_get_theme_data' ),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
-				},
-			),
-		);
-		register_rest_route(
-			'create-block-theme/v1',
 			'/font-families',
 			array(
 				'methods'             => 'GET',
@@ -157,44 +136,47 @@ class CBT_Theme_API {
 		);
 	}
 
-	function rest_get_theme_data() {
-		try {
-			$theme_data = CBT_Theme_JSON_Resolver::get_theme_file_contents();
-			return new WP_REST_Response(
-				array(
-					'status'  => 'SUCCESS',
-					'message' => __( 'Theme data retrieved.', 'create-block-theme' ),
-					'data'    => $theme_data,
-				),
-			);
-		} catch ( Exception $error ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'FAILURE',
-					'message' => $error->getMessage(),
-				)
-			);
+	/**
+	 * Add README data and theme.json data to the current theme REST API response.
+	 *
+	 * @param WP_REST_Response $response The response object.
+	 * @param WP_Theme          $theme    The theme object.
+	 * @return WP_REST_Response Modified response object.
+	 */
+	function add_additional_data_to_theme_response( $response, $theme ) {
+		if ( ! $theme || ! $response ) {
+			return $response;
 		}
-	}
 
-	function rest_get_readme_data() {
+		$current_theme = wp_get_theme();
+		if ( $theme->get_stylesheet() !== $current_theme->get_stylesheet() ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+
+		// Add README data and theme.json data.
 		try {
-			$readme_data = CBT_Theme_Readme::get_sections();
-			return new WP_REST_Response(
-				array(
-					'status'  => 'SUCCESS',
-					'message' => __( 'Readme file data retrieved.', 'create-block-theme' ),
-					'data'    => $readme_data,
-				)
-			);
+			$data['readme']     = CBT_Theme_Readme::get_sections();
+			$data['theme_json'] = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 		} catch ( Exception $error ) {
-			return new WP_REST_Response(
+			return new WP_Error(
+				'theme_data_retrieval_failed',
+				sprintf(
+					/* translators: %1$s: error message */
+					__( 'Failed to retrieve theme data: %1$s', 'create-block-theme' ),
+					$error->getMessage()
+				),
 				array(
-					'status'  => 'FAILURE',
-					'message' => $error->getMessage(),
+					'status' => 500,
+					'code'   => $error->getCode(),
 				)
 			);
 		}
+
+		$response->set_data( $data );
+
+		return $response;
 	}
 
 	function rest_clone_theme( $request ) {

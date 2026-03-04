@@ -28,7 +28,7 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { postUpdateThemeMetadata, fetchReadmeData } from '../resolvers';
+import { postUpdateThemeMetadata } from '../resolvers';
 import { getFontsCreditsText } from '../utils/fonts';
 import { generateWpVersions } from '../utils/generate-versions';
 
@@ -70,37 +70,21 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			return;
 		}
 
-		const fetchData = async () => {
-			try {
-				const readmeData = await fetchReadmeData();
-				setTheme( {
-					name: themeData.name.raw,
-					description: themeData.description.raw,
-					uri: themeData.theme_uri.raw,
-					version: themeData.version,
-					requires_wp: themeData.requires_wp,
-					author: themeData.author.raw,
-					author_uri: themeData.author_uri.raw,
-					tags_custom: themeData.tags.rendered,
-					screenshot: themeData.screenshot,
-					recommended_plugins: readmeData.recommended_plugins,
-					font_credits: readmeData.fonts,
-					image_credits: readmeData.images,
-				} );
-			} catch ( error ) {
-				createErrorNotice(
-					error.message ||
-						__(
-							'Failed to fetch theme data.',
-							'create-block-theme'
-						),
-					{ type: 'snackbar' }
-				);
-			}
-		};
-
-		fetchData();
-	}, [ themeData, createErrorNotice ] );
+		setTheme( {
+			name: themeData.name.raw,
+			description: themeData.description.raw,
+			uri: themeData.theme_uri.raw,
+			version: themeData.version,
+			requires_wp: themeData.requires_wp,
+			author: themeData.author.raw,
+			author_uri: themeData.author_uri.raw,
+			tags_custom: themeData.tags.rendered,
+			screenshot: themeData.screenshot,
+			recommended_plugins: themeData.readme?.recommended_plugins || '',
+			font_credits: themeData.readme?.fonts || '',
+			image_credits: themeData.readme?.images || '',
+		} );
+	}, [ themeData ] );
 
 	const handleUpdateClick = () => {
 		postUpdateThemeMetadata( theme )

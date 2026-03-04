@@ -12,24 +12,22 @@ import { useState, useEffect } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { fetchThemeJson } from '../resolvers';
-
 const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 	const [ themeData, setThemeData ] = useState( '' );
-	const themeName = useSelect( ( select ) =>
-		select( 'core' ).getCurrentTheme()
-	)?.name?.raw;
-	const fetchThemeData = async () => {
-		setThemeData( await fetchThemeJson() );
-	};
-	const handleSave = () => {};
+	const themeJsonData = useSelect(
+		( select ) => select( 'core' ).getCurrentTheme(),
+		[]
+	);
 
 	useEffect( () => {
-		fetchThemeData();
-	} );
+		if ( themeJsonData ) {
+			setThemeData(
+				JSON.stringify( themeJsonData?.theme_json, null, 2 )
+			);
+		}
+	}, [ themeJsonData ] );
+
+	const handleSave = () => {};
 
 	return (
 		<Modal
@@ -37,7 +35,7 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 			title={ sprintf(
 				// translators: %s: theme name.
 				__( 'theme.json for %s', 'create-block-theme' ),
-				themeName
+				themeJsonData?.name?.raw ?? ''
 			) }
 			onRequestClose={ onRequestClose }
 			className="create-block-theme__theme-json-modal"
