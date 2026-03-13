@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.8
 Tested up to: 6.9
-Stable tag: 2.8.0
+Stable tag: 2.9.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -124,6 +124,19 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.9.0 =
+* Downgrade actions/core (#815)
+* Performance: Consolidate redundant APIs into getCurrentTheme (#804)
+* Polish sidebar using Card component (#801)
+* Add basic e2e tests (#811)
+* Use wp-env for PHP unit test (#802)
+* Bump minimum required WordPress version to 6.8 (#803)
+* Code Quality: Migrate to husky v9 format (#800)
+* Update npm deps and fix pre-commit hook config (#809)
+* Add AGENTS.md file (#808)
+* I18n: Localise content attribute of the Read More block (#810)
+* Fix: Localize repeated background images in Cover block (#794) (#795)
 
 = 2.8.0 =
 * Update "Tested up to" version to 6.9 (#793)
