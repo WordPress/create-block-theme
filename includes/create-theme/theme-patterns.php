@@ -3,7 +3,7 @@
 class CBT_Theme_Patterns {
 	public static function pattern_from_template( $template, $new_slug = null ) {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
-		$template_slug   = str_replace( '*/', '* /', $template->slug );
+		$template_slug   = str_replace( '*/', '*&#47;', $template->slug );
 		$pattern_slug    = $theme_slug . '/' . $template_slug;
 		$pattern_content = <<<PHP
 		<?php
@@ -30,8 +30,8 @@ class CBT_Theme_Patterns {
 		$pattern->slug         = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
 		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
 		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
-		$pattern_title         = str_replace( '*/', '* /', $pattern->title );
-		$pattern_categories    = str_replace( '*/', '* /', $pattern->categories );
+		$pattern_title         = str_replace( '*/', '*&#47;', $pattern->title );
+		$pattern_categories    = str_replace( '*/', '*&#47;', $pattern->categories );
 		$pattern->content      = <<<PHP
 		<?php
 		/**
