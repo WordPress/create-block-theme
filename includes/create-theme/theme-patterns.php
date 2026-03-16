@@ -3,8 +3,8 @@
 class CBT_Theme_Patterns {
 	public static function pattern_from_template( $template, $new_slug = null ) {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
-		$pattern_slug    = $theme_slug . '/' . $template->slug;
 		$template_slug   = str_replace( '*/', '* /', $template->slug );
+		$pattern_slug    = $theme_slug . '/' . $template_slug;
 		$pattern_content = <<<PHP
 		<?php
 		/**
