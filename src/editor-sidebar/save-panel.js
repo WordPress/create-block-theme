@@ -134,25 +134,6 @@ export const SaveThemePanel = () => {
 					<CheckboxControl
 						__nextHasNoMarginBottom
 						label={ __(
-							'Save color slugs without the custom- prefix',
-							'create-block-theme'
-						) }
-						help={ __(
-							'Best for new blank themes. Leave this disabled if your existing content already uses custom- color slugs.',
-							'create-block-theme'
-						) }
-						disabled={ ! preference.saveStyle }
-						checked={
-							preference.saveStyle &&
-							preference.removeCustomColorPrefix
-						}
-						onChange={ () =>
-							handleTogglePreference( 'removeCustomColorPrefix' )
-						}
-					/>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __(
 							'Save Template Changes',
 							'create-block-theme'
 						) }
@@ -278,6 +259,25 @@ export const SaveThemePanel = () => {
 						checked={ preference.removeTaxQuery }
 						onChange={ () =>
 							handleTogglePreference( 'removeTaxQuery' )
+						}
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Remove the custom- prefix from color slugs',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Best for new blank themes. Leave this disabled if your existing content already uses custom- color slugs.',
+							'create-block-theme'
+						) }
+						disabled={ ! preference.saveStyle }
+						checked={
+							preference.saveStyle &&
+							preference.removeCustomColorPrefix
+						}
+						onChange={ () =>
+							handleTogglePreference( 'removeCustomColorPrefix' )
 						}
 					/>
 					<Button
