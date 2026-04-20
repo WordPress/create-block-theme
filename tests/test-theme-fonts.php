@@ -4,7 +4,9 @@
  *
  * @package Create_Block_Theme
  */
-class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
+require_once __DIR__ . '/class-create-block-theme-test-case.php';
+
+class Test_Create_Block_Theme_Fonts extends Create_Block_Theme_Test_Case {
 
 	protected static $admin_id;
 	protected static $editor_id;
@@ -380,33 +382,6 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		CBT_Theme_Fonts::persist_font_settings();
 	}
 
-	private function create_blank_theme() {
-
-		$test_theme_slug = 'cbttesttheme';
-
-		delete_theme( $test_theme_slug );
-
-		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/create-blank' );
-		$request->set_param( 'name', $test_theme_slug );
-		$request->set_param( 'description', '' );
-		$request->set_param( 'uri', '' );
-		$request->set_param( 'author', '' );
-		$request->set_param( 'author_uri', '' );
-		$request->set_param( 'tags_custom', '' );
-		$request->set_param( 'recommended_plugins', '' );
-
-		rest_do_request( $request );
-
-		CBT_Theme_JSON_Resolver::clean_cached_data();
-
-		return $test_theme_slug;
-	}
-
-	private function uninstall_theme( $theme_slug ) {
-		CBT_Theme_JSON_Resolver::write_user_settings( array() );
-		delete_theme( $theme_slug );
-	}
-
 	private function activate_user_font() {
 
 		$font_dir              = wp_get_font_dir();
@@ -499,4 +474,3 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $actual );
 	}
 }
-

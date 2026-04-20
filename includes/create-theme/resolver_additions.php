@@ -15,65 +15,53 @@ function cbt_augment_resolver_with_utilities() {
 		 *
 		 * @param string $content ['all', 'current', 'user'] Determines which settings content to include in the export.
 		 * @param array $extra_theme_data Any theme json extra data to be included in the export.
+		 * @param array $options Export options.
 		 * All options include user settings.
 		 * 'current' will include settings from the currently installed theme but NOT from the parent theme.
 		 * 'all' will include settings from the current theme as well as the parent theme (if it has one)
 		 * 'variation' will include just the user custom styles and settings.
 		 */
-		public static function export_theme_data( $content, $extra_theme_data = null ) {
+		public static function export_theme_data( $content, $extra_theme_data = null, $options = array() ) {
 			$current_theme = wp_get_theme();
-			if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-				$theme = new WP_Theme_JSON_Gutenberg();
-			} else {
-				$theme = new WP_Theme_JSON();
-			}
+			$theme         = static::create_theme_json();
 
 			if ( 'all' === $content && $current_theme->parent() ) {
 				// Get parent theme.json.
-				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
+				$parent_theme_json_data = static::get_theme_file_contents( true );
 				$parent_theme_json_data = static::translate( $parent_theme_json_data, $current_theme->parent()->get( 'TextDomain' ) );
 
 				// Get the schema from the parent JSON.
-				$schema = $parent_theme_json_data['$schema'];
-				if ( array_key_exists( 'schema', $parent_theme_json_data ) ) {
+				if ( array_key_exists( '$schema', $parent_theme_json_data ) ) {
 					$schema = $parent_theme_json_data['$schema'];
 				}
 
-				if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-					$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
-				} else {
-					$parent_theme = new WP_Theme_JSON( $parent_theme_json_data );
-				}
+				$parent_theme = static::create_theme_json( $parent_theme_json_data );
 				$theme->merge( $parent_theme );
 			}
 
 			if ( 'all' === $content || 'current' === $content ) {
-				$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+				$theme_json_data = static::get_theme_file_contents();
 				$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 
 				// Get the schema from the parent JSON.
-				if ( array_key_exists( 'schema', $theme_json_data ) ) {
+				if ( array_key_exists( '$schema', $theme_json_data ) ) {
 					$schema = $theme_json_data['$schema'];
 				}
 
-				if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-					$theme_theme = new WP_Theme_JSON_Gutenberg( $theme_json_data );
-				} else {
-					$theme_theme = new WP_Theme_JSON( $theme_json_data );
-				}
+				$theme_theme = static::create_theme_json( $theme_json_data );
 				$theme->merge( $theme_theme );
 			}
 
-			// Merge the User Data
-			$theme->merge( static::get_user_data() );
+			// Merge the User Data.
+			$user_data = static::get_user_data();
+			if ( ! empty( $options['removeCustomColorPrefix'] ) ) {
+				$user_data = static::maybe_remove_custom_prefix_from_user_color_palette_slugs( $user_data );
+			}
+			$theme->merge( $user_data );
 
 			// Merge the extra theme data received as a parameter
 			if ( ! empty( $extra_theme_data ) ) {
-				if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-					$extra_data = new WP_Theme_JSON_Gutenberg( $extra_theme_data );
-				} else {
-					$extra_data = new WP_Theme_JSON( $extra_theme_data );
-				}
+				$extra_data = static::create_theme_json( $extra_theme_data );
 				$theme->merge( $extra_data );
 			}
 
@@ -103,11 +91,122 @@ function cbt_augment_resolver_with_utilities() {
 		}
 
 		/**
+		 * Remove the custom- prefix from user-created color slugs when the theme
+		 * does not define its own color palette yet.
+		 *
+		 * WordPress stores colors added in the editor as custom presets. When a
+		 * blank theme has no palette, those first custom colors become the theme
+		 * palette after saving, so their generated custom- prefix is redundant.
+		 *
+		 * @param WP_Theme_JSON $user_data User theme JSON data.
+		 * @return WP_Theme_JSON User theme JSON data, with normalized color slugs when applicable.
+		 */
+		private static function maybe_remove_custom_prefix_from_user_color_palette_slugs( $user_data ) {
+			$theme_json_data = static::get_theme_file_contents();
+			$theme_palette   = $theme_json_data['settings']['color']['palette'] ?? null;
+
+			if ( ! empty( $theme_palette ) ) {
+				return $user_data;
+			}
+
+			$raw_user_data  = $user_data->get_raw_data();
+			$custom_palette = $raw_user_data['settings']['color']['palette']['custom'] ?? null;
+
+			if ( empty( $custom_palette ) || ! is_array( $custom_palette ) ) {
+				return $user_data;
+			}
+
+			$existing_slugs    = array_filter( array_column( $custom_palette, 'slug' ) );
+			$normalized_slugs  = array();
+			$slug_replacements = array();
+
+			foreach ( $custom_palette as $index => $color ) {
+				$color_slug = $color['slug'] ?? '';
+
+				if ( empty( $color_slug ) || 0 !== strpos( $color_slug, 'custom-' ) ) {
+					continue;
+				}
+
+				$slug_without_prefix = substr( $color_slug, strlen( 'custom-' ) );
+
+				if (
+					'' === $slug_without_prefix ||
+					in_array( $slug_without_prefix, $existing_slugs, true ) ||
+					in_array( $slug_without_prefix, $normalized_slugs, true )
+				) {
+					continue;
+				}
+
+				$custom_palette[ $index ]['slug'] = $slug_without_prefix;
+				$slug_replacements[ $color_slug ] = $slug_without_prefix;
+				$normalized_slugs[]               = $slug_without_prefix;
+			}
+
+			if ( empty( $slug_replacements ) ) {
+				return $user_data;
+			}
+
+			$raw_user_data['settings']['color']['palette']['custom'] = $custom_palette;
+
+			if ( isset( $raw_user_data['styles'] ) ) {
+				static::replace_color_slug_references( $raw_user_data['styles'], $slug_replacements );
+			}
+
+			return static::create_theme_json( $raw_user_data );
+		}
+
+		/**
+		 * Create the appropriate theme JSON object for the current environment.
+		 *
+		 * @param array $data Theme JSON data.
+		 * @return WP_Theme_JSON Theme JSON object.
+		 */
+		private static function create_theme_json( $data = array() ) {
+			return class_exists( 'WP_Theme_JSON_Gutenberg' )
+				? new WP_Theme_JSON_Gutenberg( $data )
+				: new WP_Theme_JSON( $data );
+		}
+
+		/**
+		 * Replace color slug references in style values after slug normalization.
+		 *
+		 * @param mixed $data Theme JSON style data.
+		 * @param array $slug_replacements Slug replacements keyed by original slug.
+		 */
+		private static function replace_color_slug_references( &$data, $slug_replacements ) {
+			if ( is_array( $data ) ) {
+				foreach ( $data as &$value ) {
+					static::replace_color_slug_references( $value, $slug_replacements );
+				}
+				unset( $value );
+				return;
+			}
+
+			if ( ! is_string( $data ) ) {
+				return;
+			}
+
+			foreach ( $slug_replacements as $old_slug => $new_slug ) {
+				$data = str_replace(
+					array(
+						'var:preset|color|' . $old_slug,
+						'var(--wp--preset--color--' . $old_slug . ')',
+					),
+					array(
+						'var:preset|color|' . $new_slug,
+						'var(--wp--preset--color--' . $new_slug . ')',
+					),
+					$data
+				);
+			}
+		}
+
+		/**
 		 * Get the user data.
 		 *
 		 * This is a copy of the parent function with the addition of the Gutenberg resolver.
 		 *
-		 * @return array
+		 * @return WP_Theme_JSON User theme JSON data.
 		 */
 		public static function get_user_data() {
 			// Determine the correct method to retrieve user data
@@ -128,8 +227,8 @@ function cbt_augment_resolver_with_utilities() {
 			return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $data );
 		}
 
-		public static function get_theme_file_contents() {
-			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+		public static function get_theme_file_contents( $parent = false ) {
+			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', $parent ) );
 			return $theme_json_data;
 		}
 

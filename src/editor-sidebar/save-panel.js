@@ -37,6 +37,8 @@ export const SaveThemePanel = () => {
 				_preference?.processOnlySavedTemplates ?? true,
 			savePatterns: _preference?.savePatterns ?? true,
 			saveFonts: _preference?.saveFonts ?? true,
+			removeCustomColorPrefix:
+				_preference?.removeCustomColorPrefix ?? false,
 			removeNavRefs: _preference?.removeNavRefs ?? false,
 			localizeText: _preference?.localizeText ?? false,
 			localizeImages: _preference?.localizeImages ?? false,
@@ -128,6 +130,25 @@ export const SaveThemePanel = () => {
 						) }
 						checked={ preference.saveStyle }
 						onChange={ () => handleTogglePreference( 'saveStyle' ) }
+					/>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Save color slugs without the custom- prefix',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Best for new blank themes. Leave this disabled if your existing content already uses custom- color slugs.',
+							'create-block-theme'
+						) }
+						disabled={ ! preference.saveStyle }
+						checked={
+							preference.saveStyle &&
+							preference.removeCustomColorPrefix
+						}
+						onChange={ () =>
+							handleTogglePreference( 'removeCustomColorPrefix' )
+						}
 					/>
 					<CheckboxControl
 						__nextHasNoMarginBottom
