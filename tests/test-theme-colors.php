@@ -96,7 +96,7 @@ class Test_Create_Block_Theme_Colors extends Create_Block_Theme_Test_Case {
 		$this->uninstall_theme( $test_theme_slug );
 	}
 
-	public function test_custom_color_prefix_is_preserved_when_theme_already_has_palette() {
+	public function test_custom_color_prefix_is_removed_when_option_is_enabled_for_theme_with_palette() {
 		wp_set_current_user( self::$admin_id );
 
 		$test_theme_slug = $this->create_blank_theme();
@@ -124,10 +124,52 @@ class Test_Create_Block_Theme_Colors extends Create_Block_Theme_Test_Case {
 		CBT_Theme_JSON::add_theme_json_to_local( 'all', array( 'removeCustomColorPrefix' => true ) );
 		CBT_Theme_JSON_Resolver::clean_cached_data();
 
-		$theme_data = CBT_Theme_JSON_Resolver::get_theme_data()->get_settings();
+		$theme_data = CBT_Theme_JSON_Resolver::get_theme_file_contents();
 
-		$this->assertEquals( 'base', $theme_data['color']['palette']['theme'][0]['slug'] );
-		$this->assertEquals( 'custom-accent', $theme_data['color']['palette']['theme'][1]['slug'] );
+		$this->assertEquals( 'base', $theme_data['settings']['color']['palette'][0]['slug'] );
+		$this->assertEquals( 'accent', $theme_data['settings']['color']['palette'][1]['slug'] );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_custom_color_prefix_is_preserved_when_normalized_slug_already_exists() {
+		wp_set_current_user( self::$admin_id );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$theme_json                                 = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+		$theme_json['settings']['color']['palette'] = array(
+			array(
+				'slug'  => 'base',
+				'name'  => 'Base',
+				'color' => '#2B2B2B',
+			),
+		);
+		CBT_Theme_JSON_Resolver::write_theme_file_contents( $theme_json );
+
+		$this->add_user_color_palette(
+			array(
+				array(
+					'slug'  => 'custom-base',
+					'name'  => 'Custom Base',
+					'color' => '#F5F0E8',
+				),
+			),
+			array(
+				'color' => array(
+					'background' => 'var:preset|color|custom-base',
+				),
+			)
+		);
+
+		CBT_Theme_JSON::add_theme_json_to_local( 'all', array( 'removeCustomColorPrefix' => true ) );
+		CBT_Theme_JSON_Resolver::clean_cached_data();
+
+		$theme_data = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+
+		$this->assertEquals( 'base', $theme_data['settings']['color']['palette'][0]['slug'] );
+		$this->assertEquals( 'custom-base', $theme_data['settings']['color']['palette'][1]['slug'] );
+		$this->assertEquals( 'var(--wp--preset--color--custom-base)', $theme_data['styles']['color']['background'] );
 
 		$this->uninstall_theme( $test_theme_slug );
 	}

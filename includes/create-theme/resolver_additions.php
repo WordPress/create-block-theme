@@ -91,23 +91,19 @@ function cbt_augment_resolver_with_utilities() {
 		}
 
 		/**
-		 * Remove the custom- prefix from user-created color slugs when the theme
-		 * does not define its own color palette yet.
+		 * Remove the custom- prefix from user-created color slugs when the
+		 * normalized slug does not conflict with an existing color slug.
 		 *
-		 * WordPress stores colors added in the editor as custom presets. When a
-		 * blank theme has no palette, those first custom colors become the theme
-		 * palette after saving, so their generated custom- prefix is redundant.
+		 * WordPress stores colors added in the editor as custom presets. When
+		 * those colors are saved to the theme palette, their generated custom-
+		 * prefix is redundant unless the unprefixed slug already exists.
 		 *
 		 * @param WP_Theme_JSON $user_data User theme JSON data.
 		 * @return WP_Theme_JSON User theme JSON data, with normalized color slugs when applicable.
 		 */
 		private static function maybe_remove_custom_prefix_from_user_color_palette_slugs( $user_data ) {
 			$theme_json_data = static::get_theme_file_contents();
-			$theme_palette   = $theme_json_data['settings']['color']['palette'] ?? null;
-
-			if ( ! empty( $theme_palette ) ) {
-				return $user_data;
-			}
+			$theme_palette   = $theme_json_data['settings']['color']['palette'] ?? array();
 
 			$raw_user_data  = $user_data->get_raw_data();
 			$custom_palette = $raw_user_data['settings']['color']['palette']['custom'] ?? null;
@@ -116,7 +112,10 @@ function cbt_augment_resolver_with_utilities() {
 				return $user_data;
 			}
 
-			$existing_slugs    = array_filter( array_column( $custom_palette, 'slug' ) );
+			$existing_slugs    = array_merge(
+				static::get_color_palette_slugs( $theme_palette ),
+				static::get_color_palette_slugs( $custom_palette )
+			);
 			$normalized_slugs  = array();
 			$slug_replacements = array();
 
@@ -153,6 +152,32 @@ function cbt_augment_resolver_with_utilities() {
 			}
 
 			return static::create_theme_json( $raw_user_data );
+		}
+
+		/**
+		 * Get color slugs from a theme.json palette.
+		 *
+		 * @param array $palette Color palette data.
+		 * @return array Color slugs.
+		 */
+		private static function get_color_palette_slugs( $palette ) {
+			if ( empty( $palette ) || ! is_array( $palette ) ) {
+				return array();
+			}
+
+			if ( isset( $palette[0] ) ) {
+				return array_filter( array_column( $palette, 'slug' ) );
+			}
+
+			$slugs = array();
+
+			foreach ( $palette as $palette_group ) {
+				if ( is_array( $palette_group ) ) {
+					$slugs = array_merge( $slugs, array_filter( array_column( $palette_group, 'slug' ) ) );
+				}
+			}
+
+			return $slugs;
 		}
 
 		/**
