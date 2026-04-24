@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+// eslint-disable-next-line import/no-unresolved -- Provided as an external at build time via @wordpress/dependency-extraction-webpack-plugin.
 import { addFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
