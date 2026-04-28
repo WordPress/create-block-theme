@@ -41,7 +41,10 @@ export function expandTypographyDefaults( typographySupport ) {
 	}
 	return {
 		...typographySupport,
-		__experimentalDefaultControls: defaults,
+		__experimentalDefaultControls: {
+			...( typographySupport.__experimentalDefaultControls ?? {} ),
+			...defaults,
+		},
 	};
 }
 

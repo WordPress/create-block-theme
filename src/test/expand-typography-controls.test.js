@@ -133,6 +133,21 @@ describe( 'expandTypographyDefaults', () => {
 		} );
 	} );
 
+	it( 'preserves unknown keys already set in __experimentalDefaultControls', () => {
+		const input = {
+			fontSize: true,
+			__experimentalDefaultControls: {
+				fontSize: false,
+				someFutureControl: true,
+			},
+		};
+		const result = expandTypographyDefaults( input );
+		expect( result.__experimentalDefaultControls ).toEqual( {
+			fontSize: true,
+			someFutureControl: true,
+		} );
+	} );
+
 	it( 'preserves other keys on the typography supports object', () => {
 		const input = {
 			fontSize: true,
