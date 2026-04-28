@@ -8,7 +8,8 @@ import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
-	PanelBody,
+	Card,
+	CardBody,
 	CheckboxControl,
 } from '@wordpress/components';
 
@@ -43,25 +44,27 @@ export const EditorPreferencesPanel = () => {
 	};
 
 	return (
-		<PanelBody>
+		<Card size="small" isBorderless>
 			<ScreenHeader
 				title={ __( 'Editor preferences', 'create-block-theme' ) }
 			/>
-			<VStack spacing={ 4 }>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __(
-						'Expand all typography controls in the block inspector',
-						'create-block-theme'
-					) }
-					help={ __(
-						'Shows every typography control by default instead of hiding them behind the ellipsis menu. Applies in the Site Editor only. The editor will reload when you change this.',
-						'create-block-theme'
-					) }
-					checked={ expandAllTypographyControls }
-					onChange={ handleToggle }
-				/>
-			</VStack>
-		</PanelBody>
+			<CardBody>
+				<VStack spacing={ 4 }>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __(
+							'Expand all typography controls in the block inspector',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Shows every typography control by default instead of hiding them behind the ellipsis menu. Applies in the Site Editor only. The editor will reload when you change this.',
+							'create-block-theme'
+						) }
+						checked={ expandAllTypographyControls }
+						onChange={ handleToggle }
+					/>
+				</VStack>
+			</CardBody>
+		</Card>
 	);
 };
