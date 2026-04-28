@@ -55,11 +55,11 @@ export const EditorPreferencesPanel = () => {
 					<CheckboxControl
 						__nextHasNoMarginBottom
 						label={ __(
-							'Expand all typography controls in the block inspector',
+							'Expand typography controls in the block inspector',
 							'create-block-theme'
 						) }
 						help={ __(
-							'Shows every typography control by default instead of hiding them behind the ellipsis menu. Applies in the Site Editor only. The editor will reload when you change this.',
+							'Shows the controls in the typography panel by default instead of hiding them behind the ellipsis menu. Applies in the Site Editor only. The editor will reload when you change this.',
 							'create-block-theme'
 						) }
 						checked={ expandAllTypographyControls }
