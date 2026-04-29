@@ -1,4 +1,11 @@
 /**
+ * Internal dependencies
+ */
+// Side-effect import — must load before block registration so the
+// registerBlockType filter is in place when blocks register.
+import './editor-enhancements/expand-typography-controls';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -39,6 +46,7 @@ import {
 	blockMeta,
 	help,
 	trash,
+	cog,
 } from '@wordpress/icons';
 
 /**
@@ -55,6 +63,7 @@ import { downloadExportedTheme } from './resolvers';
 import downloadFile from './utils/download-file';
 import AboutPlugin from './editor-sidebar/about';
 import ResetTheme from './editor-sidebar/reset-theme';
+import { EditorPreferencesPanel } from './editor-sidebar/editor-preferences-panel';
 import './plugin-styles.scss';
 
 function PluginSidebarItem( { icon, path, children, onClick } ) {
@@ -232,6 +241,20 @@ const CreateBlockThemePlugin = () => {
 							<CardBody>
 								<VStack spacing={ 0 }>
 									<PluginSidebarItem
+										path="/editor-preferences"
+										icon={ cog }
+									>
+										{ __(
+											'Editor preferences',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+								</VStack>
+							</CardBody>
+							<CardDivider />
+							<CardBody>
+								<VStack spacing={ 0 }>
+									<PluginSidebarItem
 										path="/about"
 										icon={ help }
 									>
@@ -328,6 +351,10 @@ const CreateBlockThemePlugin = () => {
 
 					<NavigatorScreen path="/reset">
 						<ResetTheme />
+					</NavigatorScreen>
+
+					<NavigatorScreen path="/editor-preferences">
+						<EditorPreferencesPanel />
 					</NavigatorScreen>
 				</NavigatorProvider>
 			</PluginSidebar>
