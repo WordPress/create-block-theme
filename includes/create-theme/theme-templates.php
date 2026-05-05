@@ -230,7 +230,7 @@ class CBT_Theme_Templates {
 			);
 
 			// Write the media assets if there are any
-			if ( $template->media ) {
+			if ( ! empty( $template->media ) ) {
 				CBT_Theme_Media::add_media_to_local( $template->media );
 			}
 
@@ -258,7 +258,7 @@ class CBT_Theme_Templates {
 			);
 
 			// Write the media assets if there are any
-			if ( $template->media ) {
+			if ( ! empty( $template->media ) ) {
 				CBT_Theme_Media::add_media_to_local( $template->media );
 			}
 
