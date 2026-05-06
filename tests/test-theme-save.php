@@ -130,10 +130,13 @@ class Test_Create_Block_Theme_Save extends WP_UnitTestCase {
 
 	public function falsy_flag_provider() {
 		return array(
-			'bool false'   => array( false ),
-			'int 0'        => array( 0 ),
-			'empty string' => array( '' ),
-			'null'         => array( null ),
+			'bool false'     => array( false ),
+			'int 0'          => array( 0 ),
+			'empty string'   => array( '' ),
+			'null'           => array( null ),
+			'string "false"' => array( 'false' ),
+			'string "FALSE"' => array( 'FALSE' ),
+			'string "0"'     => array( '0' ),
 		);
 	}
 

@@ -60,23 +60,27 @@ class CBT_Theme_Save {
 	}
 
 	/**
-	 * Normalize the save flags through a single ! empty() check.
+	 * Normalize the save flags through wp_validate_boolean().
 	 *
 	 * Collapses two prior issues: undefined-index notices when a flag was
 	 * read without isset() (notably processOnlySavedTemplates), and strict
 	 * `true ===` checks that rejected `1` / `"true"` / `"1"` from non-JS
-	 * callers.
+	 * callers (CLI, form-encoded REST clients).
+	 *
+	 * Uses wp_validate_boolean() rather than ! empty() so the string
+	 * "false" (commonly sent by query-string and form-encoded callers) is
+	 * treated as falsy, not truthy.
 	 *
 	 * @param array $options Raw options array.
 	 * @return array<string,bool> Normalized boolean flags.
 	 */
 	private static function normalize_flags( array $options ) {
 		return array(
-			'saveFonts'                 => ! empty( $options['saveFonts'] ),
-			'saveTemplates'             => ! empty( $options['saveTemplates'] ),
-			'processOnlySavedTemplates' => ! empty( $options['processOnlySavedTemplates'] ),
-			'saveStyle'                 => ! empty( $options['saveStyle'] ),
-			'savePatterns'              => ! empty( $options['savePatterns'] ),
+			'saveFonts'                 => wp_validate_boolean( $options['saveFonts'] ?? false ),
+			'saveTemplates'             => wp_validate_boolean( $options['saveTemplates'] ?? false ),
+			'processOnlySavedTemplates' => wp_validate_boolean( $options['processOnlySavedTemplates'] ?? false ),
+			'saveStyle'                 => wp_validate_boolean( $options['saveStyle'] ?? false ),
+			'savePatterns'              => wp_validate_boolean( $options['savePatterns'] ?? false ),
 		);
 	}
 }
