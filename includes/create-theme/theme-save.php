@@ -2,6 +2,12 @@
 /**
  * Theme Save
  *
+ * Service that persists user changes from the Editor to the active theme on
+ * disk. Shared by the REST endpoint at `/create-block-theme/v1/save` and any
+ * future non-REST callers (e.g. WP-CLI). The service does not perform
+ * capability or input-sanitization checks on its own — callers are
+ * responsible for those before invoking `run()`.
+ *
  * @package Create_Block_Theme
  */
 class CBT_Theme_Save {
@@ -14,6 +20,14 @@ class CBT_Theme_Save {
 	 * styles select scope ('user' / 'current' / 'all') based on
 	 * `processOnlySavedTemplates` and `is_child_theme()`. After all steps run,
 	 * the theme cache is invalidated once.
+	 *
+	 * Callers must enforce their own capability checks (e.g.
+	 * `current_user_can( 'edit_theme_options' )`) and sanitize any non-flag
+	 * values they place in `$options` that flow into downstream services
+	 * such as `CBT_Theme_Patterns::add_patterns_to_theme()` and
+	 * `CBT_Theme_Templates::add_templates_to_local()`. The REST endpoint
+	 * relies on the route's `permission_callback` and the framework's
+	 * sanitize layer; CLI and other callers must replicate that.
 	 *
 	 * @param array $options Options array with keys:
 	 *                       - saveFonts (bool)

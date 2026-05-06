@@ -2,6 +2,11 @@
 /**
  * Tests for CBT_Theme_Save service.
  *
+ * Note: cache invalidation (`wp_get_theme()->cache_delete()`) is intentionally
+ * not asserted here. Observing it would require either mocking the static
+ * `wp_get_theme()` helper or wiring up a counter via filters — both
+ * disproportionate to the value of locking in a single line of behavior.
+ *
  * @package Create_Block_Theme
  */
 class Test_Create_Block_Theme_Save extends WP_UnitTestCase {
