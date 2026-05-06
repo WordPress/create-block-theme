@@ -13,6 +13,7 @@ require_once __DIR__ . '/create-theme/theme-utils.php';
 require_once __DIR__ . '/create-theme/theme-readme.php';
 require_once __DIR__ . '/create-theme/theme-fonts.php';
 require_once __DIR__ . '/create-theme/theme-create.php';
+require_once __DIR__ . '/create-theme/theme-settings-save.php';
 
 /**
  * The api functionality of the plugin leveraged by the site editor UI.
@@ -63,6 +64,17 @@ class CBT_Theme_API {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_theme_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'create-block-theme/v1',
+			'/theme-settings',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_save_theme_settings' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_theme_options' );
 				},
@@ -390,6 +402,28 @@ class CBT_Theme_API {
 			array(
 				'status'  => 'SUCCESS',
 				'message' => __( 'Theme Saved.', 'create-block-theme' ),
+			)
+		);
+	}
+
+	/**
+	 * Persist a partial theme.json payload from the Edit Theme Settings modal.
+	 *
+	 * Accepts the keys `settings`, `customTemplates`, `templateParts`, and
+	 * `removedShadowDefaults`. Only keys present in the payload are written;
+	 * missing keys leave the existing theme.json untouched.
+	 */
+	function rest_save_theme_settings( $request ) {
+		$result = CBT_Theme_Settings_Save::run( $request->get_json_params() );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'status'     => 'SUCCESS',
+				'theme_json' => $result,
 			)
 		);
 	}
