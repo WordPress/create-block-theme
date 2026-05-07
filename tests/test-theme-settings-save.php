@@ -343,6 +343,56 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 		$this->assertSame( $payload, CBT_Theme_Settings_Save::validate( $payload ) );
 	}
 
+	public function test_validate_rejects_custom_template_entry_missing_title() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array( 'customTemplates' => array( array( 'name' => 'page-wide' ) ) )
+		);
+		$this->assertWPError( $result );
+		$this->assertStringContainsString( 'title', $result->get_error_message() );
+	}
+
+	public function test_validate_rejects_template_part_entry_missing_area() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array( 'templateParts' => array( array( 'name' => 'sidebar' ) ) )
+		);
+		$this->assertWPError( $result );
+		$this->assertStringContainsString( 'area', $result->get_error_message() );
+	}
+
+	public function test_validate_rejects_entry_with_empty_required_key() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array(
+				'customTemplates' => array(
+					array(
+						'name'  => 'page-wide',
+						'title' => '',
+					),
+				),
+			)
+		);
+		$this->assertWPError( $result );
+	}
+
+	public function test_validate_rejects_template_part_missing_name() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array( 'templateParts' => array( array( 'area' => 'header' ) ) )
+		);
+		$this->assertWPError( $result );
+		$this->assertStringContainsString( 'name', $result->get_error_message() );
+	}
+
+	public function test_validate_accepts_complete_template_part_entry() {
+		$payload = array(
+			'templateParts' => array(
+				array(
+					'name' => 'sidebar',
+					'area' => 'uncategorized',
+				),
+			),
+		);
+		$this->assertSame( $payload, CBT_Theme_Settings_Save::validate( $payload ) );
+	}
+
 	/* ---------------------------------------------------------------- *
 	 * run() — write-failure path
 	 *

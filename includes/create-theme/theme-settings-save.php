@@ -169,24 +169,42 @@ class CBT_Theme_Settings_Save {
 			}
 		}
 
-		// Validate `name` slugs on customTemplates and templateParts entries
-		// (the `name` field is used as the file-system slug, e.g. templates/<name>.html).
-		foreach ( array( 'customTemplates', 'templateParts' ) as $list_key ) {
+		// Validate required keys + slug format on customTemplates and templateParts
+		// entries. `name` is required on both (used as the file-system slug,
+		// e.g. templates/<name>.html). `area` is required on templateParts;
+		// `title` is required on customTemplates.
+		$entry_required_keys = array(
+			'customTemplates' => array( 'name', 'title' ),
+			'templateParts'   => array( 'name', 'area' ),
+		);
+		foreach ( $entry_required_keys as $list_key => $required_keys ) {
 			if ( ! isset( $payload[ $list_key ] ) ) {
 				continue;
 			}
 			foreach ( $payload[ $list_key ] as $entry ) {
-				if ( ! isset( $entry['name'] ) ) {
-					continue;
+				foreach ( $required_keys as $required_key ) {
+					if ( ! isset( $entry[ $required_key ] ) || ! is_string( $entry[ $required_key ] ) || '' === $entry[ $required_key ] ) {
+						return new WP_Error(
+							'cbt_invalid_payload',
+							sprintf(
+								/* translators: 1: list key, 2: required key */
+								__( 'Entries of "%1$s" must have a non-empty string "%2$s" field.', 'create-block-theme' ),
+								$list_key,
+								$required_key
+							),
+							array( 'status' => 400 )
+						);
+					}
 				}
-				if ( ! is_string( $entry['name'] ) || sanitize_key( $entry['name'] ) !== $entry['name'] || '' === $entry['name'] ) {
+				// `name` must be a valid slug (used as filename).
+				if ( sanitize_key( $entry['name'] ) !== $entry['name'] ) {
 					return new WP_Error(
 						'cbt_invalid_payload',
 						sprintf(
 							/* translators: 1: list key, 2: invalid name */
 							__( 'Invalid "%1$s" entry name "%2$s". Names must be lowercase alphanumeric with dashes or underscores.', 'create-block-theme' ),
 							$list_key,
-							is_scalar( $entry['name'] ) ? (string) $entry['name'] : '?'
+							$entry['name']
 						),
 						array( 'status' => 400 )
 					);
