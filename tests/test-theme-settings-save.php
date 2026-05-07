@@ -243,4 +243,153 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 		$slugs       = array_column( $out['settings']['shadow']['presets'], 'slug' );
 		$this->assertContains( 'my-custom-shadow', $slugs );
 	}
+
+	/* ---------------------------------------------------------------- *
+	 * sanitize() — context-aware (CSS values must round-trip)
+	 * ---------------------------------------------------------------- */
+
+	public function test_sanitize_preserves_complex_shadow_value() {
+		$shadow = '6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0)';
+		$out    = CBT_Theme_Settings_Save::sanitize(
+			array(
+				'settings' => array(
+					'shadow' => array(
+						'presets' => array(
+							array(
+								'slug'   => 'outlined',
+								'name'   => 'Outlined',
+								'shadow' => $shadow,
+							),
+						),
+					),
+				),
+			)
+		);
+		$this->assertSame( $shadow, $out['settings']['shadow']['presets'][0]['shadow'] );
+	}
+
+	public function test_sanitize_preserves_gradient_value() {
+		$gradient = 'linear-gradient(135deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)';
+		$out      = CBT_Theme_Settings_Save::sanitize(
+			array(
+				'settings' => array(
+					'color' => array(
+						'gradients' => array(
+							array(
+								'slug'     => 'vivid',
+								'name'     => 'Vivid',
+								'gradient' => $gradient,
+							),
+						),
+					),
+				),
+			)
+		);
+		$this->assertSame( $gradient, $out['settings']['color']['gradients'][0]['gradient'] );
+	}
+
+	public function test_sanitize_post_types_entries_are_slug_normalized() {
+		$out = CBT_Theme_Settings_Save::sanitize(
+			array(
+				'customTemplates' => array(
+					array(
+						'name'      => 'page-wide',
+						'title'     => 'Wide Page',
+						'postTypes' => array( 'Page', 'POST' ),
+					),
+				),
+			)
+		);
+		// `sanitize_key` lowercases.
+		$this->assertSame( array( 'page', 'post' ), $out['customTemplates'][0]['postTypes'] );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * validate() — slug rejection
+	 * ---------------------------------------------------------------- */
+
+	public function test_validate_rejects_removed_shadow_slug_with_invalid_chars() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array( 'removedShadowDefaults' => array( 'natural', 'has spaces' ) )
+		);
+		$this->assertWPError( $result );
+		$this->assertSame( 'cbt_invalid_payload', $result->get_error_code() );
+	}
+
+	public function test_validate_rejects_custom_template_name_with_invalid_chars() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array(
+				'customTemplates' => array(
+					array(
+						'name'  => 'Has Caps',
+						'title' => 'Caps Page',
+					),
+				),
+			)
+		);
+		$this->assertWPError( $result );
+	}
+
+	public function test_validate_accepts_well_formed_slugs() {
+		$payload = array(
+			'removedShadowDefaults' => array( 'natural', 'sharp_2' ),
+			'customTemplates'       => array(
+				array(
+					'name'  => 'page-wide-2',
+					'title' => 'Wide Page',
+				),
+			),
+		);
+		$this->assertSame( $payload, CBT_Theme_Settings_Save::validate( $payload ) );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * run() — write-failure path
+	 *
+	 * Verified via integration: a hardened service should surface a write
+	 * failure as WP_Error rather than returning the merged payload as if it
+	 * had been persisted. Smoke tests the unhappy path of
+	 * `CBT_Theme_JSON_Resolver::write_theme_file_contents`.
+	 * ---------------------------------------------------------------- */
+
+	public function test_run_returns_wp_error_on_write_failure() {
+		// Create a temp theme directory with a read-only theme.json. Point the
+		// resolver at it via the stylesheet_directory filter; file_put_contents
+		// will fail because the file is not writable, which the service must
+		// surface as WP_Error rather than reporting SUCCESS.
+		$tmp_dir    = sys_get_temp_dir() . '/cbt-test-' . uniqid();
+		$theme_json = $tmp_dir . '/theme.json';
+		mkdir( $tmp_dir );
+		file_put_contents( $theme_json, '{}' );
+		chmod( $theme_json, 0444 );
+		// Best-effort guard: skip if running as root (chmod is meaningless).
+		if ( is_writable( $theme_json ) ) {
+			chmod( $theme_json, 0644 );
+			unlink( $theme_json );
+			rmdir( $tmp_dir );
+			$this->markTestSkipped( 'Cannot make file read-only in this environment.' );
+		}
+
+		$filter = static function () use ( $tmp_dir ) {
+			return $tmp_dir;
+		};
+		add_filter( 'stylesheet_directory', $filter );
+		add_filter( 'template_directory', $filter );
+
+		$result = CBT_Theme_Settings_Save::run(
+			array( 'settings' => array( 'color' => array( 'custom' => true ) ) )
+		);
+
+		remove_filter( 'stylesheet_directory', $filter );
+		remove_filter( 'template_directory', $filter );
+
+		// Cleanup.
+		chmod( $theme_json, 0644 );
+		unlink( $theme_json );
+		rmdir( $tmp_dir );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'cbt_write_failed', $result->get_error_code() );
+		$this->assertSame( 500, $result->get_error_data()['status'] );
+	}
 }

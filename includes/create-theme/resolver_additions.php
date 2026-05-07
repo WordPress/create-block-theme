@@ -135,8 +135,13 @@ function cbt_augment_resolver_with_utilities() {
 
 		public static function write_theme_file_contents( $theme_json_data ) {
 			$theme_json = wp_json_encode( $theme_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-			file_put_contents( static::get_file_path_from_theme( 'theme.json' ), $theme_json );
+			// Suppress warnings so a permission/disk error returns false cleanly
+			// rather than emitting a PHP warning that may be promoted to an
+			// exception. Callers must check the boolean return value.
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			$bytes = @file_put_contents( static::get_file_path_from_theme( 'theme.json' ), $theme_json );
 			static::clean_cached_data();
+			return false !== $bytes;
 		}
 
 		public static function write_user_settings( $user_settings ) {

@@ -24,6 +24,23 @@ class CBT_Theme_Settings_Save {
 	);
 
 	/**
+	 * Keys whose string values are user-facing labels and benefit from
+	 * `sanitize_text_field()` (HTML stripping, whitespace normalization).
+	 */
+	const TEXT_FIELD_KEYS = array( 'name', 'title', 'label', 'description' );
+
+	/**
+	 * Keys whose string values are slug-formatted and pass through `sanitize_key()`.
+	 * Used for both leaf scalars and entries of slug-list keys (e.g., `postTypes`).
+	 */
+	const SLUG_FIELD_KEYS = array( 'slug', 'area' );
+
+	/**
+	 * Keys whose values are lists of slug strings (the entries — not the key — are slugs).
+	 */
+	const SLUG_LIST_KEYS = array( 'postTypes' );
+
+	/**
 	 * Persist a partial theme.json payload to the active theme's theme.json.
 	 *
 	 * @param array $payload Partial-theme.json payload from the modal.
@@ -49,7 +66,14 @@ class CBT_Theme_Settings_Save {
 			$merged = self::reify_shadow_removals( $merged, $sanitized['removedShadowDefaults'] );
 		}
 
-		CBT_Theme_JSON_Resolver::write_theme_file_contents( $merged );
+		$wrote = CBT_Theme_JSON_Resolver::write_theme_file_contents( $merged );
+		if ( true !== $wrote ) {
+			return new WP_Error(
+				'cbt_write_failed',
+				__( 'Failed to write theme.json. Check filesystem permissions on the active theme directory.', 'create-block-theme' ),
+				array( 'status' => 500 )
+			);
+		}
 
 		return $merged;
 	}
@@ -131,6 +155,42 @@ class CBT_Theme_Settings_Save {
 						array( 'status' => 400 )
 					);
 				}
+				if ( sanitize_key( $slug ) !== $slug || '' === $slug ) {
+					return new WP_Error(
+						'cbt_invalid_payload',
+						sprintf(
+							/* translators: %s: invalid slug */
+							__( 'Invalid shadow slug "%s". Slugs must be lowercase alphanumeric with dashes or underscores.', 'create-block-theme' ),
+							$slug
+						),
+						array( 'status' => 400 )
+					);
+				}
+			}
+		}
+
+		// Validate `name` slugs on customTemplates and templateParts entries
+		// (the `name` field is used as the file-system slug, e.g. templates/<name>.html).
+		foreach ( array( 'customTemplates', 'templateParts' ) as $list_key ) {
+			if ( ! isset( $payload[ $list_key ] ) ) {
+				continue;
+			}
+			foreach ( $payload[ $list_key ] as $entry ) {
+				if ( ! isset( $entry['name'] ) ) {
+					continue;
+				}
+				if ( ! is_string( $entry['name'] ) || sanitize_key( $entry['name'] ) !== $entry['name'] || '' === $entry['name'] ) {
+					return new WP_Error(
+						'cbt_invalid_payload',
+						sprintf(
+							/* translators: 1: list key, 2: invalid name */
+							__( 'Invalid "%1$s" entry name "%2$s". Names must be lowercase alphanumeric with dashes or underscores.', 'create-block-theme' ),
+							$list_key,
+							is_scalar( $entry['name'] ) ? (string) $entry['name'] : '?'
+						),
+						array( 'status' => 400 )
+					);
+				}
 			}
 		}
 
@@ -138,22 +198,44 @@ class CBT_Theme_Settings_Save {
 	}
 
 	/**
-	 * Recursively sanitize string leaves in the payload. Booleans and numbers
-	 * pass through; arrays recurse; strings are run through `sanitize_text_field`.
+	 * Recursively sanitize the payload, applying a context-aware sanitizer per
+	 * leaf based on the parent key.
 	 *
-	 * @param mixed $value
+	 * - `name`/`title`/`label`/`description` → `sanitize_text_field()` (HTML-stripped labels).
+	 * - `slug`/`area` → `sanitize_key()` (already validated to be slug-safe; this is belt-and-braces).
+	 * - Entries inside `postTypes` lists → `sanitize_key()`.
+	 * - Everything else (CSS values like `shadow`, `color`, `gradient`, `fontFamily`)
+	 *   → `wp_kses_no_null()` (strip NULL bytes only; preserve whitespace, parens, commas).
+	 *
+	 * Booleans and numbers pass through unchanged.
+	 *
+	 * @param mixed  $value      Value to sanitize.
+	 * @param string $parent_key The key under which `$value` lives (empty for the root).
+	 *                           For list entries, the list's key name.
 	 * @return mixed
 	 */
-	public static function sanitize( $value ) {
+	public static function sanitize( $value, $parent_key = '' ) {
 		if ( is_array( $value ) ) {
 			$out = array();
 			foreach ( $value as $k => $v ) {
-				$out[ $k ] = self::sanitize( $v );
+				// Associative-key children inherit their own key as context.
+				// List-entry children inherit the list's key as context.
+				$child_context = is_string( $k ) ? $k : $parent_key;
+				$out[ $k ]     = self::sanitize( $v, $child_context );
 			}
 			return $out;
 		}
 		if ( is_string( $value ) ) {
-			return sanitize_text_field( $value );
+			if ( in_array( $parent_key, self::TEXT_FIELD_KEYS, true ) ) {
+				return sanitize_text_field( $value );
+			}
+			if (
+				in_array( $parent_key, self::SLUG_FIELD_KEYS, true ) ||
+				in_array( $parent_key, self::SLUG_LIST_KEYS, true )
+			) {
+				return sanitize_key( $value );
+			}
+			return wp_kses_no_null( $value );
 		}
 		return $value;
 	}
