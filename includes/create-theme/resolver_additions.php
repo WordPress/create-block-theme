@@ -137,11 +137,14 @@ function cbt_augment_resolver_with_utilities() {
 			$theme_json = wp_json_encode( $theme_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 			$target     = static::get_file_path_from_theme( 'theme.json' );
 
-			// Atomic write: write to a sibling temp file, then rename into place.
-			// If the write or rename fails partway, the original theme.json is
-			// untouched. `file_put_contents` would truncate-then-write, leaving
-			// a corrupt file on interruption.
-			$tmp = $target . '.tmp';
+			// Atomic write with a request-unique temp file: write to a
+			// per-request sibling temp file, then rename into place. A
+			// per-request name prevents two concurrent saves from clobbering
+			// each other's staging payload (a shared `theme.json.tmp` is unsafe
+			// — request A could rename request B's truncated contents, or one
+			// could unlink the other's temp file mid-write). Each request
+			// cleans up only its own temp file on failure.
+			$tmp = $target . '.' . uniqid( '', true ) . '.tmp';
 			// Suppress warnings so a permission/disk error returns false cleanly
 			// rather than emitting a PHP warning that may be promoted to an
 			// exception. Callers must check the boolean return value.

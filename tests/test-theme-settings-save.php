@@ -473,6 +473,82 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 	}
 
 	/* ---------------------------------------------------------------- *
+	 * validate() — JSON shape (object vs list) enforcement
+	 *
+	 * PHP's `json_decode(..., true)` flattens `{}` and `[]` to the same empty
+	 * array, but a non-empty JSON list passed where an object is expected
+	 * (or vice versa) is detectable and should be rejected.
+	 * ---------------------------------------------------------------- */
+
+	public function test_validate_rejects_settings_passed_as_non_empty_list() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array( 'settings' => array( array( 'foo' => 'bar' ) ) )
+		);
+		$this->assertWPError( $result );
+		$this->assertStringContainsString( 'object', $result->get_error_message() );
+	}
+
+	public function test_validate_rejects_custom_templates_passed_as_object() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array(
+				'customTemplates' => array(
+					'page-wide' => array(
+						'name'  => 'page-wide',
+						'title' => 'Wide Page',
+					),
+				),
+			)
+		);
+		$this->assertWPError( $result );
+		$this->assertStringContainsString( 'list', $result->get_error_message() );
+	}
+
+	public function test_validate_rejects_removed_shadow_defaults_passed_as_object() {
+		$result = CBT_Theme_Settings_Save::validate(
+			array( 'removedShadowDefaults' => array( 'natural' => true ) )
+		);
+		$this->assertWPError( $result );
+	}
+
+	public function test_validate_accepts_empty_arrays_for_either_shape() {
+		// Empty arrays are intentionally permitted regardless of expected
+		// shape — they're handled in merge() (no-op for object positions,
+		// clear for list positions where the existing value is a list).
+		$payload = array(
+			'settings'              => array(),
+			'customTemplates'       => array(),
+			'templateParts'         => array(),
+			'removedShadowDefaults' => array(),
+		);
+		$this->assertSame( $payload, CBT_Theme_Settings_Save::validate( $payload ) );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * merge() — list normalization
+	 * ---------------------------------------------------------------- */
+
+	public function test_merge_writes_lists_with_sequential_keys() {
+		// Routes a proper list payload through the `is_list`-true branch and
+		// confirms it lands with sequential integer keys (i.e., emits as a
+		// JSON list, not an object, when serialized).
+		$current = array();
+		$payload = array(
+			'customTemplates' => array(
+				array(
+					'name'  => 'a',
+					'title' => 'A',
+				),
+				array(
+					'name'  => 'b',
+					'title' => 'B',
+				),
+			),
+		);
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertSame( array( 0, 1 ), array_keys( $out['customTemplates'] ) );
+	}
+
+	/* ---------------------------------------------------------------- *
 	 * run() — write-failure path
 	 *
 	 * Verified via integration: a hardened service should surface a write
@@ -518,7 +594,17 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 		rmdir( $tmp_dir );
 
 		$this->assertWPError( $result );
-		$this->assertSame( 'cbt_write_failed', $result->get_error_code() );
-		$this->assertSame( 500, $result->get_error_data()['status'] );
+		// A read-only theme directory blocks both lockfile creation and the
+		// atomic write. Accept either failure code; both are correct surfaces
+		// for "the filesystem said no" and both protect against the original
+		// silent-success bug.
+		$this->assertContains(
+			$result->get_error_code(),
+			array( 'cbt_lock_failed', 'cbt_write_failed' )
+		);
+		$this->assertContains(
+			(int) $result->get_error_data()['status'],
+			array( 500, 503 )
+		);
 	}
 }

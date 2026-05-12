@@ -13,9 +13,15 @@
  * invoking `run()`. The service performs payload-shape validation and
  * sanitization but does not authenticate.
  *
- * Known limitation: concurrent edits are last-write-wins. Two clients with
- * the modal open simultaneously will silently overwrite each other. ETag /
- * If-Match handling can be added if this becomes a problem in practice.
+ * Concurrent saves on a single host are serialized via `flock()` on a
+ * sibling lockfile (`theme.json.lock`), so disjoint edits from two clients
+ * compose correctly. The remaining limitation is conflicting same-key
+ * edits, which are still last-write-wins (the second save sees the first
+ * save's state after taking the lock, merges its payload on top, and the
+ * conflicting field gets the second client's value). Distributed hosts
+ * where `flock()` is not honored (some NFS configurations) degrade to
+ * best-effort. ETag / If-Match handling is a candidate follow-up if the
+ * remaining conflict case becomes a problem in practice.
  *
  * @package Create_Block_Theme
  * @see https://datatracker.ietf.org/doc/html/rfc7396 JSON Merge Patch
@@ -68,18 +74,51 @@ class CBT_Theme_Settings_Save {
 
 		$sanitized = self::sanitize( $validated );
 
-		$current = CBT_Theme_JSON_Resolver::get_theme_file_contents();
-		if ( ! is_array( $current ) ) {
-			$current = array();
+		// Serialize concurrent saves on a single host: hold an exclusive lock
+		// on a sibling lockfile around the read-merge-write sequence. This
+		// prevents two requests from reading stale state, merging in
+		// parallel, and one overwriting the other's disjoint changes. On
+		// distributed hosts where flock isn't honored (some NFS configs)
+		// this degrades to best-effort, hence the documented limitation.
+		$lock_path = get_stylesheet_directory() . '/theme.json.lock';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$lock_handle = @fopen( $lock_path, 'c' );
+		if ( false === $lock_handle ) {
+			return new WP_Error(
+				'cbt_lock_failed',
+				__( 'Could not acquire theme.json save lock. Check filesystem permissions on the active theme directory.', 'create-block-theme' ),
+				array( 'status' => 503 )
+			);
+		}
+		if ( ! flock( $lock_handle, LOCK_EX ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose( $lock_handle );
+			return new WP_Error(
+				'cbt_lock_failed',
+				__( 'Could not acquire theme.json save lock.', 'create-block-theme' ),
+				array( 'status' => 503 )
+			);
 		}
 
-		$merged = self::merge( $current, $sanitized );
+		try {
+			$current = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+			if ( ! is_array( $current ) ) {
+				$current = array();
+			}
 
-		if ( array_key_exists( 'removedShadowDefaults', $sanitized ) ) {
-			$merged = self::reify_shadow_removals( $merged, $sanitized['removedShadowDefaults'] );
+			$merged = self::merge( $current, $sanitized );
+
+			if ( array_key_exists( 'removedShadowDefaults', $sanitized ) ) {
+				$merged = self::reify_shadow_removals( $merged, $sanitized['removedShadowDefaults'] );
+			}
+
+			$wrote = CBT_Theme_JSON_Resolver::write_theme_file_contents( $merged );
+		} finally {
+			flock( $lock_handle, LOCK_UN );
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			fclose( $lock_handle );
 		}
 
-		$wrote = CBT_Theme_JSON_Resolver::write_theme_file_contents( $merged );
 		if ( true !== $wrote ) {
 			return new WP_Error(
 				'cbt_write_failed',
@@ -114,12 +153,24 @@ class CBT_Theme_Settings_Save {
 			}
 		}
 
-		if ( isset( $payload['settings'] ) && ! is_array( $payload['settings'] ) ) {
-			return new WP_Error(
-				'cbt_invalid_payload',
-				__( '"settings" must be an object.', 'create-block-theme' ),
-				array( 'status' => 400 )
-			);
+		if ( isset( $payload['settings'] ) ) {
+			if ( ! is_array( $payload['settings'] ) ) {
+				return new WP_Error(
+					'cbt_invalid_payload',
+					__( '"settings" must be an object.', 'create-block-theme' ),
+					array( 'status' => 400 )
+				);
+			}
+			// Reject JSON lists in an object position. Empty array is
+			// ambiguous in PHP (both `{}` and `[]` decode to `[]`) and is
+			// allowed — `merge()` handles it as a no-op.
+			if ( ! empty( $payload['settings'] ) && self::is_list( $payload['settings'] ) ) {
+				return new WP_Error(
+					'cbt_invalid_payload',
+					__( '"settings" must be an object, not a list.', 'create-block-theme' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 
 		foreach ( array( 'customTemplates', 'templateParts' ) as $list_key ) {
@@ -132,6 +183,19 @@ class CBT_Theme_Settings_Save {
 					sprintf(
 						/* translators: %s: payload key */
 						__( '"%s" must be an array.', 'create-block-theme' ),
+						$list_key
+					),
+					array( 'status' => 400 )
+				);
+			}
+			// Require a JSON list, not a JSON object. Empty array is ambiguous
+			// in PHP and is allowed.
+			if ( ! empty( $payload[ $list_key ] ) && ! self::is_list( $payload[ $list_key ] ) ) {
+				return new WP_Error(
+					'cbt_invalid_payload',
+					sprintf(
+						/* translators: %s: payload key */
+						__( '"%s" must be a list, not an object.', 'create-block-theme' ),
 						$list_key
 					),
 					array( 'status' => 400 )
@@ -157,6 +221,13 @@ class CBT_Theme_Settings_Save {
 				return new WP_Error(
 					'cbt_invalid_payload',
 					__( '"removedShadowDefaults" must be an array of slugs.', 'create-block-theme' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( ! empty( $payload['removedShadowDefaults'] ) && ! self::is_list( $payload['removedShadowDefaults'] ) ) {
+				return new WP_Error(
+					'cbt_invalid_payload',
+					__( '"removedShadowDefaults" must be a list, not an object.', 'create-block-theme' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -333,6 +404,10 @@ class CBT_Theme_Settings_Save {
 				! self::is_list( $result[ $key ] )
 			) {
 				$result[ $key ] = self::merge( $result[ $key ], $value );
+			} elseif ( is_array( $value ) && self::is_list( $value ) ) {
+				// Normalize lists to a contiguous index. Defends against any
+				// sparse-keyed array slipping past validation.
+				$result[ $key ] = array_values( $value );
 			} else {
 				$result[ $key ] = $value;
 			}
