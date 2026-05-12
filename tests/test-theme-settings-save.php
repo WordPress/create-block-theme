@@ -199,6 +199,85 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 	}
 
 	/* ---------------------------------------------------------------- *
+	 * merge() — RFC 7396 semantics
+	 * ---------------------------------------------------------------- */
+
+	public function test_merge_null_deletes_existing_key() {
+		$current = array(
+			'settings' => array(
+				'color' => array(
+					'custom'         => true,
+					'defaultPalette' => true,
+				),
+			),
+		);
+		$payload = array(
+			'settings' => array( 'color' => array( 'custom' => null ) ),
+		);
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertArrayNotHasKey( 'custom', $out['settings']['color'] );
+		$this->assertTrue( $out['settings']['color']['defaultPalette'] );
+	}
+
+	public function test_merge_null_for_missing_key_is_no_op() {
+		$current = array( 'settings' => array( 'color' => array( 'custom' => true ) ) );
+		$payload = array( 'settings' => array( 'color' => array( 'doesNotExist' => null ) ) );
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertTrue( $out['settings']['color']['custom'] );
+		$this->assertArrayNotHasKey( 'doesNotExist', $out['settings']['color'] );
+	}
+
+	public function test_merge_empty_object_at_top_level_is_no_op() {
+		// The footgun the JSON-Merge-Patch contract closes: `settings: {}` must
+		// not wipe everything in the existing settings tree.
+		$current = array(
+			'settings' => array(
+				'color'   => array( 'custom' => true ),
+				'spacing' => array( 'padding' => true ),
+			),
+		);
+		$payload = array( 'settings' => array() );
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertSame( $current, $out );
+	}
+
+	public function test_merge_empty_object_nested_is_no_op() {
+		$current = array(
+			'settings' => array(
+				'color' => array(
+					'custom'  => true,
+					'palette' => array( array( 'slug' => 'a' ) ),
+				),
+			),
+		);
+		$payload = array( 'settings' => array( 'color' => array() ) );
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertSame( $current, $out );
+	}
+
+	public function test_merge_empty_for_existing_list_still_clears() {
+		// `palette: []` should still clear the palette, because palette is a
+		// list (its current value is a sequential array).
+		$current = array(
+			'settings' => array(
+				'color' => array( 'palette' => array( array( 'slug' => 'a' ) ) ),
+			),
+		);
+		$payload = array( 'settings' => array( 'color' => array( 'palette' => array() ) ) );
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertSame( array(), $out['settings']['color']['palette'] );
+	}
+
+	public function test_merge_empty_for_missing_list_is_no_op() {
+		// payload `customTemplates: []` against a theme.json that doesn't have
+		// a customTemplates key at all → no-op (don't create an empty list).
+		$current = array( 'settings' => array() );
+		$payload = array( 'customTemplates' => array() );
+		$out     = CBT_Theme_Settings_Save::merge( $current, $payload );
+		$this->assertArrayNotHasKey( 'customTemplates', $out );
+	}
+
+	/* ---------------------------------------------------------------- *
 	 * reify_shadow_removals()
 	 * ---------------------------------------------------------------- */
 
@@ -403,21 +482,21 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 	 * ---------------------------------------------------------------- */
 
 	public function test_run_returns_wp_error_on_write_failure() {
-		// Create a temp theme directory with a read-only theme.json. Point the
-		// resolver at it via the stylesheet_directory filter; file_put_contents
-		// will fail because the file is not writable, which the service must
-		// surface as WP_Error rather than reporting SUCCESS.
+		// Create a temp theme directory with a theme.json, then make the
+		// directory read-only so the atomic write (write-temp-then-rename)
+		// can't create its `theme.json.tmp` sibling. The service must surface
+		// the failure as WP_Error rather than reporting SUCCESS.
 		$tmp_dir    = sys_get_temp_dir() . '/cbt-test-' . uniqid();
 		$theme_json = $tmp_dir . '/theme.json';
 		mkdir( $tmp_dir );
 		file_put_contents( $theme_json, '{}' );
-		chmod( $theme_json, 0444 );
+		chmod( $tmp_dir, 0555 );
 		// Best-effort guard: skip if running as root (chmod is meaningless).
-		if ( is_writable( $theme_json ) ) {
-			chmod( $theme_json, 0644 );
+		if ( is_writable( $tmp_dir ) ) {
+			chmod( $tmp_dir, 0755 );
 			unlink( $theme_json );
 			rmdir( $tmp_dir );
-			$this->markTestSkipped( 'Cannot make file read-only in this environment.' );
+			$this->markTestSkipped( 'Cannot make directory read-only in this environment.' );
 		}
 
 		$filter = static function () use ( $tmp_dir ) {
@@ -434,7 +513,7 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 		remove_filter( 'template_directory', $filter );
 
 		// Cleanup.
-		chmod( $theme_json, 0644 );
+		chmod( $tmp_dir, 0755 );
 		unlink( $theme_json );
 		rmdir( $tmp_dir );
 

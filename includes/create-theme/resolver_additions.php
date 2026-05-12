@@ -135,13 +135,34 @@ function cbt_augment_resolver_with_utilities() {
 
 		public static function write_theme_file_contents( $theme_json_data ) {
 			$theme_json = wp_json_encode( $theme_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			$target     = static::get_file_path_from_theme( 'theme.json' );
+
+			// Atomic write: write to a sibling temp file, then rename into place.
+			// If the write or rename fails partway, the original theme.json is
+			// untouched. `file_put_contents` would truncate-then-write, leaving
+			// a corrupt file on interruption.
+			$tmp = $target . '.tmp';
 			// Suppress warnings so a permission/disk error returns false cleanly
 			// rather than emitting a PHP warning that may be promoted to an
 			// exception. Callers must check the boolean return value.
 			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			$bytes = @file_put_contents( static::get_file_path_from_theme( 'theme.json' ), $theme_json );
+			$bytes = @file_put_contents( $tmp, $theme_json );
+			if ( false === $bytes ) {
+				return false;
+			}
+
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! @rename( $tmp, $target ) ) {
+				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				@unlink( $tmp );
+				return false;
+			}
+
 			static::clean_cached_data();
-			return false !== $bytes;
+			// Bust the WP-level theme cache too — `clean_cached_data()` only
+			// clears the JSON resolver's caches, not `wp_get_theme()`.
+			wp_get_theme()->cache_delete();
+			return true;
 		}
 
 		public static function write_user_settings( $user_settings ) {

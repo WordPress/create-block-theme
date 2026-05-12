@@ -4,15 +4,21 @@
  *
  * Persists Edit Theme Settings modal payloads to the active theme's theme.json.
  * Accepts a partial-`theme.json` payload (only the keys the user edited),
- * deep-merges it into the existing file, and writes the result. Reifies the
- * `removedShadowDefaults` operational key into the standard
- * `settings.shadow.defaultPresets` + `settings.shadow.presets` shape.
+ * deep-merges it into the existing file using JSON Merge Patch semantics
+ * (RFC 7396), and writes the result. Reifies the `removedShadowDefaults`
+ * operational key into the standard `settings.shadow.defaultPresets` +
+ * `settings.shadow.presets` shape.
  *
  * Callers must enforce capability checks (`edit_theme_options`) before
  * invoking `run()`. The service performs payload-shape validation and
  * sanitization but does not authenticate.
  *
+ * Known limitation: concurrent edits are last-write-wins. Two clients with
+ * the modal open simultaneously will silently overwrite each other. ETag /
+ * If-Match handling can be added if this becomes a problem in practice.
+ *
  * @package Create_Block_Theme
+ * @see https://datatracker.ietf.org/doc/html/rfc7396 JSON Merge Patch
  */
 class CBT_Theme_Settings_Save {
 
@@ -26,6 +32,13 @@ class CBT_Theme_Settings_Save {
 	/**
 	 * Keys whose string values are user-facing labels and benefit from
 	 * `sanitize_text_field()` (HTML stripping, whitespace normalization).
+	 *
+	 * This is an allowlist. Adding a new label-class field to theme.json
+	 * upstream means adding it here — otherwise it falls through to
+	 * `wp_kses_no_null` and HTML will not be stripped. Trade-off accepted:
+	 * the inverse rule ("strip HTML by default, allowlist CSS-value fields")
+	 * silently corrupts CSS for new fields, which is worse than missing a
+	 * label sanitization update.
 	 */
 	const TEXT_FIELD_KEYS = array( 'name', 'title', 'label', 'description' );
 
@@ -259,11 +272,28 @@ class CBT_Theme_Settings_Save {
 	}
 
 	/**
-	 * Deep-merge $payload into $current. At every level, associative-array
-	 * values are merged recursively; lists, scalars, and empty arrays replace
-	 * the existing value. Missing parent keys are created.
+	 * Deep-merge $payload into $current using JSON Merge Patch (RFC 7396)
+	 * semantics, with one PHP-imposed accommodation.
 	 *
-	 * The operational key `removedShadowDefaults` is dropped here — it's
+	 * Rules:
+	 *
+	 * - **`null` deletes the key.** Sending `{"settings":{"color":{"custom":null}}}`
+	 *   removes `settings.color.custom` from the result. Deleting a missing
+	 *   key is a no-op.
+	 * - **Empty object (`{}`) is a no-op.** Per RFC 7396, an empty object means
+	 *   "no change at this key." PHP cannot distinguish a JSON `{}` from a JSON
+	 *   `[]` after `json_decode(..., true)` (both become empty PHP arrays), so
+	 *   we use a heuristic: if the existing value at this key is a list, an
+	 *   empty payload value clears that list; otherwise it is treated as a
+	 *   no-op. This means clients that intend to clear a list MUST already
+	 *   know the field is list-typed (which is how the modal is built).
+	 * - **Associative-object values are merged recursively.** Leaves replace.
+	 * - **List values replace wholesale** — RFC 7396 does not support
+	 *   per-element list patching. To remove one palette entry, send the full
+	 *   new palette.
+	 * - **Missing parent keys are created** when assigning into them.
+	 *
+	 * The operational key `removedShadowDefaults` is skipped here — it's
 	 * handled separately by `reify_shadow_removals()`.
 	 *
 	 * @param array $current
@@ -276,6 +306,25 @@ class CBT_Theme_Settings_Save {
 			if ( 'removedShadowDefaults' === $key ) {
 				continue;
 			}
+
+			// RFC 7396: null deletes the key.
+			if ( null === $value ) {
+				unset( $result[ $key ] );
+				continue;
+			}
+
+			// Empty array: RFC 7396 says `{}` is a no-op. PHP can't tell `{}`
+			// from `[]`, so we infer intent from the existing value:
+			//   - existing value is a list → caller intends to clear it.
+			//   - otherwise (existing is assoc, missing, or scalar) → no-op.
+			if ( is_array( $value ) && empty( $value ) ) {
+				if ( isset( $result[ $key ] ) && is_array( $result[ $key ] ) && self::is_list( $result[ $key ] ) ) {
+					$result[ $key ] = array();
+				}
+				continue;
+			}
+
+			// Deep merge associative-object → associative-object.
 			if (
 				is_array( $value ) &&
 				! self::is_list( $value ) &&
