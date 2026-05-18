@@ -135,7 +135,14 @@ function cbt_augment_resolver_with_utilities() {
 
 		public static function write_theme_file_contents( $theme_json_data ) {
 			$theme_json = wp_json_encode( $theme_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-			$target     = static::get_file_path_from_theme( 'theme.json' );
+			// `wp_json_encode` returns false if the data contains an
+			// unencodable value (resources, NAN/INF after wrapping, etc.).
+			// Bail before opening a temp file so theme.json is never
+			// truncated or replaced with empty content.
+			if ( false === $theme_json ) {
+				return false;
+			}
+			$target = static::get_file_path_from_theme( 'theme.json' );
 
 			// Atomic write with a request-unique temp file: write to a
 			// per-request sibling temp file, then rename into place. A

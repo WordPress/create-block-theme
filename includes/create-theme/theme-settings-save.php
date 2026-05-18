@@ -75,12 +75,16 @@ class CBT_Theme_Settings_Save {
 		$sanitized = self::sanitize( $validated );
 
 		// Serialize concurrent saves on a single host: hold an exclusive lock
-		// on a sibling lockfile around the read-merge-write sequence. This
-		// prevents two requests from reading stale state, merging in
-		// parallel, and one overwriting the other's disjoint changes. On
-		// distributed hosts where flock isn't honored (some NFS configs)
-		// this degrades to best-effort, hence the documented limitation.
-		$lock_path = get_stylesheet_directory() . '/theme.json.lock';
+		// on a process-temp lockfile (scoped by theme slug) around the
+		// read-merge-write sequence. This prevents two requests from reading
+		// stale state, merging in parallel, and one overwriting the other's
+		// disjoint changes. On distributed hosts where flock isn't honored
+		// (some NFS configs) this degrades to best-effort, hence the
+		// documented limitation.
+		//
+		// Stored in `get_temp_dir()` rather than the theme directory so the
+		// file isn't included in theme exports.
+		$lock_path = get_temp_dir() . 'cbt-theme-settings-' . md5( get_stylesheet() ) . '.lock';
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$lock_handle = @fopen( $lock_path, 'c' );
 		if ( false === $lock_handle ) {

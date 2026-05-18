@@ -607,4 +607,48 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 			array( 500, 503 )
 		);
 	}
+
+	/* ---------------------------------------------------------------- *
+	 * writer — encoding-failure path must not touch the existing file
+	 * ---------------------------------------------------------------- */
+
+	public function test_writer_does_not_overwrite_on_encoding_failure() {
+		// Set up a temp theme directory with a known theme.json. Point the
+		// resolver at it via the stylesheet_directory filter. Call the writer
+		// with an unencodable payload (a PHP resource). The writer must
+		// return false and leave the original theme.json byte-for-byte
+		// untouched. Guards against the bug where wp_json_encode returns
+		// false and we'd otherwise truncate the existing file or write an
+		// empty string in its place.
+		$tmp_dir       = sys_get_temp_dir() . '/cbt-encode-test-' . uniqid();
+		$theme_json    = $tmp_dir . '/theme.json';
+		$known_content = '{"version":3,"settings":{"existing":"data"}}';
+		mkdir( $tmp_dir );
+		file_put_contents( $theme_json, $known_content );
+
+		$filter = static function () use ( $tmp_dir ) {
+			return $tmp_dir;
+		};
+		add_filter( 'stylesheet_directory', $filter );
+		add_filter( 'template_directory', $filter );
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$resource = fopen( 'php://memory', 'r' );
+		$payload  = array( 'unencodable' => $resource );
+		$result   = CBT_Theme_JSON_Resolver::write_theme_file_contents( $payload );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+		fclose( $resource );
+
+		remove_filter( 'stylesheet_directory', $filter );
+		remove_filter( 'template_directory', $filter );
+
+		$on_disk = file_get_contents( $theme_json );
+
+		// Cleanup before asserts so the temp tree is removed even if asserts fail.
+		unlink( $theme_json );
+		rmdir( $tmp_dir );
+
+		$this->assertFalse( $result, 'Writer should return false when wp_json_encode fails.' );
+		$this->assertSame( $known_content, $on_disk, 'theme.json must be byte-for-byte unchanged on encode failure.' );
+	}
 }
