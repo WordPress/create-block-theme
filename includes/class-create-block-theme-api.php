@@ -414,7 +414,20 @@ class CBT_Theme_API {
 	 * missing keys leave the existing theme.json untouched.
 	 */
 	function rest_save_theme_settings( $request ) {
-		$result = CBT_Theme_Settings_Save::run( $request->get_json_params() );
+		// `get_json_params()` returns null (or a scalar) for empty or
+		// non-object request bodies. The service signature requires an array,
+		// so guard here and return a 400 rather than letting the type hint
+		// fatal at the service boundary.
+		$payload = $request->get_json_params();
+		if ( ! is_array( $payload ) ) {
+			return new WP_Error(
+				'cbt_invalid_payload',
+				__( 'Request body must be a JSON object.', 'create-block-theme' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$result = CBT_Theme_Settings_Save::run( $payload );
 
 		if ( is_wp_error( $result ) ) {
 			return $result;

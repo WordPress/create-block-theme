@@ -651,4 +651,76 @@ class Test_CBT_Theme_Settings_Save extends WP_UnitTestCase {
 		$this->assertFalse( $result, 'Writer should return false when wp_json_encode fails.' );
 		$this->assertSame( $known_content, $on_disk, 'theme.json must be byte-for-byte unchanged on encode failure.' );
 	}
+
+	/* ---------------------------------------------------------------- *
+	 * REST handler — malformed request bodies must return 400, not 500
+	 * ---------------------------------------------------------------- */
+
+	public function test_rest_handler_rejects_empty_body() {
+		// An empty body decodes to null. Without the handler-level guard,
+		// the service signature would TypeError on `array $payload`.
+		$api     = new CBT_Theme_API();
+		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/theme-settings' );
+		$result  = $api->rest_save_theme_settings( $request );
+		$this->assertWPError( $result );
+		$this->assertSame( 'cbt_invalid_payload', $result->get_error_code() );
+		$this->assertSame( 400, $result->get_error_data()['status'] );
+	}
+
+	public function test_rest_handler_rejects_scalar_body() {
+		$api     = new CBT_Theme_API();
+		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/theme-settings' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( '42' );
+		$result = $api->rest_save_theme_settings( $request );
+		$this->assertWPError( $result );
+		$this->assertSame( 400, $result->get_error_data()['status'] );
+	}
+
+	public function test_rest_handler_rejects_null_body() {
+		$api     = new CBT_Theme_API();
+		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/theme-settings' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( 'null' );
+		$result = $api->rest_save_theme_settings( $request );
+		$this->assertWPError( $result );
+		$this->assertSame( 400, $result->get_error_data()['status'] );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * run() — `removedShadowDefaults: null` is a no-op, not a TypeError
+	 * ---------------------------------------------------------------- */
+
+	public function test_run_treats_null_removed_shadow_defaults_as_no_op() {
+		// Set up a temp theme directory so run() can complete its write.
+		$tmp_dir    = sys_get_temp_dir() . '/cbt-null-rsd-test-' . uniqid();
+		$theme_json = $tmp_dir . '/theme.json';
+		mkdir( $tmp_dir );
+		file_put_contents( $theme_json, '{}' );
+
+		$filter = static function () use ( $tmp_dir ) {
+			return $tmp_dir;
+		};
+		add_filter( 'stylesheet_directory', $filter );
+		add_filter( 'template_directory', $filter );
+
+		$result = CBT_Theme_Settings_Save::run(
+			array(
+				'settings'              => array( 'color' => array( 'custom' => true ) ),
+				'removedShadowDefaults' => null,
+			)
+		);
+
+		remove_filter( 'stylesheet_directory', $filter );
+		remove_filter( 'template_directory', $filter );
+
+		// Cleanup.
+		unlink( $theme_json );
+		rmdir( $tmp_dir );
+
+		// Should not WP_Error and should not have reified — shadow section
+		// should be absent from the merged result because reify never ran.
+		$this->assertIsArray( $result );
+		$this->assertArrayNotHasKey( 'shadow', $result['settings'] ?? array() );
+	}
 }

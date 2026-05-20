@@ -112,7 +112,13 @@ class CBT_Theme_Settings_Save {
 
 			$merged = self::merge( $current, $sanitized );
 
-			if ( array_key_exists( 'removedShadowDefaults', $sanitized ) ) {
+			// `isset()` (not `array_key_exists()`): the operational reify only
+			// runs when a real array of slugs was supplied. A `null` value at
+			// this key is treated as absent — equivalent to omitting the key
+			// from the payload entirely. This prevents `removedShadowDefaults:
+			// null` from reaching `reify_shadow_removals()` and violating its
+			// `array $removed_slugs` type.
+			if ( isset( $sanitized['removedShadowDefaults'] ) ) {
 				$merged = self::reify_shadow_removals( $merged, $sanitized['removedShadowDefaults'] );
 			}
 
@@ -136,8 +142,9 @@ class CBT_Theme_Settings_Save {
 
 	/**
 	 * Validate payload shape. Rejects unknown top-level keys and shape
-	 * mismatches. Returns the payload with the operational key extracted but
-	 * otherwise unchanged on success.
+	 * mismatches. Returns the payload unchanged on success. The operational
+	 * `removedShadowDefaults` key is handled later — skipped by `merge()` and
+	 * applied separately by `reify_shadow_removals()`.
 	 *
 	 * @param array $payload Raw payload from the request.
 	 * @return array|WP_Error
@@ -365,7 +372,10 @@ class CBT_Theme_Settings_Save {
 	 * - **Associative-object values are merged recursively.** Leaves replace.
 	 * - **List values replace wholesale** — RFC 7396 does not support
 	 *   per-element list patching. To remove one palette entry, send the full
-	 *   new palette.
+	 *   new palette. This means a caller editing only one entry must round-trip
+	 *   the entire list, so a non-modal caller (e.g., a hypothetical WP-CLI
+	 *   command per #828) needs to read-modify-write to avoid clobbering other
+	 *   entries. Intentional under the modal-owns-canonical-list design.
 	 * - **Missing parent keys are created** when assigning into them.
 	 *
 	 * The operational key `removedShadowDefaults` is skipped here — it's
