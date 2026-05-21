@@ -533,13 +533,16 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 						className="create-block-theme__edit-theme-settings-modal__disclaimer"
 					>
 						<div>
-							{ sprintf(
-								/* translators: %s: comma-separated list of customized sections (e.g. "color, typography") */
-								__(
-									'You have changes in the Site Editor that haven’t been written to theme.json: %s.',
-									'create-block-theme'
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: %s: comma-separated list of customized sections, wrapped in <list></list> (e.g. "color, typography") */
+									__(
+										'You have changes in the Site Editor that haven’t been written to theme.json: <list>%s</list>.',
+										'create-block-theme'
+									),
+									customizedSections.join( ', ' )
 								),
-								customizedSections.join( ', ' )
+								{ list: <strong /> }
 							) }
 						</div>
 						<div>
