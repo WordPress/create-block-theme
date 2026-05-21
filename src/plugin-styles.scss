@@ -50,3 +50,14 @@ $modal-footer-height: 70px;
 	margin-bottom: 8px;
 }
 
+.cbt-palette-column-headers {
+	padding: 0 12px;
+
+	&__swatch,
+	&__remove {
+		display: inline-block;
+		width: 24px;
+		flex-shrink: 0;
+	}
+}
+

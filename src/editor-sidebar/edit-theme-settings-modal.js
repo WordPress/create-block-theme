@@ -232,18 +232,44 @@ const PalettePanel = ( { value, onChange } ) => {
 				/>
 			</HStack>
 			{ value.length > 0 && (
-				<ItemGroup isBordered isSeparated>
-					{ value.map( ( entry, index ) => (
-						<PaletteRow
-							key={ index }
-							entry={ entry }
-							onUpdate={ ( updated ) =>
-								updateEntry( index, updated )
-							}
-							onRemove={ () => removeEntry( index ) }
+				<>
+					<HStack
+						className="cbt-palette-column-headers"
+						alignment="center"
+						spacing={ 3 }
+					>
+						<span
+							className="cbt-palette-column-headers__swatch"
+							aria-hidden="true"
 						/>
-					) ) }
-				</ItemGroup>
+						<FlexBlock>
+							<BaseControl.VisualLabel>
+								{ __( 'Name', 'create-block-theme' ) }
+							</BaseControl.VisualLabel>
+						</FlexBlock>
+						<FlexBlock>
+							<BaseControl.VisualLabel>
+								{ __( 'Slug', 'create-block-theme' ) }
+							</BaseControl.VisualLabel>
+						</FlexBlock>
+						<span
+							className="cbt-palette-column-headers__remove"
+							aria-hidden="true"
+						/>
+					</HStack>
+					<ItemGroup isBordered isSeparated>
+						{ value.map( ( entry, index ) => (
+							<PaletteRow
+								key={ index }
+								entry={ entry }
+								onUpdate={ ( updated ) =>
+									updateEntry( index, updated )
+								}
+								onRemove={ () => removeEntry( index ) }
+							/>
+						) ) }
+					</ItemGroup>
+				</>
 			) }
 		</VStack>
 	);
