@@ -135,8 +135,44 @@ function cbt_augment_resolver_with_utilities() {
 
 		public static function write_theme_file_contents( $theme_json_data ) {
 			$theme_json = wp_json_encode( $theme_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-			file_put_contents( static::get_file_path_from_theme( 'theme.json' ), $theme_json );
+			// `wp_json_encode` returns false if the data contains an
+			// unencodable value (resources, NAN/INF after wrapping, etc.).
+			// Bail before opening a temp file so theme.json is never
+			// truncated or replaced with empty content.
+			if ( false === $theme_json ) {
+				return false;
+			}
+			$target = static::get_file_path_from_theme( 'theme.json' );
+
+			// Atomic write with a request-unique temp file: write to a
+			// per-request sibling temp file, then rename into place. A
+			// per-request name prevents two concurrent saves from clobbering
+			// each other's staging payload (a shared `theme.json.tmp` is unsafe
+			// — request A could rename request B's truncated contents, or one
+			// could unlink the other's temp file mid-write). Each request
+			// cleans up only its own temp file on failure.
+			$tmp = $target . '.' . uniqid( '', true ) . '.tmp';
+			// Suppress warnings so a permission/disk error returns false cleanly
+			// rather than emitting a PHP warning that may be promoted to an
+			// exception. Callers must check the boolean return value.
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			$bytes = @file_put_contents( $tmp, $theme_json );
+			if ( false === $bytes ) {
+				return false;
+			}
+
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! @rename( $tmp, $target ) ) {
+				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				@unlink( $tmp );
+				return false;
+			}
+
 			static::clean_cached_data();
+			// Bust the WP-level theme cache too — `clean_cached_data()` only
+			// clears the JSON resolver's caches, not `wp_get_theme()`.
+			wp_get_theme()->cache_delete();
+			return true;
 		}
 
 		public static function write_user_settings( $user_settings ) {
