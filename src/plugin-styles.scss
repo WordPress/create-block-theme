@@ -27,3 +27,26 @@ $modal-footer-height: 70px;
 	object-fit: cover;
 }
 
+.create-block-theme__edit-theme-settings-modal {
+	padding-bottom: $modal-footer-height;
+}
+
+.create-block-theme__edit-theme-settings-modal__footer {
+	border-top: 1px solid #ddd;
+	background-color: #fff;
+	position: absolute;
+	bottom: 0;
+	margin: 0 -32px;
+	padding: 16px 32px;
+	height: $modal-footer-height;
+}
+
+.cbt-palette-swatch-button {
+	min-width: 24px;
+	padding: 0;
+}
+
+.cbt-palette-section-header {
+	margin-bottom: 8px;
+}
+
