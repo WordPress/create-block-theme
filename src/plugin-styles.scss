@@ -51,13 +51,28 @@ $modal-footer-height: 70px;
 }
 
 .cbt-palette-column-headers {
+	// Match the horizontal padding @wordpress/components Item applies to row
+	// content so column headers line up with the inputs below.
 	padding: 0 12px;
 
-	&__swatch,
-	&__remove {
+	&__spacer {
 		display: inline-block;
 		width: 24px;
+		height: 24px;
 		flex-shrink: 0;
+	}
+
+	&__label {
+		display: block;
+		// Align with the visible text inside the TextControl input below
+		// (inputs have ~12px internal padding before text).
+		padding-left: 12px;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: 1.4;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: #757575;
 	}
 }
 

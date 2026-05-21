@@ -239,21 +239,21 @@ const PalettePanel = ( { value, onChange } ) => {
 						spacing={ 3 }
 					>
 						<span
-							className="cbt-palette-column-headers__swatch"
+							className="cbt-palette-column-headers__spacer"
 							aria-hidden="true"
 						/>
 						<FlexBlock>
-							<BaseControl.VisualLabel>
+							<span className="cbt-palette-column-headers__label">
 								{ __( 'Name', 'create-block-theme' ) }
-							</BaseControl.VisualLabel>
+							</span>
 						</FlexBlock>
 						<FlexBlock>
-							<BaseControl.VisualLabel>
+							<span className="cbt-palette-column-headers__label">
 								{ __( 'Slug', 'create-block-theme' ) }
-							</BaseControl.VisualLabel>
+							</span>
 						</FlexBlock>
 						<span
-							className="cbt-palette-column-headers__remove"
+							className="cbt-palette-column-headers__spacer"
 							aria-hidden="true"
 						/>
 					</HStack>
