@@ -307,6 +307,73 @@ const pickColorSettings = ( themeColor ) => {
 	return out;
 };
 
+// Human-readable label for each top-level slice of `settings` / `styles`
+// that the user may have customized in the Site Editor. Keys are taken
+// from the canonical theme.json schema; anything not in this map is
+// surfaced under "other" as a catch-all so newly-introduced WP keys don't
+// silently vanish from the warning.
+const USER_CUSTOMIZATION_SECTION_LABELS = {
+	color: __( 'color', 'create-block-theme' ),
+	typography: __( 'typography', 'create-block-theme' ),
+	spacing: __( 'spacing', 'create-block-theme' ),
+	layout: __( 'layout', 'create-block-theme' ),
+	dimensions: __( 'dimensions', 'create-block-theme' ),
+	border: __( 'borders', 'create-block-theme' ),
+	shadow: __( 'shadows', 'create-block-theme' ),
+	background: __( 'background', 'create-block-theme' ),
+	elements: __( 'elements', 'create-block-theme' ),
+	blocks: __( 'block styles', 'create-block-theme' ),
+	filter: __( 'filters', 'create-block-theme' ),
+	css: __( 'additional CSS', 'create-block-theme' ),
+	custom: __( 'custom', 'create-block-theme' ),
+};
+
+const isNonEmpty = ( value ) => {
+	if ( value === null || value === undefined ) {
+		return false;
+	}
+	if ( Array.isArray( value ) ) {
+		return value.length > 0;
+	}
+	if ( typeof value === 'object' ) {
+		return Object.keys( value ).length > 0;
+	}
+	return true;
+};
+
+// Crawl the saved user Global Styles record + any in-editor edits and
+// return the de-duplicated, human-readable list of top-level slices that
+// have user-level customizations diverging from theme.json.
+const getCustomizedSections = ( userGlobalStyles, edits ) => {
+	const sections = new Set();
+
+	const visit = ( record ) => {
+		if ( ! record ) {
+			return;
+		}
+		for ( const top of [ 'settings', 'styles' ] ) {
+			const slice = record[ top ];
+			if ( ! slice || typeof slice !== 'object' ) {
+				continue;
+			}
+			for ( const [ key, value ] of Object.entries( slice ) ) {
+				if ( isNonEmpty( value ) ) {
+					sections.add( key );
+				}
+			}
+		}
+	};
+
+	visit( userGlobalStyles );
+	visit( edits );
+
+	return Array.from( sections ).map(
+		( key ) =>
+			USER_CUSTOMIZATION_SECTION_LABELS[ key ] ||
+			__( 'other', 'create-block-theme' )
+	);
+};
+
 // Per-field dirty diff between the modal's working state and the last-saved
 // snapshot from the server. Returns the number of fields that differ —
 // surfaced in the Update button label.
@@ -330,6 +397,25 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 		( select ) => select( 'core' ).getCurrentTheme(),
 		[]
 	);
+
+	const customizedSections = useSelect( ( select ) => {
+		const core = select( 'core' );
+		const getId = core.__experimentalGetCurrentGlobalStylesId;
+		if ( typeof getId !== 'function' ) {
+			return [];
+		}
+		const id = getId();
+		if ( ! id ) {
+			return [];
+		}
+		// Saved user-origin record (database).
+		const record = core.getEntityRecord( 'root', 'globalStyles', id );
+		// In-editor edits not yet persisted to the database.
+		const edits = core.getEntityRecordEdits?.( 'root', 'globalStyles', id );
+		return getCustomizedSections( record, edits );
+	}, [] );
+	const hasUserCustomizations = customizedSections.length > 0;
+
 	const { invalidateResolution } = useDispatch( 'core' );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -440,27 +526,33 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 						'create-block-theme'
 					) }
 				</Text>
-				<Notice
-					status="warning"
-					isDismissible={ false }
-					className="create-block-theme__edit-theme-settings-modal__disclaimer"
-				>
-					<div>
-						{ __(
-							'Changes you’ve saved in the Site Editor live in the database, not in your theme files.',
-							'create-block-theme'
-						) }
-					</div>
-					<div>
-						{ createInterpolateElement(
-							__(
-								'Click <strong>Save Changes to Theme</strong> first to write them to theme.json — otherwise the edits you make here may conflict with or hide them.',
-								'create-block-theme'
-							),
-							{ strong: <strong /> }
-						) }
-					</div>
-				</Notice>
+				{ hasUserCustomizations && (
+					<Notice
+						status="warning"
+						isDismissible={ false }
+						className="create-block-theme__edit-theme-settings-modal__disclaimer"
+					>
+						<div>
+							{ sprintf(
+								/* translators: %s: comma-separated list of customized sections (e.g. "color, typography") */
+								__(
+									'You have changes in the Site Editor that haven’t been written to theme.json: %s.',
+									'create-block-theme'
+								),
+								customizedSections.join( ', ' )
+							) }
+						</div>
+						<div>
+							{ createInterpolateElement(
+								__(
+									'Click <strong>Save Changes to Theme</strong> first — otherwise the edits you make here may be hidden by those overrides.',
+									'create-block-theme'
+								),
+								{ strong: <strong /> }
+							) }
+						</div>
+					</Notice>
+				) }
 				<TabPanel
 					className="create-block-theme__edit-theme-settings-tabs"
 					tabs={ tabs }
