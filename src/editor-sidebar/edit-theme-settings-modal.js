@@ -307,7 +307,7 @@ const ColorTab = ( {
 } ) => (
 	<>
 		<PanelBody
-			title={ __( 'Color Settings', 'create-block-theme' ) }
+			title={ __( 'Default and custom presets', 'create-block-theme' ) }
 			initialOpen
 		>
 			<ColorSettingsPanel
