@@ -361,6 +361,18 @@ const ColorTab = ( {
 } ) => {
 	const [ isPaletteOpen, setIsPaletteOpen ] = useState( false );
 	const paletteRef = useRef( null );
+	const prevPaletteLengthRef = useRef( palette.length );
+
+	// When the palette transitions from empty (force-open) to having entries,
+	// the force-open condition stops applying. Without this, adding the very
+	// first color via the empty-state button would collapse the accordion and
+	// hide the row that was just added.
+	useEffect( () => {
+		if ( prevPaletteLengthRef.current === 0 && palette.length > 0 ) {
+			setIsPaletteOpen( true );
+		}
+		prevPaletteLengthRef.current = palette.length;
+	}, [ palette.length ] );
 
 	const focusPalette = () => {
 		setIsPaletteOpen( true );
