@@ -38,7 +38,7 @@ import {
 	tool,
 	copy,
 	download,
-	edit,
+	pencil,
 	code,
 	chevronLeft,
 	chevronRight,
@@ -171,7 +171,7 @@ const CreateBlockThemePlugin = () => {
 										) }
 									</PluginSidebarItem>
 									<PluginSidebarItem
-										icon={ edit }
+										icon={ pencil }
 										onClick={ () =>
 											setIsMetadataEditorOpen( true )
 										}
