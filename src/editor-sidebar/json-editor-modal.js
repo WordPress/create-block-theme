@@ -10,7 +10,7 @@ import { json } from '@codemirror/lang-json';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 	const [ themeData, setThemeData ] = useState( '' );
@@ -18,6 +18,14 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 		( select ) => select( 'core' ).getCurrentTheme(),
 		[]
 	);
+	const { invalidateResolution } = useDispatch( 'core' );
+
+	// Force a fresh fetch on every mount so the modal reflects writes the
+	// Edit Theme Settings flow has made to theme.json since the resolver
+	// last resolved.
+	useEffect( () => {
+		invalidateResolution( 'getCurrentTheme' );
+	}, [ invalidateResolution ] );
 
 	useEffect( () => {
 		if ( themeJsonData ) {
