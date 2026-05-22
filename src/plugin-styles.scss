@@ -30,6 +30,13 @@ $modal-footer-height: 70px;
 
 .create-block-theme__edit-theme-settings-modal {
 	padding-bottom: $modal-footer-height;
+
+	// Drop the top border on the first PanelBody when it sits below a
+	// non-panel sibling (e.g. our PaletteSummary card) so the boundary
+	// doesn't double-up with the summary's bottom edge.
+	.components-tab-panel__tab-content > :not(.components-panel__body) + .components-panel__body {
+		border-top: 0;
+	}
 }
 
 .create-block-theme__edit-theme-settings-modal__footer {
@@ -78,6 +85,12 @@ $modal-footer-height: 70px;
 
 .cbt-palette-section-header {
 	margin-bottom: 8px;
+
+	// Nudge the right-edge action (e.g. "+ Add a color") -8px so it aligns
+	// with the PanelBody chevron in the accordion header directly above.
+	> :last-child {
+		margin-right: -8px;
+	}
 }
 
 .cbt-palette-column-headers {

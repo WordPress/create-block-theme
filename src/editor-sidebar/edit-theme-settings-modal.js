@@ -215,6 +215,7 @@ const PaletteRow = ( { entry, onUpdate, onRemove } ) => (
 			</FlexBlock>
 			<Button
 				icon={ lineSolid }
+				iconSize={ 20 }
 				label={ __( 'Remove color', 'create-block-theme' ) }
 				onClick={ onRemove }
 				className="cbt-palette-swatch-button"
