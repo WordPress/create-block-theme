@@ -38,8 +38,14 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 				setThemeName( active?.name?.raw ?? '' );
 				setThemeData( JSON.stringify( active?.theme_json, null, 2 ) );
 			} )
-			.catch( () => {
-				// Swallow — leave the modal showing whatever was last rendered.
+			.catch( ( err ) => {
+				// Leave the modal showing whatever was last rendered, but
+				// surface the failure to the console so it isn't invisible.
+				// eslint-disable-next-line no-console
+				console.error(
+					'View theme.json: failed to fetch active theme',
+					err
+				);
 			} );
 		return () => {
 			cancelled = true;

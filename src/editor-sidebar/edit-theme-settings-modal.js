@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useState,
 	useEffect,
@@ -61,6 +61,54 @@ const COLOR_SETTINGS_DEFAULTS = {
 	customGradient: true,
 	customDuotone: true,
 	link: false,
+};
+
+// Local-only stable ID for React keys on palette rows. Entries that come
+// from the server (initial load, save response) get a `__cbtRowId` added
+// when we seed local state; entries the user adds get one at creation.
+// Stripped from the payload before sending to the server.
+let nextRowIdCounter = 0;
+const newRowId = () => `cbt-row-${ ++nextRowIdCounter }`;
+
+const augmentPaletteWithIds = ( entries ) =>
+	entries.map( ( entry ) => ( {
+		...entry,
+		__cbtRowId: entry.__cbtRowId || newRowId(),
+	} ) );
+
+const stripPaletteIds = ( entries ) =>
+	entries.map( ( { __cbtRowId: _id, ...rest } ) => rest );
+
+const palettesEqual = ( a, b ) => {
+	if ( a.length !== b.length ) {
+		return false;
+	}
+	for ( let i = 0; i < a.length; i++ ) {
+		if (
+			a[ i ].slug !== b[ i ].slug ||
+			a[ i ].name !== b[ i ].name ||
+			a[ i ].color !== b[ i ].color
+		) {
+			return false;
+		}
+	}
+	return true;
+};
+
+// Find the next free index for an auto-generated `new-color-N` slug so
+// Add → Remove → Add doesn't produce duplicate slugs.
+const nextNewColorIndex = ( entries ) => {
+	let max = 0;
+	for ( const entry of entries ) {
+		const match = /^new-color-(\d+)$/.exec( entry.slug || '' );
+		if ( match ) {
+			const n = parseInt( match[ 1 ], 10 );
+			if ( n > max ) {
+				max = n;
+			}
+		}
+	}
+	return max + 1;
 };
 
 const ColorSettingsPanel = ( { value, onChange } ) => {
@@ -250,7 +298,8 @@ const PalettePanel = ( { value, onChange } ) => {
 		onChange( [
 			...value,
 			{
-				slug: `new-color-${ value.length + 1 }`,
+				__cbtRowId: newRowId(),
+				slug: `new-color-${ nextNewColorIndex( value ) }`,
 				name: __( 'New color', 'create-block-theme' ),
 				color: '#000000',
 			},
@@ -296,7 +345,7 @@ const PalettePanel = ( { value, onChange } ) => {
 					<ItemGroup isBordered isSeparated>
 						{ value.map( ( entry, index ) => (
 							<div
-								key={ index }
+								key={ entry.__cbtRowId }
 								ref={
 									index === value.length - 1
 										? lastRowRef
@@ -501,22 +550,17 @@ const getCustomizedSections = ( userGlobalStyles, edits ) => {
 	);
 };
 
-// Per-field dirty diff between the modal's working state and the last-saved
-// snapshot from the server. Returns the number of fields that differ —
-// surfaced in the Update button label.
-const countChanges = ( current, snapshot ) => {
-	let count = 0;
+// Returns the set of color-settings keys whose current value differs from
+// the last-saved snapshot. Used to drive both the Update-button counter
+// and the minimal-patch payload sent to the server.
+const getDirtyColorKeys = ( current, snapshot ) => {
+	const keys = [];
 	for ( const key of COLOR_SETTINGS_KEYS ) {
-		if ( current.colorSettings[ key ] !== snapshot.colorSettings[ key ] ) {
-			count += 1;
+		if ( current[ key ] !== snapshot[ key ] ) {
+			keys.push( key );
 		}
 	}
-	if (
-		JSON.stringify( current.palette ) !== JSON.stringify( snapshot.palette )
-	) {
-		count += 1;
-	}
-	return count;
+	return keys;
 };
 
 export const EditThemeSettingsModal = ( { onRequestClose } ) => {
@@ -549,10 +593,15 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 
 	const themeColor = themeData?.theme_json?.settings?.color;
 
+	// `snapshot` is the server-canonical state — palette entries here have
+	// NO `__cbtRowId` since the server never sees that key. Working state
+	// (`palette`) is augmented with row IDs for stable React keys.
 	const initialState = useMemo(
 		() => ( {
 			colorSettings: pickColorSettings( themeColor ),
-			palette: themeColor?.palette ? [ ...themeColor.palette ] : [],
+			palette: Array.isArray( themeColor?.palette )
+				? themeColor.palette
+				: [],
 		} ),
 		[ themeColor ]
 	);
@@ -560,47 +609,85 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 	const [ colorSettings, setColorSettings ] = useState(
 		initialState.colorSettings
 	);
-	const [ palette, setPalette ] = useState( initialState.palette );
+	const [ palette, setPalette ] = useState( () =>
+		augmentPaletteWithIds( initialState.palette )
+	);
 	const [ snapshot, setSnapshot ] = useState( initialState );
 	const [ isSaving, setIsSaving ] = useState( false );
 
-	// Reseed local state when the server-side theme data refreshes (initial
-	// load, and after a successful save invalidates the resolver).
-	useEffect( () => {
-		setColorSettings( initialState.colorSettings );
-		setPalette( initialState.palette );
-		setSnapshot( initialState );
-	}, [ initialState ] );
-
-	const changeCount = countChanges( { colorSettings, palette }, snapshot );
+	const dirtyColorKeys = useMemo(
+		() => getDirtyColorKeys( colorSettings, snapshot.colorSettings ),
+		[ colorSettings, snapshot.colorSettings ]
+	);
+	const strippedPalette = useMemo(
+		() => stripPaletteIds( palette ),
+		[ palette ]
+	);
+	const paletteDirty = useMemo(
+		() => ! palettesEqual( strippedPalette, snapshot.palette ),
+		[ strippedPalette, snapshot.palette ]
+	);
+	const changeCount = dirtyColorKeys.length + ( paletteDirty ? 1 : 0 );
 	const isDirty = changeCount > 0;
 
+	const hasEmptySlug = palette.some(
+		( entry ) => ! entry.slug || ! entry.slug.trim()
+	);
+
+	// Reseed local state from refreshed server data — but only if the user
+	// hasn't started editing in this session. Otherwise a mid-flight cache
+	// invalidation (e.g. another resolver triggers it) would silently wipe
+	// pending edits.
+	useEffect( () => {
+		if ( isDirty ) {
+			return;
+		}
+		setColorSettings( initialState.colorSettings );
+		setPalette( augmentPaletteWithIds( initialState.palette ) );
+		setSnapshot( initialState );
+		// `isDirty` is intentionally excluded from deps: we only want to
+		// reseed when the server-side data changes, not when the user's
+		// edits transition the dirty flag.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ initialState ] );
+
 	const handleUpdateClick = async () => {
+		// Build a minimal patch: only the keys the user touched in this
+		// session. Avoids overwriting fields another tab/CLI may have
+		// edited concurrently (server-side merge is RFC 7396 last-writes-
+		// wins on lists, so sending an unchanged palette would still
+		// clobber concurrent palette edits).
+		const colorPayload = {};
+		for ( const key of dirtyColorKeys ) {
+			colorPayload[ key ] = colorSettings[ key ];
+		}
+		if ( paletteDirty ) {
+			colorPayload.palette = strippedPalette;
+		}
+		if ( Object.keys( colorPayload ).length === 0 ) {
+			return;
+		}
+
 		setIsSaving( true );
 		try {
 			// The endpoint returns `{ status, theme_json: <merged> }` on
-			// success. Reseed from the merged theme.json directly instead of
-			// relying on a refetch: `getCurrentTheme` is entity-record-backed
-			// and `invalidateResolution` doesn't reliably re-fetch it before
-			// the user sees the (now-stale) dirty count.
+			// success. Reseed snapshot from the merged theme.json directly
+			// instead of relying on a refetch: `getCurrentTheme` is
+			// entity-record-backed and `invalidateResolution` doesn't
+			// reliably re-fetch it before the user sees the dirty count.
 			const response = await postUpdateThemeSettings( {
-				settings: {
-					color: {
-						...colorSettings,
-						palette,
-					},
-				},
+				settings: { color: colorPayload },
 			} );
 			const savedColor = response?.theme_json?.settings?.color || {};
 			const nextColorSettings = pickColorSettings( savedColor );
-			const nextPalette = Array.isArray( savedColor.palette )
-				? [ ...savedColor.palette ]
+			const nextPaletteRaw = Array.isArray( savedColor.palette )
+				? savedColor.palette
 				: [];
 			setColorSettings( nextColorSettings );
-			setPalette( nextPalette );
+			setPalette( augmentPaletteWithIds( nextPaletteRaw ) );
 			setSnapshot( {
 				colorSettings: nextColorSettings,
-				palette: nextPalette,
+				palette: nextPaletteRaw,
 			} );
 			createSuccessNotice(
 				__( 'Theme settings saved.', 'create-block-theme' ),
@@ -646,10 +733,26 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 	const updateLabel = isDirty
 		? sprintf(
 				/* translators: %d: number of pending changes */
-				__( 'Update (%d changes)', 'create-block-theme' ),
+				_n(
+					'Update (%d change)',
+					'Update (%d changes)',
+					changeCount,
+					'create-block-theme'
+				),
 				changeCount
 		  )
 		: __( 'Update', 'create-block-theme' );
+
+	// Use Intl.ListFormat so the separator (and final "and") match the
+	// user's locale instead of being hard-coded English punctuation.
+	// Falls back to a plain ", " join in environments without it.
+	const sectionList =
+		typeof Intl !== 'undefined' && Intl.ListFormat
+			? new Intl.ListFormat( undefined, {
+					style: 'long',
+					type: 'conjunction',
+			  } ).format( customizedSections )
+			: customizedSections.join( ', ' );
 
 	return (
 		<Modal
@@ -683,7 +786,7 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 										'You have changes in the Site Editor that haven’t been written to theme.json: <list>%s</list>.',
 										'create-block-theme'
 									),
-									customizedSections.join( ', ' )
+									sectionList
 								),
 								{ list: <strong /> }
 							) }
@@ -713,8 +816,17 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 				<Button
 					variant="primary"
 					onClick={ handleUpdateClick }
-					disabled={ ! isDirty || isSaving }
+					disabled={ ! isDirty || isSaving || hasEmptySlug }
 					isBusy={ isSaving }
+					label={
+						hasEmptySlug
+							? __(
+									'Every palette entry needs a slug.',
+									'create-block-theme'
+							  )
+							: undefined
+					}
+					showTooltip={ hasEmptySlug }
 				>
 					{ updateLabel }
 				</Button>
