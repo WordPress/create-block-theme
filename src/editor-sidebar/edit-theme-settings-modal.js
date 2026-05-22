@@ -301,7 +301,9 @@ const PaletteSummary = ( { palette, onEdit } ) => (
 	<HStack
 		className="cbt-palette-summary"
 		alignment="center"
-		justify="space-between"
+		justify="flex-start"
+		spacing={ 3 }
+		expanded={ false }
 	>
 		<HStack
 			className="cbt-palette-summary__swatches"
