@@ -242,18 +242,12 @@ const PalettePanel = ( { value, onChange } ) => {
 		<VStack spacing={ 1 }>
 			<HStack
 				className="cbt-palette-section-header"
-				justify="space-between"
+				justify="flex-end"
 				alignment="center"
 			>
-				<BaseControl.VisualLabel>
-					{ __( 'Color presets', 'create-block-theme' ) }
-				</BaseControl.VisualLabel>
-				<Button
-					icon={ plus }
-					label={ __( 'Add new color', 'create-block-theme' ) }
-					onClick={ addColor }
-					showTooltip
-				/>
+				<Button icon={ plus } variant="tertiary" onClick={ addColor }>
+					{ __( 'Add a color', 'create-block-theme' ) }
+				</Button>
 			</HStack>
 			{ value.length > 0 && (
 				<>
