@@ -224,6 +224,21 @@ const PaletteRow = ( { entry, onUpdate, onRemove } ) => (
 );
 
 const PalettePanel = ( { value, onChange } ) => {
+	const lastRowRef = useRef( null );
+	const prevLengthRef = useRef( value.length );
+
+	// After a row is appended, slide the new row into view. Compare against
+	// the previous length so edits/removes don't trigger a scroll.
+	useEffect( () => {
+		if ( value.length > prevLengthRef.current && lastRowRef.current ) {
+			lastRowRef.current.scrollIntoView( {
+				behavior: 'smooth',
+				block: 'center',
+			} );
+		}
+		prevLengthRef.current = value.length;
+	}, [ value.length ] );
+
 	const updateEntry = ( index, updated ) =>
 		onChange( value.map( ( e, i ) => ( i === index ? updated : e ) ) );
 
@@ -279,14 +294,22 @@ const PalettePanel = ( { value, onChange } ) => {
 					</HStack>
 					<ItemGroup isBordered isSeparated>
 						{ value.map( ( entry, index ) => (
-							<PaletteRow
+							<div
 								key={ index }
-								entry={ entry }
-								onUpdate={ ( updated ) =>
-									updateEntry( index, updated )
+								ref={
+									index === value.length - 1
+										? lastRowRef
+										: null
 								}
-								onRemove={ () => removeEntry( index ) }
-							/>
+							>
+								<PaletteRow
+									entry={ entry }
+									onUpdate={ ( updated ) =>
+										updateEntry( index, updated )
+									}
+									onRemove={ () => removeEntry( index ) }
+								/>
+							</div>
 						) ) }
 					</ItemGroup>
 				</>
