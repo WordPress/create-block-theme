@@ -48,6 +48,9 @@ $modal-footer-height: 70px;
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 32px;
+	// Top-align so the two group headers (and their first toggle) line up
+	// even when the columns contain different numbers of toggles.
+	align-items: start;
 
 	@media (min-width: $break-small) {
 		grid-template-columns: 1fr 1fr;
