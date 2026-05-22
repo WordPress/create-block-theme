@@ -66,7 +66,7 @@ const ColorSettingsPanel = ( { value, onChange } ) => {
 		onChange( { ...value, [ key ]: next } );
 
 	return (
-		<VStack spacing={ 8 }>
+		<div className="cbt-color-settings-columns">
 			<VStack spacing={ 1 }>
 				<BaseControl.VisualLabel>
 					{ __( 'Default presets', 'create-block-theme' ) }
@@ -74,12 +74,13 @@ const ColorSettingsPanel = ( { value, onChange } ) => {
 				<VStack spacing={ 3 }>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __(
-							'Default duotone filters',
+						label={ __( 'Default palette', 'create-block-theme' ) }
+						help={ __(
+							'Show WordPress’s default color palette in the editor.',
 							'create-block-theme'
 						) }
-						checked={ value.defaultDuotone }
-						onChange={ update( 'defaultDuotone' ) }
+						checked={ value.defaultPalette }
+						onChange={ update( 'defaultPalette' ) }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
@@ -87,14 +88,25 @@ const ColorSettingsPanel = ( { value, onChange } ) => {
 							'Default gradients',
 							'create-block-theme'
 						) }
+						help={ __(
+							'Show WordPress’s default gradient presets in the editor.',
+							'create-block-theme'
+						) }
 						checked={ value.defaultGradients }
 						onChange={ update( 'defaultGradients' ) }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Default palette', 'create-block-theme' ) }
-						checked={ value.defaultPalette }
-						onChange={ update( 'defaultPalette' ) }
+						label={ __(
+							'Default duotone filters',
+							'create-block-theme'
+						) }
+						help={ __(
+							'Show WordPress’s default duotone filters in the editor.',
+							'create-block-theme'
+						) }
+						checked={ value.defaultDuotone }
+						onChange={ update( 'defaultDuotone' ) }
 					/>
 				</VStack>
 			</VStack>
@@ -106,8 +118,22 @@ const ColorSettingsPanel = ( { value, onChange } ) => {
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Custom colors', 'create-block-theme' ) }
+						help={ __(
+							'Allow custom colors in the editor color picker.',
+							'create-block-theme'
+						) }
 						checked={ value.custom }
 						onChange={ update( 'custom' ) }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Custom gradients', 'create-block-theme' ) }
+						help={ __(
+							'Let users create custom gradients in the editor.',
+							'create-block-theme'
+						) }
+						checked={ value.customGradient }
+						onChange={ update( 'customGradient' ) }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
@@ -115,14 +141,12 @@ const ColorSettingsPanel = ( { value, onChange } ) => {
 							'Custom duotone filters',
 							'create-block-theme'
 						) }
+						help={ __(
+							'Let users create custom duotone filters.',
+							'create-block-theme'
+						) }
 						checked={ value.customDuotone }
 						onChange={ update( 'customDuotone' ) }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Custom gradients', 'create-block-theme' ) }
-						checked={ value.customGradient }
-						onChange={ update( 'customGradient' ) }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
@@ -136,7 +160,7 @@ const ColorSettingsPanel = ( { value, onChange } ) => {
 					/>
 				</VStack>
 			</VStack>
-		</VStack>
+		</div>
 	);
 };
 
