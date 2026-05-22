@@ -6,6 +6,7 @@ import {
 	useState,
 	useEffect,
 	useMemo,
+	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -334,14 +335,25 @@ const ColorTab = ( {
 	onChangePalette,
 } ) => {
 	const [ isPaletteOpen, setIsPaletteOpen ] = useState( false );
+	const paletteRef = useRef( null );
+
+	const focusPalette = () => {
+		setIsPaletteOpen( true );
+		// Scroll on the next frame so the accordion has expanded (if it was
+		// closed) before we measure its target position. Works on subsequent
+		// clicks too, because scrollIntoView fires unconditionally.
+		window.requestAnimationFrame( () => {
+			paletteRef.current?.scrollIntoView( {
+				behavior: 'smooth',
+				block: 'start',
+			} );
+		} );
+	};
 
 	return (
 		<>
 			{ palette.length > 0 && (
-				<PaletteSummary
-					palette={ palette }
-					onEdit={ () => setIsPaletteOpen( true ) }
-				/>
+				<PaletteSummary palette={ palette } onEdit={ focusPalette } />
 			) }
 			<PanelBody
 				title={ __(
@@ -355,13 +367,18 @@ const ColorTab = ( {
 					onChange={ onChangeColorSettings }
 				/>
 			</PanelBody>
-			<PanelBody
-				title={ __( 'Palette', 'create-block-theme' ) }
-				opened={ isPaletteOpen }
-				onToggle={ setIsPaletteOpen }
-			>
-				<PalettePanel value={ palette } onChange={ onChangePalette } />
-			</PanelBody>
+			<div ref={ paletteRef }>
+				<PanelBody
+					title={ __( 'Palette', 'create-block-theme' ) }
+					opened={ isPaletteOpen }
+					onToggle={ setIsPaletteOpen }
+				>
+					<PalettePanel
+						value={ palette }
+						onChange={ onChangePalette }
+					/>
+				</PanelBody>
+			</div>
 		</>
 	);
 };
