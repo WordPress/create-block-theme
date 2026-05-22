@@ -372,7 +372,10 @@ const ColorTab = ( {
 			<div ref={ paletteRef }>
 				<PanelBody
 					title={ __( 'Palette', 'create-block-theme' ) }
-					opened={ isPaletteOpen }
+					// When the palette is empty the summary card is hidden,
+					// so force the accordion open to keep the "Add a color"
+					// button discoverable.
+					opened={ isPaletteOpen || palette.length === 0 }
 					onToggle={ setIsPaletteOpen }
 				>
 					<PalettePanel
