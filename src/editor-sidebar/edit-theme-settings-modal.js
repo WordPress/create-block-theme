@@ -578,7 +578,12 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 	const handleUpdateClick = async () => {
 		setIsSaving( true );
 		try {
-			await postUpdateThemeSettings( {
+			// The endpoint returns the merged theme.json on success. Use it
+			// as the new canonical state instead of relying on a refetch:
+			// `getCurrentTheme` is entity-record-backed and
+			// `invalidateResolution` doesn't reliably re-fetch it before the
+			// user sees the (now-stale) dirty count.
+			const merged = await postUpdateThemeSettings( {
 				settings: {
 					color: {
 						...colorSettings,
@@ -586,12 +591,23 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 					},
 				},
 			} );
+			const savedColor = merged?.settings?.color || {};
+			const nextColorSettings = pickColorSettings( savedColor );
+			const nextPalette = Array.isArray( savedColor.palette )
+				? [ ...savedColor.palette ]
+				: [];
+			setColorSettings( nextColorSettings );
+			setPalette( nextPalette );
+			setSnapshot( {
+				colorSettings: nextColorSettings,
+				palette: nextPalette,
+			} );
 			createSuccessNotice(
 				__( 'Theme settings saved.', 'create-block-theme' ),
 				{ type: 'snackbar' }
 			);
-			// Refresh the theme entity so panels reseed from the new server
-			// state via the `initialState` effect above.
+			// Also invalidate the entity-record cache so the rest of the UI
+			// (e.g. View theme.json, future modal opens) sees fresh data.
 			invalidateResolution( 'getCurrentTheme' );
 		} catch ( error ) {
 			createErrorNotice(
