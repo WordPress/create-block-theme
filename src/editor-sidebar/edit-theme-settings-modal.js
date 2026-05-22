@@ -578,12 +578,12 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 	const handleUpdateClick = async () => {
 		setIsSaving( true );
 		try {
-			// The endpoint returns the merged theme.json on success. Use it
-			// as the new canonical state instead of relying on a refetch:
-			// `getCurrentTheme` is entity-record-backed and
-			// `invalidateResolution` doesn't reliably re-fetch it before the
-			// user sees the (now-stale) dirty count.
-			const merged = await postUpdateThemeSettings( {
+			// The endpoint returns `{ status, theme_json: <merged> }` on
+			// success. Reseed from the merged theme.json directly instead of
+			// relying on a refetch: `getCurrentTheme` is entity-record-backed
+			// and `invalidateResolution` doesn't reliably re-fetch it before
+			// the user sees the (now-stale) dirty count.
+			const response = await postUpdateThemeSettings( {
 				settings: {
 					color: {
 						...colorSettings,
@@ -591,7 +591,7 @@ export const EditThemeSettingsModal = ( { onRequestClose } ) => {
 					},
 				},
 			} );
-			const savedColor = merged?.settings?.color || {};
+			const savedColor = response?.theme_json?.settings?.color || {};
 			const nextColorSettings = pickColorSettings( savedColor );
 			const nextPalette = Array.isArray( savedColor.palette )
 				? [ ...savedColor.palette ]
