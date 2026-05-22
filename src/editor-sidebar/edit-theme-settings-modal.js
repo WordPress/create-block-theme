@@ -27,6 +27,7 @@ import {
 	ColorPicker,
 	Dropdown,
 	FlexBlock,
+	Icon,
 	Modal,
 	Notice,
 	PanelBody,
@@ -34,7 +35,7 @@ import {
 	TextControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { plus, lineSolid } from '@wordpress/icons';
+import { plus, lineSolid, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -293,27 +294,77 @@ const PalettePanel = ( { value, onChange } ) => {
 	);
 };
 
+const SWATCH_PREVIEW_COUNT = 5;
+
+const PaletteSummary = ( { palette, onEdit } ) => (
+	<HStack
+		className="cbt-palette-summary"
+		alignment="center"
+		justify="space-between"
+	>
+		<HStack
+			className="cbt-palette-summary__swatches"
+			alignment="center"
+			spacing={ 0 }
+			expanded={ false }
+		>
+			{ palette
+				.slice( 0, SWATCH_PREVIEW_COUNT )
+				.map( ( entry, index ) => (
+					<ColorIndicator key={ index } colorValue={ entry.color } />
+				) ) }
+		</HStack>
+		<Button
+			variant="tertiary"
+			onClick={ onEdit }
+			className="cbt-palette-summary__edit"
+		>
+			<HStack alignment="center" spacing={ 1 } expanded={ false }>
+				<span>{ __( 'Edit palette', 'create-block-theme' ) }</span>
+				<Icon icon={ chevronRight } />
+			</HStack>
+		</Button>
+	</HStack>
+);
+
 const ColorTab = ( {
 	colorSettings,
 	onChangeColorSettings,
 	palette,
 	onChangePalette,
-} ) => (
-	<>
-		<PanelBody
-			title={ __( 'Default and custom presets', 'create-block-theme' ) }
-			initialOpen
-		>
-			<ColorSettingsPanel
-				value={ colorSettings }
-				onChange={ onChangeColorSettings }
-			/>
-		</PanelBody>
-		<PanelBody title={ __( 'Palette', 'create-block-theme' ) } initialOpen>
-			<PalettePanel value={ palette } onChange={ onChangePalette } />
-		</PanelBody>
-	</>
-);
+} ) => {
+	const [ isPaletteOpen, setIsPaletteOpen ] = useState( false );
+
+	return (
+		<>
+			{ palette.length > 0 && (
+				<PaletteSummary
+					palette={ palette }
+					onEdit={ () => setIsPaletteOpen( true ) }
+				/>
+			) }
+			<PanelBody
+				title={ __(
+					'Default and custom presets',
+					'create-block-theme'
+				) }
+				initialOpen
+			>
+				<ColorSettingsPanel
+					value={ colorSettings }
+					onChange={ onChangeColorSettings }
+				/>
+			</PanelBody>
+			<PanelBody
+				title={ __( 'Palette', 'create-block-theme' ) }
+				opened={ isPaletteOpen }
+				onToggle={ setIsPaletteOpen }
+			>
+				<PalettePanel value={ palette } onChange={ onChangePalette } />
+			</PanelBody>
+		</>
+	);
+};
 
 const pickColorSettings = ( themeColor ) => {
 	const out = { ...COLOR_SETTINGS_DEFAULTS };
