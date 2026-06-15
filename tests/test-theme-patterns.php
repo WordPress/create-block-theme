@@ -168,4 +168,46 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( $safe, $body );
 	}
+
+	public function test_pattern_from_template_strips_php_open_tag() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = '<p>safe</p><?php phpinfo(); ?>';
+		$result            = CBT_Theme_Patterns::pattern_from_template( $template );
+		$body              = substr( $result['content'], strpos( $result['content'], '?>' ) + 2 );
+
+		$this->assertStringNotContainsString( '<?php', $body );
+		$this->assertStringContainsString( '<p>safe</p>', $body );
+	}
+
+	public function test_pattern_from_template_strips_script_language_php() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = '<p>safe</p><script language="php">phpinfo();</script>';
+		$result            = CBT_Theme_Patterns::pattern_from_template( $template );
+		$body              = substr( $result['content'], strpos( $result['content'], '?>' ) + 2 );
+
+		$this->assertStringNotContainsString( '<script', $body );
+	}
+
+	public function test_pattern_from_template_preserves_legitimate_block_markup() {
+		$safe              = '<!-- wp:paragraph --><p>hello</p><!-- /wp:paragraph -->';
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = $safe;
+		$result            = CBT_Theme_Patterns::pattern_from_template( $template );
+
+		$this->assertStringContainsString( $safe, $result['content'] );
+	}
+
+	public function test_pattern_from_template_keeps_slug_escape_intact() {
+		$template          = new stdClass();
+		$template->slug    = 'evil */ break';
+		$template->content = '<p>safe</p>';
+		$result            = CBT_Theme_Patterns::pattern_from_template( $template );
+
+		// PR #817 escapes `*/` in the slug to `*&#47;`. Confirm still in effect.
+		$this->assertStringContainsString( '*&#47;', $result['content'] );
+		$this->assertStringNotContainsString( 'evil */ break', $result['content'] );
+	}
 }

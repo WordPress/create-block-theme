@@ -41,6 +41,7 @@ class CBT_Theme_Patterns {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$template_slug   = str_replace( '*/', '*&#47;', $template->slug );
 		$pattern_slug    = $theme_slug . '/' . $template_slug;
+		$safe_body       = self::strip_php_tags( $template->content );
 		$pattern_content = <<<PHP
 		<?php
 		/**
@@ -49,7 +50,7 @@ class CBT_Theme_Patterns {
 		 * Inserter: no
 		 */
 		?>
-		{$template->content}
+		{$safe_body}
 		PHP;
 
 		return array(
