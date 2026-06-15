@@ -128,6 +128,49 @@ class CBT_Theme_Fonts {
 		return in_array( $extension, $allowed, true );
 	}
 
+	/**
+	 * Post-download MIME-type allowlist for downloaded font bodies.
+	 *
+	 * Uses finfo directly because WordPress core's MIME registry has no font
+	 * entries, so wp_check_filetype_and_ext() rejects all fonts. finfo_file
+	 * detects the MIME from the bytes on disk independently of the registry.
+	 *
+	 * @param string $tmp_file Local path to the downloaded file.
+	 * @param string $url      The originating URL (kept for signature symmetry
+	 *                         with CBT_Theme_Media::is_allowed_media_file()).
+	 * @return bool True if the file's detected type is in the font allowlist.
+	 */
+	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	public static function is_allowed_font_file( $tmp_file, $url ) {
+		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
+			return false;
+		}
+		if ( ! function_exists( 'finfo_open' ) ) {
+			return false;
+		}
+		$finfo = finfo_open( FILEINFO_MIME_TYPE );
+		if ( ! $finfo ) {
+			return false;
+		}
+		$type = finfo_file( $finfo, $tmp_file );
+		finfo_close( $finfo );
+		if ( ! is_string( $type ) ) {
+			return false;
+		}
+		$allowed = array(
+			'font/ttf',
+			'font/otf',
+			'font/woff',
+			'font/woff2',
+			'application/font-woff',
+			'application/font-woff2',
+			'application/vnd.ms-fontobject',
+			'application/x-font-ttf',
+			'application/x-font-otf',
+		);
+		return in_array( $type, $allowed, true );
+	}
+
 	/*
 	 * Copy the font assets to the theme.
 	 *

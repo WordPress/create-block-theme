@@ -535,5 +535,25 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/foo.woff2?v=2' ) );
 		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/evil.php?disguised=foo.woff2' ) );
 	}
+
+	public function test_is_allowed_font_file_accepts_real_woff2() {
+		$tmp = wp_tempnam( 'cbt-test-font' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.woff2', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.woff2' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_rejects_php_body_with_woff2_url() {
+		$tmp = wp_tempnam( 'cbt-test-font-evil' );
+		copy( __DIR__ . '/data/evil.php.txt', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/evil.woff2' );
+		@unlink( $tmp );
+		$this->assertFalse( $ok );
+	}
+
+	public function test_is_allowed_font_file_rejects_missing_file() {
+		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_file( '/nonexistent/tmp/file', 'http://fonts.example.com/foo.woff2' ) );
+	}
 }
 
