@@ -1,6 +1,34 @@
 <?php
 
 class CBT_Theme_Patterns {
+	/**
+	 * Strip PHP execution tags from user-supplied pattern body content.
+	 *
+	 * Block patterns are HTML/block markup, not PHP. Any `<?php` (or short/
+	 * legacy variants) in user content is treated as malicious and removed
+	 * before the body is interpolated into the exported `.php` pattern file.
+	 *
+	 * Note: the plugin's own `escape_text_for_pattern()` injects trusted PHP
+	 * into the body LATER in the export pipeline (via `prepare_pattern_for_export`).
+	 * Sanitisation here happens BEFORE that, so trusted PHP is not stripped.
+	 *
+	 * @param string $content User-supplied body content.
+	 * @return string Same content with PHP open tags removed.
+	 */
+	private static function strip_php_tags( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return $content;
+		}
+
+		// Standard PHP open tags: <?php, <?=, <? (short tag).
+		// `php\b` matches <?php followed by a non-word char (PHP's grammar).
+		// `=` matches <?=. The lookahead `(?=\s)` and end-anchor `$` together
+		// catch the bare short tag <? followed by whitespace or EOF.
+		$content = preg_replace( '/<\?(?:php\b|=|(?=\s)|$)/i', '', $content );
+
+		return $content;
+	}
+
 	public static function pattern_from_template( $template, $new_slug = null ) {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$template_slug   = str_replace( '*/', '*&#47;', $template->slug );
@@ -32,6 +60,7 @@ class CBT_Theme_Patterns {
 		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
 		$pattern_title         = str_replace( '*/', '*&#47;', $pattern->title );
 		$pattern_categories    = str_replace( '*/', '*&#47;', $pattern->categories );
+		$safe_body             = self::strip_php_tags( $pattern_post->post_content );
 		$pattern->content      = <<<PHP
 		<?php
 		/**
@@ -40,7 +69,7 @@ class CBT_Theme_Patterns {
 		 * Categories: {$pattern_categories}
 		 */
 		?>
-		{$pattern_post->post_content}
+		{$safe_body}
 		PHP;
 
 		return $pattern;
