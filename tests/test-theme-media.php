@@ -139,4 +139,30 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 	public function test_is_allowed_media_file_rejects_missing_file() {
 		$this->assertFalse( CBT_Theme_Media::is_allowed_media_file( '/nonexistent/tmp/file', 'http://example.com/cat.jpg' ) );
 	}
+
+	public function test_add_media_to_local_skips_php_url_without_downloading() {
+		$theme_assets = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
+		$malicious    = $theme_assets . 'evil.php';
+
+		// Make sure the dir exists and the file is NOT pre-existing.
+		if ( file_exists( $malicious ) ) {
+			unlink( $malicious );
+		}
+
+		// Track whether any HTTP request gets attempted; allowlist short-circuits before download_url.
+		$attempted = false;
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$tracker = function ( $preempt, $args, $url ) use ( &$attempted ) {
+			$attempted = true;
+			return new WP_Error( 'cbt_test_intercept', 'blocked by test' );
+		};
+		add_filter( 'pre_http_request', $tracker, 10, 3 );
+
+		CBT_Theme_Media::add_media_to_local( array( 'http://example.com/evil.php' ) );
+
+		remove_filter( 'pre_http_request', $tracker, 10 );
+
+		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension URL' );
+		$this->assertFileDoesNotExist( $malicious );
+	}
 }

@@ -4,6 +4,19 @@ require_once( __DIR__ . '/theme-utils.php' );
 
 class CBT_Theme_Media {
 
+	/**
+	 * Map a media URL to its target folder under the theme.
+	 *
+	 * Note: as of the validation added in add_media_to_local(), the `else`
+	 * branch (unknown extension → `/assets/`) is unreachable from the
+	 * download path because `is_allowed_media_url()` rejects unknown
+	 * extensions before this function is consulted. The branch remains
+	 * here because `make_relative_media_url()` also calls this function
+	 * to rewrite URLs of already-local media in exported templates.
+	 *
+	 * @param string $url Media URL.
+	 * @return string Relative folder path starting with `/assets/`.
+	 */
 	public static function get_media_folder_path_from_url( $url ) {
 		$extension        = strtolower( pathinfo( $url, PATHINFO_EXTENSION ) );
 		$folder_path      = '';
@@ -193,6 +206,11 @@ class CBT_Theme_Media {
 
 		foreach ( $media as $url ) {
 
+			// Pre-download URL extension allowlist — see is_allowed_media_url().
+			if ( ! self::is_allowed_media_url( $url ) ) {
+				continue;
+			}
+
 			$download_file = download_url( $url );
 
 			if ( is_wp_error( $download_file ) ) {
@@ -206,13 +224,22 @@ class CBT_Theme_Media {
 			}
 
 			// TODO: implement a warning if the file is missing
-			if ( ! is_wp_error( $download_file ) ) {
-				$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
-				if ( ! is_dir( $media_path ) ) {
-					wp_mkdir_p( $media_path );
-				}
-				rename( $download_file, $media_path . basename( $url ) );
+			if ( is_wp_error( $download_file ) ) {
+				continue;
 			}
+
+			// Post-download MIME allowlist — defence-in-depth against
+			// content/extension mismatch.
+			if ( ! self::is_allowed_media_file( $download_file, $url ) ) {
+				@unlink( $download_file );
+				continue;
+			}
+
+			$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
+			if ( ! is_dir( $media_path ) ) {
+				wp_mkdir_p( $media_path );
+			}
+			rename( $download_file, $media_path . basename( $url ) );
 		}
 
 	}
