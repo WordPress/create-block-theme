@@ -119,4 +119,24 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/cat.jpg?v=2' ) );
 		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/evil.php?disguised=cat.jpg' ) );
 	}
+
+	public function test_is_allowed_media_file_accepts_real_png() {
+		$tmp = wp_tempnam( 'cbt-test-png' );
+		copy( __DIR__ . '/data/tiny.png', $tmp );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, 'http://example.com/cat.png' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_media_file_rejects_php_body_with_image_url() {
+		$tmp = wp_tempnam( 'cbt-test-php' );
+		copy( __DIR__ . '/data/evil.php.txt', $tmp );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, 'http://example.com/evil.jpg' );
+		@unlink( $tmp );
+		$this->assertFalse( $ok );
+	}
+
+	public function test_is_allowed_media_file_rejects_missing_file() {
+		$this->assertFalse( CBT_Theme_Media::is_allowed_media_file( '/nonexistent/tmp/file', 'http://example.com/cat.jpg' ) );
+	}
 }

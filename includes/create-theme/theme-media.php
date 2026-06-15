@@ -58,6 +58,41 @@ class CBT_Theme_Media {
 	}
 
 	/**
+	 * Post-download MIME-type allowlist for downloaded media bodies.
+	 *
+	 * Uses wp_check_filetype_and_ext() to detect the real type of the bytes
+	 * on disk so that, e.g., a `.jpg`-named file whose body is PHP source
+	 * is rejected before we move it into the theme directory.
+	 *
+	 * @param string $tmp_file Local path to the downloaded file.
+	 * @param string $url      The originating URL (used to hint the basename).
+	 * @return bool True if the file's detected type is in the allowlist.
+	 */
+	public static function is_allowed_media_file( $tmp_file, $url ) {
+		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
+			return false;
+		}
+		$allowed = array(
+			'image/jpeg',
+			'image/png',
+			'image/gif',
+			'image/svg+xml',
+			'image/webp',
+			'video/mp4',
+			'video/webm',
+			'video/ogg',
+			'video/x-msvideo',
+			'video/quicktime',
+			'video/mpeg',
+			'video/3gpp',
+			'video/3gpp2',
+		);
+		$check   = wp_check_filetype_and_ext( $tmp_file, basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
+		$type    = isset( $check['type'] ) ? $check['type'] : false;
+		return is_string( $type ) && in_array( $type, $allowed, true );
+	}
+
+	/**
 	 * Get the absolute URLs of all media files for a template
 	 */
 	public static function get_media_absolute_urls_from_template( $template ) {
