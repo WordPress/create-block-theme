@@ -115,15 +115,55 @@ class CBT_Theme_Fonts {
 	/**
 	 * Allowlist check on the URL's path extension before we attempt to download a font.
 	 *
+	 * Defends against multi-extension polyglots (`evil.php.woff2`) by rejecting
+	 * any URL whose basename contains a dangerous extension segment anywhere,
+	 * not just at the end.
+	 *
 	 * @param string $url Absolute URL pointing at a font face source.
-	 * @return bool True if the extension is in the font allowlist.
+	 * @return bool True if the basename is safe and the final extension is in the font allowlist.
 	 */
 	public static function is_allowed_font_url( $url ) {
 		if ( ! is_string( $url ) || '' === $url ) {
 			return false;
 		}
-		$path      = wp_parse_url( $url, PHP_URL_PATH );
-		$extension = strtolower( pathinfo( (string) $path, PATHINFO_EXTENSION ) );
+		$path     = wp_parse_url( $url, PHP_URL_PATH );
+		$basename = strtolower( basename( (string) $path ) );
+
+		// Reject if ANY dot-separated segment is a dangerous extension.
+		// Mirrors the denylist in CBT_Theme_Media::is_allowed_media_url().
+		$dangerous = array(
+			'php',
+			'phtml',
+			'phar',
+			'php3',
+			'php4',
+			'php5',
+			'php7',
+			'php8',
+			'phps',
+			'html',
+			'htm',
+			'xhtml',
+			'htaccess',
+			'htpasswd',
+			'cgi',
+			'pl',
+			'py',
+			'rb',
+			'sh',
+			'asp',
+			'aspx',
+			'jsp',
+			'js',
+			'mjs',
+		);
+		foreach ( explode( '.', $basename ) as $segment ) {
+			if ( in_array( $segment, $dangerous, true ) ) {
+				return false;
+			}
+		}
+
+		$extension = pathinfo( $basename, PATHINFO_EXTENSION );
 		$allowed   = array( 'ttf', 'otf', 'woff', 'woff2', 'eot' );
 		return in_array( $extension, $allowed, true );
 	}

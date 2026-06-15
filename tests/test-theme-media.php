@@ -165,4 +165,30 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension URL' );
 		$this->assertFileDoesNotExist( $malicious );
 	}
+
+	public function test_is_allowed_media_url_rejects_multi_extension_polyglots() {
+		$urls = array(
+			'http://example.com/evil.php.jpg',
+			'http://example.com/evil.phtml.png',
+			'http://example.com/evil.phar.gif',
+			'http://example.com/sneaky.htaccess.jpg',
+			'http://example.com/inject.html.png',
+			'http://example.com/evil.PHP.jpg', // case-insensitive
+		);
+		foreach ( $urls as $url ) {
+			$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( $url ), "Should reject polyglot: $url" );
+		}
+	}
+
+	public function test_is_allowed_media_url_accepts_multi_dot_filenames() {
+		// Legitimate multi-dot filenames where NO interior segment is dangerous.
+		$urls = array(
+			'http://example.com/image.full.size.jpg',
+			'http://example.com/photo.v2.png',
+			'http://example.com/clip.final.mp4',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( $url ), "Should accept legit multi-dot: $url" );
+		}
+	}
 }

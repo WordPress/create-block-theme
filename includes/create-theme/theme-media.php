@@ -35,18 +35,60 @@ class CBT_Theme_Media {
 	/**
 	 * Allowlist check on the URL's path extension before we attempt to download it.
 	 *
-	 * Strips any query string before extracting the extension so that
-	 * `evil.php?disguised=cat.jpg` is correctly identified as `.php`.
+	 * Defends against two bypass classes:
+	 * 1. Query string disguise: strips the query before extracting the extension
+	 *    so `evil.php?disguised=cat.jpg` is correctly identified as `.php`.
+	 * 2. Multi-extension polyglots: rejects URLs whose basename contains ANY
+	 *    dangerous extension segment (`evil.php.jpg` → rejected) regardless of
+	 *    the final extension — defends against historical Apache configs that
+	 *    execute any filename containing `.php` anywhere.
 	 *
 	 * @param string $url Absolute URL.
-	 * @return bool True if the extension is in the media allowlist.
+	 * @return bool True if the basename is safe and the final extension is in the media allowlist.
 	 */
 	public static function is_allowed_media_url( $url ) {
 		if ( ! is_string( $url ) || '' === $url ) {
 			return false;
 		}
-		$path      = wp_parse_url( $url, PHP_URL_PATH );
-		$extension = strtolower( pathinfo( (string) $path, PATHINFO_EXTENSION ) );
+		$path     = wp_parse_url( $url, PHP_URL_PATH );
+		$basename = strtolower( basename( (string) $path ) );
+
+		// Reject if ANY dot-separated segment of the basename is a dangerous
+		// extension. This blocks multi-extension polyglots like `evil.php.jpg`
+		// that execute on Apache hosts with `AddHandler ... .php`.
+		$dangerous = array(
+			'php',
+			'phtml',
+			'phar',
+			'php3',
+			'php4',
+			'php5',
+			'php7',
+			'php8',
+			'phps',
+			'html',
+			'htm',
+			'xhtml',
+			'htaccess',
+			'htpasswd',
+			'cgi',
+			'pl',
+			'py',
+			'rb',
+			'sh',
+			'asp',
+			'aspx',
+			'jsp',
+			'js',
+			'mjs',
+		);
+		foreach ( explode( '.', $basename ) as $segment ) {
+			if ( in_array( $segment, $dangerous, true ) ) {
+				return false;
+			}
+		}
+
+		$extension = pathinfo( $basename, PATHINFO_EXTENSION );
 		$allowed   = array(
 			// images
 			'jpg',

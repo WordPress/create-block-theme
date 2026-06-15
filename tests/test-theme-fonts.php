@@ -617,5 +617,29 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		$this->uninstall_theme( $test_theme_slug );
 	}
+
+	public function test_is_allowed_font_url_rejects_multi_extension_polyglots() {
+		$urls = array(
+			'http://fonts.example.com/evil.php.woff2',
+			'http://fonts.example.com/evil.phtml.ttf',
+			'http://fonts.example.com/sneaky.htaccess.woff',
+			'http://fonts.example.com/inject.html.otf',
+			'http://fonts.example.com/evil.PHP.woff2', // case-insensitive
+		);
+		foreach ( $urls as $url ) {
+			$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should reject polyglot: $url" );
+		}
+	}
+
+	public function test_is_allowed_font_url_accepts_multi_dot_filenames() {
+		// Legitimate multi-dot filenames where NO interior segment is dangerous.
+		$urls = array(
+			'http://fonts.example.com/font.bold.italic.woff2',
+			'http://fonts.example.com/family.v2.ttf',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should accept legit multi-dot: $url" );
+		}
+	}
 }
 
