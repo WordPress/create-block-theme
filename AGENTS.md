@@ -52,9 +52,9 @@ npm run build
 # Watch for changes and rebuild the plugin
 npm run start
 
-# Run the PHP unit tests (requires Docker; test:php:setup must succeed first)
-npm run test:php:setup
-npm run test:php
+# Run the PHP unit tests (requires Docker; setup must succeed first)
+npm run test:unit:php:setup
+npm run test:unit:php
 
 # Run the JavaScript unit tests
 npm run test:unit
