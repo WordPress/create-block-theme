@@ -51,6 +51,12 @@ class CBT_Theme_Zip {
 				$font_dir         = wp_get_font_dir();
 				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+
+					// Pre-download URL extension allowlist — see CBT_Theme_Fonts::is_allowed_font_url().
+					if ( ! CBT_Theme_Fonts::is_allowed_font_url( $font_src ) ) {
+						continue;
+					}
+
 					$font_filename        = basename( $font_src );
 					$font_pretty_filename = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
 					$font_family_dir_name = sanitize_title( $font_family['name'] );
@@ -63,6 +69,14 @@ class CBT_Theme_Zip {
 					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_face['src'] );
+						if ( is_wp_error( $tmp_file ) ) {
+							continue;
+						}
+						// Post-download MIME allowlist.
+						if ( ! CBT_Theme_Fonts::is_allowed_font_file( $tmp_file, $font_src ) ) {
+							@unlink( $tmp_file );
+							continue;
+						}
 						$zip->addFileToTheme( $tmp_file, $font_face_path );
 						unlink( $tmp_file );
 					}
@@ -228,6 +242,12 @@ class CBT_Theme_Zip {
 	static function add_media_to_zip( $zip, $media ) {
 		$media = array_unique( $media );
 		foreach ( $media as $url ) {
+
+			// Pre-download URL extension allowlist — see CBT_Theme_Media::is_allowed_media_url().
+			if ( ! CBT_Theme_Media::is_allowed_media_url( $url ) ) {
+				continue;
+			}
+
 			$folder_path   = CBT_Theme_Media::get_media_folder_path_from_url( $url );
 			$download_file = download_url( $url );
 
@@ -243,11 +263,19 @@ class CBT_Theme_Zip {
 
 			// If there was an error downloading the file, skip it.
 			// TODO: Implement a warning if the file is missing
-			if ( ! is_wp_error( $download_file ) ) {
-				$content_array  = file( $download_file );
-				$file_as_string = implode( '', $content_array );
-				$zip->addFromStringToTheme( $folder_path . basename( $url ), $file_as_string );
+			if ( is_wp_error( $download_file ) ) {
+				continue;
 			}
+
+			// Post-download MIME allowlist.
+			if ( ! CBT_Theme_Media::is_allowed_media_file( $download_file, $url ) ) {
+				@unlink( $download_file );
+				continue;
+			}
+
+			$content_array  = file( $download_file );
+			$file_as_string = implode( '', $content_array );
+			$zip->addFromStringToTheme( $folder_path . basename( $url ), $file_as_string );
 		}
 	}
 
