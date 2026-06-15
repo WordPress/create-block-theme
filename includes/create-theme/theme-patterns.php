@@ -20,11 +20,13 @@ class CBT_Theme_Patterns {
 			return $content;
 		}
 
-		// Standard PHP open tags: <?php, <?=, <? (short tag).
-		// `php\b` matches <?php followed by a non-word char (PHP's grammar).
-		// `=` matches <?=. The lookahead `(?=\s)` and end-anchor `$` together
-		// catch the bare short tag <? followed by whitespace or EOF.
-		$content = preg_replace( '/<\?(?:php\b|=|(?=\s)|$)/i', '', $content );
+		// Strip ANY `<?` open tag, with a single carve-out for `<?xml` (the
+		// XML declaration, which appears in legitimate SVG content). Without
+		// the negative lookahead, hosts with `short_open_tag=1` would still
+		// execute `<?$x=…`, `<?(…)`, `<?"…"`, `<?//comment`, `<?/*comment*/`,
+		// `<?;`, etc. — none of which match `<?php` or `<?=` literally but
+		// all of which PHP's parser recognises as open tags.
+		$content = preg_replace( '/<\?(?!xml\b)/i', '', $content );
 
 		return $content;
 	}

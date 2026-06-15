@@ -90,4 +90,54 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		$this->assertStringContainsString( '*&#47;', $pattern->content );
 		$this->assertStringNotContainsString( 'evil */ break', $pattern->content );
 	}
+
+	public function test_pattern_from_wp_block_strips_short_tag_followed_by_non_letter() {
+		// Short-tag bypasses recognised by PHP when short_open_tag=1. The body
+		// after sanitisation must NOT contain ANY `<?` followed by non-`xml`.
+		$payloads = array(
+			'<p>safe</p><?$x = phpinfo(); ?>',
+			'<p>safe</p><?(phpinfo()); ?>',
+			'<p>safe</p><?"" . phpinfo(); ?>',
+			'<p>safe</p><?//comment' . "\n" . 'phpinfo(); ?>',
+			'<p>safe</p><?/*comment*/ phpinfo(); ?>',
+			'<p>safe</p><?;phpinfo(); ?>',
+		);
+		foreach ( $payloads as $payload ) {
+			$post    = $this->make_wp_block_post( $payload );
+			$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+			$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
+
+			// The security property is that the `<?` open tag is removed —
+			// once neutralised, any residual `phpinfo` text is inert HTML.
+			$this->assertStringNotContainsString( '<?', $body, "Short-tag bypass survived: $payload" );
+		}
+	}
+
+	public function test_pattern_from_wp_block_preserves_xml_declaration() {
+		// The XML declaration `<` + `?xml version="1.0"` + `?` + `>` is
+		// legitimate (appears in SVG content in block markup) and MUST
+		// survive sanitisation.
+		$safe    = '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>';
+		$post    = $this->make_wp_block_post( $safe );
+		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+		$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
+
+		$this->assertStringContainsString( '<?xml', $body );
+	}
+
+	public function test_strip_php_tags_handles_non_string_input() {
+		// Defensive guard — non-string input should round-trip without error.
+		// We can't call the private helper directly; exercise it via
+		// pattern_from_wp_block by constructing a post stub with non-string content.
+		$post               = new stdClass();
+		$post->ID           = 0;
+		$post->post_title   = 'Stub';
+		$post->post_content = null;
+		// Should not throw — but pattern_from_wp_block also reads other fields,
+		// so use a real wp_block post and then null out post_content.
+		$real_post               = $this->make_wp_block_post( '<p>safe</p>' );
+		$real_post->post_content = null;
+		$pattern                 = CBT_Theme_Patterns::pattern_from_wp_block( $real_post );
+		$this->assertNotNull( $pattern );
+	}
 }
