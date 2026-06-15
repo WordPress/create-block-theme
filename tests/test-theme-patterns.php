@@ -140,4 +140,32 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		$pattern                 = CBT_Theme_Patterns::pattern_from_wp_block( $real_post );
 		$this->assertNotNull( $pattern );
 	}
+
+	public function test_pattern_from_wp_block_strips_script_language_php() {
+		$payloads = array(
+			'<p>safe</p><script language="php">phpinfo();</script>',
+			'<p>safe</p><script language=\'php\'>phpinfo();</script>',
+			'<p>safe</p><script language=php>phpinfo();</script>',
+			'<p>safe</p><script LANGUAGE="PHP">phpinfo();</script>',
+		);
+		foreach ( $payloads as $payload ) {
+			$post    = $this->make_wp_block_post( $payload );
+			$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+			$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
+
+			$this->assertStringNotContainsString( 'phpinfo', $body, "Inner PHP should be stripped: $payload" );
+			$this->assertStringNotContainsString( '<script', $body, "Opening <script tag should be stripped: $payload" );
+		}
+	}
+
+	public function test_pattern_from_wp_block_preserves_unrelated_script_tags() {
+		// `<script type="application/json">` and similar non-PHP scripts are legitimate
+		// in block markup and MUST NOT be stripped.
+		$safe    = '<script type="application/json">{"a":1}</script>';
+		$post    = $this->make_wp_block_post( '<p>safe</p>' . $safe );
+		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+		$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
+
+		$this->assertStringContainsString( $safe, $body );
+	}
 }

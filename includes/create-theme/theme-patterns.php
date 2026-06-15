@@ -28,6 +28,12 @@ class CBT_Theme_Patterns {
 		// all of which PHP's parser recognises as open tags.
 		$content = preg_replace( '/<\?(?!xml\b)/i', '', $content );
 
+		// Strip legacy `<script language="php">…</script>` blocks. PHP 7+
+		// removed this parser, but custom SAPIs / polyfills could still
+		// honour it. Match the entire block (opening tag → closing tag,
+		// inclusive of inner content).
+		$content = preg_replace( '#<script\s+language\s*=\s*["\']?php["\']?[^>]*>.*?</script>#is', '', $content );
+
 		return $content;
 	}
 
