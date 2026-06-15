@@ -201,6 +201,14 @@ class CBT_Theme_Fonts {
 						// If the font source starts with 'file:' then it's already a theme asset.
 						continue;
 					}
+
+					// Pre-download URL extension allowlist — applies to both
+					// the local-copy and remote-download branches because the
+					// URL itself is the input we don't trust.
+					if ( ! self::is_allowed_font_url( $font_src ) ) {
+						continue;
+					}
+
 					$font_filename        = basename( $font_src );
 					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
@@ -211,6 +219,14 @@ class CBT_Theme_Fonts {
 					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_src );
+						if ( is_wp_error( $tmp_file ) ) {
+							continue;
+						}
+						// Post-download MIME allowlist.
+						if ( ! self::is_allowed_font_file( $tmp_file, $font_src ) ) {
+							@unlink( $tmp_file );
+							continue;
+						}
 						copy( $tmp_file, $font_face_path );
 						unlink( $tmp_file );
 					}

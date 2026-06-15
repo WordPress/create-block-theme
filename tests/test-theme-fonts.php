@@ -555,5 +555,43 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 	public function test_is_allowed_font_file_rejects_missing_file() {
 		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_file( '/nonexistent/tmp/file', 'http://fonts.example.com/foo.woff2' ) );
 	}
+
+	public function test_copy_font_assets_to_theme_skips_php_src_without_downloading() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Spy on HTTP — should NOT be called for the disallowed URL.
+		$attempted = false;
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$tracker = function ( $preempt, $args, $url ) use ( &$attempted ) {
+			$attempted = true;
+			return new WP_Error( 'cbt_test_intercept', 'blocked by test' );
+		};
+		add_filter( 'pre_http_request', $tracker, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Evil Family',
+				'slug'     => 'evil-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Evil Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'http://fonts.example.com/evil.php' ),
+					),
+				),
+			),
+		);
+		CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $tracker, 10 );
+
+		$malicious = get_stylesheet_directory() . '/assets/fonts/evil-family/evil-family-400-normal.php';
+		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension font src' );
+		$this->assertFileDoesNotExist( $malicious );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
 }
 
