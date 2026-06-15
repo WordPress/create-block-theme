@@ -1,0 +1,45 @@
+name: PR Playground Preview
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened, edited]
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+    preview:
+        name: Add Playground preview button
+        runs-on: ubuntu-latest
+        steps:
+            - name: Post Playground Preview Button
+              uses: WordPress/action-wp-playground-pr-preview@v3
+              with:
+                  blueprint: |
+                      {
+                          "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+                          "landingPage": "/wp-admin/themes.php?page=create-block-theme-landing",
+                          "steps": [
+                              {
+                                  "step": "login",
+                                  "username": "admin",
+                                  "password": "password"
+                              },
+                              {
+                                  "step": "installPlugin",
+                                  "pluginData": {
+                                      "resource": "git:directory",
+                                      "url": "https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git",
+                                      "ref": "${{ github.event.pull_request.head.sha }}",
+                                      "refType": "commit",
+                                      "path": "/"
+                                  },
+                                  "options": {
+                                      "activate": true,
+                                      "targetFolderName": "create-block-theme"
+                                  }
+                              }
+                          ]
+                      }
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
