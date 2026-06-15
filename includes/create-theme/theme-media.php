@@ -20,6 +20,44 @@ class CBT_Theme_Media {
 	}
 
 	/**
+	 * Allowlist check on the URL's path extension before we attempt to download it.
+	 *
+	 * Strips any query string before extracting the extension so that
+	 * `evil.php?disguised=cat.jpg` is correctly identified as `.php`.
+	 *
+	 * @param string $url Absolute URL.
+	 * @return bool True if the extension is in the media allowlist.
+	 */
+	public static function is_allowed_media_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return false;
+		}
+		$path      = wp_parse_url( $url, PHP_URL_PATH );
+		$extension = strtolower( pathinfo( (string) $path, PATHINFO_EXTENSION ) );
+		$allowed   = array(
+			// images
+			'jpg',
+			'jpeg',
+			'png',
+			'gif',
+			'svg',
+			'webp',
+			// videos
+			'mp4',
+			'm4v',
+			'webm',
+			'ogv',
+			'wmv',
+			'avi',
+			'mov',
+			'mpg',
+			'3gp',
+			'3g2',
+		);
+		return in_array( $extension, $allowed, true );
+	}
+
+	/**
 	 * Get the absolute URLs of all media files for a template
 	 */
 	public static function get_media_absolute_urls_from_template( $template ) {

@@ -80,4 +80,43 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
 
 	}
+
+	public function test_is_allowed_media_url_accepts_image_extension() {
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/cat.jpg' ) );
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/path/photo.png' ) );
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'https://example.com/clip.webp' ) );
+	}
+
+	public function test_is_allowed_media_url_accepts_video_extension() {
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/movie.mp4' ) );
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/movie.webm' ) );
+	}
+
+	public function test_is_allowed_media_url_rejects_php_extension() {
+		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/evil.php' ) );
+	}
+
+	public function test_is_allowed_media_url_rejects_other_dangerous_extensions() {
+		$urls = array(
+			'http://example.com/evil.phtml',
+			'http://example.com/evil.phar',
+			'http://example.com/evil.html',
+			'http://example.com/.htaccess',
+			'http://example.com/evil.php5',
+			'http://example.com/no-extension',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( $url ), "Should reject: $url" );
+		}
+	}
+
+	public function test_is_allowed_media_url_is_case_insensitive() {
+		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/EVIL.PHP' ) );
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/CAT.JPG' ) );
+	}
+
+	public function test_is_allowed_media_url_ignores_query_string() {
+		$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/cat.jpg?v=2' ) );
+		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/evil.php?disguised=cat.jpg' ) );
+	}
 }
