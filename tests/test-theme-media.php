@@ -191,4 +191,49 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 			$this->assertTrue( CBT_Theme_Media::is_allowed_media_url( $url ), "Should accept legit multi-dot: $url" );
 		}
 	}
+
+	public function test_add_media_to_local_writes_legit_png() {
+		$theme_assets_dir = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+		$expected_path    = $theme_assets_dir . 'tinytest.png';
+
+		if ( file_exists( $expected_path ) ) {
+			unlink( $expected_path );
+		}
+
+		$png_bytes         = file_get_contents( __DIR__ . '/data/tiny.png' );
+		$captured_tmp_path = null;
+
+		// Intercept download_url and write the real PNG bytes to its tmp file.
+		// download_url internally calls wp_safe_remote_get with stream=true and a
+		// `filename` arg; we short-circuit by returning a body, which download_url
+		// then writes to its tmp path via the WP HTTP API.
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $png_bytes, &$captured_tmp_path ) {
+			$captured_tmp_path = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $captured_tmp_path ) {
+				file_put_contents( $captured_tmp_path, $png_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $captured_tmp_path,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		CBT_Theme_Media::add_media_to_local( array( 'http://example.com/tinytest.png' ) );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$this->assertFileExists( $expected_path, 'Legitimate PNG URL should have been written to the theme assets dir' );
+		if ( file_exists( $expected_path ) ) {
+			$this->assertSame( $png_bytes, file_get_contents( $expected_path ) );
+			unlink( $expected_path );
+		}
+	}
 }

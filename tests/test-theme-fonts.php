@@ -641,5 +641,57 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 			$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should accept legit multi-dot: $url" );
 		}
 	}
+
+	public function test_copy_font_assets_to_theme_writes_legit_woff2() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$woff2_bytes = file_get_contents( __DIR__ . '/data/fonts/OpenSans-Regular.woff2' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $woff2_bytes ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, $woff2_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Test Sans',
+				'slug'     => 'test-sans',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Test Sans',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'http://fonts.example.com/test-sans.woff2' ),
+					),
+				),
+			),
+		);
+		CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$expected = get_stylesheet_directory() . '/assets/fonts/test-sans/test-sans-400-normal.woff2';
+		$this->assertFileExists( $expected, 'Legitimate WOFF2 URL should have been written to assets/fonts/' );
+		if ( file_exists( $expected ) ) {
+			$this->assertSame( $woff2_bytes, file_get_contents( $expected ) );
+		}
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
 }
 
