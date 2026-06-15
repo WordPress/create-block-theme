@@ -112,6 +112,22 @@ class CBT_Theme_Fonts {
 		return $font_filename;
 	}
 
+	/**
+	 * Allowlist check on the URL's path extension before we attempt to download a font.
+	 *
+	 * @param string $url Absolute URL pointing at a font face source.
+	 * @return bool True if the extension is in the font allowlist.
+	 */
+	public static function is_allowed_font_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return false;
+		}
+		$path      = wp_parse_url( $url, PHP_URL_PATH );
+		$extension = strtolower( pathinfo( (string) $path, PATHINFO_EXTENSION ) );
+		$allowed   = array( 'ttf', 'otf', 'woff', 'woff2', 'eot' );
+		return in_array( $extension, $allowed, true );
+	}
+
 	/*
 	 * Copy the font assets to the theme.
 	 *

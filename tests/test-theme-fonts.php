@@ -498,5 +498,42 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$actual    = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $src, $src_index );
 		$this->assertEquals( $expected, $actual );
 	}
+
+	public function test_is_allowed_font_url_accepts_standard_extensions() {
+		$urls = array(
+			'http://fonts.example.com/foo.ttf',
+			'http://fonts.example.com/foo.otf',
+			'http://fonts.example.com/foo.woff',
+			'http://fonts.example.com/foo.woff2',
+			'http://fonts.example.com/foo.eot',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should accept: $url" );
+		}
+	}
+
+	public function test_is_allowed_font_url_rejects_php_and_other_extensions() {
+		$urls = array(
+			'http://fonts.example.com/evil.php',
+			'http://fonts.example.com/evil.phtml',
+			'http://fonts.example.com/evil.phar',
+			'http://fonts.example.com/evil.txt',
+			'http://fonts.example.com/evil.bin',
+			'http://fonts.example.com/no-extension',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should reject: $url" );
+		}
+	}
+
+	public function test_is_allowed_font_url_is_case_insensitive() {
+		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/EVIL.PHP' ) );
+		$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/FOO.WOFF2' ) );
+	}
+
+	public function test_is_allowed_font_url_ignores_query_string() {
+		$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/foo.woff2?v=2' ) );
+		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/evil.php?disguised=foo.woff2' ) );
+	}
 }
 
