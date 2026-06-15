@@ -544,6 +544,30 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertTrue( $ok );
 	}
 
+	public function test_is_allowed_font_file_accepts_real_ttf() {
+		$tmp = wp_tempnam( 'cbt-test-ttf' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.ttf', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.ttf' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_accepts_real_otf() {
+		$tmp = wp_tempnam( 'cbt-test-otf' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.otf', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.otf' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_accepts_real_woff() {
+		$tmp = wp_tempnam( 'cbt-test-woff' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.woff', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.woff' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
 	public function test_is_allowed_font_file_rejects_php_body_with_woff2_url() {
 		$tmp = wp_tempnam( 'cbt-test-font-evil' );
 		copy( __DIR__ . '/data/evil.php.txt', $tmp );

@@ -158,15 +158,18 @@ class CBT_Theme_Fonts {
 			return false;
 		}
 		$allowed = array(
-			'font/ttf',
-			'font/otf',
-			'font/woff',
-			'font/woff2',
+			'application/font-sfnt',
 			'application/font-woff',
 			'application/font-woff2',
 			'application/vnd.ms-fontobject',
-			'application/x-font-ttf',
+			'application/vnd.ms-opentype',
 			'application/x-font-otf',
+			'application/x-font-ttf',
+			'font/otf',
+			'font/sfnt',
+			'font/ttf',
+			'font/woff',
+			'font/woff2',
 		);
 		return in_array( $type, $allowed, true );
 	}
