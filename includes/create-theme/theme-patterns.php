@@ -29,13 +29,13 @@ class CBT_Theme_Patterns {
 			return $content;
 		}
 
-		// Strip ANY `<?` open tag, with a single carve-out for `<?xml` (the
-		// XML declaration, which appears in legitimate SVG content). Without
-		// the negative lookahead, hosts with `short_open_tag=1` would still
-		// execute `<?$x=…`, `<?(…)`, `<?"…"`, `<?//comment`, `<?/*comment*/`,
-		// `<?;`, etc. — none of which match `<?php` or `<?=` literally but
-		// all of which PHP's parser recognises as open tags.
-		$content = preg_replace( '/<\?(?!xml\b)/i', '', $content );
+		// Strip ANY `<?` open tag. On hosts with `short_open_tag=1`, PHP parses
+		// `<?` followed by `$`, `(`, `"`, `//`, `/*`, `;`, or `xml` as an open
+		// tag — preserving any of them would either re-execute as PHP or
+		// produce a fatal parse error when the exported `.php` file is loaded.
+		// Block patterns are HTML/block markup, so there's no legitimate
+		// `<?xml` content to preserve.
+		$content = preg_replace( '/<\?/', '', $content );
 
 		// Strip legacy `<script language="php">…</script>` blocks. PHP 7+
 		// removed this parser, but custom SAPIs / polyfills could still

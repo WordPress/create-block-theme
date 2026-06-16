@@ -93,7 +93,7 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 
 	public function test_pattern_from_wp_block_strips_short_tag_followed_by_non_letter() {
 		// Short-tag bypasses recognised by PHP when short_open_tag=1. The body
-		// after sanitisation must NOT contain ANY `<?` followed by non-`xml`.
+		// after sanitisation must NOT contain ANY `<?` open tag.
 		$payloads = array(
 			'<p>safe</p><?$x = phpinfo(); ?>',
 			'<p>safe</p><?(phpinfo()); ?>',
@@ -113,16 +113,19 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_pattern_from_wp_block_preserves_xml_declaration() {
-		// The XML declaration `<` + `?xml version="1.0"` + `?` + `>` is
-		// legitimate (appears in SVG content in block markup) and MUST
-		// survive sanitisation.
-		$safe    = '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>';
-		$post    = $this->make_wp_block_post( $safe );
+	public function test_pattern_from_wp_block_strips_xml_declaration() {
+		// XML declarations are parsed as a short PHP open tag on hosts with
+		// short_open_tag=1, producing a fatal parse error when the exported
+		// pattern is loaded. Block patterns do not legitimately contain XML
+		// declarations, so they are stripped along with PHP tags.
+		$payload = '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>';
+		$post    = $this->make_wp_block_post( $payload );
 		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
 		$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
 
-		$this->assertStringContainsString( '<?xml', $body );
+		$this->assertStringNotContainsString( '<?xml', $body );
+		// The surrounding SVG markup survives — only the `<?` open tag is removed.
+		$this->assertStringContainsString( '<svg', $body );
 	}
 
 	public function test_strip_php_tags_handles_non_string_input() {
