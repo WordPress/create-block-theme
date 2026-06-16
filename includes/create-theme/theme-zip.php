@@ -271,10 +271,9 @@ class CBT_Theme_Zip {
 				continue;
 			}
 
-			$content_array  = file( $download_file );
-			$file_as_string = implode( '', $content_array );
-			$zip->addFromStringToTheme( $folder_path . basename( $url ), $file_as_string );
-		}
+			$file_name = basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+			$zip->addFileToTheme( $download_file, ltrim( $folder_path, '/' ) . $file_name );
+			@unlink( $download_file );
 	}
 
 }
