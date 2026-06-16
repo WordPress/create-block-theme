@@ -209,6 +209,21 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertFalse( $ok );
 	}
 
+	public function test_is_allowed_media_file_rejects_extension_mismatch() {
+		$tmp = wp_tempnam( 'cbt-test-svg-as-jpg' );
+		file_put_contents( $tmp, '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>' );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, 'http://example.com/cat.jpg' );
+		@unlink( $tmp );
+		$this->assertFalse( $ok, 'Downloaded media bytes should match the URL extension before being saved under that filename.' );
+	}
+
+	public function test_make_relative_media_url_uses_path_filename_not_query_basename() {
+		$relative_url = CBT_Theme_Media::make_relative_media_url( 'http://example.com/cat.jpg?/evil.php' );
+
+		$this->assertStringContainsString( '/assets/images/cat.jpg', $relative_url );
+		$this->assertStringNotContainsString( 'evil.php', $relative_url );
+	}
+
 	public function test_add_media_to_local_skips_php_url_without_downloading() {
 		$theme_assets = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
 		$malicious    = $theme_assets . 'evil.php';

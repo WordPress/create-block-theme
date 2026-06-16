@@ -35,6 +35,50 @@ class Test_Create_Block_Theme_Zip extends WP_UnitTestCase {
 		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension URL' );
 	}
 
+	public function test_add_media_to_zip_preserves_downloaded_file_until_close() {
+		list( $zip, $tmp_path ) = $this->make_temp_zip( 'cbt-test' );
+
+		$png_bytes = file_get_contents( __DIR__ . '/data/tiny.png' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $png_bytes ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, $png_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		CBT_Theme_Zip::add_media_to_zip( $zip, array( 'http://example.com/tinyzip.png' ) );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$closed = @$zip->close();
+		$reader = null;
+		try {
+			$this->assertTrue( $closed, 'ZIP should close successfully after downloaded media is added.' );
+
+			$reader = new ZipArchive();
+			$this->assertTrue( $reader->open( $tmp_path ), 'ZIP should be readable after close.' );
+			$this->assertSame( $png_bytes, $reader->getFromName( 'cbt-test/assets/images/tinyzip.png' ) );
+		} finally {
+			if ( $reader instanceof ZipArchive ) {
+				$reader->close();
+			}
+			@unlink( $tmp_path );
+		}
+	}
+
 	/**
 	 * Integration-level test for the font sink would require seeding the
 	 * user global-styles post and getting WP_Theme_JSON_Resolver to surface
