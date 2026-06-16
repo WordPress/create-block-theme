@@ -276,4 +276,53 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<?php', $result->content, 'Attacker PHP open tag must be stripped' );
 		$this->assertFalse( isset( $result->pattern ), 'paternize_template should not run once the attacker open tag is stripped' );
 	}
+
+	public function test_add_patterns_to_theme_writes_sanitised_body_to_disk() {
+		// Use whatever theme is currently active in the test environment.
+		// wp-env bootstraps with a working block theme so writes succeed.
+		$patterns_dir          = get_stylesheet_directory() . '/patterns';
+		$expected_pattern_path = $patterns_dir . '/cbt-pattern-rce-probe.php';
+
+		// Track whether we created the patterns/ directory (for cleanup).
+		$created_patterns_dir = ! is_dir( $patterns_dir );
+
+		// Make sure the destination doesn't pre-exist from a prior run.
+		if ( file_exists( $expected_pattern_path ) ) {
+			unlink( $expected_pattern_path );
+		}
+
+		// Create a malicious wp_block post. We bypass KSES the same way the
+		// other tests in this class do (via the make_wp_block_post helper) —
+		// this simulates an Editor user who has the `unfiltered_html` cap.
+		$this->make_wp_block_post(
+			'<p>safe</p><?php file_put_contents("/tmp/cbt_should_not_be_written.txt", "pwned"); ?>',
+			'CBT Pattern RCE Probe'
+		);
+
+		// Run the export. NOTE: add_patterns_to_theme calls wp_delete_post on the
+		// source wp_block at the end — that's intentional plugin behaviour; we
+		// don't need to clean up the post ourselves.
+		CBT_Theme_Patterns::add_patterns_to_theme();
+
+		// Assert the file was written.
+		$this->assertFileExists( $expected_pattern_path, 'Pattern file should have been written to the active theme' );
+
+		// Assert the body of the file does NOT contain executable PHP outside
+		// the metadata docblock.
+		$contents = file_get_contents( $expected_pattern_path );
+		$body     = substr( $contents, strpos( $contents, '?>' ) + 2 );
+
+		$this->assertStringNotContainsString( '<?php', $body, 'Body of generated pattern file must not contain <?php' );
+		$this->assertStringContainsString( '<p>safe</p>', $body, 'Legitimate markup must survive sanitisation' );
+
+		// Cleanup: remove the generated pattern file, and the patterns/ dir if we created it.
+		unlink( $expected_pattern_path );
+		if ( $created_patterns_dir && is_dir( $patterns_dir ) && count( scandir( $patterns_dir ) ) === 2 ) {
+			rmdir( $patterns_dir );
+		}
+
+		// Final paranoia: assert the marker file was NOT written (i.e. the
+		// stripped PHP never executed).
+		$this->assertFileDoesNotExist( '/tmp/cbt_should_not_be_written.txt' );
+	}
 }
