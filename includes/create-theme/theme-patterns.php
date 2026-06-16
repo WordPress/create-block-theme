@@ -21,9 +21,8 @@ class CBT_Theme_Patterns {
 	 * would strip the plugin's own localization helpers and break the
 	 * "Make text translation-ready" feature.
 	 *
-	 * @param string $content User-supplied body content.
-	 * @return string Same content with PHP open tags removed.
-	 */
+	 * @param mixed $content User-supplied body content.
+	 * @return mixed Same content with PHP open tags removed (when input is a non-empty string).
 	public static function strip_php_tags( $content ) {
 		if ( ! is_string( $content ) || '' === $content ) {
 			return $content;
