@@ -64,4 +64,39 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 
 		$this->assertFalse( $result );
 	}
+
+	public function test_save_endpoint_rejects_when_file_mods_disallowed() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		add_filter( 'cbt_file_mods_allowed', '__return_false' );
+		$request  = new WP_REST_Request( 'POST', '/create-block-theme/v1/save' );
+		$response = rest_get_server()->dispatch( $request );
+		remove_filter( 'cbt_file_mods_allowed', '__return_false' );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	public function test_save_endpoint_rejects_anonymous() {
+		wp_set_current_user( 0 );
+		$request  = new WP_REST_Request( 'POST', '/create-block-theme/v1/save' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 401, $response->get_status() );
+	}
+
+	public function test_font_families_endpoint_still_accessible_to_admin() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		// /font-families is a GET and is NOT gated by can_modify_theme().
+		// Even with file mods disallowed, it should still respond (not 403).
+		add_filter( 'cbt_file_mods_allowed', '__return_false' );
+		$request  = new WP_REST_Request( 'GET', '/create-block-theme/v1/font-families' );
+		$response = rest_get_server()->dispatch( $request );
+		remove_filter( 'cbt_file_mods_allowed', '__return_false' );
+
+		$this->assertNotSame( 403, $response->get_status() );
+	}
 }

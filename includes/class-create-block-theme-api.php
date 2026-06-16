@@ -43,7 +43,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_export_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -54,7 +54,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_update_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -65,7 +65,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -76,7 +76,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme_settings' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -87,7 +87,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_clone_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -98,7 +98,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_variation' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -109,7 +109,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_blank_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -120,7 +120,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_child_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			)
 		);
@@ -142,7 +142,7 @@ class CBT_Theme_API {
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'rest_reset_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return $this->can_modify_theme();
 				},
 			),
 		);
