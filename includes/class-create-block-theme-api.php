@@ -504,4 +504,45 @@ class CBT_Theme_API {
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
 		return $sanitized_theme;
 	}
+
+	/**
+	 * Permission check for filesystem-mutating REST routes.
+	 *
+	 * On multisite, themes are network-shared. Require super-admin to prevent
+	 * sub-site administrators from crossing the tenant boundary into the
+	 * shared `wp-content/themes/` directory.
+	 *
+	 * Honors the WP hardening constants `DISALLOW_FILE_EDIT` and
+	 * `DISALLOW_FILE_MODS` via `file_mods_allowed()`, matching the behaviour
+	 * the plugin had pre-v2.1.2 and aligning with WP Core's theme-editor.
+	 *
+	 * @return bool
+	 */
+	private function can_modify_theme() {
+		if ( ! $this->file_mods_allowed() ) {
+			return false;
+		}
+		if ( is_multisite() ) {
+			return is_super_admin();
+		}
+		return current_user_can( 'edit_theme_options' );
+	}
+
+	/**
+	 * Whether theme-file modifications are permitted by site configuration.
+	 *
+	 * Read-only inside production code paths. The `cbt_file_mods_allowed`
+	 * filter exists primarily as a test seam — `DISALLOW_FILE_EDIT` and
+	 * `DISALLOW_FILE_MODS` are `define`d constants and cannot be undefined
+	 * once set, so tests need a way to simulate them.
+	 *
+	 * @return bool True if both DISALLOW_FILE_EDIT and DISALLOW_FILE_MODS are absent / false.
+	 */
+	private function file_mods_allowed() {
+		$allowed = ! ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT );
+		if ( $allowed ) {
+			$allowed = ! ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS );
+		}
+		return apply_filters( 'cbt_file_mods_allowed', $allowed );
+	}
 }
