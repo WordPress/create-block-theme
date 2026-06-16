@@ -169,49 +169,74 @@ class CBT_Theme_Fonts {
 	}
 
 	/**
-	 * Post-download MIME-type allowlist for downloaded font bodies.
+	 * Magic-byte verification of a downloaded font file.
 	 *
-	 * Uses finfo directly because WordPress core's MIME registry has no font
-	 * entries, so wp_check_filetype_and_ext() rejects all fonts. finfo_file
-	 * detects the MIME from the bytes on disk independently of the registry.
+	 * libmagic-based MIME detection (via finfo or wp_check_filetype_and_ext)
+	 * is unreliable for font formats: WordPress Core has no font MIMEs in
+	 * its registry, and PHP base images ship with varying libmagic versions
+	 * — older builds return application/octet-stream for WOFF/WOFF2 rather
+	 * than the modern font/woff(2) types. Direct magic-byte verification is
+	 * version-independent and provides a stronger content guarantee.
+	 *
+	 * Recognised formats:
+	 *  - WOFF2: magic `wOF2` at offset 0
+	 *  - WOFF:  magic `wOFF` at offset 0
+	 *  - OTF / OpenType (CFF): magic `OTTO` at offset 0
+	 *  - TTF:  magic `\x00\x01\x00\x00` at offset 0 (or `true` for legacy Mac)
+	 *  - EOT:  Version field (offset 8) is 0x00010000 / 0x00020001 / 0x00020002
 	 *
 	 * @param string $tmp_file Local path to the downloaded file.
 	 * @param string $url      The originating URL (kept for signature symmetry
 	 *                         with CBT_Theme_Media::is_allowed_media_file()).
-	 * @return bool True if the file's detected type is in the font allowlist.
+	 * @return bool True if the file's leading bytes match a known font signature.
 	 */
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	public static function is_allowed_font_file( $tmp_file, $url ) {
 		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
 			return false;
 		}
-		if ( ! function_exists( 'finfo_open' ) ) {
+
+		// Read 12 bytes — covers magic-at-offset-0 formats (4 bytes) and the
+		// EOT Version field at offset 8 (4 bytes).
+		$fp = fopen( $tmp_file, 'rb' );
+		if ( false === $fp ) {
 			return false;
 		}
-		$finfo = finfo_open( FILEINFO_MIME_TYPE );
-		if ( ! $finfo ) {
+		$head = fread( $fp, 12 );
+		fclose( $fp );
+
+		if ( false === $head || strlen( $head ) < 4 ) {
 			return false;
 		}
-		$type = finfo_file( $finfo, $tmp_file );
-		finfo_close( $finfo );
-		if ( ! is_string( $type ) ) {
-			return false;
-		}
-		$allowed = array(
-			'application/font-sfnt',
-			'application/font-woff',
-			'application/font-woff2',
-			'application/vnd.ms-fontobject',
-			'application/vnd.ms-opentype',
-			'application/x-font-otf',
-			'application/x-font-ttf',
-			'font/otf',
-			'font/sfnt',
-			'font/ttf',
-			'font/woff',
-			'font/woff2',
+
+		// Most font formats have a 4-byte magic at offset 0.
+		$first_four       = substr( $head, 0, 4 );
+		$magic_signatures = array(
+			'wOF2',                  // WOFF2
+			'wOFF',                  // WOFF
+			'OTTO',                  // OpenType (CFF flavour)
+			"\x00\x01\x00\x00",      // TrueType
+			'true',                  // Mac TrueType
 		);
-		return in_array( $type, $allowed, true );
+		if ( in_array( $first_four, $magic_signatures, true ) ) {
+			return true;
+		}
+
+		// EOT has no fixed magic at offset 0. Its Version field at offset 8
+		// takes one of three known values (little-endian uint32):
+		// 0x00010000, 0x00020001, 0x00020002.
+		if ( 12 === strlen( $head ) ) {
+			$version_le_bytes = array(
+				"\x00\x00\x01\x00", // 0x00010000
+				"\x01\x00\x02\x00", // 0x00020001
+				"\x02\x00\x02\x00", // 0x00020002
+			);
+			if ( in_array( substr( $head, 8, 4 ), $version_le_bytes, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/*
