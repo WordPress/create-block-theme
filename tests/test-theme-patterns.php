@@ -286,9 +286,12 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		// Track whether we created the patterns/ directory (for cleanup).
 		$created_patterns_dir = ! is_dir( $patterns_dir );
 
-		// Make sure the destination doesn't pre-exist from a prior run.
+		// Make sure the destination and marker file don't pre-exist from a prior run.
 		if ( file_exists( $expected_pattern_path ) ) {
 			unlink( $expected_pattern_path );
+		}
+		if ( file_exists( '/tmp/cbt_should_not_be_written.txt' ) ) {
+			unlink( '/tmp/cbt_should_not_be_written.txt' );
 		}
 
 		// Create a malicious wp_block post. We bypass KSES the same way the
