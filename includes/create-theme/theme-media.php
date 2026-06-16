@@ -279,12 +279,12 @@ class CBT_Theme_Media {
 				continue;
 			}
 
+			$filename   = basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
 			$media_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . self::get_media_folder_path_from_url( $url );
 			if ( ! is_dir( $media_path ) ) {
 				wp_mkdir_p( $media_path );
 			}
-			rename( $download_file, $media_path . basename( $url ) );
-		}
+			rename( $download_file, $media_path . $filename );
 
 	}
 
