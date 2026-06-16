@@ -277,8 +277,9 @@ class CBT_Theme_Fonts {
 						continue;
 					}
 
-					$font_filename        = basename( $font_src );
-					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
+					$font_src_path        = (string) wp_parse_url( $font_src, PHP_URL_PATH );
+					$font_filename        = basename( $font_src_path );
+					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src_path, $font_src_index );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
 					$font_dir             = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
