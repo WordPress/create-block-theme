@@ -63,6 +63,7 @@ class Test_Create_Block_Theme_Zip extends WP_UnitTestCase {
 
 		remove_filter( 'pre_http_request', $mock, 10 );
 
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- ZipArchive::close() may emit a warning if the archive ended up empty; the test asserts the return value instead.
 		$closed = @$zip->close();
 		$reader = null;
 		try {
