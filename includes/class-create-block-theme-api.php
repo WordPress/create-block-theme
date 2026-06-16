@@ -532,6 +532,7 @@ class CBT_Theme_API {
 	 * Whether theme-file modifications are permitted by site configuration.
 	 *
 	 * @return bool True when file modifications are allowed by configuration (DISALLOW_FILE_EDIT / DISALLOW_FILE_MODS) and not disabled by the cbt_file_mods_allowed filter.
+	 */
 	private function file_mods_allowed() {
 		$const_allowed = ! ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT );
 		if ( $const_allowed ) {
