@@ -140,6 +140,75 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertFalse( CBT_Theme_Media::is_allowed_media_file( '/nonexistent/tmp/file', 'http://example.com/cat.jpg' ) );
 	}
 
+	/**
+	 * Helper: write magic bytes to a tmp file and assert acceptance.
+	 */
+	private function assert_media_magic_accepted( $bytes, $url ) {
+		$tmp = wp_tempnam( 'cbt-test-magic' );
+		file_put_contents( $tmp, $bytes );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, $url );
+		@unlink( $tmp );
+		$this->assertTrue( $ok, "Should accept magic bytes for $url" );
+	}
+
+	public function test_is_allowed_media_file_accepts_jpeg_magic() {
+		$this->assert_media_magic_accepted( "\xff\xd8\xff\xe0" . str_repeat( "\x00", 16 ), 'http://example.com/cat.jpg' );
+	}
+
+	public function test_is_allowed_media_file_accepts_gif_magic() {
+		$this->assert_media_magic_accepted( 'GIF89a' . str_repeat( "\x00", 16 ), 'http://example.com/cat.gif' );
+	}
+
+	public function test_is_allowed_media_file_accepts_webp_magic() {
+		// RIFF + 4-byte size (any) + 'WEBP' + payload.
+		$this->assert_media_magic_accepted( "RIFF\x00\x00\x00\x00WEBP" . str_repeat( "\x00", 16 ), 'http://example.com/cat.webp' );
+	}
+
+	public function test_is_allowed_media_file_accepts_svg_content() {
+		$this->assert_media_magic_accepted( '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>', 'http://example.com/cat.svg' );
+	}
+
+	public function test_is_allowed_media_file_accepts_svg_with_xml_declaration() {
+		// Use a `?` ` >` split for the closing tag so PHP does not exit the
+		// file's PHP mode inside this string literal.
+		$payload = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' . '<svg xmlns="http://www.w3.org/2000/svg"/>';
+		$this->assert_media_magic_accepted( $payload, 'http://example.com/cat.svg' );
+	}
+
+	public function test_is_allowed_media_file_accepts_mp4_ftyp() {
+		// ISO BMFF: 4-byte size + 'ftyp' + brand. Covers mp4, m4v, mov, 3gp, 3g2.
+		$this->assert_media_magic_accepted( "\x00\x00\x00\x20" . 'ftypisom' . str_repeat( "\x00", 16 ), 'http://example.com/cat.mp4' );
+	}
+
+	public function test_is_allowed_media_file_accepts_webm_magic() {
+		$this->assert_media_magic_accepted( "\x1a\x45\xdf\xa3" . str_repeat( "\x00", 16 ), 'http://example.com/cat.webm' );
+	}
+
+	public function test_is_allowed_media_file_accepts_ogv_magic() {
+		$this->assert_media_magic_accepted( 'OggS' . str_repeat( "\x00", 16 ), 'http://example.com/cat.ogv' );
+	}
+
+	public function test_is_allowed_media_file_accepts_wmv_asf_magic() {
+		$this->assert_media_magic_accepted( "\x30\x26\xb2\x75\x8e\x66\xcf\x11" . str_repeat( "\x00", 16 ), 'http://example.com/cat.wmv' );
+	}
+
+	public function test_is_allowed_media_file_accepts_avi_riff() {
+		// RIFF + 4-byte size (any) + 'AVI ' + payload.
+		$this->assert_media_magic_accepted( "RIFF\x00\x00\x00\x00AVI " . str_repeat( "\x00", 16 ), 'http://example.com/cat.avi' );
+	}
+
+	public function test_is_allowed_media_file_accepts_mpeg_magic() {
+		$this->assert_media_magic_accepted( "\x00\x00\x01\xb3" . str_repeat( "\x00", 16 ), 'http://example.com/cat.mpg' );
+	}
+
+	public function test_is_allowed_media_file_rejects_random_bytes() {
+		$tmp = wp_tempnam( 'cbt-test-random' );
+		file_put_contents( $tmp, 'this is just random text that does not match any magic' );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, 'http://example.com/cat.jpg' );
+		@unlink( $tmp );
+		$this->assertFalse( $ok );
+	}
+
 	public function test_add_media_to_local_skips_php_url_without_downloading() {
 		$theme_assets = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
 		$malicious    = $theme_assets . 'evil.php';

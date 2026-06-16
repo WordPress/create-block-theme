@@ -115,38 +115,110 @@ class CBT_Theme_Media {
 	}
 
 	/**
-	 * Post-download MIME-type allowlist for downloaded media bodies.
+	 * Magic-byte verification of a downloaded media file.
 	 *
-	 * Uses wp_check_filetype_and_ext() to detect the real type of the bytes
-	 * on disk so that, e.g., a `.jpg`-named file whose body is PHP source
-	 * is rejected before we move it into the theme directory.
+	 * libmagic-based MIME detection (via wp_check_filetype_and_ext) is
+	 * unreliable here for two reasons: WordPress Core's default mime registry
+	 * omits SVG entirely, and its mappings for some video formats (wmv, avi)
+	 * differ from what libmagic returns. The result was that legitimate
+	 * SVG/WMV/AVI URLs passed the URL allowlist and then silently failed the
+	 * post-download check.
+	 *
+	 * This implementation verifies content by inspecting the file's leading
+	 * bytes against the known magic signatures for each allowed format.
+	 *
+	 * Recognised formats:
+	 *  - JPEG: `\xff\xd8\xff` at offset 0
+	 *  - PNG:  `\x89PNG` at offset 0
+	 *  - GIF:  `GIF8` at offset 0 (covers GIF87a and GIF89a)
+	 *  - WebP: `RIFF....WEBP` at offset 0 (RIFF + size + form)
+	 *  - SVG:  `<svg` somewhere in the first 1024 bytes (allows leading XML
+	 *          declaration / BOM / whitespace before the root element)
+	 *  - MP4 / M4V / MOV / 3GP / 3G2 (ISO BMFF): `ftyp` at offset 4
+	 *  - WebM: `\x1a\x45\xdf\xa3` (EBML) at offset 0
+	 *  - OGV:  `OggS` at offset 0
+	 *  - WMV:  ASF GUID `\x30\x26\xb2\x75\x8e\x66\xcf\x11` at offset 0
+	 *  - AVI:  `RIFF....AVI ` at offset 0
+	 *  - MPEG: `\x00\x00\x01\xb3` (sequence) or `\x00\x00\x01\xba` (system)
 	 *
 	 * @param string $tmp_file Local path to the downloaded file.
-	 * @param string $url      The originating URL (used to hint the basename).
-	 * @return bool True if the file's detected type is in the allowlist.
+	 * @param string $url      The originating URL (kept for signature symmetry
+	 *                         with CBT_Theme_Fonts::is_allowed_font_file()).
+	 * @return bool True if the file's leading bytes match a known media signature.
 	 */
+	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	public static function is_allowed_media_file( $tmp_file, $url ) {
 		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
 			return false;
 		}
-		$allowed = array(
-			'image/jpeg',
-			'image/png',
-			'image/gif',
-			'image/svg+xml',
-			'image/webp',
-			'video/mp4',
-			'video/webm',
-			'video/ogg',
-			'video/x-msvideo',
-			'video/quicktime',
-			'video/mpeg',
-			'video/3gpp',
-			'video/3gpp2',
-		);
-		$check   = wp_check_filetype_and_ext( $tmp_file, basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
-		$type    = isset( $check['type'] ) ? $check['type'] : false;
-		return is_string( $type ) && in_array( $type, $allowed, true );
+
+		// Read 1024 bytes — covers all fixed-position magic-byte formats and
+		// gives enough room for SVG's `<svg` tag after an optional XML
+		// declaration / BOM / whitespace.
+		$fp = fopen( $tmp_file, 'rb' );
+		if ( false === $fp ) {
+			return false;
+		}
+		$head = fread( $fp, 1024 );
+		fclose( $fp );
+
+		if ( false === $head || strlen( $head ) < 4 ) {
+			return false;
+		}
+
+		$first_four = substr( $head, 0, 4 );
+
+		// JPEG: \xff\xd8\xff followed by a marker byte.
+		if ( "\xff\xd8\xff" === substr( $first_four, 0, 3 ) ) {
+			return true;
+		}
+		// PNG.
+		if ( "\x89PNG" === $first_four ) {
+			return true;
+		}
+		// GIF (GIF87a or GIF89a).
+		if ( 'GIF8' === $first_four ) {
+			return true;
+		}
+		// Ogg container (OGV).
+		if ( 'OggS' === $first_four ) {
+			return true;
+		}
+		// WebM (EBML header).
+		if ( "\x1a\x45\xdf\xa3" === $first_four ) {
+			return true;
+		}
+		// MPEG sequence (\x00\x00\x01\xb3) or system (\x00\x00\x01\xba) header.
+		if ( "\x00\x00\x01\xb3" === $first_four || "\x00\x00\x01\xba" === $first_four ) {
+			return true;
+		}
+
+		// WMV / ASF: 16-byte GUID header. We check the first 8 bytes which
+		// uniquely identify the ASF container.
+		if ( strlen( $head ) >= 8 && "\x30\x26\xb2\x75\x8e\x66\xcf\x11" === substr( $head, 0, 8 ) ) {
+			return true;
+		}
+
+		// RIFF-based formats (WebP and AVI): `RIFF` + 4-byte size + 4-char form.
+		if ( 'RIFF' === $first_four && strlen( $head ) >= 12 ) {
+			$form = substr( $head, 8, 4 );
+			if ( 'WEBP' === $form || 'AVI ' === $form ) {
+				return true;
+			}
+		}
+
+		// ISO BMFF (MP4, M4V, MOV, 3GP, 3G2): `ftyp` at offset 4.
+		if ( strlen( $head ) >= 8 && 'ftyp' === substr( $head, 4, 4 ) ) {
+			return true;
+		}
+
+		// SVG: XML-based, may have a leading XML declaration / BOM / whitespace
+		// before the `<svg` root. Case-insensitive search in the head.
+		if ( false !== stripos( $head, '<svg' ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
