@@ -531,13 +531,7 @@ class CBT_Theme_API {
 	/**
 	 * Whether theme-file modifications are permitted by site configuration.
 	 *
-	 * Read-only inside production code paths. The `cbt_file_mods_allowed`
-	 * filter exists primarily as a test seam — `DISALLOW_FILE_EDIT` and
-	 * `DISALLOW_FILE_MODS` are `define`d constants and cannot be undefined
-	 * once set, so tests need a way to simulate them.
-	 *
-	 * @return bool True if both DISALLOW_FILE_EDIT and DISALLOW_FILE_MODS are absent / false.
-	 */
+	 * @return bool True when file modifications are allowed by configuration (DISALLOW_FILE_EDIT / DISALLOW_FILE_MODS) and not disabled by the cbt_file_mods_allowed filter.
 	private function file_mods_allowed() {
 		$const_allowed = ! ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT );
 		if ( $const_allowed ) {
