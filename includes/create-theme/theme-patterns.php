@@ -12,7 +12,7 @@ class CBT_Theme_Patterns {
 	 *  1. `pattern_from_wp_block()` in this class (wp_block patterns), where
 	 *    sanitisation happens BEFORE `prepare_pattern_for_export()` injects
 	 *    trusted `<?php esc_*_e(...);?>` markers.
-	 *  -2. `CBT_Theme_Templates::prepare_template_for_export()` (templates and
+	 *  2. `CBT_Theme_Templates::prepare_template_for_export()` (templates and
 	 *    template parts), where sanitisation must happen at the very start —
 	 *    BEFORE `escape_text_in_template()` injects the same trusted markers.
 	 *
