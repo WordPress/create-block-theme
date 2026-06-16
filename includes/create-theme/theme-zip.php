@@ -47,8 +47,6 @@ class CBT_Theme_Zip {
 			}
 			$font_slugs_to_remove[] = $font_family['slug'];
 			foreach ( $font_family['fontFace'] as &$font_face ) {
-				$font_filename    = basename( $font_face['src'] );
-				$font_dir         = wp_get_font_dir();
 				$font_face['src'] = (array) $font_face['src'];
 				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
 
