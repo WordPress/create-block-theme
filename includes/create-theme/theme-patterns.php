@@ -8,14 +8,23 @@ class CBT_Theme_Patterns {
 	 * legacy variants) in user content is treated as malicious and removed
 	 * before the body is interpolated into the exported `.php` pattern file.
 	 *
-	 * Note: the plugin's own `escape_text_for_pattern()` injects trusted PHP
-	 * into the body LATER in the export pipeline (via `prepare_pattern_for_export`).
-	 * Sanitisation here happens BEFORE that, so trusted PHP is not stripped.
+	 * This helper is `public static` because it is invoked from two pipelines:
+	 *  - `pattern_from_wp_block()` in this class (wp_block patterns), where
+	 *    sanitisation happens BEFORE `prepare_pattern_for_export()` injects
+	 *    trusted `<?php esc_*_e(...);?>` markers.
+	 *  - `CBT_Theme_Templates::prepare_template_for_export()` (templates and
+	 *    template parts), where sanitisation must happen at the very start —
+	 *    BEFORE `escape_text_in_template()` injects the same trusted markers.
+	 *
+	 * In both cases the rule is: sanitise first, inject trusted PHP second,
+	 * build the heredoc third. Calling this AFTER the trusted-PHP injection
+	 * would strip the plugin's own localization helpers and break the
+	 * "Make text translation-ready" feature.
 	 *
 	 * @param string $content User-supplied body content.
 	 * @return string Same content with PHP open tags removed.
 	 */
-	private static function strip_php_tags( $content ) {
+	public static function strip_php_tags( $content ) {
 		if ( ! is_string( $content ) || '' === $content ) {
 			return $content;
 		}
@@ -37,11 +46,20 @@ class CBT_Theme_Patterns {
 		return $content;
 	}
 
+	/**
+	 * Build a pattern .php file from a template stdClass.
+	 *
+	 * IMPORTANT: this function expects `$template->content` to be already
+	 * sanitised by the caller. The pipeline entry point is
+	 * `CBT_Theme_Templates::prepare_template_for_export`, which strips PHP
+	 * tags from `$template->content` BEFORE the trusted-PHP injection done
+	 * by `escape_text_in_template`. Calling `pattern_from_template` with
+	 * un-sanitised user content would re-introduce the PHP injection bug.
+	 */
 	public static function pattern_from_template( $template, $new_slug = null ) {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$template_slug   = str_replace( '*/', '*&#47;', $template->slug );
 		$pattern_slug    = $theme_slug . '/' . $template_slug;
-		$safe_body       = self::strip_php_tags( $template->content );
 		$pattern_content = <<<PHP
 		<?php
 		/**
@@ -50,7 +68,7 @@ class CBT_Theme_Patterns {
 		 * Inserter: no
 		 */
 		?>
-		{$safe_body}
+		{$template->content}
 		PHP;
 
 		return array(

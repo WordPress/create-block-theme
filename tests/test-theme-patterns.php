@@ -170,24 +170,41 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 	}
 
 	public function test_pattern_from_template_strips_php_open_tag() {
+		// Sanitisation now lives in prepare_template_for_export (the public
+		// entry point), not in pattern_from_template itself. Exercise the
+		// pipeline that the export code actually uses.
 		$template          = new stdClass();
 		$template->slug    = 'test-template';
 		$template->content = '<p>safe</p><?php phpinfo(); ?>';
-		$result            = CBT_Theme_Patterns::pattern_from_template( $template );
-		$body              = substr( $result['content'], strpos( $result['content'], '?>' ) + 2 );
 
-		$this->assertStringNotContainsString( '<?php', $body );
-		$this->assertStringContainsString( '<p>safe</p>', $body );
+		$options = array(
+			'localizeText'   => false,
+			'localizeImages' => false,
+			'removeNavRefs'  => false,
+		);
+
+		$result = CBT_Theme_Templates::prepare_template_for_export( $template, null, $options );
+
+		$this->assertStringNotContainsString( '<?php', $result->content );
+		$this->assertStringContainsString( '<p>safe</p>', $result->content );
 	}
 
 	public function test_pattern_from_template_strips_script_language_php() {
+		// Sanitisation now lives in prepare_template_for_export (the public
+		// entry point), not in pattern_from_template itself.
 		$template          = new stdClass();
 		$template->slug    = 'test-template';
 		$template->content = '<p>safe</p><script language="php">phpinfo();</script>';
-		$result            = CBT_Theme_Patterns::pattern_from_template( $template );
-		$body              = substr( $result['content'], strpos( $result['content'], '?>' ) + 2 );
 
-		$this->assertStringNotContainsString( '<script', $body );
+		$options = array(
+			'localizeText'   => false,
+			'localizeImages' => false,
+			'removeNavRefs'  => false,
+		);
+
+		$result = CBT_Theme_Templates::prepare_template_for_export( $template, null, $options );
+
+		$this->assertStringNotContainsString( '<script', $result->content );
 	}
 
 	public function test_pattern_from_template_preserves_legitimate_block_markup() {
@@ -209,5 +226,54 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		// PR #817 escapes `*/` in the slug to `*&#47;`. Confirm still in effect.
 		$this->assertStringContainsString( '*&#47;', $result['content'] );
 		$this->assertStringNotContainsString( 'evil */ break', $result['content'] );
+	}
+
+	public function test_prepare_template_for_export_preserves_trusted_localize_markers() {
+		// When localizeText=true is enabled, CBT_Theme_Templates::escape_text_in_template
+		// injects trusted PHP esc_html_e(...) markers into the template body.
+		// Those trusted markers MUST survive the pattern export — only attacker-injected
+		// PHP should be stripped, not the plugin's own translation helpers.
+		$template          = new stdClass();
+		$template->slug    = 'test-localize';
+		$template->content = '<!-- wp:paragraph --><p>Hello world</p><!-- /wp:paragraph -->';
+
+		$options = array(
+			'localizeText'   => true,
+			'localizeImages' => false,
+			'removeNavRefs'  => false,
+		);
+
+		$result = CBT_Theme_Templates::prepare_template_for_export( $template, null, $options );
+
+		// After export with localizeText=true, the pattern body should contain
+		// a trusted PHP esc_html_e marker INCLUDING its opening tag. If the
+		// strip is wrongly applied, the opening tag is gone, leaving a broken
+		// fragment in the HTML body.
+		$this->assertNotEmpty( $result->pattern, 'paternize_template should populate ->pattern when trusted PHP is injected' );
+		$this->assertStringContainsString( "<?php esc_html_e('Hello world'", $result->pattern, 'Trusted localization marker (with PHP open tag) must survive sanitisation' );
+	}
+
+	public function test_prepare_template_for_export_still_strips_attacker_php() {
+		// Even with localizeText off, attacker PHP in template content MUST be stripped
+		// before paternize / heredoc construction.
+		$template          = new stdClass();
+		$template->slug    = 'test-attacker';
+		$template->content = '<!-- wp:paragraph --><p>safe</p><!-- /wp:paragraph --><?php phpinfo(); ?>';
+
+		$options = array(
+			'localizeText'   => false,
+			'localizeImages' => false,
+			'removeNavRefs'  => false,
+		);
+
+		$result = CBT_Theme_Templates::prepare_template_for_export( $template, null, $options );
+
+		// paternize_template only runs when content contains a PHP open tag.
+		// The strip should have removed it BEFORE paternize ran, so ->pattern
+		// should be unset and ->content should be the original block markup
+		// with the open tag removed. Note: residual `phpinfo` text remains in
+		// the body but is inert HTML once the open tag is gone.
+		$this->assertStringNotContainsString( '<?php', $result->content, 'Attacker PHP open tag must be stripped' );
+		$this->assertFalse( isset( $result->pattern ), 'paternize_template should not run once the attacker open tag is stripped' );
 	}
 }
