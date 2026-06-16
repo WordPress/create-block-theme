@@ -57,9 +57,9 @@ class CBT_Theme_Zip {
 						continue;
 					}
 
-					$font_filename        = basename( $font_src );
-					$font_pretty_filename = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
-					$font_family_dir_name = sanitize_title( $font_family['name'] );
+					$font_src_path        = (string) wp_parse_url( $font_src, PHP_URL_PATH );
+					$font_filename        = basename( $font_src_path );
+					$font_pretty_filename = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $font_src_path, $font_src_index );
 					$font_family_dir_path = path_join( $theme_font_asset_location, $font_family_dir_name );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
 
