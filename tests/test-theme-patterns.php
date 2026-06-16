@@ -276,27 +276,31 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 	}
 
 	public function test_add_patterns_to_theme_writes_sanitised_body_to_disk() {
-		// Use whatever theme is currently active in the test environment.
-		// wp-env bootstraps with a working block theme so writes succeed.
-		$patterns_dir          = get_stylesheet_directory() . '/patterns';
-		$expected_pattern_path = $patterns_dir . '/cbt-pattern-rce-probe.php';
+		// Run inside a fresh test theme so the side effects of
+		// add_patterns_to_theme — including replace_local_pattern_references()
+		// rewriting existing template/pattern files and clear_user_*_customizations
+		// deleting user-template posts — are scoped to a throwaway directory
+		// and don't pollute subsequent tests in the suite.
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
 
-		// Track whether we created the patterns/ directory (for cleanup).
-		$created_patterns_dir = ! is_dir( $patterns_dir );
+		$test_theme_slug = $this->create_blank_theme();
 
-		// Make sure the destination and marker file don't pre-exist from a prior run.
-		if ( file_exists( $expected_pattern_path ) ) {
-			unlink( $expected_pattern_path );
-		}
-		if ( file_exists( '/tmp/cbt_should_not_be_written.txt' ) ) {
-			unlink( '/tmp/cbt_should_not_be_written.txt' );
+		$expected_pattern_path = get_stylesheet_directory() . '/patterns/cbt-pattern-rce-probe.php';
+		$marker                = '/tmp/cbt_should_not_be_written.txt';
+
+		// The marker file lives outside the theme directory, so uninstall_theme
+		// can't reach it — pre-delete defensively in case a prior failed run
+		// left it behind.
+		if ( file_exists( $marker ) ) {
+			unlink( $marker );
 		}
 
 		// Create a malicious wp_block post. We bypass KSES the same way the
 		// other tests in this class do (via the make_wp_block_post helper) —
 		// this simulates an Editor user who has the `unfiltered_html` cap.
 		$this->make_wp_block_post(
-			'<p>safe</p><?php file_put_contents("/tmp/cbt_should_not_be_written.txt", "pwned"); ?>',
+			'<p>safe</p><?php file_put_contents("' . $marker . '", "pwned"); ?>',
 			'CBT Pattern RCE Probe'
 		);
 
@@ -316,14 +320,47 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<?php', $body, 'Body of generated pattern file must not contain <?php' );
 		$this->assertStringContainsString( '<p>safe</p>', $body, 'Legitimate markup must survive sanitisation' );
 
-		// Cleanup: remove the generated pattern file, and the patterns/ dir if we created it.
-		unlink( $expected_pattern_path );
-		if ( $created_patterns_dir && is_dir( $patterns_dir ) && count( scandir( $patterns_dir ) ) === 2 ) {
-			rmdir( $patterns_dir );
-		}
-
 		// Final paranoia: assert the marker file was NOT written (i.e. the
 		// stripped PHP never executed).
-		$this->assertFileDoesNotExist( '/tmp/cbt_should_not_be_written.txt' );
+		$this->assertFileDoesNotExist( $marker );
+
+		// Cleanup — uninstall_theme removes the entire test theme directory,
+		// taking patterns/, templates/, parts/, etc. with it.
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	/**
+	 * Create a fresh test theme via the plugin's REST endpoint and activate it.
+	 *
+	 * Mirrors the helper in Test_Create_Block_Theme_Fonts so this test class
+	 * can isolate side effects of theme-modifying operations.
+	 */
+	private function create_blank_theme() {
+		$test_theme_slug = 'cbttesttheme';
+
+		delete_theme( $test_theme_slug );
+
+		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/create-blank' );
+		$request->set_param( 'name', $test_theme_slug );
+		$request->set_param( 'description', '' );
+		$request->set_param( 'uri', '' );
+		$request->set_param( 'author', '' );
+		$request->set_param( 'author_uri', '' );
+		$request->set_param( 'tags_custom', '' );
+		$request->set_param( 'recommended_plugins', '' );
+
+		rest_do_request( $request );
+
+		CBT_Theme_JSON_Resolver::clean_cached_data();
+
+		return $test_theme_slug;
+	}
+
+	/**
+	 * Tear down the test theme created by create_blank_theme().
+	 */
+	private function uninstall_theme( $theme_slug ) {
+		CBT_Theme_JSON_Resolver::write_user_settings( array() );
+		delete_theme( $theme_slug );
 	}
 }
