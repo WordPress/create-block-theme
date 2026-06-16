@@ -115,42 +115,45 @@ class CBT_Theme_Media {
 	}
 
 	/**
-	 * Magic-byte verification of a downloaded media file.
+	 * Magic-byte verification of a downloaded media file against its URL extension.
+	 *
+	 * The downloaded bytes must match the format claimed by the URL extension —
+	 * a `.jpg` URL whose body is SVG/PHP/anything-else is rejected so we never
+	 * persist content that doesn't match its filename on disk (which would also
+	 * confuse browsers that MIME-sniff regardless of Content-Type).
 	 *
 	 * libmagic-based MIME detection (via wp_check_filetype_and_ext) is
-	 * unreliable here for two reasons: WordPress Core's default mime registry
-	 * omits SVG entirely, and its mappings for some video formats (wmv, avi)
-	 * differ from what libmagic returns. The result was that legitimate
-	 * SVG/WMV/AVI URLs passed the URL allowlist and then silently failed the
-	 * post-download check.
+	 * unreliable here: WordPress Core's default mime registry omits SVG and
+	 * uses inconsistent mappings for some video formats. Verifying magic bytes
+	 * directly is version-independent and gives a stronger guarantee.
 	 *
-	 * This implementation verifies content by inspecting the file's leading
-	 * bytes against the known magic signatures for each allowed format.
-	 *
-	 * Recognised formats:
-	 *  - JPEG: `\xff\xd8\xff` at offset 0
-	 *  - PNG:  `\x89PNG` at offset 0
-	 *  - GIF:  `GIF8` at offset 0 (covers GIF87a and GIF89a)
-	 *  - WebP: `RIFF....WEBP` at offset 0 (RIFF + size + form)
-	 *  - SVG:  `<svg` somewhere in the first 1024 bytes (allows leading XML
-	 *          declaration / BOM / whitespace before the root element)
-	 *  - MP4 / M4V / MOV / 3GP / 3G2 (ISO BMFF): `ftyp` at offset 4
-	 *  - WebM: `\x1a\x45\xdf\xa3` (EBML) at offset 0
-	 *  - OGV:  `OggS` at offset 0
-	 *  - WMV:  ASF GUID `\x30\x26\xb2\x75\x8e\x66\xcf\x11` at offset 0
-	 *  - AVI:  `RIFF....AVI ` at offset 0
-	 *  - MPEG: `\x00\x00\x01\xb3` (sequence) or `\x00\x00\x01\xba` (system)
+	 * Recognised magic per extension:
+	 *  - jpg / jpeg → `\xff\xd8\xff`
+	 *  - png        → `\x89PNG`
+	 *  - gif        → `GIF8` (covers GIF87a and GIF89a)
+	 *  - webp       → `RIFF....WEBP`
+	 *  - svg        → `<svg` somewhere in the first 1024 bytes
+	 *  - mp4 / m4v / mov / 3gp / 3g2 → `ftyp` at offset 4 (ISO BMFF)
+	 *  - webm       → `\x1a\x45\xdf\xa3` (EBML)
+	 *  - ogv        → `OggS`
+	 *  - wmv        → ASF GUID `\x30\x26\xb2\x75\x8e\x66\xcf\x11`
+	 *  - avi        → `RIFF....AVI `
+	 *  - mpg / mpeg → `\x00\x00\x01\xb3` (sequence) or `\x00\x00\x01\xba` (system)
 	 *
 	 * @param string $tmp_file Local path to the downloaded file.
-	 * @param string $url      The originating URL (kept for signature symmetry
-	 *                         with CBT_Theme_Fonts::is_allowed_font_file()).
-	 * @return bool True if the file's leading bytes match a known media signature.
+	 * @param string $url      The originating URL — its extension determines
+	 *                         which magic-byte family the body must match.
+	 * @return bool True if the file's leading bytes match the magic signature
+	 *              expected for the URL's extension.
 	 */
-	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	public static function is_allowed_media_file( $tmp_file, $url ) {
 		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
 			return false;
 		}
+
+		// Derive the extension from the URL's path (ignore query/fragment).
+		$path      = (string) wp_parse_url( $url, PHP_URL_PATH );
+		$extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
 
 		// Read 1024 bytes — covers all fixed-position magic-byte formats and
 		// gives enough room for SVG's `<svg` tag after an optional XML
@@ -166,59 +169,55 @@ class CBT_Theme_Media {
 			return false;
 		}
 
-		$first_four = substr( $head, 0, 4 );
+		switch ( $extension ) {
+			case 'jpg':
+			case 'jpeg':
+				return "\xff\xd8\xff" === substr( $head, 0, 3 );
 
-		// JPEG: \xff\xd8\xff followed by a marker byte.
-		if ( "\xff\xd8\xff" === substr( $first_four, 0, 3 ) ) {
-			return true;
-		}
-		// PNG.
-		if ( "\x89PNG" === $first_four ) {
-			return true;
-		}
-		// GIF (GIF87a or GIF89a).
-		if ( 'GIF8' === $first_four ) {
-			return true;
-		}
-		// Ogg container (OGV).
-		if ( 'OggS' === $first_four ) {
-			return true;
-		}
-		// WebM (EBML header).
-		if ( "\x1a\x45\xdf\xa3" === $first_four ) {
-			return true;
-		}
-		// MPEG sequence (\x00\x00\x01\xb3) or system (\x00\x00\x01\xba) header.
-		if ( "\x00\x00\x01\xb3" === $first_four || "\x00\x00\x01\xba" === $first_four ) {
-			return true;
-		}
+			case 'png':
+				return "\x89PNG" === substr( $head, 0, 4 );
 
-		// WMV / ASF: 16-byte GUID header. We check the first 8 bytes which
-		// uniquely identify the ASF container.
-		if ( strlen( $head ) >= 8 && "\x30\x26\xb2\x75\x8e\x66\xcf\x11" === substr( $head, 0, 8 ) ) {
-			return true;
-		}
+			case 'gif':
+				return 'GIF8' === substr( $head, 0, 4 );
 
-		// RIFF-based formats (WebP and AVI): `RIFF` + 4-byte size + 4-char form.
-		if ( 'RIFF' === $first_four && strlen( $head ) >= 12 ) {
-			$form = substr( $head, 8, 4 );
-			if ( 'WEBP' === $form || 'AVI ' === $form ) {
-				return true;
-			}
-		}
+			case 'webp':
+				return strlen( $head ) >= 12
+					&& 'RIFF' === substr( $head, 0, 4 )
+					&& 'WEBP' === substr( $head, 8, 4 );
 
-		// ISO BMFF (MP4, M4V, MOV, 3GP, 3G2): `ftyp` at offset 4.
-		if ( strlen( $head ) >= 8 && 'ftyp' === substr( $head, 4, 4 ) ) {
-			return true;
-		}
+			case 'svg':
+				return false !== stripos( $head, '<svg' );
 
-		// SVG: XML-based, may have a leading XML declaration / BOM / whitespace
-		// before the `<svg` root. Case-insensitive search in the head.
-		if ( false !== stripos( $head, '<svg' ) ) {
-			return true;
-		}
+			case 'mp4':
+			case 'm4v':
+			case 'mov':
+			case '3gp':
+			case '3g2':
+				return strlen( $head ) >= 8 && 'ftyp' === substr( $head, 4, 4 );
 
-		return false;
+			case 'webm':
+				return "\x1a\x45\xdf\xa3" === substr( $head, 0, 4 );
+
+			case 'ogv':
+				return 'OggS' === substr( $head, 0, 4 );
+
+			case 'wmv':
+				return strlen( $head ) >= 8
+					&& "\x30\x26\xb2\x75\x8e\x66\xcf\x11" === substr( $head, 0, 8 );
+
+			case 'avi':
+				return strlen( $head ) >= 12
+					&& 'RIFF' === substr( $head, 0, 4 )
+					&& 'AVI ' === substr( $head, 8, 4 );
+
+			case 'mpg':
+			case 'mpeg':
+				$first_four = substr( $head, 0, 4 );
+				return "\x00\x00\x01\xb3" === $first_four || "\x00\x00\x01\xba" === $first_four;
+
+			default:
+				return false;
+		}
 	}
 
 	/**
@@ -307,10 +306,15 @@ class CBT_Theme_Media {
 	public static function make_relative_media_url( $absolute_url ) {
 		if ( ! empty( $absolute_url ) && CBT_Theme_Utils::is_absolute_url( $absolute_url ) ) {
 			$folder_path = self::get_media_folder_path_from_url( $absolute_url );
+			// Derive the filename from the parsed URL path so query strings
+			// (which can contain `/`) don't leak into the exported asset
+			// reference — `basename($url)` on `cat.jpg?/evil.php` would
+			// otherwise return `evil.php`.
+			$filename = basename( (string) wp_parse_url( $absolute_url, PHP_URL_PATH ) );
 			if ( is_child_theme() ) {
-				return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $folder_path . basename( $absolute_url );
+				return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $folder_path . $filename;
 			}
-			return '<?php echo esc_url( get_template_directory_uri() ); ?>' . $folder_path . basename( $absolute_url );
+			return '<?php echo esc_url( get_template_directory_uri() ); ?>' . $folder_path . $filename;
 		}
 		return $absolute_url;
 	}

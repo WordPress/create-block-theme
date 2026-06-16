@@ -272,9 +272,17 @@ class CBT_Theme_Zip {
 				continue;
 			}
 
+			// Read the bytes into memory before unlinking — ZipArchive defers
+			// reading files added via addFile() until close() is called, so
+			// removing the tmp file immediately would leave an empty entry
+			// in the final archive.
 			$file_name = basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
-			$zip->addFileToTheme( $download_file, ltrim( $folder_path, '/' ) . $file_name );
+			$bytes     = file_get_contents( $download_file );
 			@unlink( $download_file );
+			if ( false === $bytes ) {
+				continue;
+			}
+			$zip->addFromStringToTheme( ltrim( $folder_path, '/' ) . $file_name, $bytes );
 		}
 	}
 
