@@ -18,7 +18,9 @@ class CBT_Theme_Media {
 	 * @return string Relative folder path starting with `/assets/`.
 	 */
 	public static function get_media_folder_path_from_url( $url ) {
-		$extension        = strtolower( pathinfo( $url, PATHINFO_EXTENSION ) );
+		$path           = wp_parse_url( $url, PHP_URL_PATH );
+		$basename       = strtolower( basename( (string) $path ) );
+		$extension      = strtolower( pathinfo( $basename, PATHINFO_EXTENSION ) );
 		$folder_path      = '';
 		$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' );
 		$video_extensions = array( 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'ogv', '3gp', '3g2' );
