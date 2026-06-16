@@ -99,4 +99,42 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 
 		$this->assertNotSame( 403, $response->get_status() );
 	}
+
+	public function test_super_admin_can_modify_theme_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'requires multisite — set WP_TESTS_MULTISITE=1' );
+		}
+		$super = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		grant_super_admin( $super );
+		wp_set_current_user( $super );
+
+		$this->assertTrue( $this->invoke_private( 'can_modify_theme' ) );
+
+		revoke_super_admin( $super );
+	}
+
+	public function test_subsite_admin_cannot_modify_theme_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'requires multisite — set WP_TESTS_MULTISITE=1' );
+		}
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		// Explicitly NOT a super-admin.
+		wp_set_current_user( $admin );
+
+		$this->assertFalse( $this->invoke_private( 'can_modify_theme' ) );
+	}
+
+	public function test_save_endpoint_rejects_subsite_admin_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'requires multisite — set WP_TESTS_MULTISITE=1' );
+		}
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$request  = new WP_REST_Request( 'POST', '/create-block-theme/v1/save' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
 }
