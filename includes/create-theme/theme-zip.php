@@ -66,8 +66,10 @@ class CBT_Theme_Zip {
 					$font_dir = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
 						$zip->addFileToTheme( path_join( $font_dir['path'], $font_filename ), $font_face_path );
+					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_src );
+						if ( is_wp_error( $tmp_file ) ) {
 							continue;
 						}
 						// Post-download MIME allowlist.
@@ -274,6 +276,7 @@ class CBT_Theme_Zip {
 			$file_name = basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
 			$zip->addFileToTheme( $download_file, ltrim( $folder_path, '/' ) . $file_name );
 			@unlink( $download_file );
+		}
 	}
 
 }
