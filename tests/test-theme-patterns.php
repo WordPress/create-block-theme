@@ -249,7 +249,7 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		// a trusted PHP esc_html_e marker INCLUDING its opening tag. If the
 		// strip is wrongly applied, the opening tag is gone, leaving a broken
 		// fragment in the HTML body.
-		$this->assertNotEmpty( $result->pattern, 'paternize_template should populate ->pattern when trusted PHP is injected' );
+		$this->assertTrue( isset( $result->pattern ) && '' !== $result->pattern, 'paternize_template should populate ->pattern when trusted PHP is injected' );
 		$this->assertStringContainsString( "<?php esc_html_e('Hello world'", $result->pattern, 'Trusted localization marker (with PHP open tag) must survive sanitisation' );
 	}
 
