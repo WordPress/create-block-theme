@@ -130,13 +130,9 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 
 	public function test_strip_php_tags_handles_non_string_input() {
 		// Defensive guard — non-string input should not cause errors.
-		// Exercise strip_php_tags() via pattern_from_wp_block() to cover the integration path.
-		$post               = new stdClass();
-		$post->ID           = 0;
-		$post->post_title   = 'Stub';
-		$post->post_content = null;
-		// Should not throw — but pattern_from_wp_block also reads other fields,
-		// so use a real wp_block post and then null out post_content.
+		// Build a real wp_block post (so pattern_from_wp_block can read its other
+		// fields) and then null out post_content to exercise the strip_php_tags
+		// non-string path.
 		$real_post               = $this->make_wp_block_post( '<p>safe</p>' );
 		$real_post->post_content = null;
 		$pattern                 = CBT_Theme_Patterns::pattern_from_wp_block( $real_post );
