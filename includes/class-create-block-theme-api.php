@@ -539,10 +539,11 @@ class CBT_Theme_API {
 	 * @return bool True if both DISALLOW_FILE_EDIT and DISALLOW_FILE_MODS are absent / false.
 	 */
 	private function file_mods_allowed() {
-		$allowed = ! ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT );
-		if ( $allowed ) {
-			$allowed = ! ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS );
+		$const_allowed = ! ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT );
+		if ( $const_allowed ) {
+			$const_allowed = ! ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS );
 		}
-		return apply_filters( 'cbt_file_mods_allowed', $allowed );
+		$filtered = (bool) apply_filters( 'cbt_file_mods_allowed', $const_allowed );
+		return $const_allowed && $filtered;
 	}
 }
