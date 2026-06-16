@@ -285,7 +285,7 @@ class CBT_Theme_Media {
 				wp_mkdir_p( $media_path );
 			}
 			rename( $download_file, $media_path . $filename );
-
+		}
 	}
 
 
