@@ -97,7 +97,8 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 		remove_filter( 'cbt_file_mods_allowed', '__return_false' );
 
-		$this->assertNotSame( 403, $response->get_status() );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'SUCCESS', $response->get_data()['status'] );
 	}
 
 	public function test_super_admin_can_modify_theme_on_multisite() {
