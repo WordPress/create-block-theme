@@ -8,8 +8,9 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 	 * Helper: invoke a private method on a CBT_Theme_API instance.
 	 */
 	private function invoke_private( $method ) {
-		$instance = new CBT_Theme_API();
-		$ref      = new ReflectionMethod( $instance, $method );
+		$ref_class = new ReflectionClass( CBT_Theme_API::class );
+		$instance  = $ref_class->newInstanceWithoutConstructor();
+		$ref       = new ReflectionMethod( $instance, $method );
 		$ref->setAccessible( true );
 		return $ref->invoke( $instance );
 	}
