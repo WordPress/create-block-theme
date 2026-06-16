@@ -129,9 +129,8 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 	}
 
 	public function test_strip_php_tags_handles_non_string_input() {
-		// Defensive guard — non-string input should round-trip without error.
-		// We can't call the private helper directly; exercise it via
-		// pattern_from_wp_block by constructing a post stub with non-string content.
+		// Defensive guard — non-string input should not cause errors.
+		// Exercise strip_php_tags() via pattern_from_wp_block() to cover the integration path.
 		$post               = new stdClass();
 		$post->ID           = 0;
 		$post->post_title   = 'Stub';
