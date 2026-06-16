@@ -169,6 +169,11 @@ class CBT_Theme_Templates {
 			);
 		}
 
+		// Strip PHP tags from the raw template body BEFORE any
+		// trusted-PHP injection (escape_text_in_template below).
+		// Sanitising here preserves the legitimate localization output.
+		$template->content = CBT_Theme_Patterns::strip_php_tags( $template->content );
+
 		$template = self::eliminate_environment_specific_content( $template, $options );
 
 		if ( array_key_exists( 'localizeText', $options ) && $options['localizeText'] ) {
