@@ -66,6 +66,17 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$this->assertFalse( $result );
 	}
 
+	public function test_file_mods_allowed_respects_core_file_mod_allowed_filter() {
+		// WordPress Core's canonical `file_mod_allowed` filter is the
+		// mechanism hosts and security plugins use to disable file mods
+		// globally. file_mods_allowed() must honour it.
+		add_filter( 'file_mod_allowed', '__return_false' );
+		$result = $this->invoke_private( 'file_mods_allowed' );
+		remove_filter( 'file_mod_allowed', '__return_false' );
+
+		$this->assertFalse( $result );
+	}
+
 	public function test_save_endpoint_rejects_when_file_mods_disallowed() {
 		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin );

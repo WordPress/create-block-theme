@@ -531,14 +531,25 @@ class CBT_Theme_API {
 	/**
 	 * Whether theme-file modifications are permitted by site configuration.
 	 *
-	 * @return bool True when file modifications are allowed by configuration (DISALLOW_FILE_EDIT / DISALLOW_FILE_MODS) and not disabled by the cbt_file_mods_allowed filter.
+	 * Delegates the `DISALLOW_FILE_MODS` check (and the canonical
+	 * `file_mod_allowed` filter that hosts and security plugins use to disable
+	 * file modifications globally) to WordPress Core's `wp_is_file_mod_allowed()`.
+	 * `DISALLOW_FILE_EDIT` is checked explicitly because it is a separate
+	 * constant that Core's helper does NOT cover.
+	 *
+	 * The `cbt_file_mods_allowed` filter remains as a test seam — it can only
+	 * further restrict, never re-enable, the policy decided by core / the
+	 * constants.
+	 *
+	 * @return bool True when file modifications are allowed by site configuration.
 	 */
 	private function file_mods_allowed() {
-		$const_allowed = ! ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT );
-		if ( $const_allowed ) {
-			$const_allowed = ! ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS );
+		if ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) {
+			$allowed = false;
+		} else {
+			$allowed = wp_is_file_mod_allowed( 'create_block_theme_modify_theme' );
 		}
-		$filtered = (bool) apply_filters( 'cbt_file_mods_allowed', $const_allowed );
-		return $const_allowed && $filtered;
+		$filtered = (bool) apply_filters( 'cbt_file_mods_allowed', $allowed );
+		return $allowed && $filtered;
 	}
 }
