@@ -77,6 +77,16 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$this->assertFalse( $result );
 	}
 
+	public function test_file_mods_allowed_filter_cannot_reenable_core_disallow() {
+		add_filter( 'file_mod_allowed', '__return_false' );
+		add_filter( 'cbt_file_mods_allowed', '__return_true' );
+		$result = $this->invoke_private( 'file_mods_allowed' );
+		remove_filter( 'cbt_file_mods_allowed', '__return_true' );
+		remove_filter( 'file_mod_allowed', '__return_false' );
+
+		$this->assertFalse( $result );
+	}
+
 	public function test_save_endpoint_rejects_when_file_mods_disallowed() {
 		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin );
