@@ -76,11 +76,7 @@ class CBT_Theme_Zip {
 							@unlink( $tmp_file );
 							continue;
 						}
-						// Read the bytes into memory before unlinking — ZipArchive
-						// defers reading files added via addFile() until close()
-						// is called, so removing the tmp file immediately would
-						// leave an empty entry in the final archive. Same fix
-						// applied to add_media_to_zip().
+						// Read the bytes into memory before unlinking.
 						$bytes = file_get_contents( $tmp_file );
 						@unlink( $tmp_file );
 						if ( false === $bytes ) {
