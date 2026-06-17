@@ -153,6 +153,11 @@ class CBT_Theme_Locale {
 			case 'core/comments-pagination-previous':
 			case 'core/comments-pagination-next':
 			case 'core/post-navigation-link':
+			case 'core/navigation-link':
+			case 'core/navigation-submenu':
+			case 'core/home-link':
+			case 'core/social-link':
+			case 'core/categories':
 				return array( 'label' );
 			case 'core/post-excerpt':
 				return array( 'moreText' );

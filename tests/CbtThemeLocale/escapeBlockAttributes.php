@@ -66,6 +66,31 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 				'expected_markup' => '<!-- wp:post-navigation-link {"label":"<?php esc_attr_e(\'Custom Label\', \'test-locale-theme\');?>"} /-->',
 			),
 
+			'navigation-link with label'              => array(
+				'block_markup'    => '<!-- wp:navigation-link {"label":"About","url":"/about"} /-->',
+				'expected_markup' => '<!-- wp:navigation-link {"label":"<?php esc_attr_e(\'About\', \'test-locale-theme\');?>","url":"/about"} /-->',
+			),
+
+			'navigation-submenu with label'           => array(
+				'block_markup'    => '<!-- wp:navigation-submenu {"label":"Resources","url":"/resources"} /-->',
+				'expected_markup' => '<!-- wp:navigation-submenu {"label":"<?php esc_attr_e(\'Resources\', \'test-locale-theme\');?>","url":"/resources"} /-->',
+			),
+
+			'home-link with label'                    => array(
+				'block_markup'    => '<!-- wp:home-link {"label":"Home"} /-->',
+				'expected_markup' => '<!-- wp:home-link {"label":"<?php esc_attr_e(\'Home\', \'test-locale-theme\');?>"} /-->',
+			),
+
+			'social-link with label'                  => array(
+				'block_markup'    => '<!-- wp:social-link {"url":"https://example.com","service":"chain","label":"My website"} /-->',
+				'expected_markup' => '<!-- wp:social-link {"url":"https://example.com","service":"chain","label":"<?php esc_attr_e(\'My website\', \'test-locale-theme\');?>"} /-->',
+			),
+
+			'categories with label'                   => array(
+				'block_markup'    => '<!-- wp:categories {"displayAsDropdown":true,"label":"Browse by topic"} /-->',
+				'expected_markup' => '<!-- wp:categories {"displayAsDropdown":true,"label":"<?php esc_attr_e(\'Browse by topic\', \'test-locale-theme\');?>"} /-->',
+			),
+
 			'search block with only some attributes'  => array(
 				'block_markup'    => '<!-- wp:search {"placeholder":"Search..."} /-->',
 				'expected_markup' => '<!-- wp:search {"placeholder":"<?php esc_attr_e(\'Search...\', \'test-locale-theme\');?>"} /-->',
