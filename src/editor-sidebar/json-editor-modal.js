@@ -36,7 +36,9 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 					return;
 				}
 				setThemeName( active?.name?.raw ?? active?.name ?? '' );
-				setThemeData( JSON.stringify( active?.theme_json ?? {}, null, 2 ) );
+				setThemeData(
+					JSON.stringify( active?.theme_json ?? {}, null, 2 )
+				);
 			} )
 			.catch( ( err ) => {
 				// Leave the modal showing whatever was last rendered, but

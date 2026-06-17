@@ -547,7 +547,11 @@ const getCustomizedSections = ( userGlobalStyles, edits ) => {
 		const label = USER_CUSTOMIZATION_SECTION_LABELS[ key ];
 		return label
 			? label
-			: sprintf( __( 'other (%s)', 'create-block-theme' ), key );
+			: sprintf(
+					/* translators: %s: the raw setting key (e.g. "spacing") for a customization that doesn't have a friendly label. */
+					__( 'other (%s)', 'create-block-theme' ),
+					key
+			  );
 	} );
 };
 
