@@ -23,7 +23,7 @@ class CBT_Theme_Media {
 		$extension        = strtolower( pathinfo( $basename, PATHINFO_EXTENSION ) );
 		$folder_path      = '';
 		$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' );
-		$video_extensions = array( 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'ogv', '3gp', '3g2' );
+		$video_extensions = array( 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'mpeg', '3gp', '3g2' );
 		if ( in_array( $extension, $image_extensions, true ) ) {
 			$folder_path = apply_filters( 'cbt_media_folder_path_images', '/assets/images/' );
 		} elseif ( in_array( $extension, $video_extensions, true ) ) {
@@ -108,6 +108,7 @@ class CBT_Theme_Media {
 			'avi',
 			'mov',
 			'mpg',
+			'mpeg',
 			'3gp',
 			'3g2',
 		);
