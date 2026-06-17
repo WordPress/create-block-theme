@@ -543,11 +543,12 @@ const getCustomizedSections = ( userGlobalStyles, edits ) => {
 	visit( userGlobalStyles );
 	visit( edits );
 
-	return Array.from( sections ).map(
-		( key ) =>
-			USER_CUSTOMIZATION_SECTION_LABELS[ key ] ||
-			__( 'other', 'create-block-theme' )
-	);
+	return Array.from( sections ).map( ( key ) => {
+		const label = USER_CUSTOMIZATION_SECTION_LABELS[ key ];
+		return label
+			? label
+			: sprintf( __( 'other (%s)', 'create-block-theme' ), key );
+	} );
 };
 
 // Returns the set of color-settings keys whose current value differs from
