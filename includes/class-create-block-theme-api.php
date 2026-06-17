@@ -508,48 +508,22 @@ class CBT_Theme_API {
 	/**
 	 * Permission check for filesystem-mutating REST routes.
 	 *
-	 * On multisite, themes are network-shared. Require super-admin to prevent
-	 * sub-site administrators from crossing the tenant boundary into the
-	 * shared `wp-content/themes/` directory.
+	 * Combines two WordPress Core primitives:
 	 *
-	 * Honors the WP hardening constants `DISALLOW_FILE_EDIT` and
-	 * `DISALLOW_FILE_MODS` via `file_mods_allowed()`, matching the behaviour
-	 * the plugin had pre-v2.1.2 and aligning with WP Core's theme-editor.
+	 *  - `current_user_can( 'edit_themes' )` — Core's canonical theme-file
+	 *    capability. Held by Administrators on single-site, super-admins on
+	 *    multisite (NOT sub-site admins), and automatically denied when
+	 *    `DISALLOW_FILE_EDIT` is defined. This single check covers the
+	 *    multisite tenant boundary and the `DISALLOW_FILE_EDIT` hardening
+	 *    that the plugin honoured pre-v2.1.2.
+	 *  - `wp_is_file_mod_allowed( 'create_block_theme_modify_theme' )` —
+	 *    Core's canonical file-modification gate. Handles `DISALLOW_FILE_MODS`
+	 *    and the `file_mod_allowed` filter (used by hosts / security plugins).
 	 *
-	 * @return bool
+	 * @return bool True when both checks pass.
 	 */
 	private function can_modify_theme() {
-		if ( ! $this->file_mods_allowed() ) {
-			return false;
-		}
-		if ( is_multisite() ) {
-			return is_super_admin();
-		}
-		return current_user_can( 'edit_theme_options' );
-	}
-
-	/**
-	 * Whether theme-file modifications are permitted by site configuration.
-	 *
-	 * Delegates the `DISALLOW_FILE_MODS` check (and the canonical
-	 * `file_mod_allowed` filter that hosts and security plugins use to disable
-	 * file modifications globally) to WordPress Core's `wp_is_file_mod_allowed()`.
-	 * `DISALLOW_FILE_EDIT` is checked explicitly because it is a separate
-	 * constant that Core's helper does NOT cover.
-	 *
-	 * The `cbt_file_mods_allowed` filter remains as a test seam — it can only
-	 * further restrict, never re-enable, the policy decided by core / the
-	 * constants.
-	 *
-	 * @return bool True when file modifications are allowed by site configuration.
-	 */
-	private function file_mods_allowed() {
-		if ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) {
-			$allowed = false;
-		} else {
-			$allowed = wp_is_file_mod_allowed( 'create_block_theme_modify_theme' );
-		}
-		$filtered = (bool) apply_filters( 'cbt_file_mods_allowed', $allowed );
-		return $allowed && $filtered;
+		return current_user_can( 'edit_themes' )
+			&& wp_is_file_mod_allowed( 'create_block_theme_modify_theme' );
 	}
 }
