@@ -169,28 +169,31 @@ class CBT_Theme_Fonts {
 	}
 
 	/**
-	 * Magic-byte verification of a downloaded font file.
+	 * Magic-byte verification of a downloaded font file against its URL extension.
+	 *
+	 * The downloaded bytes must match the format claimed by the URL extension —
+	 * a `.woff2` URL whose body is TTF (or anything else) is rejected so we
+	 * never persist content that doesn't match its filename on disk.
 	 *
 	 * libmagic-based MIME detection (via finfo or wp_check_filetype_and_ext)
-	 * is unreliable for font formats: WordPress Core has no font MIMEs in
-	 * its registry, and PHP base images ship with varying libmagic versions
-	 * — older builds return application/octet-stream for WOFF/WOFF2 rather
-	 * than the modern font/woff(2) types. Direct magic-byte verification is
-	 * version-independent and provides a stronger content guarantee.
+	 * is unreliable for font formats: WordPress Core has no font MIMEs in its
+	 * registry, and PHP base images ship with varying libmagic versions.
+	 * Verifying magic bytes directly is version-independent and gives a
+	 * stronger guarantee.
 	 *
-	 * Recognised formats:
-	 *  - WOFF2: magic `wOF2` at offset 0
-	 *  - WOFF:  magic `wOFF` at offset 0
-	 *  - OTF / OpenType (CFF): magic `OTTO` at offset 0
-	 *  - TTF:  magic `\x00\x01\x00\x00` at offset 0 (or `true` for legacy Mac)
-	 *  - EOT:  Version field (offset 8) is 0x00010000 / 0x00020001 / 0x00020002
+	 * Recognised magic per extension:
+	 *  - woff2 → `wOF2` at offset 0
+	 *  - woff  → `wOFF` at offset 0
+	 *  - otf   → `OTTO` at offset 0
+	 *  - ttf   → `\x00\x01\x00\x00` at offset 0 (or `true` for legacy Mac)
+	 *  - eot   → Version field (offset 8) is 0x00010000 / 0x00020001 / 0x00020002
 	 *
 	 * @param string $tmp_file Local path to the downloaded file.
-	 * @param string $url      The originating URL (kept for signature symmetry
-	 *                         with CBT_Theme_Media::is_allowed_media_file()).
-	 * @return bool True if the file's leading bytes match a known font signature.
+	 * @param string $url      The originating URL — its extension determines
+	 *                         which magic-byte family the body must match.
+	 * @return bool True if the file's leading bytes match the magic signature
+	 *              expected for the URL's extension.
 	 */
-	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	public static function is_allowed_font_file( $tmp_file, $url ) {
 		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
 			return false;
@@ -209,34 +212,38 @@ class CBT_Theme_Fonts {
 			return false;
 		}
 
-		// Most font formats have a 4-byte magic at offset 0.
-		$first_four       = substr( $head, 0, 4 );
-		$magic_signatures = array(
-			'wOF2',                  // WOFF2
-			'wOFF',                  // WOFF
-			'OTTO',                  // OpenType (CFF flavour)
-			"\x00\x01\x00\x00",      // TrueType
-			'true',                  // Mac TrueType
-		);
-		if ( in_array( $first_four, $magic_signatures, true ) ) {
-			return true;
-		}
+		// Derive the extension from the URL's path (ignore query/fragment) so
+		// the bytes must match the format claimed by the URL — saving a TTF
+		// body under a .woff2 filename would otherwise defeat the allowlist
+		// intent and produce broken assets in the exported theme/zip.
+		$path       = (string) wp_parse_url( $url, PHP_URL_PATH );
+		$extension  = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+		$first_four = substr( $head, 0, 4 );
 
-		// EOT has no fixed magic at offset 0. Its Version field at offset 8
-		// takes one of three known values (little-endian uint32):
-		// 0x00010000, 0x00020001, 0x00020002.
-		if ( 12 === strlen( $head ) ) {
-			$version_le_bytes = array(
-				"\x00\x00\x01\x00", // 0x00010000
-				"\x01\x00\x02\x00", // 0x00020001
-				"\x02\x00\x02\x00", // 0x00020002
-			);
-			if ( in_array( substr( $head, 8, 4 ), $version_le_bytes, true ) ) {
-				return true;
-			}
-		}
+		switch ( $extension ) {
+			case 'woff2':
+				return 'wOF2' === $first_four;
 
-		return false;
+			case 'woff':
+				return 'wOFF' === $first_four;
+
+			case 'otf':
+				return 'OTTO' === $first_four;
+
+			case 'ttf':
+				return "\x00\x01\x00\x00" === $first_four || 'true' === $first_four;
+
+			case 'eot':
+				return 12 === strlen( $head )
+					&& in_array(
+						substr( $head, 8, 4 ),
+						array( "\x00\x00\x01\x00", "\x01\x00\x02\x00", "\x02\x00\x02\x00" ),
+						true
+					);
+
+			default:
+				return false;
+		}
 	}
 
 	/*
