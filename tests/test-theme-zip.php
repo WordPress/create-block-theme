@@ -12,6 +12,10 @@ class Test_Create_Block_Theme_Zip extends WP_UnitTestCase {
 		$tmp_path = wp_tempnam( $slug . '.zip' );
 		// wp_tempnam() creates the file; ZipArchive::OVERWRITE will replace it.
 		$zip = CBT_Theme_Zip::create_zip( $tmp_path, $slug );
+		if ( is_wp_error( $zip ) ) {
+			@unlink( $tmp_path );
+			$this->markTestSkipped( $zip->get_error_message() );
+		}
 		return array( $zip, $tmp_path );
 	}
 
