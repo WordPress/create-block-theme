@@ -141,6 +141,10 @@ class CBT_Theme_API {
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'rest_reset_theme' ),
+				// /reset-theme doesn't mutate theme files (it only clears
+				// user customisations from the DB), but is gated on the same
+				// cap as the file-mutating routes for permission-surface
+				// consistency.
 				'permission_callback' => function () {
 					return $this->can_modify_theme();
 				},
