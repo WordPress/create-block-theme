@@ -76,8 +76,17 @@ class CBT_Theme_Zip {
 							@unlink( $tmp_file );
 							continue;
 						}
-						$zip->addFileToTheme( $tmp_file, $font_face_path );
-						unlink( $tmp_file );
+						// Read the bytes into memory before unlinking — ZipArchive
+						// defers reading files added via addFile() until close()
+						// is called, so removing the tmp file immediately would
+						// leave an empty entry in the final archive. Same fix
+						// applied to add_media_to_zip().
+						$bytes = file_get_contents( $tmp_file );
+						@unlink( $tmp_file );
+						if ( false === $bytes ) {
+							continue;
+						}
+						$zip->addFromStringToTheme( $font_face_path, $bytes );
 					}
 					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . path_join( $font_family_dir_name, $font_pretty_filename );
 				}
