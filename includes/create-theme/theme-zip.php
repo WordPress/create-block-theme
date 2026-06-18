@@ -48,7 +48,16 @@ class CBT_Theme_Zip {
 			$font_slugs_to_remove[] = $font_family['slug'];
 			foreach ( $font_family['fontFace'] as &$font_face ) {
 				$font_face['src'] = (array) $font_face['src'];
-				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+				// Build a fresh srcs list so rejected sources (disallowed URL,
+				// failed download, MIME mismatch) are dropped rather than
+				// persisted into the exported theme.json.
+				$kept_srcs = array();
+				foreach ( $font_face['src'] as $font_src_index => $font_src ) {
+					if ( is_string( $font_src ) && str_starts_with( $font_src, 'file:' ) ) {
+						// Already a theme asset — keep as-is.
+						$kept_srcs[] = $font_src;
+						continue;
+					}
 
 					// Pre-download URL extension allowlist — see CBT_Theme_Fonts::is_allowed_font_url().
 					if ( ! CBT_Theme_Fonts::is_allowed_font_url( $font_src ) ) {
@@ -84,8 +93,9 @@ class CBT_Theme_Zip {
 						}
 						$zip->addFromStringToTheme( $font_face_path, $bytes );
 					}
-					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . path_join( $font_family_dir_name, $font_pretty_filename );
+					$kept_srcs[] = 'file:./assets/fonts/' . path_join( $font_family_dir_name, $font_pretty_filename );
 				}
+				$font_face['src'] = $kept_srcs;
 			}
 		}
 

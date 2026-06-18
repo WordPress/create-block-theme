@@ -271,9 +271,14 @@ class CBT_Theme_Fonts {
 				// src can be a string or an array
 				// if it is a string, cast it to an array
 				$font_face['src'] = (array) $font_face['src'];
-				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+				// Build a fresh srcs list so rejected sources (disallowed URL,
+				// failed download, MIME mismatch) are dropped rather than
+				// persisted into theme.json.
+				$kept_srcs = array();
+				foreach ( $font_face['src'] as $font_src_index => $font_src ) {
 					if ( str_starts_with( $font_src, 'file:' ) ) {
 						// If the font source starts with 'file:' then it's already a theme asset.
+						$kept_srcs[] = $font_src;
 						continue;
 					}
 
@@ -306,9 +311,10 @@ class CBT_Theme_Fonts {
 						copy( $tmp_file, $font_face_path );
 						unlink( $tmp_file );
 					}
-					$font_face_family_path               = path_join( $font_family_dir_name, $font_pretty_filename );
-					$font_face['src'][ $font_src_index ] = path_join( 'file:./assets/fonts/', $font_face_family_path );
+					$font_face_family_path = path_join( $font_family_dir_name, $font_pretty_filename );
+					$kept_srcs[]           = path_join( 'file:./assets/fonts/', $font_face_family_path );
 				}
+				$font_face['src'] = $kept_srcs;
 			}
 		}
 

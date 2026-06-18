@@ -693,5 +693,136 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 
 		$this->uninstall_theme( $test_theme_slug );
 	}
+
+	public function test_copy_font_assets_to_theme_drops_disallowed_url_from_returned_src() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$woff2_bytes = file_get_contents( __DIR__ . '/data/fonts/OpenSans-Regular.woff2' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $woff2_bytes ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, $woff2_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Mixed Family',
+				'slug'     => 'mixed-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Mixed Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array(
+							'http://fonts.example.com/legit.woff2',
+							'http://fonts.example.com/evil.php',
+						),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$returned_src = $result[0]['fontFace'][0]['src'];
+		$this->assertCount( 1, $returned_src, 'Disallowed URL should be dropped from the returned src list.' );
+		$this->assertStringStartsWith( 'file:./assets/fonts/', $returned_src[0] );
+		$this->assertNotContains( 'http://fonts.example.com/evil.php', $returned_src, 'Rejected URL must not be persisted to the returned families.' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_copy_font_assets_to_theme_drops_mime_mismatch_src_from_returned_families() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Serve PHP bytes for a .woff2 URL — passes URL allowlist, fails MIME.
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, "<?php echo 'pwned'; ?>" );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Polyglot Family',
+				'slug'     => 'polyglot-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Polyglot Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'http://fonts.example.com/disguised.woff2' ),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$returned_src = $result[0]['fontFace'][0]['src'];
+		$this->assertSame( array(), $returned_src, 'Source with mismatched MIME must be dropped from the returned src list.' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_copy_font_assets_to_theme_preserves_existing_file_src() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$families = array(
+			array(
+				'name'     => 'Local Family',
+				'slug'     => 'local-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Local Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'file:./assets/fonts/local-family.woff2' ),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		$this->assertSame(
+			array( 'file:./assets/fonts/local-family.woff2' ),
+			$result[0]['fontFace'][0]['src'],
+			'Pre-existing file: src should be preserved unchanged.'
+		);
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
 }
 
