@@ -4,17 +4,6 @@
  */
 class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 
-	/**
-	 * Helper: invoke a private method on a CBT_Theme_API instance.
-	 */
-	private function invoke_private( $method ) {
-		$ref_class = new ReflectionClass( CBT_Theme_API::class );
-		$instance  = $ref_class->newInstanceWithoutConstructor();
-		$ref       = new ReflectionMethod( $instance, $method );
-		$ref->setAccessible( true );
-		return $ref->invoke( $instance );
-	}
-
 	public function test_admin_can_modify_theme_on_single_site() {
 		if ( is_multisite() ) {
 			$this->markTestSkipped( 'single-site only' );
@@ -22,7 +11,7 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin );
 
-		$this->assertTrue( $this->invoke_private( 'can_modify_theme' ) );
+		$this->assertTrue( CBT_Theme_API::can_modify_theme() );
 	}
 
 	public function test_editor_cannot_modify_theme_on_single_site() {
@@ -32,12 +21,12 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
 		wp_set_current_user( $editor );
 
-		$this->assertFalse( $this->invoke_private( 'can_modify_theme' ) );
+		$this->assertFalse( CBT_Theme_API::can_modify_theme() );
 	}
 
 	public function test_anonymous_cannot_modify_theme() {
 		wp_set_current_user( 0 );
-		$this->assertFalse( $this->invoke_private( 'can_modify_theme' ) );
+		$this->assertFalse( CBT_Theme_API::can_modify_theme() );
 	}
 
 	public function test_admin_blocked_by_core_file_mod_allowed_filter() {
@@ -51,7 +40,7 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		wp_set_current_user( $admin );
 
 		add_filter( 'file_mod_allowed', '__return_false' );
-		$result = $this->invoke_private( 'can_modify_theme' );
+		$result = CBT_Theme_API::can_modify_theme();
 		remove_filter( 'file_mod_allowed', '__return_false' );
 
 		$this->assertFalse( $result );
@@ -108,7 +97,7 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		grant_super_admin( $super );
 		wp_set_current_user( $super );
 
-		$this->assertTrue( $this->invoke_private( 'can_modify_theme' ) );
+		$this->assertTrue( CBT_Theme_API::can_modify_theme() );
 
 		revoke_super_admin( $super );
 	}
@@ -121,7 +110,7 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		// Explicitly NOT a super-admin — `edit_themes` is super-admin-only on multisite.
 		wp_set_current_user( $admin );
 
-		$this->assertFalse( $this->invoke_private( 'can_modify_theme' ) );
+		$this->assertFalse( CBT_Theme_API::can_modify_theme() );
 	}
 
 	public function test_save_endpoint_rejects_subsite_admin_on_multisite() {
@@ -136,5 +125,55 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 
 		$this->assertSame( 403, $response->get_status() );
 		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	public function test_admin_landing_menu_not_registered_when_cannot_modify_theme() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		add_filter( 'file_mod_allowed', '__return_false' );
+
+		$landing = new CBT_Admin_Landing();
+		set_current_screen( 'themes.php' );
+		global $submenu;
+		$submenu = array();
+		$landing->create_admin_menu();
+		$menu_after_deny = isset( $submenu['themes.php'] ) ? $submenu['themes.php'] : array();
+
+		remove_filter( 'file_mod_allowed', '__return_false' );
+
+		$slugs = array_column( $menu_after_deny, 2 );
+		$this->assertNotContains(
+			'create-block-theme-landing',
+			$slugs,
+			'Landing-page menu must NOT be registered when the user cannot modify the theme.'
+		);
+	}
+
+	public function test_editor_sidebar_enqueue_drops_when_cannot_modify_theme() {
+		// Sub-site admin on multisite or DISALLOW_FILE_MODS site: the sidebar
+		// JS should not enqueue. Simulate by gating via file_mod_allowed.
+		global $pagenow;
+		$saved_pagenow = $pagenow;
+		$pagenow       = 'site-editor.php';
+
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		add_filter( 'file_mod_allowed', '__return_false' );
+
+		$tools = new CBT_Editor_Tools();
+		// Reset any prior enqueue state.
+		wp_dequeue_script( 'create-block-theme-slot-fill' );
+		$tools->create_block_theme_sidebar_enqueue();
+		$enqueued = wp_script_is( 'create-block-theme-slot-fill', 'enqueued' );
+
+		remove_filter( 'file_mod_allowed', '__return_false' );
+		$pagenow = $saved_pagenow;
+
+		$this->assertFalse(
+			$enqueued,
+			'Sidebar script must NOT be enqueued when the user cannot modify the theme.'
+		);
 	}
 }

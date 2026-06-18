@@ -43,7 +43,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_export_theme' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -54,7 +54,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_update_theme' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -65,7 +65,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -76,7 +76,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme_settings' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -87,7 +87,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_clone_theme' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -98,7 +98,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_variation' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -109,7 +109,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_blank_theme' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -120,7 +120,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_child_theme' ),
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -146,7 +146,7 @@ class CBT_Theme_API {
 				// cap as the file-mutating routes for permission-surface
 				// consistency.
 				'permission_callback' => function () {
-					return $this->can_modify_theme();
+					return self::can_modify_theme();
 				},
 			),
 		);
@@ -526,7 +526,7 @@ class CBT_Theme_API {
 	 *
 	 * @return bool True when both checks pass.
 	 */
-	private function can_modify_theme() {
+	public static function can_modify_theme() {
 		return current_user_can( 'edit_themes' )
 			&& wp_is_file_mod_allowed( 'create_block_theme_modify_theme' );
 	}
