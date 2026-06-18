@@ -22,7 +22,7 @@ class CBT_Theme_Media {
 		$basename         = strtolower( basename( (string) $path ) );
 		$extension        = strtolower( pathinfo( $basename, PATHINFO_EXTENSION ) );
 		$folder_path      = '';
-		$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp' );
+		$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'avif' );
 		$video_extensions = array( 'mp4', 'm4v', 'webm', 'ogv', 'wmv', 'avi', 'mov', 'mpg', 'mpeg', '3gp', '3g2' );
 		if ( in_array( $extension, $image_extensions, true ) ) {
 			$folder_path = apply_filters( 'cbt_media_folder_path_images', '/assets/images/' );
@@ -99,6 +99,7 @@ class CBT_Theme_Media {
 			'gif',
 			'svg',
 			'webp',
+			'avif',
 			// videos
 			'mp4',
 			'm4v',
@@ -133,6 +134,7 @@ class CBT_Theme_Media {
 	 *  - png        → `\x89PNG`
 	 *  - gif        → `GIF8` (covers GIF87a and GIF89a)
 	 *  - webp       → `RIFF....WEBP`
+	 *  - avif       → `ftyp` at offset 4 + brand `avif` or `avis` at offset 8 (ISO BMFF)
 	 *  - svg        → `<svg` somewhere in the first 1024 bytes
 	 *  - mp4 / m4v / mov / 3gp / 3g2 → `ftyp` at offset 4 (ISO BMFF)
 	 *  - webm       → `\x1a\x45\xdf\xa3` (EBML)
@@ -185,6 +187,13 @@ class CBT_Theme_Media {
 				return strlen( $head ) >= 12
 					&& 'RIFF' === substr( $head, 0, 4 )
 					&& 'WEBP' === substr( $head, 8, 4 );
+
+			case 'avif':
+				// AVIF is ISO BMFF (like MP4) but with `avif` or `avis` as
+				// the major brand at offset 8.
+				return strlen( $head ) >= 12
+					&& 'ftyp' === substr( $head, 4, 4 )
+					&& in_array( substr( $head, 8, 4 ), array( 'avif', 'avis' ), true );
 
 			case 'svg':
 				return false !== stripos( $head, '<svg' );

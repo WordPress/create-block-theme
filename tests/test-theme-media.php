@@ -164,6 +164,16 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assert_media_magic_accepted( "RIFF\x00\x00\x00\x00WEBP" . str_repeat( "\x00", 16 ), 'http://example.com/cat.webp' );
 	}
 
+	public function test_is_allowed_media_file_accepts_avif_magic() {
+		// ISO BMFF: 4-byte size + 'ftyp' + 'avif' brand + payload.
+		$this->assert_media_magic_accepted( "\x00\x00\x00\x20" . 'ftypavif' . str_repeat( "\x00", 16 ), 'http://example.com/cat.avif' );
+	}
+
+	public function test_is_allowed_media_file_accepts_avif_sequence_brand() {
+		// AVIF image sequence uses 'avis' brand.
+		$this->assert_media_magic_accepted( "\x00\x00\x00\x20" . 'ftypavis' . str_repeat( "\x00", 16 ), 'http://example.com/cat.avif' );
+	}
+
 	public function test_is_allowed_media_file_accepts_svg_content() {
 		$this->assert_media_magic_accepted( '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>', 'http://example.com/cat.svg' );
 	}
