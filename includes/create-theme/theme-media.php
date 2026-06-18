@@ -35,6 +35,17 @@ class CBT_Theme_Media {
 	}
 
 	/**
+	 * Get the theme-relative media asset path for a URL.
+	 *
+	 * @param string $url Media URL.
+	 * @return string Relative asset path, e.g. `/assets/images/example.jpg`.
+	 */
+	public static function get_media_relative_path_from_url( $url ) {
+		$filename = basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+		return self::get_media_folder_path_from_url( $url ) . $filename;
+	}
+
+	/**
 	 * Allowlist check on the URL's path extension before we attempt to download it.
 	 *
 	 * Defends against two bypass classes:
@@ -315,16 +326,11 @@ class CBT_Theme_Media {
 	 */
 	public static function make_relative_media_url( $absolute_url ) {
 		if ( ! empty( $absolute_url ) && CBT_Theme_Utils::is_absolute_url( $absolute_url ) ) {
-			$folder_path = self::get_media_folder_path_from_url( $absolute_url );
-			// Derive the filename from the parsed URL path so query strings
-			// (which can contain `/`) don't leak into the exported asset
-			// reference — `basename($url)` on `cat.jpg?/evil.php` would
-			// otherwise return `evil.php`.
-			$filename = basename( (string) wp_parse_url( $absolute_url, PHP_URL_PATH ) );
+			$relative_path = self::get_media_relative_path_from_url( $absolute_url );
 			if ( is_child_theme() ) {
-				return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $folder_path . $filename;
+				return '<?php echo esc_url( get_stylesheet_directory_uri() ); ?>' . $relative_path;
 			}
-			return '<?php echo esc_url( get_template_directory_uri() ); ?>' . $folder_path . $filename;
+			return '<?php echo esc_url( get_template_directory_uri() ); ?>' . $relative_path;
 		}
 		return $absolute_url;
 	}
@@ -333,6 +339,7 @@ class CBT_Theme_Media {
 	 * Add media files to the local theme
 	 */
 	public static function add_media_to_local( $media ) {
+		$added_media = array();
 
 		foreach ( $media as $url ) {
 
@@ -372,20 +379,39 @@ class CBT_Theme_Media {
 			if ( ! is_dir( $media_path ) ) {
 				wp_mkdir_p( $media_path );
 			}
-			rename( $download_file, $media_path . $filename );
+			if ( rename( $download_file, $media_path . $filename ) ) {
+				$added_media[] = $url;
+			} else {
+				@unlink( $download_file );
+			}
 		}
+
+		return $added_media;
 	}
 
 
 	/**
 	 * Replace the absolute URLs of media in a template with relative URLs
 	 */
-	public static function make_template_images_local( $template ) {
+	public static function make_template_images_local( $template, $media_to_localize = null ) {
 
 		$template->media = self::get_media_absolute_urls_from_template( $template );
 
+		if ( is_null( $media_to_localize ) ) {
+			$media_to_localize = array();
+			foreach ( $template->media as $media_url ) {
+				if ( self::is_allowed_media_url( $media_url ) ) {
+					$media_to_localize[] = $media_url;
+				}
+			}
+		}
+		$media_to_localize = array_unique( (array) $media_to_localize );
+
 		// Replace the absolute URLs with relative URLs in the templates
 		foreach ( $template->media as $media_url ) {
+			if ( ! in_array( $media_url, $media_to_localize, true ) ) {
+				continue;
+			}
 			$local_media_url   = CBT_Theme_Media::make_relative_media_url( $media_url );
 			$template->content = str_replace( $media_url, $local_media_url, $template->content );
 		}

@@ -205,18 +205,27 @@ class CBT_Theme_Zip {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
+			$template->media = CBT_Theme_Media::get_media_absolute_urls_from_template( $template );
+			$validated_media = array();
+			if ( ! empty( $template->media ) ) {
+				$validated_media = self::add_media_to_zip( $zip, $template->media );
+			}
+			$template = CBT_Theme_Templates::prepare_template_for_export(
+				$template,
+				null,
+				array(
+					'localizeText'   => false,
+					'removeNavRefs'  => true,
+					'localizeImages' => true,
+					'validatedMedia' => $validated_media,
+				)
+			);
 
 			// Write the template content
 			$zip->addFromStringToTheme(
 				path_join( $template_folders['wp_template'], $template->slug . '.html' ),
 				$template->content
 			);
-
-			// Write the media assets if there are any
-			if ( $template->media ) {
-				self::add_media_to_zip( $zip, $template->media );
-			}
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
@@ -228,18 +237,27 @@ class CBT_Theme_Zip {
 		}
 
 		foreach ( $theme_templates->parts as $template ) {
-			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
+			$template->media = CBT_Theme_Media::get_media_absolute_urls_from_template( $template );
+			$validated_media = array();
+			if ( ! empty( $template->media ) ) {
+				$validated_media = self::add_media_to_zip( $zip, $template->media );
+			}
+			$template = CBT_Theme_Templates::prepare_template_for_export(
+				$template,
+				null,
+				array(
+					'localizeText'   => false,
+					'removeNavRefs'  => true,
+					'localizeImages' => true,
+					'validatedMedia' => $validated_media,
+				)
+			);
 
 			// Write the template content
 			$zip->addFromStringToTheme(
 				path_join( $template_folders['wp_template_part'], $template->slug . '.html' ),
 				$template->content
 			);
-
-			// Write the media assets if there are any
-			if ( $template->media ) {
-				self::add_media_to_zip( $zip, $template->media );
-			}
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
@@ -254,7 +272,8 @@ class CBT_Theme_Zip {
 	}
 
 	static function add_media_to_zip( $zip, $media ) {
-		$media = array_unique( $media );
+		$media       = array_unique( $media );
+		$added_media = array();
 		foreach ( $media as $url ) {
 
 			// Pre-download URL extension allowlist — see CBT_Theme_Media::is_allowed_media_url().
@@ -299,8 +318,12 @@ class CBT_Theme_Zip {
 			if ( false === $bytes ) {
 				continue;
 			}
-			$zip->addFromStringToTheme( ltrim( $folder_path, '/' ) . $file_name, $bytes );
+			if ( $zip->addFromStringToTheme( ltrim( $folder_path, '/' ) . $file_name, $bytes ) ) {
+				$added_media[] = $url;
+			}
 		}
-	}
 
+		return $added_media;
+
+	}
 }

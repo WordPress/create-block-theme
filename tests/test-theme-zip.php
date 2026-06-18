@@ -63,9 +63,11 @@ class Test_Create_Block_Theme_Zip extends WP_UnitTestCase {
 		};
 		add_filter( 'pre_http_request', $mock, 10, 3 );
 
-		CBT_Theme_Zip::add_media_to_zip( $zip, array( 'http://example.com/tinyzip.png' ) );
+		$added_media = CBT_Theme_Zip::add_media_to_zip( $zip, array( 'http://example.com/tinyzip.png' ) );
 
 		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$this->assertSame( array( 'http://example.com/tinyzip.png' ), $added_media );
 
 		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- ZipArchive::close() may emit a warning if the archive ended up empty; the test asserts the return value instead.
 		$closed = @$zip->close();
@@ -82,6 +84,37 @@ class Test_Create_Block_Theme_Zip extends WP_UnitTestCase {
 			}
 			@unlink( $tmp_path );
 		}
+	}
+
+	public function test_add_media_to_zip_does_not_return_mime_mismatch_url() {
+		list( $zip, $tmp_path ) = $this->make_temp_zip( 'cbt-test' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, "<?php echo 'pwned'; ?>" );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$added_media = CBT_Theme_Zip::add_media_to_zip( $zip, array( 'http://example.com/disguised.png' ) );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+		$zip->close();
+		@unlink( $tmp_path );
+
+		$this->assertSame( array(), $added_media, 'MIME mismatch URLs should not be reported as added to the ZIP.' );
 	}
 
 	/**

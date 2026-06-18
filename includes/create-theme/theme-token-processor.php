@@ -91,10 +91,12 @@ class CBT_Token_Processor {
 		if ( empty( $attr_value ) ) {
 			$token_part .= ' ' . $attr_name;
 		} elseif ( 'src' === $attr_name ) {
-			CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
-			$relative_src = CBT_Theme_Media::get_media_folder_path_from_url( $attr_value ) . basename( $attr_value );
-			$attr_value   = "' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}";
-			$token_part  .= ' ' . $attr_name . '="' . $attr_value . '"';
+			$added_media = CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
+			if ( in_array( $attr_value, $added_media, true ) ) {
+				$relative_src = CBT_Theme_Media::get_media_relative_path_from_url( $attr_value );
+				$attr_value   = "' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}";
+			}
+			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		} elseif ( 'href' === $attr_name ) {
 			$attr_value  = "' . esc_url( '$attr_value' ) . '";
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';

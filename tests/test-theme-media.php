@@ -234,6 +234,65 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'evil.php', $relative_url );
 	}
 
+	public function test_make_template_images_local_does_not_rewrite_disallowed_url() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/evil.php" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+
+		$new_template = CBT_Theme_Media::make_template_images_local( $template );
+
+		$this->assertStringContainsString( 'http://example.com/evil.php', $new_template->content );
+		$this->assertStringNotContainsString( '/assets/', $new_template->content );
+	}
+
+	public function test_make_template_images_local_only_rewrites_validated_media() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/copied.png" alt="" /></figure>
+			<!-- /wp:image -->
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/not-copied.png" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+
+		$new_template = CBT_Theme_Media::make_template_images_local(
+			$template,
+			array( 'http://example.com/copied.png' )
+		);
+
+		$this->assertStringContainsString( '/assets/images/copied.png', $new_template->content );
+		$this->assertStringContainsString( 'http://example.com/not-copied.png', $new_template->content );
+		$this->assertStringNotContainsString( '/assets/images/not-copied.png', $new_template->content );
+	}
+
+	public function test_prepare_template_for_export_leaves_unvalidated_media_remote() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->content = '
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/not-copied.png" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+
+		$new_template = CBT_Theme_Templates::prepare_template_for_export(
+			$template,
+			null,
+			array(
+				'localizeText'   => false,
+				'removeNavRefs'  => true,
+				'localizeImages' => true,
+				'validatedMedia' => array(),
+			)
+		);
+
+		$this->assertStringContainsString( 'http://example.com/not-copied.png', $new_template->content );
+		$this->assertStringNotContainsString( '/assets/images/not-copied.png', $new_template->content );
+	}
+
 	public function test_add_media_to_local_skips_php_url_without_downloading() {
 		$theme_assets = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
 		$malicious    = $theme_assets . 'evil.php';
@@ -320,14 +379,113 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		};
 		add_filter( 'pre_http_request', $mock, 10, 3 );
 
-		CBT_Theme_Media::add_media_to_local( array( 'http://example.com/tinytest.png' ) );
+		$added_media = CBT_Theme_Media::add_media_to_local( array( 'http://example.com/tinytest.png' ) );
 
 		remove_filter( 'pre_http_request', $mock, 10 );
 
+		$this->assertSame( array( 'http://example.com/tinytest.png' ), $added_media );
 		$this->assertFileExists( $expected_path, 'Legitimate PNG URL should have been written to the theme assets dir' );
 		if ( file_exists( $expected_path ) ) {
 			$this->assertSame( $png_bytes, file_get_contents( $expected_path ) );
 			unlink( $expected_path );
 		}
+	}
+
+	public function test_add_media_to_local_does_not_return_mime_mismatch_url() {
+		$theme_assets_dir = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+		$expected_path    = $theme_assets_dir . 'disguised.png';
+
+		if ( file_exists( $expected_path ) ) {
+			unlink( $expected_path );
+		}
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, "<?php echo 'pwned'; ?>" );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$added_media = CBT_Theme_Media::add_media_to_local( array( 'http://example.com/disguised.png' ) );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$this->assertSame( array(), $added_media, 'MIME mismatch URLs should not be reported as copied.' );
+		$this->assertFileDoesNotExist( $expected_path );
+	}
+
+	public function test_token_processor_src_uses_path_filename_after_successful_copy() {
+		$theme_assets_dir = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+		$expected_path    = $theme_assets_dir . 'cat.png';
+
+		if ( file_exists( $expected_path ) ) {
+			unlink( $expected_path );
+		}
+
+		$png_bytes = file_get_contents( __DIR__ . '/data/tiny.png' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $png_bytes ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, $png_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$processor = new CBT_Token_Processor( '<span><img src="http://example.com/cat.png?/evil.php" alt=""></span>' );
+		$processor->process_tokens();
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$tokens = implode( '', $processor->get_tokens() );
+		$this->assertStringContainsString( '/assets/images/cat.png', $tokens );
+		$this->assertStringNotContainsString( 'evil.php', $tokens );
+
+		if ( file_exists( $expected_path ) ) {
+			unlink( $expected_path );
+		}
+	}
+
+	public function test_token_processor_src_leaves_rejected_media_remote() {
+		$attempted = false;
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$tracker = function ( $preempt, $args, $url ) use ( &$attempted ) {
+			$attempted = true;
+			return new WP_Error( 'cbt_test_intercept', 'blocked by test' );
+		};
+		add_filter( 'pre_http_request', $tracker, 10, 3 );
+
+		$processor = new CBT_Token_Processor( '<span><img src="http://example.com/evil.php" alt=""></span>' );
+		$processor->process_tokens();
+
+		remove_filter( 'pre_http_request', $tracker, 10 );
+
+		$tokens = implode( '', $processor->get_tokens() );
+		$this->assertFalse( $attempted, 'download_url() must NOT be called for a rejected token src.' );
+		$this->assertStringContainsString( 'http://example.com/evil.php', $tokens );
+		$this->assertStringNotContainsString( '/assets/', $tokens );
 	}
 }
