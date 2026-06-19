@@ -497,6 +497,40 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_make_template_images_local_does_not_prefix_match_rejected_url() {
+		// Regression: plain str_replace on the whole template would
+		// substring-match the validated URL inside the rejected URL when
+		// one is a prefix of the other (e.g. `photo.png` inside
+		// `photo.png.php`). That would silently localize the rejected URL
+		// even though the validated-media guard rejected it. The parsed
+		// rewrite must only touch values that EXACTLY match a validated
+		// URL.
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image -->
+			<figure><img src="http://example.com/photo.png" alt="" /></figure>
+			<!-- /wp:image -->
+			<!-- wp:image -->
+			<figure><img src="http://example.com/photo.png.php" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+		// Only the safe URL is in the validated-media list — the .php
+		// polyglot was rejected upstream and must NOT be localized.
+		$new_template = CBT_Theme_Media::make_template_images_local(
+			$template,
+			array( 'http://example.com/photo.png' )
+		);
+
+		// The validated URL is rewritten.
+		$this->assertStringNotContainsString( 'src="http://example.com/photo.png"', $new_template->content );
+		$this->assertStringContainsString( '/assets/images/photo.png', $new_template->content );
+
+		// The rejected URL is left intact at its original (remote) value —
+		// neither partially rewritten nor pointed at a missing local asset.
+		$this->assertStringContainsString( 'http://example.com/photo.png.php', $new_template->content );
+		$this->assertStringNotContainsString( '/assets/images/photo.png.php', $new_template->content );
+	}
+
 	public function test_token_processor_src_leaves_rejected_media_remote() {
 		$attempted = false;
 		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable

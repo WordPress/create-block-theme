@@ -415,7 +415,16 @@ class CBT_Theme_Media {
 
 
 	/**
-	 * Replace the absolute URLs of media in a template with relative URLs
+	 * Replace the absolute URLs of media in a template with relative URLs.
+	 *
+	 * Plain str_replace on `$template->content` would substring-match a
+	 * shorter validated URL inside a longer rejected URL when one is a prefix
+	 * of the other (e.g. `photo.png` inside `photo.png.php`). That would
+	 * silently localize the rejected URL even though the validated-media guard
+	 * already refused to download it. Instead, walk the parsed block tree
+	 * with WP_HTML_Tag_Processor for HTML attributes and direct array access
+	 * for block-comment JSON attrs, replacing ONLY values that match a
+	 * validated URL exactly.
 	 */
 	public static function make_template_images_local( $template, $media_to_localize = null ) {
 
@@ -431,15 +440,136 @@ class CBT_Theme_Media {
 		}
 		$media_to_localize = array_unique( (array) $media_to_localize );
 
-		// Replace the absolute URLs with relative URLs in the templates
-		foreach ( $template->media as $media_url ) {
-			if ( ! in_array( $media_url, $media_to_localize, true ) ) {
-				continue;
-			}
-			$local_media_url   = CBT_Theme_Media::make_relative_media_url( $media_url );
-			$template->content = str_replace( $media_url, $local_media_url, $template->content );
+		if ( empty( $media_to_localize ) ) {
+			return $template;
 		}
 
+		// Map absolute URL → its local PHP-echo rewrite.
+		$rewrites = array();
+		foreach ( $media_to_localize as $url ) {
+			$rewrites[ $url ] = self::make_relative_media_url( $url );
+		}
+
+		// The rewrites contain literal PHP open/close tags that must land
+		// VERBATIM in the exported template. Both WP_HTML_Tag_Processor's
+		// set_attribute() and wp_json_encode() (inside serialize_blocks)
+		// would escape `<`, `>` and quotes. Route the rewrites through
+		// opaque placeholders so they survive both passes, and swap them
+		// for the raw PHP at the very end with a single straight string
+		// substitution.
+		//
+		// The placeholder is shaped as a root-relative URL path:
+		// WP_HTML_Tag_Processor's URI-safety check on `src` rewrites
+		// schemeless values like `PLACEHOLDER` to `http://PLACEHOLDER`,
+		// but accepts a leading `/` unchanged. The path uses characters
+		// that wp_json_encode leaves untouched as well.
+		$placeholders     = array();
+		$next_placeholder = static function ( $raw ) use ( &$placeholders ) {
+			$id                  = '/__cbt-local-media-' . count( $placeholders ) . '__';
+			$placeholders[ $id ] = $raw;
+			return $id;
+		};
+
+		$blocks = parse_blocks( $template->content );
+		self::rewrite_media_urls_in_blocks( $blocks, $rewrites, $next_placeholder );
+		$content = serialize_blocks( $blocks );
+
+		if ( ! empty( $placeholders ) ) {
+			$content = strtr( $content, $placeholders );
+		}
+
+		$template->content = $content;
 		return $template;
+	}
+
+	/**
+	 * Recurse into a parsed block tree and rewrite any URL value that
+	 * exactly matches an entry in $rewrites.
+	 *
+	 * @param array    $blocks           Parsed block tree (modified in place).
+	 * @param array    $rewrites         Map of absolute URL → raw replacement.
+	 * @param callable $next_placeholder Returns the placeholder for a rewrite.
+	 */
+	private static function rewrite_media_urls_in_blocks( &$blocks, $rewrites, $next_placeholder ) {
+		foreach ( $blocks as &$block ) {
+			if ( ! empty( $block['attrs'] ) && is_array( $block['attrs'] ) ) {
+				$block['attrs'] = self::rewrite_url_values_in_attrs( $block['attrs'], $rewrites, $next_placeholder );
+			}
+			if ( ! empty( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+				foreach ( $block['innerContent'] as $i => $part ) {
+					if ( is_string( $part ) && '' !== $part ) {
+						$block['innerContent'][ $i ] = self::rewrite_media_urls_in_html( $part, $rewrites, $next_placeholder );
+					}
+				}
+			}
+			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+				self::rewrite_media_urls_in_blocks( $block['innerBlocks'], $rewrites, $next_placeholder );
+			}
+		}
+	}
+
+	/**
+	 * Recursively walk a block-attrs array and replace any `url` string that
+	 * exactly matches a validated URL.
+	 */
+	private static function rewrite_url_values_in_attrs( $attrs, $rewrites, $next_placeholder ) {
+		foreach ( $attrs as $key => $value ) {
+			if ( 'url' === $key && is_string( $value ) && isset( $rewrites[ $value ] ) ) {
+				$attrs[ $key ] = $next_placeholder( $rewrites[ $value ] );
+				continue;
+			}
+			if ( is_array( $value ) ) {
+				$attrs[ $key ] = self::rewrite_url_values_in_attrs( $value, $rewrites, $next_placeholder );
+			}
+		}
+		return $attrs;
+	}
+
+	/**
+	 * Replace img/video src+poster and inline `background-image:url(...)`
+	 * values that exactly match a validated URL.
+	 */
+	private static function rewrite_media_urls_in_html( $html, $rewrites, $next_placeholder ) {
+		$processor = new WP_HTML_Tag_Processor( $html );
+		while ( $processor->next_tag() ) {
+			$tag = strtolower( (string) $processor->get_tag() );
+			if ( 'img' === $tag ) {
+				self::maybe_swap_attr_to_placeholder( $processor, 'src', $rewrites, $next_placeholder );
+			}
+			if ( 'video' === $tag ) {
+				self::maybe_swap_attr_to_placeholder( $processor, 'src', $rewrites, $next_placeholder );
+				self::maybe_swap_attr_to_placeholder( $processor, 'poster', $rewrites, $next_placeholder );
+			}
+			$style = $processor->get_attribute( 'style' );
+			if ( is_string( $style ) && '' !== $style ) {
+				$new_style = self::rewrite_css_background_url( $style, $rewrites, $next_placeholder );
+				if ( $new_style !== $style ) {
+					$processor->set_attribute( 'style', $new_style );
+				}
+			}
+		}
+		return $processor->get_updated_html();
+	}
+
+	private static function maybe_swap_attr_to_placeholder( $processor, $attr, $rewrites, $next_placeholder ) {
+		$value = $processor->get_attribute( $attr );
+		if ( is_string( $value ) && isset( $rewrites[ $value ] ) ) {
+			$processor->set_attribute( $attr, $next_placeholder( $rewrites[ $value ] ) );
+		}
+	}
+
+	private static function rewrite_css_background_url( $style, $rewrites, $next_placeholder ) {
+		return preg_replace_callback(
+			'/background-image\s*:\s*url\(\s*(["\']?)([^"\')]+)\1\s*\)/i',
+			static function ( $matches ) use ( $rewrites, $next_placeholder ) {
+				$url = $matches[2];
+				if ( ! isset( $rewrites[ $url ] ) ) {
+					return $matches[0];
+				}
+				$quote = $matches[1];
+				return 'background-image:url(' . $quote . $next_placeholder( $rewrites[ $url ] ) . $quote . ')';
+			},
+			$style
+		);
 	}
 }
