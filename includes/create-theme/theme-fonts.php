@@ -112,6 +112,140 @@ class CBT_Theme_Fonts {
 		return $font_filename;
 	}
 
+	/**
+	 * Allowlist check on the URL's path extension before we attempt to download a font.
+	 *
+	 * Defends against multi-extension polyglots (`evil.php.woff2`) by rejecting
+	 * any URL whose basename contains a dangerous extension segment anywhere,
+	 * not just at the end.
+	 *
+	 * @param string $url Absolute URL pointing at a font face source.
+	 * @return bool True if the basename is safe and the final extension is in the font allowlist.
+	 */
+	public static function is_allowed_font_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return false;
+		}
+		$path     = wp_parse_url( $url, PHP_URL_PATH );
+		$basename = strtolower( basename( (string) $path ) );
+
+		// Reject if ANY dot-separated segment is a dangerous extension.
+		// Mirrors the denylist in CBT_Theme_Media::is_allowed_media_url().
+		$dangerous = array(
+			'php',
+			'phtml',
+			'phar',
+			'php3',
+			'php4',
+			'php5',
+			'php7',
+			'php8',
+			'phps',
+			'html',
+			'htm',
+			'xhtml',
+			'htaccess',
+			'htpasswd',
+			'cgi',
+			'pl',
+			'py',
+			'rb',
+			'sh',
+			'asp',
+			'aspx',
+			'jsp',
+			'js',
+			'mjs',
+		);
+		foreach ( explode( '.', $basename ) as $segment ) {
+			if ( in_array( $segment, $dangerous, true ) ) {
+				return false;
+			}
+		}
+
+		$extension = pathinfo( $basename, PATHINFO_EXTENSION );
+		$allowed   = array( 'ttf', 'otf', 'woff', 'woff2', 'eot' );
+		return in_array( $extension, $allowed, true );
+	}
+
+	/**
+	 * Magic-byte verification of a downloaded font file against its URL extension.
+	 *
+	 * The downloaded bytes must match the format claimed by the URL extension —
+	 * a `.woff2` URL whose body is TTF (or anything else) is rejected so we
+	 * never persist content that doesn't match its filename on disk.
+	 *
+	 * libmagic-based MIME detection (via finfo or wp_check_filetype_and_ext)
+	 * is unreliable for font formats: WordPress Core has no font MIMEs in its
+	 * registry, and PHP base images ship with varying libmagic versions.
+	 * Verifying magic bytes directly is version-independent and gives a
+	 * stronger guarantee.
+	 *
+	 * Recognised magic per extension:
+	 *  - woff2 → `wOF2` at offset 0
+	 *  - woff  → `wOFF` at offset 0
+	 *  - otf   → `OTTO` at offset 0
+	 *  - ttf   → `\x00\x01\x00\x00` at offset 0 (or `true` for legacy Mac)
+	 *  - eot   → Version field (offset 8) is 0x00010000 / 0x00020001 / 0x00020002
+	 *
+	 * @param string $tmp_file Local path to the downloaded file.
+	 * @param string $url      The originating URL — its extension determines
+	 *                         which magic-byte family the body must match.
+	 * @return bool True if the file's leading bytes match the magic signature
+	 *              expected for the URL's extension.
+	 */
+	public static function is_allowed_font_file( $tmp_file, $url ) {
+		if ( ! is_string( $tmp_file ) || ! file_exists( $tmp_file ) ) {
+			return false;
+		}
+
+		// Read 12 bytes — covers magic-at-offset-0 formats (4 bytes) and the
+		// EOT Version field at offset 8 (4 bytes).
+		$fp = fopen( $tmp_file, 'rb' );
+		if ( false === $fp ) {
+			return false;
+		}
+		$head = fread( $fp, 12 );
+		fclose( $fp );
+
+		if ( false === $head || strlen( $head ) < 4 ) {
+			return false;
+		}
+
+		// Derive the extension from the URL's path (ignore query/fragment) so
+		// the bytes must match the format claimed by the URL — saving a TTF
+		// body under a .woff2 filename would otherwise defeat the allowlist
+		// intent and produce broken assets in the exported theme/zip.
+		$path       = (string) wp_parse_url( $url, PHP_URL_PATH );
+		$extension  = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+		$first_four = substr( $head, 0, 4 );
+
+		switch ( $extension ) {
+			case 'woff2':
+				return 'wOF2' === $first_four;
+
+			case 'woff':
+				return 'wOFF' === $first_four;
+
+			case 'otf':
+				return 'OTTO' === $first_four;
+
+			case 'ttf':
+				return "\x00\x01\x00\x00" === $first_four || 'true' === $first_four;
+
+			case 'eot':
+				return 12 === strlen( $head )
+					&& in_array(
+						substr( $head, 8, 4 ),
+						array( "\x00\x00\x01\x00", "\x01\x00\x02\x00", "\x02\x00\x02\x00" ),
+						true
+					);
+
+			default:
+				return false;
+		}
+	}
+
 	/*
 	 * Copy the font assets to the theme.
 	 *
@@ -137,27 +271,59 @@ class CBT_Theme_Fonts {
 				// src can be a string or an array
 				// if it is a string, cast it to an array
 				$font_face['src'] = (array) $font_face['src'];
-				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
+				// Build a fresh srcs list so rejected sources (disallowed URL,
+				// failed download, MIME mismatch) are dropped rather than
+				// persisted into theme.json.
+				$kept_srcs = array();
+				foreach ( $font_face['src'] as $font_src_index => $font_src ) {
 					if ( str_starts_with( $font_src, 'file:' ) ) {
 						// If the font source starts with 'file:' then it's already a theme asset.
+						$kept_srcs[] = $font_src;
 						continue;
 					}
-					$font_filename        = basename( $font_src );
-					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
+
+					// Pre-download URL extension allowlist — applies to both
+					// the local-copy and remote-download branches because the
+					// URL itself is the input we don't trust.
+					if ( ! self::is_allowed_font_url( $font_src ) ) {
+						continue;
+					}
+
+					$font_src_path        = (string) wp_parse_url( $font_src, PHP_URL_PATH );
+					$font_filename        = basename( $font_src_path );
+					$font_pretty_filename = self::make_filename_from_fontface( $font_face, $font_src_path, $font_src_index );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
 					$font_dir             = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
-						// If the file is hosted on this server then copy it to the theme
-						copy( path_join( $font_dir['path'], $font_filename ), $font_face_path );
+						// If the file is hosted on this server then copy it to the theme.
+						$local_source = path_join( $font_dir['path'], $font_filename );
+						// Magic-byte allowlist on the local source too — the
+						// WP user-fonts directory is the input we don't trust:
+						// anything that ended up there (via a separate flow,
+						// or a polyglot) shouldn't be copied verbatim into
+						// the theme just because the URL extension looked OK.
+						if ( ! self::is_allowed_font_file( $local_source, $font_src ) ) {
+							continue;
+						}
+						copy( $local_source, $font_face_path );
 					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_src );
+						if ( is_wp_error( $tmp_file ) ) {
+							continue;
+						}
+						// Post-download MIME allowlist.
+						if ( ! self::is_allowed_font_file( $tmp_file, $font_src ) ) {
+							@unlink( $tmp_file );
+							continue;
+						}
 						copy( $tmp_file, $font_face_path );
 						unlink( $tmp_file );
 					}
-					$font_face_family_path               = path_join( $font_family_dir_name, $font_pretty_filename );
-					$font_face['src'][ $font_src_index ] = path_join( 'file:./assets/fonts/', $font_face_family_path );
+					$font_face_family_path = path_join( $font_family_dir_name, $font_pretty_filename );
+					$kept_srcs[]           = path_join( 'file:./assets/fonts/', $font_face_family_path );
 				}
+				$font_face['src'] = $kept_srcs;
 			}
 		}
 

@@ -498,5 +498,376 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$actual    = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $src, $src_index );
 		$this->assertEquals( $expected, $actual );
 	}
+
+	public function test_is_allowed_font_url_accepts_standard_extensions() {
+		$urls = array(
+			'http://fonts.example.com/foo.ttf',
+			'http://fonts.example.com/foo.otf',
+			'http://fonts.example.com/foo.woff',
+			'http://fonts.example.com/foo.woff2',
+			'http://fonts.example.com/foo.eot',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should accept: $url" );
+		}
+	}
+
+	public function test_is_allowed_font_url_rejects_php_and_other_extensions() {
+		$urls = array(
+			'http://fonts.example.com/evil.php',
+			'http://fonts.example.com/evil.phtml',
+			'http://fonts.example.com/evil.phar',
+			'http://fonts.example.com/evil.txt',
+			'http://fonts.example.com/evil.bin',
+			'http://fonts.example.com/no-extension',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should reject: $url" );
+		}
+	}
+
+	public function test_is_allowed_font_url_is_case_insensitive() {
+		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/EVIL.PHP' ) );
+		$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/FOO.WOFF2' ) );
+	}
+
+	public function test_is_allowed_font_url_ignores_query_string() {
+		$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/foo.woff2?v=2' ) );
+		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( 'http://fonts.example.com/evil.php?disguised=foo.woff2' ) );
+	}
+
+	public function test_is_allowed_font_file_accepts_real_woff2() {
+		$tmp = wp_tempnam( 'cbt-test-font' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.woff2', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.woff2' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_accepts_real_ttf() {
+		$tmp = wp_tempnam( 'cbt-test-ttf' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.ttf', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.ttf' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_accepts_real_otf() {
+		$tmp = wp_tempnam( 'cbt-test-otf' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.otf', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.otf' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_accepts_real_woff() {
+		$tmp = wp_tempnam( 'cbt-test-woff' );
+		copy( __DIR__ . '/data/fonts/OpenSans-Regular.woff', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/foo.woff' );
+		@unlink( $tmp );
+		$this->assertTrue( $ok );
+	}
+
+	public function test_is_allowed_font_file_rejects_php_body_with_woff2_url() {
+		$tmp = wp_tempnam( 'cbt-test-font-evil' );
+		copy( __DIR__ . '/data/evil.php.txt', $tmp );
+		$ok = CBT_Theme_Fonts::is_allowed_font_file( $tmp, 'http://fonts.example.com/evil.woff2' );
+		@unlink( $tmp );
+		$this->assertFalse( $ok );
+	}
+
+	public function test_is_allowed_font_file_rejects_missing_file() {
+		$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_file( '/nonexistent/tmp/file', 'http://fonts.example.com/foo.woff2' ) );
+	}
+
+	public function test_copy_font_assets_to_theme_skips_php_src_without_downloading() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Spy on HTTP — should NOT be called for the disallowed URL.
+		$attempted = false;
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$tracker = function ( $preempt, $args, $url ) use ( &$attempted ) {
+			$attempted = true;
+			return new WP_Error( 'cbt_test_intercept', 'blocked by test' );
+		};
+		add_filter( 'pre_http_request', $tracker, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Evil Family',
+				'slug'     => 'evil-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Evil Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'http://fonts.example.com/evil.php' ),
+					),
+				),
+			),
+		);
+		CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $tracker, 10 );
+
+		$malicious = get_stylesheet_directory() . '/assets/fonts/evil-family/evil-family-400-normal.php';
+		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension font src' );
+		$this->assertFileDoesNotExist( $malicious );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_is_allowed_font_url_rejects_multi_extension_polyglots() {
+		$urls = array(
+			'http://fonts.example.com/evil.php.woff2',
+			'http://fonts.example.com/evil.phtml.ttf',
+			'http://fonts.example.com/sneaky.htaccess.woff',
+			'http://fonts.example.com/inject.html.otf',
+			'http://fonts.example.com/evil.PHP.woff2', // case-insensitive
+		);
+		foreach ( $urls as $url ) {
+			$this->assertFalse( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should reject polyglot: $url" );
+		}
+	}
+
+	public function test_is_allowed_font_url_accepts_multi_dot_filenames() {
+		// Legitimate multi-dot filenames where NO interior segment is dangerous.
+		$urls = array(
+			'http://fonts.example.com/font.bold.italic.woff2',
+			'http://fonts.example.com/family.v2.ttf',
+		);
+		foreach ( $urls as $url ) {
+			$this->assertTrue( CBT_Theme_Fonts::is_allowed_font_url( $url ), "Should accept legit multi-dot: $url" );
+		}
+	}
+
+	public function test_copy_font_assets_to_theme_writes_legit_woff2() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$woff2_bytes = file_get_contents( __DIR__ . '/data/fonts/OpenSans-Regular.woff2' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $woff2_bytes ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, $woff2_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Test Sans',
+				'slug'     => 'test-sans',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Test Sans',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'http://fonts.example.com/test-sans.woff2' ),
+					),
+				),
+			),
+		);
+		CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$expected = get_stylesheet_directory() . '/assets/fonts/test-sans/test-sans-400-normal.woff2';
+		$this->assertFileExists( $expected, 'Legitimate WOFF2 URL should have been written to assets/fonts/' );
+		if ( file_exists( $expected ) ) {
+			$this->assertSame( $woff2_bytes, file_get_contents( $expected ) );
+		}
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_copy_font_assets_to_theme_drops_disallowed_url_from_returned_src() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$woff2_bytes = file_get_contents( __DIR__ . '/data/fonts/OpenSans-Regular.woff2' );
+
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) use ( $woff2_bytes ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, $woff2_bytes );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Mixed Family',
+				'slug'     => 'mixed-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Mixed Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array(
+							'http://fonts.example.com/legit.woff2',
+							'http://fonts.example.com/evil.php',
+						),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$returned_src = $result[0]['fontFace'][0]['src'];
+		$this->assertCount( 1, $returned_src, 'Disallowed URL should be dropped from the returned src list.' );
+		$this->assertStringStartsWith( 'file:./assets/fonts/', $returned_src[0] );
+		$this->assertNotContains( 'http://fonts.example.com/evil.php', $returned_src, 'Rejected URL must not be persisted to the returned families.' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_copy_font_assets_to_theme_drops_mime_mismatch_src_from_returned_families() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		// Serve PHP bytes for a .woff2 URL — passes URL allowlist, fails MIME.
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$mock = function ( $preempt, $args, $url ) {
+			$tmp = isset( $args['filename'] ) ? $args['filename'] : null;
+			if ( $tmp ) {
+				file_put_contents( $tmp, "<?php echo 'pwned'; ?>" );
+			}
+			return array(
+				'headers'  => array(),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'body'     => '',
+				'cookies'  => array(),
+				'filename' => $tmp,
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 3 );
+
+		$families = array(
+			array(
+				'name'     => 'Polyglot Family',
+				'slug'     => 'polyglot-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Polyglot Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'http://fonts.example.com/disguised.woff2' ),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		remove_filter( 'pre_http_request', $mock, 10 );
+
+		$returned_src = $result[0]['fontFace'][0]['src'];
+		$this->assertSame( array(), $returned_src, 'Source with mismatched MIME must be dropped from the returned src list.' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_copy_font_assets_to_theme_rejects_local_non_font_source() {
+		// A font src pointing at the WP user-fonts directory whose body is
+		// NOT a font (e.g. a polyglot left behind by a separate flow) should
+		// be dropped from the returned src list. The local-copy branch must
+		// not trust the URL extension alone.
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$font_dir = wp_get_font_dir();
+		if ( ! file_exists( $font_dir['path'] ) ) {
+			mkdir( $font_dir['path'], 0777, true );
+		}
+		$disguised_name = 'evil-disguised-400-normal.woff2';
+		$disguised_path = $font_dir['path'] . '/' . $disguised_name;
+		// PHP body, woff2 extension — passes the URL allowlist, must be
+		// rejected by the magic-byte check.
+		file_put_contents( $disguised_path, "<?php echo 'pwned'; ?>" );
+
+		$families = array(
+			array(
+				'name'     => 'Evil Local',
+				'slug'     => 'evil-local',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Evil Local',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( $font_dir['url'] . '/' . $disguised_name ),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		$returned_src = $result[0]['fontFace'][0]['src'];
+		$this->assertSame( array(), $returned_src, 'Non-font local source must be dropped from the returned src list.' );
+		$this->assertFileDoesNotExist(
+			get_stylesheet_directory() . '/assets/fonts/evil-local/' . $disguised_name,
+			'Non-font local source must NOT be copied into the theme.'
+		);
+
+		@unlink( $disguised_path );
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_copy_font_assets_to_theme_preserves_existing_file_src() {
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$families = array(
+			array(
+				'name'     => 'Local Family',
+				'slug'     => 'local-family',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Local Family',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( 'file:./assets/fonts/local-family.woff2' ),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		$this->assertSame(
+			array( 'file:./assets/fonts/local-family.woff2' ),
+			$result[0]['fontFace'][0]['src'],
+			'Pre-existing file: src should be preserved unchanged.'
+		);
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
 }
 

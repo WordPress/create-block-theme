@@ -47,27 +47,65 @@ class CBT_Theme_Zip {
 			}
 			$font_slugs_to_remove[] = $font_family['slug'];
 			foreach ( $font_family['fontFace'] as &$font_face ) {
-				$font_filename    = basename( $font_face['src'] );
-				$font_dir         = wp_get_font_dir();
 				$font_face['src'] = (array) $font_face['src'];
-				foreach ( $font_face['src'] as $font_src_index => &$font_src ) {
-					$font_filename        = basename( $font_src );
-					$font_pretty_filename = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $font_src, $font_src_index );
+				// Build a fresh srcs list so rejected sources (disallowed URL,
+				// failed download, MIME mismatch) are dropped rather than
+				// persisted into the exported theme.json.
+				$kept_srcs = array();
+				foreach ( $font_face['src'] as $font_src_index => $font_src ) {
+					if ( is_string( $font_src ) && str_starts_with( $font_src, 'file:' ) ) {
+						// Already a theme asset — keep as-is.
+						$kept_srcs[] = $font_src;
+						continue;
+					}
+
+					// Pre-download URL extension allowlist — see CBT_Theme_Fonts::is_allowed_font_url().
+					if ( ! CBT_Theme_Fonts::is_allowed_font_url( $font_src ) ) {
+						continue;
+					}
+
+					$font_src_path        = (string) wp_parse_url( $font_src, PHP_URL_PATH );
+					$font_filename        = basename( $font_src_path );
+					$font_pretty_filename = CBT_Theme_Fonts::make_filename_from_fontface( $font_face, $font_src_path, $font_src_index );
 					$font_family_dir_name = sanitize_title( $font_family['name'] );
 					$font_family_dir_path = path_join( $theme_font_asset_location, $font_family_dir_name );
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
 
 					$font_dir = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
-						$zip->addFileToTheme( path_join( $font_dir['path'], $font_filename ), $font_face_path );
+						$local_source = path_join( $font_dir['path'], $font_filename );
+						// Magic-byte allowlist on the local source too — the
+						// WP user-fonts directory is the input we don't trust:
+						// anything that ended up there (via a separate flow,
+						// or a polyglot) shouldn't be zipped verbatim into
+						// the exported theme just because the URL extension
+						// looked OK.
+						if ( ! CBT_Theme_Fonts::is_allowed_font_file( $local_source, $font_src ) ) {
+							continue;
+						}
+						$zip->addFileToTheme( $local_source, $font_face_path );
 					} else {
 						// otherwise download it from wherever it is hosted
-						$tmp_file = download_url( $font_face['src'] );
-						$zip->addFileToTheme( $tmp_file, $font_face_path );
-						unlink( $tmp_file );
+						$tmp_file = download_url( $font_src );
+						if ( is_wp_error( $tmp_file ) ) {
+							continue;
+						}
+						// Post-download MIME allowlist.
+						if ( ! CBT_Theme_Fonts::is_allowed_font_file( $tmp_file, $font_src ) ) {
+							@unlink( $tmp_file );
+							continue;
+						}
+						// Read the bytes into memory before unlinking.
+						$bytes = file_get_contents( $tmp_file );
+						@unlink( $tmp_file );
+						if ( false === $bytes ) {
+							continue;
+						}
+						$zip->addFromStringToTheme( $font_face_path, $bytes );
 					}
-					$font_face['src'][ $font_src_index ] = 'file:./assets/fonts/' . path_join( $font_family_dir_name, $font_pretty_filename );
+					$kept_srcs[] = 'file:./assets/fonts/' . path_join( $font_family_dir_name, $font_pretty_filename );
 				}
+				$font_face['src'] = $kept_srcs;
 			}
 		}
 
@@ -177,18 +215,27 @@ class CBT_Theme_Zip {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
+			$template->media = CBT_Theme_Media::get_media_absolute_urls_from_template( $template );
+			$validated_media = array();
+			if ( ! empty( $template->media ) ) {
+				$validated_media = self::add_media_to_zip( $zip, $template->media );
+			}
+			$template = CBT_Theme_Templates::prepare_template_for_export(
+				$template,
+				null,
+				array(
+					'localizeText'   => false,
+					'removeNavRefs'  => true,
+					'localizeImages' => true,
+					'validatedMedia' => $validated_media,
+				)
+			);
 
 			// Write the template content
 			$zip->addFromStringToTheme(
 				path_join( $template_folders['wp_template'], $template->slug . '.html' ),
 				$template->content
 			);
-
-			// Write the media assets if there are any
-			if ( $template->media ) {
-				self::add_media_to_zip( $zip, $template->media );
-			}
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
@@ -200,18 +247,27 @@ class CBT_Theme_Zip {
 		}
 
 		foreach ( $theme_templates->parts as $template ) {
-			$template = CBT_Theme_Templates::prepare_template_for_export( $template );
+			$template->media = CBT_Theme_Media::get_media_absolute_urls_from_template( $template );
+			$validated_media = array();
+			if ( ! empty( $template->media ) ) {
+				$validated_media = self::add_media_to_zip( $zip, $template->media );
+			}
+			$template = CBT_Theme_Templates::prepare_template_for_export(
+				$template,
+				null,
+				array(
+					'localizeText'   => false,
+					'removeNavRefs'  => true,
+					'localizeImages' => true,
+					'validatedMedia' => $validated_media,
+				)
+			);
 
 			// Write the template content
 			$zip->addFromStringToTheme(
 				path_join( $template_folders['wp_template_part'], $template->slug . '.html' ),
 				$template->content
 			);
-
-			// Write the media assets if there are any
-			if ( $template->media ) {
-				self::add_media_to_zip( $zip, $template->media );
-			}
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
@@ -226,8 +282,15 @@ class CBT_Theme_Zip {
 	}
 
 	static function add_media_to_zip( $zip, $media ) {
-		$media = array_unique( $media );
+		$media       = array_unique( $media );
+		$added_media = array();
 		foreach ( $media as $url ) {
+
+			// Pre-download URL extension allowlist — see CBT_Theme_Media::is_allowed_media_url().
+			if ( ! CBT_Theme_Media::is_allowed_media_url( $url ) ) {
+				continue;
+			}
+
 			$folder_path   = CBT_Theme_Media::get_media_folder_path_from_url( $url );
 			$download_file = download_url( $url );
 
@@ -236,19 +299,41 @@ class CBT_Theme_Zip {
 				//see, we might be running this in a docker container
 				//and if that's the case let's try again on port 80
 				$parsed_url = parse_url( $url );
-				if ( 'localhost' === $parsed_url['host'] && '80' !== $parsed_url['port'] ) {
+				if ( isset( $parsed_url['host'], $parsed_url['port'] )
+					&& 'localhost' === $parsed_url['host']
+					&& '80' !== $parsed_url['port'] ) {
 					$download_file = download_url( str_replace( 'localhost:' . $parsed_url['port'], 'localhost:80', $url ) );
 				}
 			}
 
 			// If there was an error downloading the file, skip it.
 			// TODO: Implement a warning if the file is missing
-			if ( ! is_wp_error( $download_file ) ) {
-				$content_array  = file( $download_file );
-				$file_as_string = implode( '', $content_array );
-				$zip->addFromStringToTheme( $folder_path . basename( $url ), $file_as_string );
+			if ( is_wp_error( $download_file ) ) {
+				continue;
+			}
+
+			// Post-download MIME allowlist.
+			if ( ! CBT_Theme_Media::is_allowed_media_file( $download_file, $url ) ) {
+				@unlink( $download_file );
+				continue;
+			}
+
+			// Read the bytes into memory before unlinking — ZipArchive defers
+			// reading files added via addFile() until close() is called, so
+			// removing the tmp file immediately would leave an empty entry
+			// in the final archive.
+			$file_name = basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+			$bytes     = file_get_contents( $download_file );
+			@unlink( $download_file );
+			if ( false === $bytes ) {
+				continue;
+			}
+			if ( $zip->addFromStringToTheme( ltrim( $folder_path, '/' ) . $file_name, $bytes ) ) {
+				$added_media[] = $url;
 			}
 		}
-	}
 
+		return $added_media;
+
+	}
 }
