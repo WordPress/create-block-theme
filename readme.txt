@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.8
 Tested up to: 6.9
-Stable tag: 2.9.0
+Stable tag: 2.10.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -125,6 +125,17 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.10.0 =
+* Validate downloaded theme assets against extension and MIME allowlists (#852)
+* Require super-admin for theme-modifying REST routes on multisite (#850)
+* I18n: Localize label attribute of additional blocks (#826)
+* I18n: Localise fileName and downloadButtonText of the File block (#827)
+* Strip PHP execution tags from pattern body content (#851)
+* Add /theme-settings REST endpoint + CBT_Theme_Settings_Save service (#843)
+* Fix: guard `$template->media` reads against undefined property (#835)
+* Add setting to expand typography controls in the block inspector (#824)
+* Sanitize pattern titles and categories (#817)
 
 = 2.9.0 =
 * Downgrade actions/core (#815)
