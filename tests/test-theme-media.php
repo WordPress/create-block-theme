@@ -174,6 +174,34 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assert_media_magic_accepted( "\x00\x00\x00\x20" . 'ftypavis' . str_repeat( "\x00", 16 ), 'http://example.com/cat.avif' );
 	}
 
+	public function test_is_allowed_media_file_accepts_avif_in_compatible_brands() {
+		// Some AVIF files (typically those emitted by HEIF-derived tooling)
+		// use `mif1` as the major brand and list `avif` only among the
+		// compatible brands. The check must accept these.
+		// Layout: size(4) + 'ftyp' + major='mif1' + minor='\x00\x00\x00\x00'
+		// + compatible brands = 'miaf' 'avif' (then padding).
+		$bytes = "\x00\x00\x00\x20" . 'ftyp' . 'mif1' . "\x00\x00\x00\x00" . 'miafavif' . str_repeat( "\x00", 8 );
+		$this->assert_media_magic_accepted( $bytes, 'http://example.com/cat.avif' );
+	}
+
+	public function test_is_allowed_media_file_accepts_avis_in_compatible_brands() {
+		// As above but with the sequence brand only in the compatible list.
+		$bytes = "\x00\x00\x00\x20" . 'ftyp' . 'mif1' . "\x00\x00\x00\x00" . 'miafavis' . str_repeat( "\x00", 8 );
+		$this->assert_media_magic_accepted( $bytes, 'http://example.com/cat.avif' );
+	}
+
+	public function test_is_allowed_media_file_rejects_heic_disguised_as_avif() {
+		// Pure HEIC: major brand `heic`, compatible brands `mif1` + `heic`
+		// (no AVIF brand anywhere). Must NOT pass the AVIF check even
+		// though the file extension claims .avif.
+		$bytes = "\x00\x00\x00\x20" . 'ftyp' . 'heic' . "\x00\x00\x00\x00" . 'mif1heic' . str_repeat( "\x00", 8 );
+		$tmp   = wp_tempnam( 'cbt-test-heic' );
+		file_put_contents( $tmp, $bytes );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, 'http://example.com/sneaky.avif' );
+		@unlink( $tmp );
+		$this->assertFalse( $ok, 'HEIC (no avif/avis brand) must be rejected when URL claims .avif' );
+	}
+
 	public function test_is_allowed_media_file_accepts_svg_content() {
 		$this->assert_media_magic_accepted( '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>', 'http://example.com/cat.svg' );
 	}

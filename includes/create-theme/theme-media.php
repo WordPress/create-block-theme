@@ -145,7 +145,8 @@ class CBT_Theme_Media {
 	 *  - png        → `\x89PNG`
 	 *  - gif        → `GIF8` (covers GIF87a and GIF89a)
 	 *  - webp       → `RIFF....WEBP`
-	 *  - avif       → `ftyp` at offset 4 + brand `avif` or `avis` at offset 8 (ISO BMFF)
+	 *  - avif       → `ftyp` at offset 4 + brand `avif` or `avis` as the major
+	 *                 brand OR anywhere in the compatible-brands list (ISO BMFF)
 	 *  - svg        → `<svg` somewhere in the first 1024 bytes
 	 *  - mp4 / m4v / mov / 3gp / 3g2 → `ftyp` at offset 4 (ISO BMFF)
 	 *  - webm       → `\x1a\x45\xdf\xa3` (EBML)
@@ -200,11 +201,34 @@ class CBT_Theme_Media {
 					&& 'WEBP' === substr( $head, 8, 4 );
 
 			case 'avif':
-				// AVIF is ISO BMFF (like MP4) but with `avif` or `avis` as
-				// the major brand at offset 8.
-				return strlen( $head ) >= 12
-					&& 'ftyp' === substr( $head, 4, 4 )
-					&& in_array( substr( $head, 8, 4 ), array( 'avif', 'avis' ), true );
+				// AVIF is ISO BMFF. The FileTypeBox layout is:
+				//   offset 0-3  : box size (big-endian uint32)
+				//   offset 4-7  : 'ftyp'
+				//   offset 8-11 : major brand
+				//   offset 12-15: minor version
+				//   offset 16+  : compatible brands (4 bytes each)
+				// Encoders set the major brand to `avif`/`avis` OR — for
+				// files derived from HEIF tooling — set the major brand to
+				// `mif1`/`miaf` and list `avif`/`avis` only in the
+				// compatible brands. Accept the file if any AVIF brand
+				// appears anywhere in the box.
+				if ( strlen( $head ) < 16 || 'ftyp' !== substr( $head, 4, 4 ) ) {
+					return false;
+				}
+				$box_size_unpack = unpack( 'N', substr( $head, 0, 4 ) );
+				$box_size        = isset( $box_size_unpack[1] ) ? (int) $box_size_unpack[1] : 0;
+				// `box_size === 1` means a 64-bit large-size follows, and
+				// `box_size === 0` means "extends to EOF". In both cases
+				// scan whatever leading bytes we have. Cap at the read
+				// window so we don't iterate past meaningful data.
+				$scan_end = ( $box_size > 1 )
+					? min( $box_size, strlen( $head ) )
+					: strlen( $head );
+				$brands   = array( substr( $head, 8, 4 ) );
+				for ( $offset = 16; $offset + 4 <= $scan_end; $offset += 4 ) {
+					$brands[] = substr( $head, $offset, 4 );
+				}
+				return (bool) array_intersect( $brands, array( 'avif', 'avis' ) );
 
 			case 'svg':
 				return false !== stripos( $head, '<svg' );
