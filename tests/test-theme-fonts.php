@@ -796,6 +796,51 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->uninstall_theme( $test_theme_slug );
 	}
 
+	public function test_copy_font_assets_to_theme_rejects_local_non_font_source() {
+		// A font src pointing at the WP user-fonts directory whose body is
+		// NOT a font (e.g. a polyglot left behind by a separate flow) should
+		// be dropped from the returned src list. The local-copy branch must
+		// not trust the URL extension alone.
+		wp_set_current_user( self::$admin_id );
+		$test_theme_slug = $this->create_blank_theme();
+
+		$font_dir = wp_get_font_dir();
+		if ( ! file_exists( $font_dir['path'] ) ) {
+			mkdir( $font_dir['path'], 0777, true );
+		}
+		$disguised_name = 'evil-disguised-400-normal.woff2';
+		$disguised_path = $font_dir['path'] . '/' . $disguised_name;
+		// PHP body, woff2 extension — passes the URL allowlist, must be
+		// rejected by the magic-byte check.
+		file_put_contents( $disguised_path, "<?php echo 'pwned'; ?>" );
+
+		$families = array(
+			array(
+				'name'     => 'Evil Local',
+				'slug'     => 'evil-local',
+				'fontFace' => array(
+					array(
+						'fontFamily' => 'Evil Local',
+						'fontWeight' => '400',
+						'fontStyle'  => 'normal',
+						'src'        => array( $font_dir['url'] . '/' . $disguised_name ),
+					),
+				),
+			),
+		);
+		$result   = CBT_Theme_Fonts::copy_font_assets_to_theme( $families );
+
+		$returned_src = $result[0]['fontFace'][0]['src'];
+		$this->assertSame( array(), $returned_src, 'Non-font local source must be dropped from the returned src list.' );
+		$this->assertFileDoesNotExist(
+			get_stylesheet_directory() . '/assets/fonts/evil-local/' . $disguised_name,
+			'Non-font local source must NOT be copied into the theme.'
+		);
+
+		@unlink( $disguised_path );
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
 	public function test_copy_font_assets_to_theme_preserves_existing_file_src() {
 		wp_set_current_user( self::$admin_id );
 		$test_theme_slug = $this->create_blank_theme();

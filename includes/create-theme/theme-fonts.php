@@ -295,8 +295,17 @@ class CBT_Theme_Fonts {
 					$font_face_path       = path_join( $font_family_dir_path, $font_pretty_filename );
 					$font_dir             = wp_get_font_dir();
 					if ( str_contains( $font_src, $font_dir['url'] ) ) {
-						// If the file is hosted on this server then copy it to the theme
-						copy( path_join( $font_dir['path'], $font_filename ), $font_face_path );
+						// If the file is hosted on this server then copy it to the theme.
+						$local_source = path_join( $font_dir['path'], $font_filename );
+						// Magic-byte allowlist on the local source too — the
+						// WP user-fonts directory is the input we don't trust:
+						// anything that ended up there (via a separate flow,
+						// or a polyglot) shouldn't be copied verbatim into
+						// the theme just because the URL extension looked OK.
+						if ( ! self::is_allowed_font_file( $local_source, $font_src ) ) {
+							continue;
+						}
+						copy( $local_source, $font_face_path );
 					} else {
 						// otherwise download it from wherever it is hosted
 						$tmp_file = download_url( $font_src );
