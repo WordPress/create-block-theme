@@ -127,53 +127,130 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
 	}
 
-	public function test_admin_landing_menu_not_registered_when_cannot_modify_theme() {
+	public function test_admin_landing_menu_gated_by_can_modify_theme() {
+		// CBT_Admin_Landing::create_admin_menu() also returns early when
+		// wp_is_block_theme() is false. To prove the cap gate (and not the
+		// block-theme guard) is what hides the menu, activate a block theme
+		// first, then assert the menu appears when can_modify_theme() passes
+		// and disappears once file_mod_allowed denies.
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'single-site only — multisite gate is covered by edit_themes super-admin check' );
+		}
 		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin );
 
-		add_filter( 'file_mod_allowed', '__return_false' );
-
-		$landing = new CBT_Admin_Landing();
+		$saved_stylesheet = get_stylesheet();
+		$test_theme_slug  = $this->create_blank_theme();
 		set_current_screen( 'themes.php' );
+		$landing = new CBT_Admin_Landing();
+
 		global $submenu;
-		$submenu = array();
-		$landing->create_admin_menu();
-		$menu_after_deny = isset( $submenu['themes.php'] ) ? $submenu['themes.php'] : array();
+		try {
+			// Gate open: menu IS registered (proves we cleared wp_is_block_theme()).
+			$submenu = array();
+			$landing->create_admin_menu();
+			$open_slugs = array_column( isset( $submenu['themes.php'] ) ? $submenu['themes.php'] : array(), 2 );
+			$this->assertContains(
+				'create-block-theme-landing',
+				$open_slugs,
+				'Landing-page menu should register on a block theme when the user can modify the theme.'
+			);
 
-		remove_filter( 'file_mod_allowed', '__return_false' );
+			// Gate denied: menu is NOT registered.
+			add_filter( 'file_mod_allowed', '__return_false' );
+			$submenu = array();
+			$landing->create_admin_menu();
+			$denied_slugs = array_column( isset( $submenu['themes.php'] ) ? $submenu['themes.php'] : array(), 2 );
+			remove_filter( 'file_mod_allowed', '__return_false' );
 
-		$slugs = array_column( $menu_after_deny, 2 );
-		$this->assertNotContains(
-			'create-block-theme-landing',
-			$slugs,
-			'Landing-page menu must NOT be registered when the user cannot modify the theme.'
-		);
+			$this->assertNotContains(
+				'create-block-theme-landing',
+				$denied_slugs,
+				'Landing-page menu must NOT register when the user cannot modify the theme.'
+			);
+		} finally {
+			$this->uninstall_theme( $test_theme_slug, $saved_stylesheet );
+		}
 	}
 
-	public function test_editor_sidebar_enqueue_drops_when_cannot_modify_theme() {
-		// Sub-site admin on multisite or DISALLOW_FILE_MODS site: the sidebar
-		// JS should not enqueue. Simulate by gating via file_mod_allowed.
+	public function test_editor_sidebar_enqueue_gated_by_can_modify_theme() {
+		// As above, CBT_Editor_Tools::create_block_theme_sidebar_enqueue()
+		// returns early when wp_is_block_theme() is false (or when $pagenow
+		// is not site-editor.php). Set up a block theme + the right pagenow,
+		// then assert the enqueue happens with the gate open and drops out
+		// once file_mod_allowed denies.
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'single-site only — multisite gate is covered by edit_themes super-admin check' );
+		}
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$saved_stylesheet = get_stylesheet();
+		$test_theme_slug  = $this->create_blank_theme();
+
 		global $pagenow;
 		$saved_pagenow = $pagenow;
 		$pagenow       = 'site-editor.php';
 
-		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		wp_set_current_user( $admin );
-
-		add_filter( 'file_mod_allowed', '__return_false' );
-
 		$tools = new CBT_Editor_Tools();
-		// Reset any prior enqueue state.
-		wp_dequeue_script( 'create-block-theme-slot-fill' );
-		$tools->create_block_theme_sidebar_enqueue();
-		$enqueued = wp_script_is( 'create-block-theme-slot-fill', 'enqueued' );
+		try {
+			// Gate open: script IS enqueued (proves we cleared wp_is_block_theme()).
+			wp_dequeue_script( 'create-block-theme-slot-fill' );
+			wp_deregister_script( 'create-block-theme-slot-fill' );
+			$tools->create_block_theme_sidebar_enqueue();
+			$this->assertTrue(
+				wp_script_is( 'create-block-theme-slot-fill', 'enqueued' ),
+				'Sidebar script should enqueue on a block theme when the user can modify the theme.'
+			);
 
-		remove_filter( 'file_mod_allowed', '__return_false' );
-		$pagenow = $saved_pagenow;
+			// Gate denied: script is NOT enqueued.
+			wp_dequeue_script( 'create-block-theme-slot-fill' );
+			wp_deregister_script( 'create-block-theme-slot-fill' );
+			add_filter( 'file_mod_allowed', '__return_false' );
+			$tools->create_block_theme_sidebar_enqueue();
+			$enqueued_after_deny = wp_script_is( 'create-block-theme-slot-fill', 'enqueued' );
+			remove_filter( 'file_mod_allowed', '__return_false' );
 
-		$this->assertFalse(
-			$enqueued,
-			'Sidebar script must NOT be enqueued when the user cannot modify the theme.'
-		);
+			$this->assertFalse(
+				$enqueued_after_deny,
+				'Sidebar script must NOT enqueue when the user cannot modify the theme.'
+			);
+		} finally {
+			$pagenow = $saved_pagenow;
+			wp_dequeue_script( 'create-block-theme-slot-fill' );
+			wp_deregister_script( 'create-block-theme-slot-fill' );
+			$this->uninstall_theme( $test_theme_slug, $saved_stylesheet );
+		}
+	}
+
+	/**
+	 * Create + activate a blank block theme using the plugin's own
+	 * /create-blank endpoint, so wp_is_block_theme() returns true. Mirrors
+	 * the helper in tests/test-theme-fonts.php.
+	 */
+	private function create_blank_theme() {
+		$test_theme_slug = 'cbt-api-test-theme';
+		delete_theme( $test_theme_slug );
+
+		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/create-blank' );
+		$request->set_param( 'name', $test_theme_slug );
+		$request->set_param( 'description', '' );
+		$request->set_param( 'uri', '' );
+		$request->set_param( 'author', '' );
+		$request->set_param( 'author_uri', '' );
+		$request->set_param( 'tags_custom', '' );
+		$request->set_param( 'recommended_plugins', '' );
+		rest_do_request( $request );
+
+		CBT_Theme_JSON_Resolver::clean_cached_data();
+		return $test_theme_slug;
+	}
+
+	private function uninstall_theme( $theme_slug, $restore_stylesheet = null ) {
+		CBT_Theme_JSON_Resolver::write_user_settings( array() );
+		if ( $restore_stylesheet ) {
+			switch_theme( $restore_stylesheet );
+		}
+		delete_theme( $theme_slug );
 	}
 }
