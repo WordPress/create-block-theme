@@ -20,6 +20,15 @@ class CBT_Editor_Tools {
 			return;
 		}
 
+		// Mirror the REST surface gate (see CBT_Theme_API::can_modify_theme()):
+		// every action exposed by this sidebar calls a mutating route, so users
+		// who cannot pass that gate (sub-site admins on multisite,
+		// DISALLOW_FILE_EDIT/DISALLOW_FILE_MODS sites, file_mod_allowed denies)
+		// should not see the sidebar at all.
+		if ( ! CBT_Theme_API::can_modify_theme() ) {
+			return;
+		}
+
 		$asset_file = include plugin_dir_path( dirname( __FILE__ ) ) . 'build/plugin-sidebar.asset.php';
 
 		wp_register_script(

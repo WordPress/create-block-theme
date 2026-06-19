@@ -18,10 +18,19 @@ class CBT_Admin_Landing {
 			return;
 		}
 
+		// Mirror the REST surface gate (see CBT_Theme_API::can_modify_theme()):
+		// every primary action on this landing page calls a mutating route, so
+		// users who cannot pass that gate (sub-site admins on multisite,
+		// DISALLOW_FILE_EDIT/DISALLOW_FILE_MODS sites, file_mod_allowed denies)
+		// should not see the menu entry at all.
+		if ( ! CBT_Theme_API::can_modify_theme() ) {
+			return;
+		}
+
 		$landing_page_slug       = 'create-block-theme-landing';
 		$landing_page_title      = _x( 'Create Block Theme', 'UI String', 'create-block-theme' );
 		$landing_page_menu_title = $landing_page_title;
-		add_theme_page( $landing_page_title, $landing_page_menu_title, 'edit_theme_options', $landing_page_slug, array( 'CBT_Admin_Landing', 'admin_menu_page' ) );
+		add_theme_page( $landing_page_title, $landing_page_menu_title, 'edit_themes', $landing_page_slug, array( 'CBT_Admin_Landing', 'admin_menu_page' ) );
 
 	}
 

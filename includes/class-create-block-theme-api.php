@@ -43,7 +43,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_export_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -54,7 +54,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_update_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -65,7 +65,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -76,7 +76,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_save_theme_settings' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -87,7 +87,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_clone_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -98,7 +98,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_variation' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -109,7 +109,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_blank_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -120,7 +120,7 @@ class CBT_Theme_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'rest_create_child_theme' ),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			)
 		);
@@ -141,8 +141,12 @@ class CBT_Theme_API {
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'rest_reset_theme' ),
+				// /reset-theme doesn't mutate theme files (it only clears
+				// user customisations from the DB), but is gated on the same
+				// cap as the file-mutating routes for permission-surface
+				// consistency.
 				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
+					return self::can_modify_theme();
 				},
 			),
 		);
@@ -503,5 +507,27 @@ class CBT_Theme_API {
 		$sanitized_theme['slug']                = sanitize_title( $theme['name'] );
 		$sanitized_theme['text_domain']         = $sanitized_theme['slug'];
 		return $sanitized_theme;
+	}
+
+	/**
+	 * Permission check for filesystem-mutating REST routes.
+	 *
+	 * Combines two WordPress Core primitives:
+	 *
+	 *  - `current_user_can( 'edit_themes' )` — Core's canonical theme-file
+	 *    capability. Held by Administrators on single-site, super-admins on
+	 *    multisite (NOT sub-site admins), and automatically denied when
+	 *    `DISALLOW_FILE_EDIT` is defined. This single check covers the
+	 *    multisite tenant boundary and the `DISALLOW_FILE_EDIT` hardening
+	 *    that the plugin honoured pre-v2.1.2.
+	 *  - `wp_is_file_mod_allowed( 'create_block_theme_modify_theme' )` —
+	 *    Core's canonical file-modification gate. Handles `DISALLOW_FILE_MODS`
+	 *    and the `file_mod_allowed` filter (used by hosts / security plugins).
+	 *
+	 * @return bool True when both checks pass.
+	 */
+	public static function can_modify_theme() {
+		return current_user_can( 'edit_themes' )
+			&& wp_is_file_mod_allowed( 'create_block_theme_modify_theme' );
 	}
 }
