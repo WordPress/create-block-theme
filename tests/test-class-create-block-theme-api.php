@@ -174,11 +174,16 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 	}
 
 	public function test_editor_sidebar_enqueue_gated_by_can_modify_theme() {
-		// As above, CBT_Editor_Tools::create_block_theme_sidebar_enqueue()
-		// returns early when wp_is_block_theme() is false (or when $pagenow
-		// is not site-editor.php). Set up a block theme + the right pagenow,
-		// then assert the enqueue happens with the gate open and drops out
-		// once file_mod_allowed denies.
+		// CBT_Editor_Tools::create_block_theme_sidebar_enqueue() has two
+		// early-return guards before the cap check: wp_is_block_theme() and
+		// $pagenow === 'site-editor.php'. Prove the cap gate (and not one of
+		// those guards) is what drops the script by:
+		//   1. Activating a block theme (so wp_is_block_theme() would pass)
+		//   2. Setting $pagenow = 'site-editor.php' (so the pagenow guard would pass)
+		//   3. Denying file_mod_allowed and calling the enqueue
+		// The enqueue must short-circuit at the cap check WITHOUT touching
+		// the asset include further down — we don't run the gate-open path
+		// because the test runner doesn't build the plugin assets.
 		if ( is_multisite() ) {
 			$this->markTestSkipped( 'single-site only — multisite gate is covered by edit_themes super-admin check' );
 		}
@@ -192,20 +197,16 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$saved_pagenow = $pagenow;
 		$pagenow       = 'site-editor.php';
 
-		$tools = new CBT_Editor_Tools();
 		try {
-			// Gate open: script IS enqueued (proves we cleared wp_is_block_theme()).
-			wp_dequeue_script( 'create-block-theme-slot-fill' );
-			wp_deregister_script( 'create-block-theme-slot-fill' );
-			$tools->create_block_theme_sidebar_enqueue();
-			$this->assertTrue(
-				wp_script_is( 'create-block-theme-slot-fill', 'enqueued' ),
-				'Sidebar script should enqueue on a block theme when the user can modify the theme.'
-			);
+			// Sanity-check both early-return guards would NOT trigger — this
+			// proves the cap check is the only thing that can drop the script.
+			$this->assertTrue( wp_is_block_theme(), 'wp_is_block_theme() must be true so the block-theme guard would not drop the enqueue.' );
+			$this->assertSame( 'site-editor.php', $pagenow, '$pagenow must be site-editor.php so the pagenow guard would not drop the enqueue.' );
 
-			// Gate denied: script is NOT enqueued.
+			$tools = new CBT_Editor_Tools();
 			wp_dequeue_script( 'create-block-theme-slot-fill' );
 			wp_deregister_script( 'create-block-theme-slot-fill' );
+
 			add_filter( 'file_mod_allowed', '__return_false' );
 			$tools->create_block_theme_sidebar_enqueue();
 			$enqueued_after_deny = wp_script_is( 'create-block-theme-slot-fill', 'enqueued' );
