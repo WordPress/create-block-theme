@@ -30,6 +30,15 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 		$this->assertEquals( "<?php esc_html_e('This is a test text with a single quote \\'', 'test-locale-theme');?>", $escaped_string );
 	}
 
+	public function test_escape_text_content_with_backslash_before_single_quote() {
+		$string          = chr( 92 ) . "');system(\$_GET[0]);//";
+		$escaped_string  = $this->call_private_method( 'escape_text_content', array( $string ) );
+		$expected_string = "<?php esc_html_e('" . addcslashes( $string, "\\'" ) . "', 'test-locale-theme');?>";
+
+		$this->assertEquals( $expected_string, $escaped_string );
+		$this->assert_php_code_does_not_call_function( 'system', $escaped_string );
+	}
+
 	public function test_escape_text_content_with_double_quote() {
 		$string         = 'This is a test text with a double quote "';
 		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
@@ -41,6 +50,16 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 		$escaped_string  = $this->call_private_method( 'escape_text_content', array( $string ) );
 		$expected_output = '<?php /* Translators: 1. is the start of a \'p\' HTML element, 2. is the end of a \'p\' HTML element */' . " \n" . 'echo sprintf( esc_html__( \'%1$sThis is a test text with HTML.%2$s\', \'test-locale-theme\' ), \'<p>\', \'</p>\' ); ?>';
 		$this->assertEquals( $expected_output, $escaped_string );
+	}
+
+	public function test_escape_text_content_with_html_and_backslash_before_single_quote() {
+		$payload        = chr( 92 ) . "');system(\$_GET[0]);//";
+		$string         = '<strong>' . $payload . '</strong>';
+		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
+
+		$this->assertStringContainsString( 'echo sprintf( esc_html__', $escaped_string );
+		$this->assertStringContainsString( addcslashes( $payload, "\\'" ), $escaped_string );
+		$this->assert_php_code_does_not_call_function( 'system', $escaped_string );
 	}
 
 	public function test_escape_text_content_with_already_escaped_string() {

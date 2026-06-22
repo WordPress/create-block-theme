@@ -8,6 +8,16 @@ require_once __DIR__ . '/theme-token-processor.php';
 class CBT_Theme_Locale {
 
 	/**
+	 * Escape a string that will be embedded in generated PHP single-quoted strings.
+	 *
+	 * @param string $string The string to escape.
+	 * @return string The escaped string.
+	 */
+	private static function escape_php_single_quoted_string( $string ) {
+		return addcslashes( (string) $string, "\\'" );
+	}
+
+	/**
 	 * Escape text for localization.
 	 *
 	 * @param string $string The string to escape.
@@ -29,18 +39,19 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
-		$string = addcslashes( $string, "'" );
+		$string = self::escape_php_single_quoted_string( $string );
 
 		$p = new CBT_Token_Processor( $string );
 		$p->process_tokens();
 		$text             = $p->get_text();
 		$tokens           = $p->get_tokens();
 		$translators_note = $p->get_translators_note();
+		$text_domain      = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
 
 		if ( ! empty( $tokens ) ) {
 			$php_tag  = '<?php ';
 			$php_tag .= $translators_note . "\n";
-			$php_tag .= "echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+			$php_tag .= "echo sprintf( esc_html__( '$text', '$text_domain' ), " . implode(
 				', ',
 				array_map(
 					function( $token ) {
@@ -52,7 +63,7 @@ class CBT_Theme_Locale {
 			return $php_tag;
 		}
 
-		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		return "<?php esc_html_e('" . $string . "', '$text_domain');?>";
 	}
 
 	/**
@@ -77,8 +88,9 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
-		$string = addcslashes( $string, "'" );
-		return "<?php esc_attr_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		$string      = self::escape_php_single_quoted_string( $string );
+		$text_domain = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
+		return "<?php esc_attr_e('" . $string . "', '$text_domain');?>";
 	}
 
 	/**
@@ -292,6 +304,13 @@ class CBT_Theme_Locale {
 					return $matches[0];
 				}
 
+				$placeholders     = array();
+				$next_placeholder = static function ( $raw ) use ( &$placeholders ) {
+					$placeholder                  = '__CBT_LOCALIZED_ATTRIBUTE_' . count( $placeholders ) . '__';
+					$placeholders[ $placeholder ] = $raw;
+					return $placeholder;
+				};
+
 				// Process each localizable attribute.
 				$modified = false;
 				foreach ( $localizable_attrs as $attr_name ) {
@@ -302,7 +321,7 @@ class CBT_Theme_Locale {
 						}
 
 						// Escape the attribute value.
-						$attrs[ $attr_name ] = self::escape_attribute( $attrs[ $attr_name ] );
+						$attrs[ $attr_name ] = $next_placeholder( self::escape_attribute( $attrs[ $attr_name ] ) );
 						$modified            = true;
 					}
 				}
@@ -310,6 +329,7 @@ class CBT_Theme_Locale {
 				// If we modified any attributes, re-encode to JSON.
 				if ( $modified ) {
 					$new_attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+					$new_attrs_json = strtr( $new_attrs_json, $placeholders );
 					return '<!-- wp:' . $block_name . ' ' . $new_attrs_json . ' ' . $self_closer . '-->';
 				}
 

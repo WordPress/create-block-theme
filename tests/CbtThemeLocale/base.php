@@ -48,4 +48,26 @@ abstract class CBT_Theme_Locale_UnitTestCase extends WP_UnitTestCase {
 		// Restore the original active theme.
 		switch_theme( $this->orig_active_theme_slug );
 	}
+
+	/**
+	 * Assert that generated PHP source does not contain a callable function token.
+	 *
+	 * @param string $function_name The function name that must not be callable.
+	 * @param string $php_code      The generated PHP source to inspect.
+	 */
+	protected function assert_php_code_does_not_call_function( $function_name, $php_code ) {
+		$tokens = token_get_all( $php_code );
+
+		foreach ( $tokens as $token ) {
+			if (
+				is_array( $token ) &&
+				T_STRING === $token[0] &&
+				0 === strcasecmp( $function_name, $token[1] )
+			) {
+				$this->fail( sprintf( 'Generated PHP should not call %s().', $function_name ) );
+			}
+		}
+
+		$this->assertTrue( true );
+	}
 }

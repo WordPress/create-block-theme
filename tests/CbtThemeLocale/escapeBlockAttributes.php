@@ -28,6 +28,19 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 		$this->assertEquals( $expected_markup, $escaped_markup, 'The markup result is not as the expected one.' );
 	}
 
+	public function test_escape_block_attribute_with_backslash_before_single_quote() {
+		$payload      = chr( 92 ) . "');system(\$_GET[0]);//";
+		$block_markup = '<!-- wp:search ' . wp_json_encode( array( 'placeholder' => $payload ), JSON_UNESCAPED_SLASHES ) . ' /-->';
+
+		$blocks         = parse_blocks( $block_markup );
+		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
+		$escaped_markup = serialize_blocks( $escaped_blocks );
+		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
+
+		$this->assertStringContainsString( 'esc_attr_e', $escaped_markup );
+		$this->assert_php_code_does_not_call_function( 'system', $escaped_markup );
+	}
+
 	public function data_test_escape_block_attributes() {
 		return array(
 
