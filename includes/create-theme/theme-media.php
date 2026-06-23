@@ -108,7 +108,6 @@ class CBT_Theme_Media {
 			'jpeg',
 			'png',
 			'gif',
-			'svg',
 			'webp',
 			'avif',
 			// videos
@@ -147,7 +146,6 @@ class CBT_Theme_Media {
 	 *  - webp       → `RIFF....WEBP`
 	 *  - avif       → `ftyp` at offset 4 + brand `avif` or `avis` as the major
 	 *                 brand OR anywhere in the compatible-brands list (ISO BMFF)
-	 *  - svg        → `<svg` somewhere in the first 1024 bytes
 	 *  - mp4 / m4v / mov / 3gp / 3g2 → `ftyp` at offset 4 (ISO BMFF)
 	 *  - webm       → `\x1a\x45\xdf\xa3` (EBML)
 	 *  - ogv        → `OggS`
@@ -170,9 +168,7 @@ class CBT_Theme_Media {
 		$path      = (string) wp_parse_url( $url, PHP_URL_PATH );
 		$extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
 
-		// Read 1024 bytes — covers all fixed-position magic-byte formats and
-		// gives enough room for SVG's `<svg` tag after an optional XML
-		// declaration / BOM / whitespace.
+		// Read 1024 bytes — covers all fixed-position magic-byte formats.
 		$fp = fopen( $tmp_file, 'rb' );
 		if ( false === $fp ) {
 			return false;
@@ -231,7 +227,9 @@ class CBT_Theme_Media {
 				return (bool) array_intersect( $brands, array( 'avif', 'avis' ) );
 
 			case 'svg':
-				return false !== stripos( $head, '<svg' );
+				// SVGs can still be referenced as theme-owned assets, but
+				// media localization does not download and copy them from URLs.
+				return false;
 
 			case 'mp4':
 			case 'm4v':
