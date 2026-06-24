@@ -120,6 +120,11 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/evil.php?disguised=cat.jpg' ) );
 	}
 
+	public function test_is_allowed_media_url_rejects_svg_extension() {
+		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/logo.svg' ) );
+		$this->assertFalse( CBT_Theme_Media::is_allowed_media_url( 'http://example.com/LOGO.SVG' ) );
+	}
+
 	public function test_is_allowed_media_file_accepts_real_png() {
 		$tmp = wp_tempnam( 'cbt-test-png' );
 		copy( __DIR__ . '/data/tiny.png', $tmp );
@@ -149,6 +154,17 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, $url );
 		@unlink( $tmp );
 		$this->assertTrue( $ok, "Should accept magic bytes for $url" );
+	}
+
+	/**
+	 * Helper: write magic bytes to a tmp file and assert rejection.
+	 */
+	private function assert_media_magic_rejected( $bytes, $url ) {
+		$tmp = wp_tempnam( 'cbt-test-magic' );
+		file_put_contents( $tmp, $bytes );
+		$ok = CBT_Theme_Media::is_allowed_media_file( $tmp, $url );
+		@unlink( $tmp );
+		$this->assertFalse( $ok, "Should reject magic bytes for $url" );
 	}
 
 	public function test_is_allowed_media_file_accepts_jpeg_magic() {
@@ -202,15 +218,15 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertFalse( $ok, 'HEIC (no avif/avis brand) must be rejected when URL claims .avif' );
 	}
 
-	public function test_is_allowed_media_file_accepts_svg_content() {
-		$this->assert_media_magic_accepted( '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>', 'http://example.com/cat.svg' );
+	public function test_is_allowed_media_file_rejects_svg_content() {
+		$this->assert_media_magic_rejected( '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="3"/></svg>', 'http://example.com/cat.svg' );
 	}
 
-	public function test_is_allowed_media_file_accepts_svg_with_xml_declaration() {
+	public function test_is_allowed_media_file_rejects_svg_with_xml_declaration() {
 		// Use a `?` ` >` split for the closing tag so PHP does not exit the
 		// file's PHP mode inside this string literal.
 		$payload = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' . '<svg xmlns="http://www.w3.org/2000/svg"/>';
-		$this->assert_media_magic_accepted( $payload, 'http://example.com/cat.svg' );
+		$this->assert_media_magic_rejected( $payload, 'http://example.com/cat.svg' );
 	}
 
 	public function test_is_allowed_media_file_accepts_mp4_ftyp() {
@@ -262,6 +278,13 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'evil.php', $relative_url );
 	}
 
+	public function test_make_relative_media_url_keeps_svg_in_images_folder() {
+		$relative_url = CBT_Theme_Media::make_relative_media_url( 'http://example.com/logo.svg' );
+
+		$this->assertStringContainsString( 'get_template_directory_uri', $relative_url );
+		$this->assertStringContainsString( '/assets/images/logo.svg', $relative_url );
+	}
+
 	public function test_make_template_images_local_does_not_rewrite_disallowed_url() {
 		$template          = new stdClass();
 		$template->content = '
@@ -274,6 +297,20 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'http://example.com/evil.php', $new_template->content );
 		$this->assertStringNotContainsString( '/assets/', $new_template->content );
+	}
+
+	public function test_make_template_images_local_does_not_rewrite_svg_url() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/logo.svg" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+
+		$new_template = CBT_Theme_Media::make_template_images_local( $template );
+
+		$this->assertStringContainsString( 'http://example.com/logo.svg', $new_template->content );
+		$this->assertStringNotContainsString( '/assets/images/logo.svg', $new_template->content );
 	}
 
 	public function test_make_template_images_local_only_rewrites_validated_media() {
@@ -345,6 +382,30 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension URL' );
 		$this->assertFileDoesNotExist( $malicious );
+	}
+
+	public function test_add_media_to_local_skips_svg_url_without_downloading() {
+		$theme_assets_dir = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+		$expected_path    = $theme_assets_dir . 'logo.svg';
+
+		if ( file_exists( $expected_path ) ) {
+			unlink( $expected_path );
+		}
+
+		$attempted = false;
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$tracker = function ( $preempt, $args, $url ) use ( &$attempted ) {
+			$attempted = true;
+			return new WP_Error( 'cbt_test_intercept', 'blocked by test' );
+		};
+		add_filter( 'pre_http_request', $tracker, 10, 3 );
+
+		CBT_Theme_Media::add_media_to_local( array( 'http://example.com/logo.svg' ) );
+
+		remove_filter( 'pre_http_request', $tracker, 10 );
+
+		$this->assertFalse( $attempted, 'download_url() must NOT be called for an SVG URL' );
+		$this->assertFileDoesNotExist( $expected_path );
 	}
 
 	public function test_is_allowed_media_url_rejects_multi_extension_polyglots() {

@@ -39,6 +39,27 @@ class Test_Create_Block_Theme_Zip extends WP_UnitTestCase {
 		$this->assertFalse( $attempted, 'download_url() must NOT be called for a disallowed-extension URL' );
 	}
 
+	public function test_add_media_to_zip_skips_svg_url_without_downloading() {
+		list( $zip, $tmp_path ) = $this->make_temp_zip( 'cbt-test' );
+
+		$attempted = false;
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$tracker = function ( $preempt, $args, $url ) use ( &$attempted ) {
+			$attempted = true;
+			return new WP_Error( 'cbt_test_intercept', 'blocked by test' );
+		};
+		add_filter( 'pre_http_request', $tracker, 10, 3 );
+
+		$added_media = CBT_Theme_Zip::add_media_to_zip( $zip, array( 'http://example.com/logo.svg' ) );
+
+		remove_filter( 'pre_http_request', $tracker, 10 );
+		$zip->close();
+		@unlink( $tmp_path );
+
+		$this->assertSame( array(), $added_media, 'SVG URLs should not be reported as added to the ZIP.' );
+		$this->assertFalse( $attempted, 'download_url() must NOT be called for an SVG URL' );
+	}
+
 	public function test_add_media_to_zip_preserves_downloaded_file_until_close() {
 		list( $zip, $tmp_path ) = $this->make_temp_zip( 'cbt-test' );
 
