@@ -28,17 +28,79 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 		$this->assertEquals( $expected_markup, $escaped_markup, 'The markup result is not as the expected one.' );
 	}
 
+	private function assert_search_block_attributes_json_decodes( $block_markup ) {
+		$this->assertSame( 1, preg_match( '/<!-- wp:search (\{.*\}) \/-->/', $block_markup, $matches ) );
+
+		json_decode( $matches[1], true );
+		$this->assertSame( JSON_ERROR_NONE, json_last_error(), json_last_error_msg() );
+	}
+
 	public function test_escape_block_attribute_with_backslash_before_single_quote() {
 		$payload      = chr( 92 ) . "');system(\$_GET[0]);//";
-		$block_markup = '<!-- wp:search ' . wp_json_encode( array( 'placeholder' => $payload ), JSON_UNESCAPED_SLASHES ) . ' /-->';
+		$block_markup = '<!-- wp:search ' . wp_json_encode(
+			array( 'placeholder' => $payload ),
+			JSON_UNESCAPED_SLASHES
+		) . ' /-->';
 
 		$blocks         = parse_blocks( $block_markup );
 		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
 		$escaped_markup = serialize_blocks( $escaped_blocks );
 		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
 
-		$this->assertStringContainsString( 'esc_attr_e', $escaped_markup );
+		$this->assertStringContainsString( "__( '%1\$s%2\$s);system(\$_GET[0]);//', 'test-locale-theme' )", $escaped_markup );
+		$this->assertStringContainsString( 'chr(92), chr(39)', $escaped_markup );
 		$this->assert_php_code_does_not_call_function( 'system', $escaped_markup );
+		$this->assert_search_block_attributes_json_decodes( $escaped_markup );
+	}
+
+	public function test_escape_block_attribute_with_double_quote() {
+		$block_markup = '<!-- wp:search ' . wp_json_encode(
+			array( 'placeholder' => 'Search "posts"' ),
+			JSON_UNESCAPED_SLASHES
+		) . ' /-->';
+
+		$blocks         = parse_blocks( $block_markup );
+		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
+		$escaped_markup = serialize_blocks( $escaped_blocks );
+		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
+
+		$this->assertStringContainsString(
+			"__( 'Search %1\$sposts%2\$s', 'test-locale-theme' )",
+			$escaped_markup
+		);
+		$this->assertStringContainsString( 'chr(34)', $escaped_markup );
+		$this->assert_search_block_attributes_json_decodes( $escaped_markup );
+	}
+
+	public function test_escape_block_attribute_with_control_characters() {
+		$block_markup = '<!-- wp:search ' . wp_json_encode(
+			array( 'placeholder' => "Line one\nLine two\tTabbed" ),
+			JSON_UNESCAPED_SLASHES
+		) . ' /-->';
+
+		$blocks         = parse_blocks( $block_markup );
+		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
+		$escaped_markup = serialize_blocks( $escaped_blocks );
+		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
+
+		$this->assertStringContainsString( "__( 'Line one%1\$sLine two%2\$sTabbed', 'test-locale-theme' )", $escaped_markup );
+		$this->assertStringContainsString( 'chr(10), chr(9)', $escaped_markup );
+		$this->assert_search_block_attributes_json_decodes( $escaped_markup );
+	}
+
+	public function test_escape_block_attribute_with_percent_and_token() {
+		$block_markup = '<!-- wp:search ' . wp_json_encode(
+			array( 'placeholder' => 'Save 50% on "posts"' ),
+			JSON_UNESCAPED_SLASHES
+		) . ' /-->';
+
+		$blocks         = parse_blocks( $block_markup );
+		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
+		$escaped_markup = serialize_blocks( $escaped_blocks );
+		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
+
+		$this->assertStringContainsString( "__( 'Save 50%% on %1\$sposts%2\$s', 'test-locale-theme' )", $escaped_markup );
+		$this->assert_search_block_attributes_json_decodes( $escaped_markup );
 	}
 
 	public function data_test_escape_block_attributes() {
@@ -112,6 +174,11 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 			'search block with only some attributes'  => array(
 				'block_markup'    => '<!-- wp:search {"placeholder":"Search..."} /-->',
 				'expected_markup' => '<!-- wp:search {"placeholder":"<?php esc_attr_e(\'Search...\', \'test-locale-theme\');?>"} /-->',
+			),
+
+			'search block with percent in attribute'  => array(
+				'block_markup'    => '<!-- wp:search {"placeholder":"100% ready"} /-->',
+				'expected_markup' => '<!-- wp:search {"placeholder":"<?php esc_attr_e(\'100% ready\', \'test-locale-theme\');?>"} /-->',
 			),
 
 			'query pagination blocks in context'      => array(
