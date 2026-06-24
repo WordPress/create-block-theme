@@ -304,15 +304,9 @@ class CBT_Theme_Locale {
 					return $matches[0];
 				}
 
-				$placeholders     = array();
-				$next_placeholder = static function ( $raw ) use ( &$placeholders ) {
-					$placeholder                  = '__CBT_LOCALIZED_ATTRIBUTE_' . count( $placeholders ) . '__';
-					$placeholders[ $placeholder ] = $raw;
-					return $placeholder;
-				};
-
 				// Process each localizable attribute.
-				$modified = false;
+				$localized_attrs = array();
+				$modified        = false;
 				foreach ( $localizable_attrs as $attr_name ) {
 					if ( isset( $attrs[ $attr_name ] ) && is_string( $attrs[ $attr_name ] ) ) {
 						// Skip if already escaped.
@@ -321,15 +315,26 @@ class CBT_Theme_Locale {
 						}
 
 						// Escape the attribute value.
-						$attrs[ $attr_name ] = $next_placeholder( self::escape_attribute( $attrs[ $attr_name ] ) );
-						$modified            = true;
+						$localized_attrs[ $attr_name ] = self::escape_attribute( $attrs[ $attr_name ] );
+						$modified                      = true;
 					}
 				}
 
 				// If we modified any attributes, re-encode to JSON.
 				if ( $modified ) {
-					$new_attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-					$new_attrs_json = strtr( $new_attrs_json, $placeholders );
+					$attr_fragments = array();
+					foreach ( $attrs as $attr_name => $attr_value ) {
+						$encoded_attr_name = wp_json_encode( (string) $attr_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+
+						if ( array_key_exists( $attr_name, $localized_attrs ) ) {
+							$attr_fragments[] = $encoded_attr_name . ':"' . $localized_attrs[ $attr_name ] . '"';
+							continue;
+						}
+
+						$attr_fragments[] = $encoded_attr_name . ':' . wp_json_encode( $attr_value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+					}
+
+					$new_attrs_json = '{' . implode( ',', $attr_fragments ) . '}';
 					return '<!-- wp:' . $block_name . ' ' . $new_attrs_json . ' ' . $self_closer . '-->';
 				}
 

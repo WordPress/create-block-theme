@@ -84,6 +84,11 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 				'expected_markup' => '<!-- wp:navigation-link {"label":"<?php esc_attr_e(\'About\', \'test-locale-theme\');?>","url":"/about"} /-->',
 			),
 
+			'navigation-link with placeholder-like text in url' => array(
+				'block_markup'    => '<!-- wp:navigation-link {"label":"About","url":"/__CBT_LOCALIZED_ATTRIBUTE_0__"} /-->',
+				'expected_markup' => '<!-- wp:navigation-link {"label":"<?php esc_attr_e(\'About\', \'test-locale-theme\');?>","url":"/__CBT_LOCALIZED_ATTRIBUTE_0__"} /-->',
+			),
+
 			'navigation-submenu with label'           => array(
 				'block_markup'    => '<!-- wp:navigation-submenu {"label":"Resources","url":"/resources"} /-->',
 				'expected_markup' => '<!-- wp:navigation-submenu {"label":"<?php esc_attr_e(\'Resources\', \'test-locale-theme\');?>","url":"/resources"} /-->',
