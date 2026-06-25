@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.8
 Tested up to: 6.9
-Stable tag: 2.10.0
+Stable tag: 2.10.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -125,6 +125,10 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.10.1 =
+* I18n: Handle backslashes in localized template text (#854)
+* Keep SVG URLs remote during export (#855)
 
 = 2.10.0 =
 * Validate downloaded theme assets against extension and MIME allowlists (#852)
