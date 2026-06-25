@@ -31,6 +31,15 @@ class CBT_Theme_Locale_EscapeAttribute extends CBT_Theme_Locale_UnitTestCase {
 		$this->assertEquals( $expected_string, $escaped_string );
 	}
 
+	public function test_escape_attribute_with_backslash_before_single_quote() {
+		$string          = chr( 92 ) . "');system(\$_GET[0]);//";
+		$escaped_string  = $this->call_private_method( 'escape_attribute', array( $string ) );
+		$expected_string = "<?php esc_attr_e('" . addcslashes( $string, "\\'" ) . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+
+		$this->assertEquals( $expected_string, $escaped_string );
+		$this->assert_php_code_does_not_call_function( 'system', $escaped_string );
+	}
+
 	public function test_escape_attribute_with_double_quote() {
 		$string          = 'This is a test attribute with a double quote "';
 		$escaped_string  = $this->call_private_method( 'escape_attribute', array( $string ) );

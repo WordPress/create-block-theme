@@ -27,6 +27,28 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		return get_post( $post_id );
 	}
 
+	/**
+	 * Assert that generated PHP source does not contain a callable function token.
+	 *
+	 * @param string $function_name The function name that must not be callable.
+	 * @param string $php_code      The generated PHP source to inspect.
+	 */
+	private function assert_php_code_does_not_call_function( $function_name, $php_code ) {
+		$tokens = token_get_all( $php_code );
+
+		foreach ( $tokens as $token ) {
+			if (
+				is_array( $token ) &&
+				T_STRING === $token[0] &&
+				0 === strcasecmp( $function_name, $token[1] )
+			) {
+				$this->fail( sprintf( 'Generated PHP should not call %s().', $function_name ) );
+			}
+		}
+
+		$this->assertTrue( true );
+	}
+
 	public function test_pattern_from_wp_block_strips_php_open_tag() {
 		$post    = $this->make_wp_block_post( '<p>safe</p><?php phpinfo(); ?>' );
 		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
@@ -326,6 +348,52 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 
 		// Cleanup — uninstall_theme removes the entire test theme directory,
 		// taking patterns/, templates/, parts/, etc. with it.
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_add_patterns_to_theme_localizes_backslash_quote_text() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$expected_pattern_path = get_stylesheet_directory() . '/patterns/cbt-localize-text-export-probe.php';
+		$marker                = '/tmp/cbt_localize_text_export_marker.txt';
+
+		if ( file_exists( $marker ) ) {
+			unlink( $marker );
+		}
+
+		$payload = chr( 92 ) . '\'); file_put_contents("' . $marker . '", "unexpected"); //';
+
+		$pattern_post = $this->make_wp_block_post(
+			wp_slash( '<!-- wp:paragraph --><p>' . $payload . '</p><!-- /wp:paragraph -->' ),
+			'CBT Localize Text Export Probe'
+		);
+		$this->assertStringContainsString( $payload, $pattern_post->post_content );
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => true,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		$this->assertFileExists( $expected_pattern_path, 'Pattern file should have been written to the active theme' );
+
+		$contents = file_get_contents( $expected_pattern_path );
+
+		$this->assertStringContainsString( 'esc_html_e', $contents, 'Pattern text should be localized' );
+		$this->assertStringContainsString( addcslashes( $payload, "\\'" ), $contents, 'Pattern text should keep the escaped backslash and quote sequence' );
+		$this->assert_php_code_does_not_call_function( 'file_put_contents', $contents );
+
+		ob_start();
+		include $expected_pattern_path;
+		ob_end_clean();
+
+		$this->assertFileDoesNotExist( $marker );
+
 		$this->uninstall_theme( $test_theme_slug );
 	}
 
