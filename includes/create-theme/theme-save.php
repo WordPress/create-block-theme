@@ -21,14 +21,18 @@ class CBT_Theme_Save {
 	 * `processOnlySavedTemplates` and `is_child_theme()`. After all steps run,
 	 * the theme cache is invalidated once.
 	 *
-	 * Callers are responsible for capability enforcement (e.g.
-	 * `current_user_can( 'edit_theme_options' )`) and for validating any
-	 * non-flag values in `$options` that flow into downstream services such
-	 * as `CBT_Theme_Patterns::add_patterns_to_theme()` and
-	 * `CBT_Theme_Templates::add_templates_to_local()`. The REST endpoint
-	 * relies solely on its `permission_callback`; the `/save` route does not
-	 * declare `args`, so no framework-level sanitization is applied. CLI and
-	 * other callers must sanitize equivalently.
+	 * Callers are responsible for capability enforcement — for REST this is
+	 * handled by the route's `permission_callback` (currently
+	 * `CBT_Theme_API::can_modify_theme()`, which requires `edit_theme_options`
+	 * plus super-admin on multisite). CLI and other callers must apply an
+	 * equivalent check before invoking `run()`.
+	 *
+	 * Callers are also responsible for validating any non-flag values in
+	 * `$options` that flow into downstream services such as
+	 * `CBT_Theme_Patterns::add_patterns_to_theme()` and
+	 * `CBT_Theme_Templates::add_templates_to_local()`. The `/save` route
+	 * does not declare `args`, so no framework-level sanitization is applied;
+	 * CLI and other callers must sanitize equivalently.
 	 *
 	 * @param array $options Options array with keys:
 	 *                       - saveFonts (bool)
