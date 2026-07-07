@@ -13,6 +13,7 @@ require_once __DIR__ . '/create-theme/theme-utils.php';
 require_once __DIR__ . '/create-theme/theme-readme.php';
 require_once __DIR__ . '/create-theme/theme-fonts.php';
 require_once __DIR__ . '/create-theme/theme-create.php';
+require_once __DIR__ . '/create-theme/theme-save.php';
 require_once __DIR__ . '/create-theme/theme-settings-save.php';
 
 /**
@@ -362,45 +363,11 @@ class CBT_Theme_API {
 	 * Save the user changes to the theme and clear user changes.
 	 */
 	function rest_save_theme( $request ) {
+		$result = CBT_Theme_Save::run( $request->get_params() );
 
-		$options = $request->get_params();
-
-		if ( isset( $options['saveFonts'] ) && true === $options['saveFonts'] ) {
-			CBT_Theme_Fonts::persist_font_settings();
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
-
-		if ( isset( $options['saveTemplates'] ) && true === $options['saveTemplates'] ) {
-			if ( true === $options['processOnlySavedTemplates'] ) {
-				CBT_Theme_Templates::add_templates_to_local( 'user', null, null, $options );
-			} else {
-				if ( is_child_theme() ) {
-					CBT_Theme_Templates::add_templates_to_local( 'current', null, null, $options );
-				} else {
-					CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options );
-				}
-			}
-			CBT_Theme_Templates::clear_user_templates_customizations();
-			CBT_Theme_Templates::clear_user_template_parts_customizations();
-		}
-
-		if ( isset( $options['saveStyle'] ) && true === $options['saveStyle'] ) {
-			if ( is_child_theme() ) {
-				CBT_Theme_JSON::add_theme_json_to_local( 'current', null, null, $options );
-			} else {
-				CBT_Theme_JSON::add_theme_json_to_local( 'all', null, null, $options );
-			}
-			CBT_Theme_Styles::clear_user_styles_customizations();
-		}
-
-		if ( isset( $options['savePatterns'] ) && true === $options['savePatterns'] ) {
-			$response = CBT_Theme_Patterns::add_patterns_to_theme( $options );
-
-			if ( is_wp_error( $response ) ) {
-				return $response;
-			}
-		}
-
-		wp_get_theme()->cache_delete();
 
 		return new WP_REST_Response(
 			array(
