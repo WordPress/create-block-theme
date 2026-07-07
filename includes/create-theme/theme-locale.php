@@ -8,6 +8,129 @@ require_once __DIR__ . '/theme-token-processor.php';
 class CBT_Theme_Locale {
 
 	/**
+	 * Escape a string that will be embedded in generated PHP single-quoted strings.
+	 *
+	 * @param string $string The string to escape.
+	 * @return string The escaped string.
+	 */
+	private static function escape_php_single_quoted_string( $string ) {
+		return addcslashes( (string) $string, "\\'" );
+	}
+
+	/**
+	 * Escape a block attribute value for localization.
+	 *
+	 * @param string $string The string to escape.
+	 * @return string The escaped string.
+	 */
+	private static function escape_block_attribute( $string ) {
+		$tokenized   = self::tokenize_block_attribute_for_php_string( $string );
+		$text_domain = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
+
+		if ( empty( $tokenized['tokens'] ) ) {
+			return "<?php esc_attr_e('" . $tokenized['text'] . "', '$text_domain');?>";
+		}
+
+		$translation_call  = "__( '" . $tokenized['text'] . "', '$text_domain' )";
+		$token_expressions = implode( ', ', wp_list_pluck( $tokenized['tokens'], 'expression' ) );
+
+		$php_tag  = '<?php ';
+		$php_tag .= $tokenized['translators_note'] . ' ';
+		$php_tag .= 'echo esc_attr( sprintf( ' . $translation_call . ', ' . $token_expressions . ' ) ); ?>';
+		return $php_tag;
+	}
+
+	/**
+	 * Tokenize characters that would be unsafe inside localized block attribute PHP strings.
+	 *
+	 * @param string $string The string to tokenize.
+	 * @return array Tokenized text, token expressions, and a translators note.
+	 */
+	private static function tokenize_block_attribute_for_php_string( $string ) {
+		$tokens        = array();
+		$text          = '';
+		$special_chars = array(
+			'\\' => array(
+				'expression'  => 'chr(92)',
+				'description' => 'a backslash character',
+			),
+			"'"  => array(
+				'expression'  => 'chr(39)',
+				'description' => 'an apostrophe character',
+			),
+			'"'  => array(
+				'expression'  => 'chr(34)',
+				'description' => 'a double quote character',
+			),
+			"\n" => array(
+				'expression'  => 'chr(10)',
+				'description' => 'a newline character',
+			),
+			"\r" => array(
+				'expression'  => 'chr(13)',
+				'description' => 'a carriage return character',
+			),
+			"\t" => array(
+				'expression'  => 'chr(9)',
+				'description' => 'a tab character',
+			),
+		);
+
+		$string     = (string) $string;
+		$length     = strlen( $string );
+		$has_tokens = false;
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$char = $string[ $i ];
+			if ( isset( $special_chars[ $char ] ) || ord( $char ) < 32 ) {
+				$has_tokens = true;
+				break;
+			}
+		}
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$char = $string[ $i ];
+			$ord  = ord( $char );
+
+			if ( isset( $special_chars[ $char ] ) || $ord < 32 ) {
+				$token_data = isset( $special_chars[ $char ] )
+					? $special_chars[ $char ]
+					: array(
+						'expression'  => 'chr(' . $ord . ')',
+						'description' => 'character code ' . $ord,
+					);
+
+				$tokens[] = $token_data;
+				$text    .= '%' . count( $tokens ) . '$s';
+				continue;
+			}
+
+			$text .= $has_tokens && '%' === $char ? '%%' : $char;
+		}
+
+		$text = self::escape_php_single_quoted_string( $text );
+
+		if ( empty( $tokens ) ) {
+			return array(
+				'text'             => $text,
+				'tokens'           => $tokens,
+				'translators_note' => '',
+			);
+		}
+
+		$descriptions = array();
+		foreach ( $tokens as $index => $token ) {
+			$descriptions[] = ( $index + 1 ) . '. is ' . $token['description'];
+		}
+
+		return array(
+			'text'             => $text,
+			'tokens'           => $tokens,
+			'translators_note' => '/* Translators: ' . implode( ', ', $descriptions ) . '. */',
+		);
+	}
+
+	/**
 	 * Escape text for localization.
 	 *
 	 * @param string $string The string to escape.
@@ -29,18 +152,19 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
-		$string = addcslashes( $string, "'" );
+		$string = self::escape_php_single_quoted_string( $string );
 
 		$p = new CBT_Token_Processor( $string );
 		$p->process_tokens();
 		$text             = $p->get_text();
 		$tokens           = $p->get_tokens();
 		$translators_note = $p->get_translators_note();
+		$text_domain      = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
 
 		if ( ! empty( $tokens ) ) {
 			$php_tag  = '<?php ';
 			$php_tag .= $translators_note . "\n";
-			$php_tag .= "echo sprintf( esc_html__( '$text', '" . wp_get_theme()->get( 'TextDomain' ) . "' ), " . implode(
+			$php_tag .= "echo sprintf( esc_html__( '$text', '$text_domain' ), " . implode(
 				', ',
 				array_map(
 					function( $token ) {
@@ -52,7 +176,7 @@ class CBT_Theme_Locale {
 			return $php_tag;
 		}
 
-		return "<?php esc_html_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		return "<?php esc_html_e('" . $string . "', '$text_domain');?>";
 	}
 
 	/**
@@ -77,8 +201,9 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
-		$string = addcslashes( $string, "'" );
-		return "<?php esc_attr_e('" . $string . "', '" . wp_get_theme()->get( 'TextDomain' ) . "');?>";
+		$string      = self::escape_php_single_quoted_string( $string );
+		$text_domain = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
+		return "<?php esc_attr_e('" . $string . "', '$text_domain');?>";
 	}
 
 	/**
@@ -125,6 +250,13 @@ class CBT_Theme_Locale {
 				return array( '/(alt=")(.*?)(")/' );
 			case 'core/details':
 				return array( '/(<summary[^>]*>)(.*?)(<\/summary>)/' );
+			case 'core/file':
+				return array(
+					// File-name link: <a> without the boolean `download` attribute.
+					'/(<a(?:(?!\sdownload[\s>])[^>])*?>)(.*?)(<\/a>)/',
+					// Download button: <a ... download ...>.
+					'/(<a[^>]*\sdownload[^>]*?>)(.*?)(<\/a>)/',
+				);
 			default:
 				return null;
 		}
@@ -146,6 +278,11 @@ class CBT_Theme_Locale {
 			case 'core/comments-pagination-previous':
 			case 'core/comments-pagination-next':
 			case 'core/post-navigation-link':
+			case 'core/navigation-link':
+			case 'core/navigation-submenu':
+			case 'core/home-link':
+			case 'core/social-link':
+			case 'core/categories':
 				return array( 'label' );
 			case 'core/post-excerpt':
 				return array( 'moreText' );
@@ -197,6 +334,7 @@ class CBT_Theme_Locale {
 				case 'core/cover':
 				case 'core/media-text':
 				case 'core/details':
+				case 'core/file':
 					$replace_content_callback = function ( $content, $pattern ) {
 						if ( empty( $content ) ) {
 							return;
@@ -280,7 +418,8 @@ class CBT_Theme_Locale {
 				}
 
 				// Process each localizable attribute.
-				$modified = false;
+				$localized_attrs = array();
+				$modified        = false;
 				foreach ( $localizable_attrs as $attr_name ) {
 					if ( isset( $attrs[ $attr_name ] ) && is_string( $attrs[ $attr_name ] ) ) {
 						// Skip if already escaped.
@@ -289,14 +428,26 @@ class CBT_Theme_Locale {
 						}
 
 						// Escape the attribute value.
-						$attrs[ $attr_name ] = self::escape_attribute( $attrs[ $attr_name ] );
-						$modified            = true;
+						$localized_attrs[ $attr_name ] = self::escape_block_attribute( $attrs[ $attr_name ] );
+						$modified                      = true;
 					}
 				}
 
 				// If we modified any attributes, re-encode to JSON.
 				if ( $modified ) {
-					$new_attrs_json = wp_json_encode( $attrs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+					$attr_fragments = array();
+					foreach ( $attrs as $attr_name => $attr_value ) {
+						$encoded_attr_name = wp_json_encode( (string) $attr_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+
+						if ( array_key_exists( $attr_name, $localized_attrs ) ) {
+							$attr_fragments[] = $encoded_attr_name . ':' . wp_json_encode( $localized_attrs[ $attr_name ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+							continue;
+						}
+
+						$attr_fragments[] = $encoded_attr_name . ':' . wp_json_encode( $attr_value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+					}
+
+					$new_attrs_json = '{' . implode( ',', $attr_fragments ) . '}';
 					return '<!-- wp:' . $block_name . ' ' . $new_attrs_json . ' ' . $self_closer . '-->';
 				}
 

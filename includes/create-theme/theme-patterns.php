@@ -1,6 +1,61 @@
 <?php
 
 class CBT_Theme_Patterns {
+	/**
+	 * Strip PHP execution tags from user-supplied pattern body content.
+	 *
+	 * Block patterns are HTML/block markup, not PHP. Any `<?php` (or short/
+	 * legacy variants) in user content is treated as malicious and removed
+	 * before the body is interpolated into the exported `.php` pattern file.
+	 *
+	 * This helper is `public static` because it is invoked from two pipelines:
+	 *  1. `pattern_from_wp_block()` in this class (wp_block patterns), where
+	 *    sanitisation happens BEFORE `prepare_pattern_for_export()` injects
+	 *    trusted `<?php esc_*_e(...);?>` markers.
+	 *  2. `CBT_Theme_Templates::prepare_template_for_export()` (templates and
+	 *    template parts), where sanitisation must happen at the very start —
+	 *    BEFORE `escape_text_in_template()` injects the same trusted markers.
+	 *
+	 * In both cases the rule is: sanitise first, inject trusted PHP second,
+	 * build the heredoc third. Calling this AFTER the trusted-PHP injection
+	 * would strip the plugin's own localization helpers and break the
+	 * "Make text translation-ready" feature.
+	 *
+	 * @param mixed $content User-supplied body content.
+	 * @return mixed Same content with PHP open tags removed (when input is a non-empty string).
+	 */
+	public static function strip_php_tags( $content ) {
+		if ( ! is_string( $content ) || '' === $content ) {
+			return $content;
+		}
+
+		// Strip ANY `<?` open tag. On hosts with `short_open_tag=1`, PHP parses
+		// `<?` followed by `$`, `(`, `"`, `//`, `/*`, `;`, or `xml` as an open
+		// tag — preserving any of them would either re-execute as PHP or
+		// produce a fatal parse error when the exported `.php` file is loaded.
+		// Block patterns are HTML/block markup, so there's no legitimate
+		// `<?xml` content to preserve.
+		$content = preg_replace( '/<\?/', '', $content );
+
+		// Strip legacy `<script language="php">…</script>` blocks. PHP 7+
+		// removed this parser, but custom SAPIs / polyfills could still
+		// honour it. Match the entire block (opening tag → closing tag,
+		// inclusive of inner content).
+		$content = preg_replace( '#<script\s+language\s*=\s*["\']?php["\']?[^>]*>.*?</script>#is', '', $content );
+
+		return $content;
+	}
+
+	/**
+	 * Build a pattern .php file from a template stdClass.
+	 *
+	 * IMPORTANT: this function expects `$template->content` to be already
+	 * sanitised by the caller. The pipeline entry point is
+	 * `CBT_Theme_Templates::prepare_template_for_export`, which strips PHP
+	 * tags from `$template->content` BEFORE the trusted-PHP injection done
+	 * by `escape_text_in_template`. Calling `pattern_from_template` with
+	 * un-sanitised user content would re-introduce the PHP injection bug.
+	 */
 	public static function pattern_from_template( $template, $new_slug = null ) {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$template_slug   = str_replace( '*/', '*&#47;', $template->slug );
@@ -32,6 +87,7 @@ class CBT_Theme_Patterns {
 		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
 		$pattern_title         = str_replace( '*/', '*&#47;', $pattern->title );
 		$pattern_categories    = str_replace( '*/', '*&#47;', $pattern->categories );
+		$safe_body             = self::strip_php_tags( $pattern_post->post_content );
 		$pattern->content      = <<<PHP
 		<?php
 		/**
@@ -40,7 +96,7 @@ class CBT_Theme_Patterns {
 		 * Categories: {$pattern_categories}
 		 */
 		?>
-		{$pattern_post->post_content}
+		{$safe_body}
 		PHP;
 
 		return $pattern;
@@ -126,12 +182,9 @@ class CBT_Theme_Patterns {
 		}
 
 		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
-			$pattern = CBT_Theme_Media::make_template_images_local( $pattern );
-
-			// Write the media assets if there are any
-			if ( $pattern->media ) {
-				CBT_Theme_Media::add_media_to_local( $pattern->media );
-			}
+			$pattern->media  = CBT_Theme_Media::get_media_absolute_urls_from_template( $pattern );
+			$validated_media = ! empty( $pattern->media ) ? CBT_Theme_Media::add_media_to_local( $pattern->media ) : array();
+			$pattern         = CBT_Theme_Media::make_template_images_local( $pattern, $validated_media );
 		}
 
 		return $pattern;

@@ -169,6 +169,11 @@ class CBT_Theme_Templates {
 			);
 		}
 
+		// Strip PHP tags from the raw template body BEFORE any
+		// trusted-PHP injection (escape_text_in_template below).
+		// Sanitising here preserves the legitimate localization output.
+		$template->content = CBT_Theme_Patterns::strip_php_tags( $template->content );
+
 		$template = self::eliminate_environment_specific_content( $template, $options );
 
 		if ( array_key_exists( 'localizeText', $options ) && $options['localizeText'] ) {
@@ -176,7 +181,8 @@ class CBT_Theme_Templates {
 		}
 
 		if ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] ) {
-			$template = CBT_Theme_Media::make_template_images_local( $template );
+			$validated_media = array_key_exists( 'validatedMedia', $options ) ? $options['validatedMedia'] : null;
+			$template        = CBT_Theme_Media::make_template_images_local( $template, $validated_media );
 		}
 
 		if ( $slug ) {
@@ -186,6 +192,23 @@ class CBT_Theme_Templates {
 		$template = self::paternize_template( $template, $slug );
 
 		return $template;
+	}
+
+	private static function should_localize_images( $options ) {
+		return ! $options || ( array_key_exists( 'localizeImages', $options ) && $options['localizeImages'] );
+	}
+
+	private static function add_validated_media_to_options( $options, $validated_media ) {
+		if ( ! $options ) {
+			$options = array(
+				'localizeText'   => false,
+				'removeNavRefs'  => true,
+				'localizeImages' => true,
+			);
+		}
+
+		$options['validatedMedia'] = $validated_media;
+		return $options;
 	}
 
 	/**
@@ -221,18 +244,20 @@ class CBT_Theme_Templates {
 
 		foreach ( $theme_templates->templates as $template ) {
 
-			$template = self::prepare_template_for_export( $template, $slug, $options );
+			$template_options = $options;
+			if ( self::should_localize_images( $template_options ) ) {
+				$template->media  = CBT_Theme_Media::get_media_absolute_urls_from_template( $template );
+				$validated_media  = ! empty( $template->media ) ? CBT_Theme_Media::add_media_to_local( $template->media ) : array();
+				$template_options = self::add_validated_media_to_options( $template_options, $validated_media );
+			}
+
+			$template = self::prepare_template_for_export( $template, $slug, $template_options );
 
 			// Write the template content
 			file_put_contents(
 				$template_dir . DIRECTORY_SEPARATOR . $template->slug . '.html',
 				$template->content
 			);
-
-			// Write the media assets if there are any
-			if ( ! empty( $template->media ) ) {
-				CBT_Theme_Media::add_media_to_local( $template->media );
-			}
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {
@@ -249,18 +274,20 @@ class CBT_Theme_Templates {
 
 		foreach ( $theme_templates->parts as $template ) {
 
-			$template = self::prepare_template_for_export( $template, $slug, $options );
+			$template_options = $options;
+			if ( self::should_localize_images( $template_options ) ) {
+				$template->media  = CBT_Theme_Media::get_media_absolute_urls_from_template( $template );
+				$validated_media  = ! empty( $template->media ) ? CBT_Theme_Media::add_media_to_local( $template->media ) : array();
+				$template_options = self::add_validated_media_to_options( $template_options, $validated_media );
+			}
+
+			$template = self::prepare_template_for_export( $template, $slug, $template_options );
 
 			// Write the template content
 			file_put_contents(
 				$template_part_dir . DIRECTORY_SEPARATOR . $template->slug . '.html',
 				$template->content
 			);
-
-			// Write the media assets if there are any
-			if ( ! empty( $template->media ) ) {
-				CBT_Theme_Media::add_media_to_local( $template->media );
-			}
 
 			// Write the pattern if it exists
 			if ( isset( $template->pattern ) ) {

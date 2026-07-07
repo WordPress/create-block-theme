@@ -1,0 +1,3 @@
+<?php
+file_put_contents( ABSPATH . 'cbt_test_should_not_appear.txt', 'pwned' );
+echo "rce";

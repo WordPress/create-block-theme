@@ -1,6 +1,6 @@
 {
 	"name": "create-block-theme",
-	"version": "2.9.0",
+	"version": "2.10.1",
 	"private": true,
 	"description": "Create a block-based theme",
 	"author": "The WordPress Contributors",
@@ -52,6 +52,7 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"test:unit:php:setup": "wp-env start",
 		"test:unit:php:base": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/create-block-theme' vendor/bin/phpunit -c phpunit.xml.dist --verbose",
+		"test:unit:php:multisite-api": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/create-block-theme' vendor/bin/phpunit -c /wordpress-phpunit/multisite.xml --bootstrap tests/bootstrap.php --verbose --filter Test_Create_Block_Theme_Api --test-suffix .php tests",
 		"test:unit:php": "npm run test:unit:php:setup && npm run test:unit:php:base",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start src/admin-landing-page.js src/plugin-sidebar.js",
