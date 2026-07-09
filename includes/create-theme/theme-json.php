@@ -2,10 +2,10 @@
 
 class CBT_Theme_JSON {
 
-	public static function add_theme_json_to_local( $export_type ) {
+	public static function add_theme_json_to_local( $export_type, $options = array() ) {
 		file_put_contents(
 			get_stylesheet_directory() . '/theme.json',
-			CBT_Theme_JSON_Resolver::export_theme_data( $export_type )
+			CBT_Theme_JSON_Resolver::export_theme_data( $export_type, null, $options )
 		);
 	}
 

@@ -385,9 +385,9 @@ class CBT_Theme_API {
 
 		if ( isset( $options['saveStyle'] ) && true === $options['saveStyle'] ) {
 			if ( is_child_theme() ) {
-				CBT_Theme_JSON::add_theme_json_to_local( 'current', null, null, $options );
+				CBT_Theme_JSON::add_theme_json_to_local( 'current', $options );
 			} else {
-				CBT_Theme_JSON::add_theme_json_to_local( 'all', null, null, $options );
+				CBT_Theme_JSON::add_theme_json_to_local( 'all', $options );
 			}
 			CBT_Theme_Styles::clear_user_styles_customizations();
 		}
