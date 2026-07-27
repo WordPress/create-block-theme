@@ -159,7 +159,7 @@ class CBT_Theme_API {
 	 * @param WP_Theme          $theme    The theme object.
 	 * @return WP_REST_Response Modified response object.
 	 */
-	function add_additional_data_to_theme_response( $response, $theme ) {
+	public function add_additional_data_to_theme_response( $response, $theme ) {
 		if ( ! $theme || ! $response ) {
 			return $response;
 		}
@@ -195,7 +195,7 @@ class CBT_Theme_API {
 		return $response;
 	}
 
-	function rest_clone_theme( $request ) {
+	public function rest_clone_theme( $request ) {
 
 		$response = CBT_Theme_Create::clone_current_theme( $this->sanitize_theme_data( $request->get_params() ) );
 
@@ -213,7 +213,7 @@ class CBT_Theme_API {
 		);
 	}
 
-	function rest_create_child_theme( $request ) {
+	public function rest_create_child_theme( $request ) {
 
 		$theme                   = $this->sanitize_theme_data( $request->get_params() );
 		$theme['is_child_theme'] = true;
@@ -236,7 +236,7 @@ class CBT_Theme_API {
 		);
 	}
 
-	function rest_create_variation( $request ) {
+	public function rest_create_variation( $request ) {
 		$options = $request->get_params();
 
 		$save_fonts = isset( $options['saveFonts'] ) && true === $options['saveFonts'];
@@ -261,7 +261,7 @@ class CBT_Theme_API {
 		);
 	}
 
-	function rest_create_blank_theme( $request ) {
+	public function rest_create_blank_theme( $request ) {
 
 		$theme = $this->sanitize_theme_data( $request->get_params() );
 		//TODO: Handle screenshots
@@ -286,7 +286,7 @@ class CBT_Theme_API {
 	/**
 	 * Export the theme as a ZIP file.
 	 */
-	function rest_export_theme() {
+	public function rest_export_theme() {
 		if ( ! class_exists( 'ZipArchive' ) ) {
 			return new WP_Error(
 				'missing_zip_package',
@@ -330,7 +330,7 @@ class CBT_Theme_API {
 	/**
 	 * Update the theme metadata and relocate the theme.
 	 */
-	function rest_update_theme( $request ) {
+	public function rest_update_theme( $request ) {
 		$theme = $this->sanitize_theme_data( $request->get_params() );
 
 		// Update the metadata of the theme in the style.css file
@@ -361,7 +361,7 @@ class CBT_Theme_API {
 	/**
 	 * Save the user changes to the theme and clear user changes.
 	 */
-	function rest_save_theme( $request ) {
+	public function rest_save_theme( $request ) {
 
 		$options = $request->get_params();
 
@@ -417,7 +417,7 @@ class CBT_Theme_API {
 	 * `removedShadowDefaults`. Only keys present in the payload are written;
 	 * missing keys leave the existing theme.json untouched.
 	 */
-	function rest_save_theme_settings( $request ) {
+	public function rest_save_theme_settings( $request ) {
 		// `get_json_params()` returns null (or a scalar) for empty or
 		// non-object request bodies. The service signature requires an array,
 		// so guard here and return a 400 rather than letting the type hint
@@ -451,7 +451,7 @@ class CBT_Theme_API {
 	 * It includes the font families from the theme.json data (theme.json file + global styles) and the theme style variations.
 	 * The font families with font faces containing src urls relative to the theme folder are converted to absolute urls.
 	 */
-	function rest_get_font_families() {
+	public function rest_get_font_families() {
 		$font_families = CBT_Theme_Fonts::get_all_fonts();
 
 		return new WP_REST_Response(
@@ -466,7 +466,7 @@ class CBT_Theme_API {
 	/**
 	 * Reset the theme to the default state.
 	 */
-	function rest_reset_theme( $request ) {
+	public function rest_reset_theme( $request ) {
 		$options = $request->get_params();
 
 		if ( isset( $options['resetStyles'] ) && true === $options['resetStyles'] ) {

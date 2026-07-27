@@ -41,6 +41,5 @@ function cbt_run_create_block_theme() {
 
 	$plugin = new CBT_Plugin();
 	$plugin->run();
-
 }
 cbt_run_create_block_theme();

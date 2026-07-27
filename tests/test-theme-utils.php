@@ -18,7 +18,6 @@ class Test_Create_Block_Theme_Utils extends WP_UnitTestCase {
 		$updated_pattern_string = CBT_Theme_Utils::replace_namespace( $pattern_string, 'old-slug', 'new-slug', 'Old Name', 'New Name' );
 		$this->assertStringContainsString( 'Slug: new-slug/index', $updated_pattern_string );
 		$this->assertStringNotContainsString( 'old-slug', $updated_pattern_string );
-
 	}
 
 	public function test_replace_namespace_in_code() {

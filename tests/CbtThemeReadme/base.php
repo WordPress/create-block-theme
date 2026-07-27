@@ -74,5 +74,4 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 	public function remove_newlines( $string ) {
 		return str_replace( array( "\r\n", "\n" ), '', $string );
 	}
-
 }

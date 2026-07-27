@@ -1,7 +1,7 @@
 <?php
 
-require_once( __DIR__ . '/theme-media.php' );
-require_once( __DIR__ . '/theme-patterns.php' );
+require_once __DIR__ . '/theme-media.php';
+require_once __DIR__ . '/theme-patterns.php';
 
 class CBT_Theme_Templates {
 
@@ -49,7 +49,6 @@ class CBT_Theme_Templates {
 			'templates' => $exported_templates,
 			'parts'     => $exported_parts,
 		);
-
 	}
 
 	/**
@@ -60,7 +59,7 @@ class CBT_Theme_Templates {
 	 * @param string $path The path to the templates folder.
 	 * @return object|bool The template if it should be included, or false if it should be excluded.
 	 */
-	static function should_include_template( $template, $export_type, $path ) {
+	public static function should_include_template( $template, $export_type, $path ) {
 		if ( 'theme' === $template->source && 'user' === $export_type ) {
 			return false;
 		}

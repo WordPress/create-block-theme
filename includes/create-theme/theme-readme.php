@@ -353,5 +353,4 @@ GNU General Public License for more details.
 		$readme_content = str_replace( "\r\n", '', $readme_content );
 		return $readme_content;
 	}
-
 }

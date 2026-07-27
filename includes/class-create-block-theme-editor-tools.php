@@ -13,7 +13,7 @@ class CBT_Editor_Tools {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'create_block_theme_sidebar_enqueue' ) );
 	}
 
-	function create_block_theme_sidebar_enqueue() {
+	public function create_block_theme_sidebar_enqueue() {
 		global $pagenow;
 
 		if ( 'site-editor.php' !== $pagenow || ! wp_is_block_theme() ) {
@@ -29,17 +29,17 @@ class CBT_Editor_Tools {
 			return;
 		}
 
-		$asset_file = include plugin_dir_path( dirname( __FILE__ ) ) . 'build/plugin-sidebar.asset.php';
+		$asset_file = include plugin_dir_path( __DIR__ ) . 'build/plugin-sidebar.asset.php';
 
 		wp_register_script(
 			'create-block-theme-slot-fill',
-			plugins_url( 'build/plugin-sidebar.js', dirname( __FILE__ ) ),
+			plugins_url( 'build/plugin-sidebar.js', __DIR__ ),
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);
 		wp_enqueue_style(
 			'create-block-theme-styles',
-			plugins_url( 'build/plugin-sidebar.css', dirname( __FILE__ ) ),
+			plugins_url( 'build/plugin-sidebar.css', __DIR__ ),
 			array(),
 			$asset_file['version']
 		);
