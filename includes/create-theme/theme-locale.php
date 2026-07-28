@@ -167,7 +167,7 @@ class CBT_Theme_Locale {
 			$php_tag .= "echo sprintf( esc_html__( '$text', '$text_domain' ), " . implode(
 				', ',
 				array_map(
-					function( $token ) {
+					function ( $token ) {
 						return "'$token'";
 					},
 					$tokens
@@ -341,7 +341,7 @@ class CBT_Theme_Locale {
 						}
 						return preg_replace_callback(
 							$pattern,
-							function( $matches ) {
+							function ( $matches ) {
 								// If the pattern is for attribute like alt="".
 								if ( str_ends_with( $matches[1], '="' ) ) {
 									return $matches[1] . self::escape_attribute( $matches[2] ) . $matches[3];
@@ -365,7 +365,7 @@ class CBT_Theme_Locale {
 				) {
 					$block['innerContent'] = is_array( $block['innerContent'] )
 					? array_map(
-						function( $content ) use ( $replace_content_callback, $pattern ) {
+						function ( $content ) use ( $replace_content_callback, $pattern ) {
 							return $replace_content_callback( $content, $pattern );
 						},
 						$block['innerContent']

@@ -1,9 +1,9 @@
 <?php
 
-require_once( __DIR__ . '/theme-media.php' );
-require_once( __DIR__ . '/theme-templates.php' );
-require_once( __DIR__ . '/theme-patterns.php' );
-require_once( __DIR__ . '/cbt-zip-archive.php' );
+require_once __DIR__ . '/theme-media.php';
+require_once __DIR__ . '/theme-templates.php';
+require_once __DIR__ . '/theme-patterns.php';
+require_once __DIR__ . '/cbt-zip-archive.php';
 
 class CBT_Theme_Zip {
 
@@ -128,7 +128,6 @@ class CBT_Theme_Zip {
 		);
 
 		return wp_json_encode( $theme_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-
 	}
 
 	public static function copy_theme_to_zip( $zip, $new_slug, $new_name ) {
@@ -281,7 +280,7 @@ class CBT_Theme_Zip {
 		return $zip;
 	}
 
-	static function add_media_to_zip( $zip, $media ) {
+	public static function add_media_to_zip( $zip, $media ) {
 		$media       = array_unique( $media );
 		$added_media = array();
 		foreach ( $media as $url ) {
@@ -334,6 +333,5 @@ class CBT_Theme_Zip {
 		}
 
 		return $added_media;
-
 	}
 }

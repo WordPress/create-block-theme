@@ -168,5 +168,4 @@ class CBT_Theme_Tags {
 </div>
 		<?php
 	}
-
 }

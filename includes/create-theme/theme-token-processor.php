@@ -32,7 +32,7 @@ class CBT_Token_Processor {
 			$has_self_closer = $this->p->has_self_closing_flag();
 
 			if ( '#tag' === $token_type ) {
-				$this->increment++;
+				++$this->increment;
 				$this->text .= '%' . $this->increment . '$s';
 				$token_label = $this->increment . '.';
 

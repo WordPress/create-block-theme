@@ -387,5 +387,4 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$new_template      = CBT_Theme_Media::make_template_images_local( $template );
 		$this->assertStringContainsString( '<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/pattern.webp', $new_template->content );
 	}
-
 }

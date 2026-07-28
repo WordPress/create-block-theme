@@ -17,7 +17,6 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'http://example.com/image.jpg', $new_template->content );
 		$this->assertStringContainsString( 'get_template_directory_uri', $new_template->content );
 		$this->assertStringContainsString( '/assets/images', $new_template->content );
-
 	}
 
 	public function test_make_cover_block_local() {
@@ -57,7 +56,6 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		// The pattern is correctly encoded
 		$this->assertStringContainsString( '<img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
-
 	}
 
 	public function test_make_group_block_local() {
@@ -78,7 +76,6 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 
 		// The pattern is correctly encoded
 		$this->assertStringContainsString( '{"backgroundImage":{"url":"<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/image.jpg"', $new_template->pattern );
-
 	}
 
 	public function test_is_allowed_media_url_accepts_image_extension() {

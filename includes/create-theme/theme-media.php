@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . '/theme-utils.php' );
+require_once __DIR__ . '/theme-utils.php';
 
 class CBT_Theme_Media {
 

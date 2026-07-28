@@ -55,7 +55,6 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertTrue( file_exists( get_stylesheet_directory() . '/assets/fonts/open-sans/open-sans-400-normal.ttf' ) );
 
 		$this->uninstall_theme( $test_theme_slug );
-
 	}
 
 	public function test_remove_deactivated_fonts_from_theme() {
@@ -262,7 +261,6 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'file:.', $fonts[1]['fontFace'][0]['src'] );
 
 		$this->uninstall_theme( $test_theme_slug );
-
 	}
 
 	public function test_non_array_font_src() {
@@ -870,4 +868,3 @@ class Test_Create_Block_Theme_Fonts extends WP_UnitTestCase {
 		$this->uninstall_theme( $test_theme_slug );
 	}
 }
-

@@ -18,7 +18,7 @@ class CBT_Theme_Fonts {
 	 * @return array|string
 	 */
 	private static function make_theme_font_src_absolute( $src ) {
-		$make_absolute = function( $url ) {
+		$make_absolute = function ( $url ) {
 			if ( str_starts_with( $url, 'file:./' ) ) {
 				return str_replace( 'file:./', get_stylesheet_directory_uri() . '/', $url );
 			}
@@ -376,7 +376,7 @@ class CBT_Theme_Fonts {
 		$theme_font_asset_location = get_stylesheet_directory() . '/assets/fonts/';
 		$font_families_to_remove   = array_filter(
 			$theme_font_families,
-			function( $theme_font_family ) use ( $font_families_to_not_remove ) {
+			function ( $theme_font_family ) use ( $font_families_to_not_remove ) {
 				return ! in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
 			}
 		);
@@ -422,7 +422,7 @@ class CBT_Theme_Fonts {
 		if ( ! is_null( $theme_font_families ) ) {
 			$theme_json['settings']['typography']['fontFamilies'] = array_filter(
 				$theme_font_families,
-				function( $theme_font_family ) use ( $font_families_to_not_remove ) {
+				function ( $theme_font_family ) use ( $font_families_to_not_remove ) {
 					return in_array( $theme_font_family['slug'], array_column( $font_families_to_not_remove, 'slug' ), true );
 				}
 			);

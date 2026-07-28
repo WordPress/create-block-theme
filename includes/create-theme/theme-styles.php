@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . '/theme-tags.php' );
+require_once __DIR__ . '/theme-tags.php';
 
 class CBT_Theme_Styles {
 
