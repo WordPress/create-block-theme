@@ -35,7 +35,8 @@ import { generateWpVersions } from '../utils/generate-versions';
 const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
 
 export const CreateThemePanel = ( { createType } ) => {
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -58,14 +59,16 @@ export const CreateThemePanel = ( { createType } ) => {
 	const handleCreateBlankClick = () => {
 		createBlankTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line no-alert
-				window.alert(
+				createSuccessNotice(
 					__(
 						'Theme created successfully. The editor will now reload.',
 						'create-block-theme'
-					)
+					),
+					{ type: 'snackbar' }
 				);
-				window.location.reload();
+				setTimeout( () => {
+					window.location.reload();
+				}, 1000 );
 			} )
 			.catch( ( error ) => {
 				const errorMessage =
@@ -81,14 +84,16 @@ export const CreateThemePanel = ( { createType } ) => {
 	const handleCloneClick = () => {
 		createClonedTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line no-alert
-				window.alert(
+				createSuccessNotice(
 					__(
 						'Theme cloned successfully. The editor will now reload.',
 						'create-block-theme'
-					)
+					),
+					{ type: 'snackbar' }
 				);
-				window.location.reload();
+				setTimeout( () => {
+					window.location.reload();
+				}, 1000 );
 			} )
 			.catch( ( error ) => {
 				const errorMessage =
@@ -104,14 +109,16 @@ export const CreateThemePanel = ( { createType } ) => {
 	const handleCreateChildClick = () => {
 		createChildTheme( theme )
 			.then( () => {
-				// eslint-disable-next-line no-alert
-				window.alert(
+				createSuccessNotice(
 					__(
 						'Child theme created successfully. The editor will now reload.',
 						'create-block-theme'
-					)
+					),
+					{ type: 'snackbar' }
 				);
-				window.location.reload();
+				setTimeout( () => {
+					window.location.reload();
+				}, 1000 );
 			} )
 			.catch( ( error ) => {
 				const errorMessage =

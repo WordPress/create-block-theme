@@ -44,7 +44,8 @@ export const SaveThemePanel = () => {
 		};
 	}, [] );
 
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const handleTogglePreference = ( key ) => {
@@ -64,29 +65,31 @@ export const SaveThemePanel = () => {
 			},
 		} )
 			.then( () => {
-				// eslint-disable-next-line no-alert
-				window.alert(
+				createSuccessNotice(
 					__(
 						'Theme saved successfully. The editor will now reload.',
 						'create-block-theme'
-					)
+					),
+					{ type: 'snackbar' }
 				);
 
-				const searchParams = new URLSearchParams(
-					window?.location?.search
-				);
-				// If user is editing a pattern and savePatterns is true, redirect back to the patterns page.
-				if (
-					preference.savePatterns &&
-					searchParams.get( 'postType' ) === 'wp_block' &&
-					searchParams.get( 'postId' )
-				) {
-					window.location =
-						'/wp-admin/site-editor.php?postType=wp_block';
-				} else {
-					// If user is not editing a pattern, reload the editor.
-					window.location.reload();
-				}
+				setTimeout( () => {
+					const searchParams = new URLSearchParams(
+						window?.location?.search
+					);
+					// If user is editing a pattern and savePatterns is true, redirect back to the patterns page.
+					if (
+						preference.savePatterns &&
+						searchParams.get( 'postType' ) === 'wp_block' &&
+						searchParams.get( 'postId' )
+					) {
+						window.location =
+							'/wp-admin/site-editor.php?postType=wp_block';
+					} else {
+						// If user is not editing a pattern, reload the editor.
+						window.location.reload();
+					}
+				}, 1000 );
 			} )
 			.catch( ( error ) => {
 				const errorMessage =

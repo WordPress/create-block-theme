@@ -1,5 +1,5 @@
-@import "../node_modules/@wordpress/base-styles/mixins";
-@include wordpress-admin-schemes();
+@use "../node_modules/@wordpress/base-styles/mixins";
+@include mixins.wordpress-admin-schemes();
 
 
 .create-block-theme {
