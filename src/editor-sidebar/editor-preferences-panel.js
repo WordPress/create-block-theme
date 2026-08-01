@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
@@ -32,17 +33,20 @@ export const EditorPreferencesPanel = () => {
 	);
 
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleToggle = ( value ) => {
 		setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, value );
-		// eslint-disable-next-line no-alert
-		window.alert(
+		createSuccessNotice(
 			__(
 				'Preference updated. The editor will now reload.',
 				'create-block-theme'
-			)
+			),
+			{ type: 'snackbar' }
 		);
-		window.location.reload();
+		setTimeout( () => {
+			window.location.reload();
+		}, 1000 );
 	};
 
 	return (
