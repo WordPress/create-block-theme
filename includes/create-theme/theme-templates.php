@@ -14,9 +14,114 @@ class CBT_Theme_Templates {
 	 * @return object An object containing the templates and parts that should be exported.
 	 */
 	public static function get_theme_templates( $export_type, $templates_to_export = null ) {
+		// For 'all' export type, include inactive templates when template activation is enabled.
+		$include_inactive = ( 'all' === $export_type );
 
-		$templates          = get_block_templates( array( 'slug__in' => $templates_to_export ) );
-		$template_parts     = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
+		// Check if template activation is enabled.
+		$active_templates            = get_option( 'active_templates', null );
+		$template_activation_enabled = ( null !== $active_templates );
+
+		if ( $include_inactive && $template_activation_enabled ) {
+			// Query posts directly to get all templates including inactive ones.
+			$query_args = array(
+				'post_type'      => 'wp_template',
+				'posts_per_page' => -1,
+				'post_status'    => array( 'publish', 'draft', 'auto-draft' ),
+				'no_found_rows'  => true,
+			);
+
+			if ( ! empty( $templates_to_export ) && is_array( $templates_to_export ) ) {
+				$query_args['post_name__in'] = $templates_to_export;
+			}
+
+			$posts     = get_posts( $query_args );
+			$templates = array();
+			foreach ( $posts as $post ) {
+				$template = get_block_template( get_stylesheet() . '//' . $post->post_name, 'wp_template' );
+				if ( ! $template || ( isset( $template->wp_id ) && $template->wp_id !== $post->ID ) ) {
+					// Create a template object from post data for custom templates.
+					$template = (object) array(
+						'wp_id'   => $post->ID,
+						'id'      => get_stylesheet() . '//' . $post->post_name,
+						'slug'    => $post->post_name,
+						'source'  => 'custom',
+						'content' => $post->post_content,
+						'title'   => $post->post_title,
+						'type'    => 'wp_template',
+						'status'  => $post->post_status,
+					);
+				}
+				if ( $template ) {
+					$templates[] = $template;
+				}
+			}
+
+			// Get theme templates.
+			$theme_templates = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template' );
+			$template_slugs  = array();
+			foreach ( $templates as $template ) {
+				$template_slugs[ $template->slug ] = true;
+			}
+			foreach ( $theme_templates as $theme_template ) {
+				if ( ! isset( $template_slugs[ $theme_template->slug ] ) ) {
+					$templates[] = $theme_template;
+				}
+			}
+		} else {
+			// Only return active templates when template activation is enabled.
+			$templates = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template' );
+		}
+
+		// Get template parts.
+		if ( $include_inactive && $template_activation_enabled ) {
+			$query_args = array(
+				'post_type'      => 'wp_template_part',
+				'posts_per_page' => -1,
+				'post_status'    => array( 'publish', 'draft', 'auto-draft' ),
+				'no_found_rows'  => true,
+			);
+
+			if ( ! empty( $templates_to_export ) && is_array( $templates_to_export ) ) {
+				$query_args['post_name__in'] = $templates_to_export;
+			}
+
+			$posts          = get_posts( $query_args );
+			$template_parts = array();
+			foreach ( $posts as $post ) {
+				$template = get_block_template( get_stylesheet() . '//' . $post->post_name, 'wp_template_part' );
+				if ( ! $template || ( isset( $template->wp_id ) && $template->wp_id !== $post->ID ) ) {
+					// Create a template object from post data for custom template parts.
+					$template = (object) array(
+						'wp_id'   => $post->ID,
+						'id'      => get_stylesheet() . '//' . $post->post_name,
+						'slug'    => $post->post_name,
+						'source'  => 'custom',
+						'content' => $post->post_content,
+						'title'   => $post->post_title,
+						'type'    => 'wp_template_part',
+						'status'  => $post->post_status,
+					);
+				}
+				if ( $template ) {
+					$template_parts[] = $template;
+				}
+			}
+
+			// Get theme template parts.
+			$theme_template_parts = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
+			$part_slugs           = array();
+			foreach ( $template_parts as $part ) {
+				$part_slugs[ $part->slug ] = true;
+			}
+			foreach ( $theme_template_parts as $theme_part ) {
+				if ( ! isset( $part_slugs[ $theme_part->slug ] ) ) {
+					$template_parts[] = $theme_part;
+				}
+			}
+		} else {
+			$template_parts = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
+		}
+
 		$exported_templates = array();
 		$exported_parts     = array();
 
@@ -103,29 +208,63 @@ class CBT_Theme_Templates {
 
 	/**
 	 * Clear all user templates customizations.
-	 * This will remove all user templates from the database.
+	 * This will remove all user templates from the database, including inactive ones.
 	 */
 	public static function clear_user_templates_customizations() {
-		$templates = get_block_templates();
-		foreach ( $templates as $template ) {
-			if ( 'custom' !== $template->source ) {
-				continue;
+		$active_templates = get_option( 'active_templates', null );
+
+		if ( null === $active_templates ) {
+			$templates = get_block_templates( array(), 'wp_template' );
+			foreach ( $templates as $template ) {
+				if ( 'custom' !== $template->source ) {
+					continue;
+				}
+				wp_delete_post( $template->wp_id, true );
 			}
-			wp_delete_post( $template->wp_id, true );
+		} else {
+			// Query posts directly to get all custom templates.
+			$query_args = array(
+				'post_type'      => 'wp_template',
+				'posts_per_page' => -1,
+				'post_status'    => array( 'publish', 'draft', 'auto-draft' ),
+				'no_found_rows'  => true,
+			);
+
+			$posts = get_posts( $query_args );
+			foreach ( $posts as $post ) {
+				wp_delete_post( $post->ID, true );
+			}
 		}
 	}
 
 	/**
 	 * Clear all user template-parts customizations.
-	 * This will remove all user template-parts from the database.
+	 * This will remove all user template-parts from the database, including inactive ones.
 	 */
 	public static function clear_user_template_parts_customizations() {
-		$template_parts = get_block_templates( array(), 'wp_template_part' );
-		foreach ( $template_parts as $template ) {
-			if ( 'custom' !== $template->source ) {
-				continue;
+		$active_templates = get_option( 'active_templates', null );
+
+		if ( null === $active_templates ) {
+			$template_parts = get_block_templates( array(), 'wp_template_part' );
+			foreach ( $template_parts as $template ) {
+				if ( 'custom' !== $template->source ) {
+					continue;
+				}
+				wp_delete_post( $template->wp_id, true );
 			}
-			wp_delete_post( $template->wp_id, true );
+		} else {
+			// Query posts directly to get all custom template parts.
+			$query_args = array(
+				'post_type'      => 'wp_template_part',
+				'posts_per_page' => -1,
+				'post_status'    => array( 'publish', 'draft', 'auto-draft' ),
+				'no_found_rows'  => true,
+			);
+
+			$posts = get_posts( $query_args );
+			foreach ( $posts as $post ) {
+				wp_delete_post( $post->ID, true );
+			}
 		}
 	}
 
