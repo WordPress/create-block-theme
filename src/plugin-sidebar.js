@@ -38,7 +38,7 @@ import {
 	tool,
 	copy,
 	download,
-	edit,
+	pencil,
 	code,
 	chevronLeft,
 	chevronRight,
@@ -58,6 +58,7 @@ import GlobalStylesJsonEditorModal from './editor-sidebar/global-styles-json-edi
 import { SaveThemePanel } from './editor-sidebar/save-panel';
 import { CreateVariationPanel } from './editor-sidebar/create-variation-panel';
 import { ThemeMetadataEditorModal } from './editor-sidebar/metadata-editor-modal';
+import { EditThemeSettingsModal } from './editor-sidebar/edit-theme-settings-modal';
 import ScreenHeader from './editor-sidebar/screen-header';
 import { downloadExportedTheme } from './resolvers';
 import downloadFile from './utils/download-file';
@@ -89,6 +90,8 @@ const CreateBlockThemePlugin = () => {
 		useState( false );
 
 	const [ isMetadataEditorOpen, setIsMetadataEditorOpen ] = useState( false );
+
+	const [ isThemeSettingsOpen, setIsThemeSettingsOpen ] = useState( false );
 
 	const [ cloneCreateType, setCloneCreateType ] = useState( '' );
 
@@ -157,7 +160,18 @@ const CreateBlockThemePlugin = () => {
 										) }
 									</PluginSidebarItem>
 									<PluginSidebarItem
-										icon={ edit }
+										icon={ cog }
+										onClick={ () =>
+											setIsThemeSettingsOpen( true )
+										}
+									>
+										{ __(
+											'Edit Theme Settings',
+											'create-block-theme'
+										) }
+									</PluginSidebarItem>
+									<PluginSidebarItem
+										icon={ pencil }
 										onClick={ () =>
 											setIsMetadataEditorOpen( true )
 										}
@@ -376,6 +390,12 @@ const CreateBlockThemePlugin = () => {
 			{ isMetadataEditorOpen && (
 				<ThemeMetadataEditorModal
 					onRequestClose={ () => setIsMetadataEditorOpen( false ) }
+				/>
+			) }
+
+			{ isThemeSettingsOpen && (
+				<EditThemeSettingsModal
+					onRequestClose={ () => setIsThemeSettingsOpen( false ) }
 				/>
 			) }
 		</>
