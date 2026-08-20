@@ -174,7 +174,8 @@ class CBT_Theme_Locale {
 			return $php_tag;
 		}
 
-		return "<?php esc_html_e('" . $text . "', '$text_domain');?>";
+		$string = self::escape_php_single_quoted_string( $string );
+		return "<?php esc_html_e('" . $string . "', '$text_domain');?>";
 	}
 
 	/**
