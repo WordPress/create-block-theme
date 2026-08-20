@@ -103,6 +103,26 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 		$this->assert_search_block_attributes_json_decodes( $escaped_markup );
 	}
 
+	public function test_escape_block_attributes_preserves_core_encoding_for_other_attributes() {
+		$block_markup = '<!-- wp:navigation-link ' . serialize_block_attributes(
+			array(
+				'label' => 'About',
+				'url'   => '<?php echo "kept encoded"; ?>',
+				'title' => 'Keep -- < > & encoded',
+			)
+		) . ' /-->';
+
+		$blocks         = parse_blocks( $block_markup );
+		$escaped_blocks = CBT_Theme_Locale::escape_text_content_of_blocks( $blocks );
+		$escaped_markup = serialize_blocks( $escaped_blocks );
+		$escaped_markup = CBT_Theme_Locale::escape_block_attribute_strings( $escaped_markup );
+
+		$this->assertStringContainsString( '"label":"<?php esc_attr_e(', $escaped_markup );
+		$this->assertStringContainsString( '"url":"\\u003c?php echo \\u0022kept encoded\\u0022; ?\\u003e"', $escaped_markup );
+		$this->assertStringContainsString( '"title":"Keep \\u002d\\u002d \\u003c \\u003e \\u0026 encoded"', $escaped_markup );
+		$this->assertStringNotContainsString( '"url":"<?php', $escaped_markup );
+	}
+
 	public function data_test_escape_block_attributes() {
 		return array(
 
