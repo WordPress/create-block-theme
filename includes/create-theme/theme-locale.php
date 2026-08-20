@@ -435,19 +435,19 @@ class CBT_Theme_Locale {
 
 				// If we modified any attributes, re-encode to JSON.
 				if ( $modified ) {
-					$attr_fragments = array();
-					foreach ( $attrs as $attr_name => $attr_value ) {
-						$encoded_attr_name = wp_json_encode( (string) $attr_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+					$attrs_for_serialization = $attrs;
+					$replacements            = array();
+					foreach ( $localized_attrs as $attr_name => $localized_value ) {
+						do {
+							$placeholder = '__CBT_LOCALIZED_ATTRIBUTE_' . wp_generate_uuid4() . '__';
+						} while ( false !== strpos( $attrs_json, $placeholder ) || isset( $replacements[ '"' . $placeholder . '"' ] ) );
 
-						if ( array_key_exists( $attr_name, $localized_attrs ) ) {
-							$attr_fragments[] = $encoded_attr_name . ':' . wp_json_encode( $localized_attrs[ $attr_name ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-							continue;
-						}
-
-						$attr_fragments[] = $encoded_attr_name . ':' . wp_json_encode( $attr_value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+						$attrs_for_serialization[ $attr_name ]    = $placeholder;
+						$replacements[ '"' . $placeholder . '"' ] = wp_json_encode( $localized_value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 					}
 
-					$new_attrs_json = '{' . implode( ',', $attr_fragments ) . '}';
+					$new_attrs_json = serialize_block_attributes( $attrs_for_serialization );
+					$new_attrs_json = strtr( $new_attrs_json, $replacements );
 					return '<!-- wp:' . $block_name . ' ' . $new_attrs_json . ' ' . $self_closer . '-->';
 				}
 
