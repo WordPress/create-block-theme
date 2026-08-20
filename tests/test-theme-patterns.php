@@ -178,6 +178,24 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_pattern_from_wp_block_stabilizes_overlapping_open_tags() {
+		$post    = $this->make_wp_block_post( '<p>safe</p><<??template data' );
+		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+		$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
+
+		$this->assertStringNotContainsString( '<?', $body );
+		$this->assertStringContainsString( '<p>safe</p>', $body );
+	}
+
+	public function test_pattern_from_wp_block_stabilizes_after_legacy_script_removal() {
+		$post    = $this->make_wp_block_post( '<p>safe</p><<script language="php">bridge</script>?template data' );
+		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+		$body    = substr( $pattern->content, strpos( $pattern->content, '?>' ) + 2 );
+
+		$this->assertStringNotContainsString( '<?', $body );
+		$this->assertStringContainsString( '<p>safe</p>', $body );
+	}
+
 	public function test_pattern_from_wp_block_preserves_unrelated_script_tags() {
 		// `<script type="application/json">` and similar non-PHP scripts are legitimate
 		// in block markup and MUST NOT be stripped.

@@ -29,19 +29,21 @@ class CBT_Theme_Patterns {
 			return $content;
 		}
 
-		// Strip ANY `<?` open tag. On hosts with `short_open_tag=1`, PHP parses
-		// `<?` followed by `$`, `(`, `"`, `//`, `/*`, `;`, or `xml` as an open
-		// tag — preserving any of them would either re-execute as PHP or
-		// produce a fatal parse error when the exported `.php` file is loaded.
-		// Block patterns are HTML/block markup, so there's no legitimate
-		// `<?xml` content to preserve.
-		$content = preg_replace( '/<\?/', '', $content );
+		// Repeat until stable because removing one sequence can bring adjacent
+		// fragments together and expose another sequence for the next pass.
+		do {
+			$previous_content = $content;
 
-		// Strip legacy `<script language="php">…</script>` blocks. PHP 7+
-		// removed this parser, but custom SAPIs / polyfills could still
-		// honour it. Match the entire block (opening tag → closing tag,
-		// inclusive of inner content).
-		$content = preg_replace( '#<script\s+language\s*=\s*["\']?php["\']?[^>]*>.*?</script>#is', '', $content );
+			// Strip ANY `<?` open tag. On hosts with `short_open_tag=1`, PHP parses
+			// `<?` followed by `$`, `(`, `"`, `//`, `/*`, `;`, or `xml` as an open
+			// tag. Block patterns are HTML/block markup, so there's no legitimate
+			// `<?xml` content to preserve.
+			$content = preg_replace( '/<\?/', '', $content );
+
+			// Strip legacy `<script language="php">…</script>` blocks. Match the
+			// entire block, including its inner content.
+			$content = preg_replace( '#<script\s+language\s*=\s*["\']?php["\']?[^>]*>.*?</script>#is', '', $content );
+		} while ( $content !== $previous_content );
 
 		return $content;
 	}
