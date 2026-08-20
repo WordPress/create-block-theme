@@ -331,6 +331,28 @@ class Test_Create_Block_Theme_Media extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '/assets/images/not-copied.png', $new_template->content );
 	}
 
+	public function test_make_template_images_local_preserves_placeholder_like_content() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:paragraph {"metadata":{"name":"/__cbt-local-media-0__/"}} -->
+			<p>Keep /__cbt-local-media-0__/ unchanged.</p>
+			<!-- /wp:paragraph -->
+			<!-- wp:image -->
+			<figure class="wp-block-image"><img src="http://example.com/copied.png" alt="" /></figure>
+			<!-- /wp:image -->
+		';
+
+		$new_template = CBT_Theme_Media::make_template_images_local(
+			$template,
+			array( 'http://example.com/copied.png' )
+		);
+
+		$this->assertStringContainsString( '"name":"/__cbt-local-media-0__/"', $new_template->content );
+		$this->assertStringContainsString( 'Keep /__cbt-local-media-0__/ unchanged.', $new_template->content );
+		$this->assertStringContainsString( '/assets/images/copied.png', $new_template->content );
+		$this->assertStringNotContainsString( '__cbt-local-media-', str_replace( '/__cbt-local-media-0__/', '', $new_template->content ) );
+	}
+
 	public function test_prepare_template_for_export_leaves_unvalidated_media_remote() {
 		$template          = new stdClass();
 		$template->slug    = 'test-template';
