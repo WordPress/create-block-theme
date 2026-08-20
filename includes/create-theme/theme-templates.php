@@ -340,12 +340,12 @@ class CBT_Theme_Templates {
 				unset( $block['attrs']['id'] );
 				// Remove the matching class token without changing similar text elsewhere.
 				foreach ( $block['innerContent'] as $inner_key => $inner_content ) {
-					if ( is_null( $inner_content ) ) {
+					if ( is_null( $inner_content ) || false === strpos( $inner_content, $image_class ) ) {
 						continue;
 					}
 
 					$processor = new WP_HTML_Tag_Processor( $inner_content );
-					while ( $processor->next_tag() ) {
+					while ( $processor->next_tag( 'img' ) ) {
 						if ( $processor->has_class( $image_class ) ) {
 							$processor->remove_class( $image_class );
 						}
