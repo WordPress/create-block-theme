@@ -62,6 +62,35 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 		$this->assert_php_code_does_not_call_function( 'system', $escaped_string );
 	}
 
+	/**
+	 * @dataProvider data_html_attribute_apostrophe_entities
+	 */
+	public function test_escape_text_content_escapes_decoded_href_values( $attribute_value, $decoded_value ) {
+		$string         = '<a href="' . $attribute_value . '">Read</a>';
+		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
+		$expected_value = addcslashes( $decoded_value, "\\'" );
+
+		$this->assertStringContainsString( "esc_url( '$expected_value' )", $escaped_string );
+	}
+
+	public function data_html_attribute_apostrophe_entities() {
+		return array(
+			'raw apostrophe'            => array( "https://example.com/it's", "https://example.com/it's" ),
+			'decimal entity'            => array( 'https://example.com/it&#39;s', "https://example.com/it's" ),
+			'hexadecimal entity'        => array( 'https://example.com/it&#x27;s', "https://example.com/it's" ),
+			'named apostrophe entity'   => array( 'https://example.com/it&apos;s', "https://example.com/it's" ),
+			'named double quote entity' => array( 'https://example.com/a&quot;b', 'https://example.com/a"b' ),
+			'backslash before entity'   => array( 'https://example.com/it\\&#39;s', "https://example.com/it\\'s" ),
+		);
+	}
+
+	public function test_escape_text_content_escapes_decoded_generic_attribute_values() {
+		$string         = '<span title="It&apos;s ready">Read</span>';
+		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
+
+		$this->assertStringContainsString( "title=\"It\\'s ready\"", $escaped_string );
+	}
+
 	public function test_escape_text_content_with_already_escaped_string() {
 		$string         = "<?php esc_html_e('This is a test text.', 'test-locale-theme');?>";
 		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );

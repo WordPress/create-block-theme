@@ -10,6 +10,16 @@ class CBT_Token_Processor {
 	private $increment        = 0;
 
 	/**
+	 * Escape a value embedded in a generated PHP single-quoted string.
+	 *
+	 * @param string $value The value to escape.
+	 * @return string The escaped value.
+	 */
+	private function escape_php_single_quoted_string( $value ) {
+		return addcslashes( (string) $value, "\\'" );
+	}
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $string The string to process.
@@ -93,14 +103,18 @@ class CBT_Token_Processor {
 		} elseif ( 'src' === $attr_name ) {
 			$added_media = CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
 			if ( in_array( $attr_value, $added_media, true ) ) {
-				$relative_src = CBT_Theme_Media::get_media_relative_path_from_url( $attr_value );
+				$relative_src = $this->escape_php_single_quoted_string( CBT_Theme_Media::get_media_relative_path_from_url( $attr_value ) );
 				$attr_value   = "' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}";
+			} else {
+				$attr_value = $this->escape_php_single_quoted_string( $attr_value );
 			}
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		} elseif ( 'href' === $attr_name ) {
+			$attr_value  = $this->escape_php_single_quoted_string( $attr_value );
 			$attr_value  = "' . esc_url( '$attr_value' ) . '";
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		} else {
+			$attr_value  = $this->escape_php_single_quoted_string( $attr_value );
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		}
 

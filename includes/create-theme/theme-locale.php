@@ -152,11 +152,9 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
-		$string = self::escape_php_single_quoted_string( $string );
-
 		$p = new CBT_Token_Processor( $string );
 		$p->process_tokens();
-		$text             = $p->get_text();
+		$text             = self::escape_php_single_quoted_string( $p->get_text() );
 		$tokens           = $p->get_tokens();
 		$translators_note = $p->get_translators_note();
 		$text_domain      = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
@@ -176,7 +174,7 @@ class CBT_Theme_Locale {
 			return $php_tag;
 		}
 
-		return "<?php esc_html_e('" . $string . "', '$text_domain');?>";
+		return "<?php esc_html_e('" . $text . "', '$text_domain');?>";
 	}
 
 	/**
