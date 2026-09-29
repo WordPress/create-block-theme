@@ -119,6 +119,34 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'wp-image-635', $new_template->content );
 	}
 
+	public function test_eliminate_image_id_only_removes_matching_class_token() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:image {"id":635} -->
+			<figure class="wp-block-image"><img class="custom-wp-image-635 wp-image-635" alt=""/><figcaption>wp-image-635?template data</figcaption></figure>
+			<!-- /wp:image -->
+		';
+		$new_template      = CBT_Theme_Templates::eliminate_environment_specific_content( $template );
+
+		$this->assertStringContainsString( 'class="custom-wp-image-635"', $new_template->content );
+		$this->assertStringContainsString( '<figcaption>wp-image-635?template data</figcaption>', $new_template->content );
+		$this->assertStringNotContainsString( ' wp-image-635"', $new_template->content );
+	}
+
+	public function test_eliminate_image_id_from_cover_with_fixed_background() {
+		$template          = new stdClass();
+		$template->content = '
+			<!-- wp:cover {"url":"http://example.com/file.jpg","id":635,"hasParallax":true} -->
+			<div class="wp-block-cover has-parallax"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div role="img" class="wp-block-cover__image-background wp-image-635 has-parallax" style="background-position:50% 50%;background-image:url(http://example.com/file.jpg)"></div><div class="wp-block-cover__inner-container"></div></div>
+			<!-- /wp:cover -->
+		';
+		$new_template      = CBT_Theme_Templates::eliminate_environment_specific_content( $template );
+
+		$this->assertStringNotContainsString( '"id":635', $new_template->content );
+		$this->assertStringNotContainsString( 'wp-image-635', $new_template->content );
+		$this->assertStringContainsString( 'class="wp-block-cover__image-background has-parallax"', $new_template->content );
+	}
+
 	public function test_eliminate_taxQuery_from_query_loop() {
 		$template          = new stdClass();
 		$template->content = '
