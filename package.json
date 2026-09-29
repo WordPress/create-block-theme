@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@codemirror/lang-json": "^6.0.2",
 		"@uiw/react-codemirror": "^4.25.4",
+		"@wordpress/hooks": "^4.56.0",
 		"@wordpress/icons": "^11.7.0",
 		"lib-font": "^3.0.0"
 	},
@@ -30,8 +31,8 @@
 		"@playwright/test": "^1.58.2",
 		"@wordpress/base-styles": "^6.16.0",
 		"@wordpress/e2e-test-utils-playwright": "^1.40.0",
-		"@wordpress/env": "^10.0.0",
-		"@wordpress/scripts": "^31.5.0",
+		"@wordpress/env": "^11.16.0",
+		"@wordpress/scripts": "^31.8.0",
 		"babel-plugin-inline-json-import": "^0.3.2",
 		"eslint-plugin-unicorn": "^56.0.0",
 		"husky": "^9.1.7",
