@@ -462,12 +462,12 @@ class CBT_Theme_Media {
 		// but accepts a leading `/` unchanged. The path uses characters
 		// that wp_json_encode leaves untouched as well.
 		$placeholders     = array();
-		$source_content   = $template->content;
-		$next_placeholder = static function ( $raw ) use ( &$placeholders, $source_content ) {
-			do {
-				$id = '/__cbt-local-media-' . wp_generate_uuid4() . '-' . count( $placeholders ) . '__/';
-			} while ( false !== strpos( $source_content, $id ) || isset( $placeholders[ $id ] ) );
-
+		$run_id           = wp_generate_uuid4();
+		$next_placeholder = static function ( $raw ) use ( &$placeholders, $run_id ) {
+				$id                  = '/__cbt-local-media-' . $run_id . '-' . count( $placeholders ) . '__/';
+				$placeholders[ $id ] = $raw;
+				return $id;
+		};
 			$placeholders[ $id ] = $raw;
 			return $id;
 		};
