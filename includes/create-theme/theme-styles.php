@@ -6,8 +6,12 @@ class CBT_Theme_Styles {
 
 	/**
 	 * Update a style CSS file with given values
+	 *
+	 * @param string $style_css      Existing stylesheet contents.
+	 * @param array  $theme          Theme metadata.
+	 * @param bool   $disable_updates Whether to disable updates for a newly generated theme.
 	 */
-	public static function update_style_css( $style_css, $theme ) {
+	public static function update_style_css( $style_css, $theme, $disable_updates = false ) {
 
 		$style_data = get_file_data(
 			path_join( get_stylesheet_directory(), 'style.css' ),
@@ -32,9 +36,18 @@ class CBT_Theme_Styles {
 		$template      = $current_theme->get( 'Template' ) ? "\n" . 'Template: ' . $current_theme->get( 'Template' ) : '';
 		$license       = $style_data['License'] ? $style_data['License'] : 'GNU General Public License v2 or later';
 		$license_uri   = $style_data['LicenseURI'] ? $style_data['LicenseURI'] : 'http://www.gnu.org/licenses/gpl-2.0.html';
+		$update_uri    = '';
 		$tags          = CBT_Theme_Tags::theme_tags_list( $theme );
 		$css_contents  = $css_contents ? "\n\n" . $css_contents : '';
 		$copyright     = '';
+
+		if ( $disable_updates ) {
+			$update_uri = 'false';
+		} elseif ( preg_match( '/^[ \t\/*#@]*Update URI:(.*)$/mi', $style_css, $matches ) ) {
+			$update_uri = trim( $matches[1] );
+		}
+
+		$update_uri = $update_uri ? "\n" . 'Update URI: ' . $update_uri : '';
 		preg_match( '/^\s*\n((?s).*?)\*\/\s*$/m', $style_css, $matches );
 		if ( isset( $matches[1] ) ) {
 			$copyright = "\n" . $matches[1];
@@ -42,7 +55,7 @@ class CBT_Theme_Styles {
 
 		return "/*
 Theme Name: {$name}
-Theme URI: {$uri}
+Theme URI: {$uri}{$update_uri}
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}
@@ -83,6 +96,7 @@ Tags: {$tags}
 		$style_css = "/*
 Theme Name: {$name}
 Theme URI: {$uri}
+Update URI: false
 Author: {$author}
 Author URI: {$author_uri}
 Description: {$description}

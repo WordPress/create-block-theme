@@ -34,7 +34,14 @@ class CBT_Theme_Create {
 		CBT_Theme_Templates::add_templates_to_local( 'all', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( path_join( $new_theme_path, 'theme.json' ), CBT_Theme_JSON_Resolver::export_theme_data( 'all' ) );
 		file_put_contents( path_join( $new_theme_path, 'readme.txt' ), CBT_Theme_Readme::create( $theme ) );
-		file_put_contents( path_join( $new_theme_path, 'style.css' ), CBT_Theme_Styles::update_style_css( file_get_contents( path_join( $new_theme_path, 'style.css' ) ), $theme ) );
+		file_put_contents(
+			path_join( $new_theme_path, 'style.css' ),
+			CBT_Theme_Styles::update_style_css(
+				file_get_contents( path_join( $new_theme_path, 'style.css' ) ),
+				$theme,
+				true
+			)
+		);
 
 		switch_theme( $theme['slug'] );
 	}
