@@ -110,6 +110,20 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 		);
 	}
 
+	public function test_escape_text_content_keeps_falsy_attribute_values() {
+		$string         = '<span data-count="0">Read</span>';
+		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
+
+		$this->assertStringContainsString( "'<span data-count=\"0\">'", $escaped_string );
+	}
+
+	public function test_escape_text_content_keeps_boolean_attributes_bare() {
+		$string         = '<button disabled>Read</button>';
+		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
+
+		$this->assertStringContainsString( "'<button disabled>'", $escaped_string );
+	}
+
 	public function test_escape_text_content_with_already_escaped_string() {
 		$string         = "<?php esc_html_e('This is a test text.', 'test-locale-theme');?>";
 		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );

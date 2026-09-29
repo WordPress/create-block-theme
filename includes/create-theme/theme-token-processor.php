@@ -89,14 +89,15 @@ class CBT_Token_Processor {
 	 * Processes individual tag attributes and escapes where necessary.
 	 *
 	 * @param string $attr_name The name of the attribute.
-	 * @param string $attr_value The value of the attribute.
+	 * @param string|true $attr_value The value of the attribute, or true for boolean attributes.
 	 * @return string The processed attribute.
 	 */
 	private function process_attribute( $attr_name, $attr_value ) {
 		$token_part = '';
 		$attr_name  = CBT_Theme_Utils::escape_php_single_quoted_string( $attr_name );
 
-		if ( empty( $attr_value ) ) {
+		// Avoid empty() so values like "0" are kept.
+		if ( true === $attr_value || '' === $attr_value ) {
 			$token_part .= ' ' . $attr_name;
 		} elseif ( 'src' === $attr_name ) {
 			$added_media = CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
