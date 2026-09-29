@@ -4,18 +4,9 @@
 */
 
 require_once __DIR__ . '/theme-token-processor.php';
+require_once __DIR__ . '/theme-utils.php';
 
 class CBT_Theme_Locale {
-
-	/**
-	 * Escape a string that will be embedded in generated PHP single-quoted strings.
-	 *
-	 * @param string $string The string to escape.
-	 * @return string The escaped string.
-	 */
-	private static function escape_php_single_quoted_string( $string ) {
-		return addcslashes( (string) $string, "\\'" );
-	}
 
 	/**
 	 * Escape a block attribute value for localization.
@@ -25,7 +16,7 @@ class CBT_Theme_Locale {
 	 */
 	private static function escape_block_attribute( $string ) {
 		$tokenized   = self::tokenize_block_attribute_for_php_string( $string );
-		$text_domain = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
+		$text_domain = CBT_Theme_Utils::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
 
 		if ( empty( $tokenized['tokens'] ) ) {
 			return "<?php esc_attr_e('" . $tokenized['text'] . "', '$text_domain');?>";
@@ -108,7 +99,7 @@ class CBT_Theme_Locale {
 			$text .= $has_tokens && '%' === $char ? '%%' : $char;
 		}
 
-		$text = self::escape_php_single_quoted_string( $text );
+		$text = CBT_Theme_Utils::escape_php_single_quoted_string( $text );
 
 		if ( empty( $tokens ) ) {
 			return array(
@@ -154,10 +145,10 @@ class CBT_Theme_Locale {
 
 		$p = new CBT_Token_Processor( $string );
 		$p->process_tokens();
-		$text             = self::escape_php_single_quoted_string( $p->get_text() );
+		$text             = CBT_Theme_Utils::escape_php_single_quoted_string( $p->get_text() );
 		$tokens           = $p->get_tokens();
 		$translators_note = $p->get_translators_note();
-		$text_domain      = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
+		$text_domain      = CBT_Theme_Utils::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
 
 		if ( ! empty( $tokens ) ) {
 			$php_tag  = '<?php ';
@@ -174,7 +165,7 @@ class CBT_Theme_Locale {
 			return $php_tag;
 		}
 
-		$string = self::escape_php_single_quoted_string( $string );
+		$string = CBT_Theme_Utils::escape_php_single_quoted_string( $string );
 		return "<?php esc_html_e('" . $string . "', '$text_domain');?>";
 	}
 
@@ -200,8 +191,8 @@ class CBT_Theme_Locale {
 			return $string;
 		}
 
-		$string      = self::escape_php_single_quoted_string( $string );
-		$text_domain = self::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
+		$string      = CBT_Theme_Utils::escape_php_single_quoted_string( $string );
+		$text_domain = CBT_Theme_Utils::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
 		return "<?php esc_attr_e('" . $string . "', '$text_domain');?>";
 	}
 

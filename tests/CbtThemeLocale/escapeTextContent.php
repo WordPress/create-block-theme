@@ -91,6 +91,25 @@ class CBT_Theme_Locale_EscapeTextContent extends CBT_Theme_Locale_UnitTestCase {
 		$this->assertStringContainsString( "title=\"It\\'s ready\"", $escaped_string );
 	}
 
+	/**
+	 * @dataProvider data_html_names_with_php_string_delimiters
+	 */
+	public function test_escape_text_content_escapes_tag_and_attribute_names( $string ) {
+		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
+
+		$this->assertNotFalse( token_get_all( $escaped_string, TOKEN_PARSE ) );
+		$this->assert_php_code_does_not_call_function( 'system', $escaped_string );
+	}
+
+	public function data_html_names_with_php_string_delimiters() {
+		return array(
+			'apostrophe in attribute name' => array( "<span data-x');system('id');//=\"1\">Read</span>" ),
+			'backslash in attribute name'  => array( "<span data-x\\');system('id');//=\"1\">Read</span>" ),
+			'apostrophe in tag name'       => array( "<a');system('id');//>Read</a');system('id');//>" ),
+			'backslash in tag name'        => array( "<a\\');system('id');//>Read</a\\');system('id');//>" ),
+		);
+	}
+
 	public function test_escape_text_content_with_already_escaped_string() {
 		$string         = "<?php esc_html_e('This is a test text.', 'test-locale-theme');?>";
 		$escaped_string = $this->call_private_method( 'escape_text_content', array( $string ) );
