@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/theme-utils.php';
+
 /**
  * Fine grained token processing class.
  */
@@ -40,11 +43,14 @@ class CBT_Token_Processor {
 					$this->translators_note .= ', ';
 				}
 
+				// Tag names can contain quotes and backslashes, so escape them for the generated PHP string.
+				$escaped_token_name = CBT_Theme_Utils::escape_php_single_quoted_string( $token_name );
+
 				if ( $is_tag_closer ) {
-					$this->tokens[]          = "</{$token_name}>";
+					$this->tokens[]          = "</{$escaped_token_name}>";
 					$this->translators_note .= $token_label . " is the end of a '" . $token_name . "' HTML element";
 				} else {
-					$token      = '<' . $token_name;
+					$token      = '<' . $escaped_token_name;
 					$attributes = $this->p->get_attribute_names_with_prefix( '' );
 
 					foreach ( $attributes as $attr_name ) {
@@ -88,19 +94,25 @@ class CBT_Token_Processor {
 	 */
 	private function process_attribute( $attr_name, $attr_value ) {
 		$token_part = '';
+		$attr_name  = CBT_Theme_Utils::escape_php_single_quoted_string( $attr_name );
+
 		if ( empty( $attr_value ) ) {
 			$token_part .= ' ' . $attr_name;
 		} elseif ( 'src' === $attr_name ) {
 			$added_media = CBT_Theme_Media::add_media_to_local( array( $attr_value ) );
 			if ( in_array( $attr_value, $added_media, true ) ) {
-				$relative_src = CBT_Theme_Media::get_media_relative_path_from_url( $attr_value );
+				$relative_src = CBT_Theme_Utils::escape_php_single_quoted_string( CBT_Theme_Media::get_media_relative_path_from_url( $attr_value ) );
 				$attr_value   = "' . esc_url( get_stylesheet_directory_uri() ) . '{$relative_src}";
+			} else {
+				$attr_value = CBT_Theme_Utils::escape_php_single_quoted_string( $attr_value );
 			}
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		} elseif ( 'href' === $attr_name ) {
+			$attr_value  = CBT_Theme_Utils::escape_php_single_quoted_string( $attr_value );
 			$attr_value  = "' . esc_url( '$attr_value' ) . '";
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		} else {
+			$attr_value  = CBT_Theme_Utils::escape_php_single_quoted_string( $attr_value );
 			$token_part .= ' ' . $attr_name . '="' . $attr_value . '"';
 		}
 

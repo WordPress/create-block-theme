@@ -1,6 +1,16 @@
 <?php
 
 class CBT_Theme_Utils {
+	/**
+	 * Escape a value embedded in a generated PHP single-quoted string.
+	 *
+	 * @param string $value The value to escape.
+	 * @return string The escaped value.
+	 */
+	public static function escape_php_single_quoted_string( $value ) {
+		return addcslashes( (string) $value, "\\'" );
+	}
+
 	public static function is_absolute_url( $url ) {
 		return ! empty( $url ) && isset( parse_url( $url )['host'] );
 	}
