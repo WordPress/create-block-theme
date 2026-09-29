@@ -460,14 +460,13 @@ class CBT_Theme_Media {
 		// WP_HTML_Tag_Processor's URI-safety check on `src` rewrites
 		// schemeless values like `PLACEHOLDER` to `http://PLACEHOLDER`,
 		// but accepts a leading `/` unchanged. The path uses characters
-		// that wp_json_encode leaves untouched as well.
+		// that wp_json_encode leaves untouched as well. The id embeds a
+		// per-run UUID so author content containing a placeholder-shaped
+		// literal is never hit by the final strtr().
 		$placeholders     = array();
 		$run_id           = wp_generate_uuid4();
 		$next_placeholder = static function ( $raw ) use ( &$placeholders, $run_id ) {
-				$id                  = '/__cbt-local-media-' . $run_id . '-' . count( $placeholders ) . '__/';
-				$placeholders[ $id ] = $raw;
-				return $id;
-		};
+			$id                  = '/__cbt-local-media-' . $run_id . '-' . count( $placeholders ) . '__/';
 			$placeholders[ $id ] = $raw;
 			return $id;
 		};
