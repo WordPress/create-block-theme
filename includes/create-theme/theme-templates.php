@@ -344,8 +344,9 @@ class CBT_Theme_Templates {
 						continue;
 					}
 
+					// Covers with fixed or repeated backgrounds put the class on a div, not an img.
 					$processor = new WP_HTML_Tag_Processor( $inner_content );
-					while ( $processor->next_tag( 'img' ) ) {
+					while ( $processor->next_tag() ) {
 						if ( $processor->has_class( $image_class ) ) {
 							$processor->remove_class( $image_class );
 						}
