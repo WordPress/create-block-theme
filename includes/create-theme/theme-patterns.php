@@ -51,6 +51,12 @@ class CBT_Theme_Patterns {
 	/**
 	 * Build a pattern .php file from a template stdClass.
 	 *
+	 * The pattern header Title is taken from `$template->title` (the
+	 * human-readable label). When that property is absent or empty the
+	 * template slug is used as a fallback so the header is never blank.
+	 * Any `* /` sequence in either value is escaped to `*&#47;` to prevent
+	 * PHP comment-block injection.
+	 *
 	 * IMPORTANT: this function expects `$template->content` to be already
 	 * sanitised by the caller. The pipeline entry point is
 	 * `CBT_Theme_Templates::prepare_template_for_export`, which strips PHP
@@ -62,10 +68,12 @@ class CBT_Theme_Patterns {
 		$theme_slug      = $new_slug ? $new_slug : wp_get_theme()->get( 'TextDomain' );
 		$template_slug   = str_replace( '*/', '*&#47;', $template->slug );
 		$pattern_slug    = $theme_slug . '/' . $template_slug;
+		$raw_title       = ! empty( $template->title ) ? $template->title : $template->slug;
+		$pattern_title   = str_replace( '*/', '*&#47;', $raw_title );
 		$pattern_content = <<<PHP
 		<?php
 		/**
-		 * Title: {$template_slug}
+		 * Title: {$pattern_title}
 		 * Slug: {$pattern_slug}
 		 * Inserter: no
 		 */
@@ -86,7 +94,7 @@ class CBT_Theme_Patterns {
 		$pattern->name         = sanitize_title_with_dashes( $pattern_post->post_title );
 		$pattern->slug         = wp_get_theme()->get( 'TextDomain' ) . '/' . $pattern->name;
 		$pattern_category_list = get_the_terms( $pattern->id, 'wp_pattern_category' );
-		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'name' ) ) : '';
+		$pattern->categories   = ! empty( $pattern_category_list ) ? join( ', ', wp_list_pluck( $pattern_category_list, 'slug' ) ) : '';
 		$pattern_title         = str_replace( '*/', '*&#47;', $pattern->title );
 		$pattern_categories    = str_replace( '*/', '*&#47;', $pattern->categories );
 		$safe_body             = self::strip_php_tags( $pattern_post->post_content );
