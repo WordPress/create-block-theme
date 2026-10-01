@@ -266,6 +266,115 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'evil */ break', $result['content'] );
 	}
 
+	/**
+	 * When $template->title is set, the pattern header must use that human-readable
+	 * title instead of the machine slug.
+	 *
+	 * @covers CBT_Theme_Patterns::pattern_from_template
+	 */
+	public function test_pattern_from_template_uses_title_not_slug() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->title   = 'Test Template Title';
+		$template->content = '<p>safe</p>';
+
+		$result = CBT_Theme_Patterns::pattern_from_template( $template );
+
+		$this->assertStringContainsString( 'Title: Test Template Title', $result['content'] );
+		$this->assertStringNotContainsString( 'Title: test-template', $result['content'] );
+	}
+
+	/**
+	 * When $template->title is absent or empty, fall back to the slug so the
+	 * header is never blank.
+	 *
+	 * @covers CBT_Theme_Patterns::pattern_from_template
+	 */
+	public function test_pattern_from_template_falls_back_to_slug_when_title_empty() {
+		$template          = new stdClass();
+		$template->slug    = 'test-template';
+		$template->title   = '';
+		$template->content = '<p>safe</p>';
+
+		$result = CBT_Theme_Patterns::pattern_from_template( $template );
+
+		$this->assertStringContainsString( 'Title: test-template', $result['content'] );
+	}
+
+	/**
+	 * A `* /` sequence inside the title must be escaped to prevent PHP comment
+	 * injection.
+	 *
+	 * @covers CBT_Theme_Patterns::pattern_from_template
+	 */
+	public function test_pattern_from_template_escapes_comment_closer_in_title() {
+		$template          = new stdClass();
+		$template->slug    = 'some-template';
+		$template->title   = 'Evil */ Title';
+		$template->content = '<p>safe</p>';
+
+		$result = CBT_Theme_Patterns::pattern_from_template( $template );
+
+		$this->assertStringContainsString( '*&#47;', $result['content'] );
+		$this->assertStringNotContainsString( 'Evil */ Title', $result['content'] );
+	}
+
+	/**
+	 * Categories written into the pattern header must use the taxonomy slug
+	 * (e.g. "category-slug") not the display name (e.g. "Category Name"), so that
+	 * WordPress core can match patterns to the correct inserter category.
+	 *
+	 * @covers CBT_Theme_Patterns::pattern_from_wp_block
+	 */
+	public function test_pattern_from_wp_block_uses_category_slugs_not_names() {
+		// Register a pattern category whose name differs from its slug.
+		$term = wp_insert_term( 'Category Name', 'wp_pattern_category', array( 'slug' => 'category-slug' ) );
+		$this->assertFalse( is_wp_error( $term ), 'Term creation should succeed' );
+
+		$post = $this->make_wp_block_post( '<p>safe</p>', 'Test Pattern' );
+
+		// Assign the category to the pattern post.
+		wp_set_object_terms( $post->ID, array( (int) $term['term_id'] ), 'wp_pattern_category' );
+
+		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+
+		// The header must contain the slug, not the display name.
+		$this->assertStringContainsString( 'Categories: category-slug', $pattern->content );
+		$this->assertStringNotContainsString( 'Categories: Category Name', $pattern->content );
+
+		// Cleanup.
+		wp_delete_term( (int) $term['term_id'], 'wp_pattern_category' );
+	}
+
+	/**
+	 * When a pattern has multiple categories, all slugs should be written
+	 * (comma-separated) in the header.
+	 *
+	 * @covers CBT_Theme_Patterns::pattern_from_wp_block
+	 */
+	public function test_pattern_from_wp_block_uses_multiple_category_slugs() {
+		$term_a = wp_insert_term( 'Category One', 'wp_pattern_category', array( 'slug' => 'category-one-slug' ) );
+		$term_b = wp_insert_term( 'Category Two', 'wp_pattern_category', array( 'slug' => 'category-two-slug' ) );
+
+		$this->assertFalse( is_wp_error( $term_a ), 'Term A creation should succeed' );
+		$this->assertFalse( is_wp_error( $term_b ), 'Term B creation should succeed' );
+
+		$post = $this->make_wp_block_post( '<p>safe</p>', 'Test Pattern' );
+		wp_set_object_terms( $post->ID, array( (int) $term_a['term_id'], (int) $term_b['term_id'] ), 'wp_pattern_category' );
+
+		$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+
+		// Both slugs must appear; display names must not.
+		$this->assertStringContainsString( 'category-one-slug', $pattern->content );
+		$this->assertStringContainsString( 'category-two-slug', $pattern->content );
+		$this->assertStringNotContainsString( 'Category One', $pattern->content );
+		$this->assertStringNotContainsString( 'Category Two', $pattern->content );
+
+		// Cleanup.
+		wp_delete_term( (int) $term_a['term_id'], 'wp_pattern_category' );
+		wp_delete_term( (int) $term_b['term_id'], 'wp_pattern_category' );
+	}
+
 	public function test_prepare_template_for_export_preserves_trusted_localize_markers() {
 		// When localizeText=true is enabled, CBT_Theme_Templates::escape_text_in_template
 		// injects trusted PHP esc_html_e(...) markers into the template body.
