@@ -3,7 +3,7 @@ Contributors: wordpressdotorg, mikachan, onemaggie, pbking, scruffian, mmaattiia
 Tags: themes, theme, block-theme
 Requires at least: 6.8
 Tested up to: 6.9
-Stable tag: 2.10.1
+Stable tag: 2.10.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -125,6 +125,16 @@ If you are having problems, please try the following:
 
 
 == Changelog ==
+
+= 2.10.2 =
+* Keep falsy and boolean attribute values in localized tokens (#878)
+* Export: Remove image classes by token (#864)
+* Media: Use unique placeholders during export (#861)
+* I18n: Escape decoded HTML attributes (#862)
+* Update wp-env to fix PHP 7.4 and 8.0 test environments (#877)
+* Export: Stabilize pattern sanitization (#865)
+* I18n: Preserve block attribute encoding (#863)
+* Update wp-coding-standards/wpcs to 3.4.1 (#859)
 
 = 2.10.1 =
 * I18n: Handle backslashes in localized template text (#854)
