@@ -177,7 +177,14 @@ class CBT_Theme_Zip {
 
 					// Replace namespace values if provided
 					if ( $new_slug ) {
-						$contents = CBT_Theme_Utils::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
+						$contents = CBT_Theme_Utils::replace_namespace(
+							$contents,
+							$old_slug,
+							$new_slug,
+							$old_name,
+							$new_name,
+							pathinfo( $relative_path, PATHINFO_EXTENSION )
+						);
 					}
 
 					// Add current file to archive

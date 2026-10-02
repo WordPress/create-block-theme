@@ -24,9 +24,227 @@ class CBT_Theme_Utils {
 		return $extension;
 	}
 
-	public static function replace_namespace( $content, $old_slug, $new_slug, $old_name, $new_name ) {
-		$new_slug_underscore = str_replace( '-', '_', $new_slug ) . '_';
+	public static function replace_namespace( $content, $old_slug, $new_slug, $old_name, $new_name, $file_extension = '' ) {
+		$new_slug_underscore = self::get_php_identifier( $new_slug ) . '_';
 		$old_slug_underscore = str_replace( '-', '_', $old_slug ) . '_';
+
+		if ( false !== strpos( $content, '<?php' ) ) {
+			$content         = self::replace_localized_javascript_identifier( $content, $old_slug, $new_slug, $old_name );
+			$updated_content = '';
+
+			foreach ( token_get_all( $content ) as $token ) {
+				if ( is_array( $token ) && self::is_php_identifier_token( $token[0] ) ) {
+					$updated_content .= self::replace_php_identifier( $token[1], $old_slug, $new_slug, $old_name );
+				} else {
+					$token_content    = is_array( $token ) ? $token[1] : $token;
+					$updated_content .= self::replace_namespace_value(
+						$token_content,
+						$old_slug,
+						$new_slug,
+						$old_name,
+						$new_name,
+						$old_slug_underscore,
+						$new_slug_underscore
+					);
+				}
+			}
+
+			return $updated_content;
+		}
+
+		if ( 'js' === strtolower( $file_extension ) ) {
+			return self::replace_javascript_namespace(
+				$content,
+				$old_slug,
+				$new_slug,
+				$old_name,
+				$new_name,
+				$old_slug_underscore,
+				$new_slug_underscore
+			);
+		}
+
+		return self::replace_namespace_value(
+			$content,
+			$old_slug,
+			$new_slug,
+			$old_name,
+			$new_name,
+			$old_slug_underscore,
+			$new_slug_underscore
+		);
+	}
+
+	private static function get_php_identifier( $slug ) {
+		$identifier = preg_replace( '/[^a-z0-9_]/', '', str_replace( '-', '_', sanitize_key( $slug ) ) );
+
+		if ( '' === $identifier ) {
+			return 'theme';
+		}
+
+		if ( is_numeric( $identifier[0] ) ) {
+			return 'theme_' . $identifier;
+		}
+
+		return $identifier;
+	}
+
+	private static function get_php_namespace( $slug ) {
+		return implode( '_', array_map( 'ucfirst', explode( '_', self::get_php_identifier( $slug ) ) ) );
+	}
+
+	private static function get_javascript_identifier( $slug, $capitalize = false ) {
+		$parts = preg_split( '/[^a-z0-9]+/', strtolower( $slug ), -1, PREG_SPLIT_NO_EMPTY );
+
+		if ( empty( $parts ) ) {
+			$parts = array( 'theme' );
+		}
+
+		if ( is_numeric( $parts[0][0] ) ) {
+			array_unshift( $parts, 'theme' );
+		}
+
+		$identifier = array_shift( $parts );
+
+		foreach ( $parts as $part ) {
+			$identifier .= ucfirst( $part );
+		}
+
+		return $capitalize ? ucfirst( $identifier ) : $identifier;
+	}
+
+	private static function get_javascript_identifier_replacements( $old_slug, $new_slug, $old_name ) {
+		$old_identifier        = self::get_javascript_identifier( $old_slug );
+		$old_capitalized       = self::get_javascript_identifier( $old_slug, true );
+		$old_name_identifier   = preg_replace( '/[^a-zA-Z0-9_$]/', '', $old_name );
+		$new_identifier        = self::get_javascript_identifier( $new_slug );
+		$new_capitalized       = self::get_javascript_identifier( $new_slug, true );
+		$replacements          = array(
+			$old_identifier      => $new_identifier,
+			$old_capitalized     => $new_capitalized,
+			$old_name_identifier => $new_capitalized,
+		);
+		$filtered_replacements = array_filter( $replacements, 'strlen', ARRAY_FILTER_USE_KEY );
+
+		uksort(
+			$filtered_replacements,
+			function ( $first, $second ) {
+				return strlen( $second ) - strlen( $first );
+			}
+		);
+
+		return $filtered_replacements;
+	}
+
+	private static function replace_javascript_identifier( $identifier, $old_slug, $new_slug, $old_name, $preserve_plain_values = false ) {
+		$replacements = self::get_javascript_identifier_replacements( $old_slug, $new_slug, $old_name );
+
+		foreach ( $replacements as $old_identifier => $new_identifier ) {
+			if ( 0 !== strpos( $identifier, $old_identifier ) ) {
+				continue;
+			}
+
+			$suffix = substr( $identifier, strlen( $old_identifier ) );
+
+			if (
+				$preserve_plain_values &&
+				(
+					( '' === $suffix && ( $identifier === $old_slug || $identifier === $old_name ) ) ||
+					( '' !== $suffix && ! preg_match( '/^[A-Z0-9]/', $suffix ) )
+				)
+			) {
+				return $identifier;
+			}
+
+			return $new_identifier . $suffix;
+		}
+
+		return $identifier;
+	}
+
+	private static function replace_embedded_javascript_identifiers( $content, $old_slug, $new_slug, $old_name ) {
+		return preg_replace_callback(
+			'/[$A-Z_a-z][$0-9A-Z_a-z]*/',
+			function ( $matches ) use ( $old_slug, $new_slug, $old_name ) {
+				return self::replace_javascript_identifier( $matches[0], $old_slug, $new_slug, $old_name, true );
+			},
+			$content
+		);
+	}
+
+	private static function replace_localized_javascript_identifier( $content, $old_slug, $new_slug, $old_name ) {
+		$pattern = '/(wp_localize_script\s*\(\s*[^,]+,\s*)([\'\"])([$A-Z_a-z][$0-9A-Z_a-z]*)(\2)/';
+
+		return preg_replace_callback(
+			$pattern,
+			function ( $matches ) use ( $old_slug, $new_slug, $old_name ) {
+				$identifier = self::replace_javascript_identifier( $matches[3], $old_slug, $new_slug, $old_name );
+
+				return $matches[1] . $matches[2] . $identifier . $matches[4];
+			},
+			$content
+		);
+	}
+
+	private static function replace_javascript_namespace( $content, $old_slug, $new_slug, $old_name, $new_name, $old_slug_underscore, $new_slug_underscore ) {
+		$content = self::replace_embedded_javascript_identifiers( $content, $old_slug, $new_slug, $old_name );
+		$pattern = <<<'REGEX'
+~(?P<string>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')
+|(?P<template>`(?:\\.|[^`\\])*`)
+|(?P<line_comment>//[^\r\n]*)
+|(?P<block_comment>/\*.*?\*/)
+|(?P<identifier>[$A-Z_a-z][$0-9A-Z_a-z]*)~sx
+REGEX;
+
+		return preg_replace_callback(
+			$pattern,
+			function ( $matches ) use ( $old_slug, $new_slug, $old_name, $new_name, $old_slug_underscore, $new_slug_underscore ) {
+				if ( ! empty( $matches['identifier'] ) ) {
+					return self::replace_javascript_identifier( $matches[0], $old_slug, $new_slug, $old_name );
+				}
+
+				if ( ! empty( $matches['template'] ) ) {
+					// Template literals may contain expressions, so leave them intact.
+					return $matches[0];
+				}
+
+				return self::replace_namespace_value(
+					$matches[0],
+					$old_slug,
+					$new_slug,
+					$old_name,
+					$new_name,
+					$old_slug_underscore,
+					$new_slug_underscore
+				);
+			},
+			$content
+		);
+	}
+
+	private static function is_php_identifier_token( $token_id ) {
+		return T_STRING === $token_id ||
+			T_VARIABLE === $token_id ||
+			( defined( 'T_NAME_QUALIFIED' ) && constant( 'T_NAME_QUALIFIED' ) === $token_id ) ||
+			( defined( 'T_NAME_FULLY_QUALIFIED' ) && constant( 'T_NAME_FULLY_QUALIFIED' ) === $token_id ) ||
+			( defined( 'T_NAME_RELATIVE' ) && constant( 'T_NAME_RELATIVE' ) === $token_id );
+	}
+
+	private static function replace_php_identifier( $content, $old_slug, $new_slug, $old_name ) {
+		$new_identifier = self::get_php_identifier( $new_slug );
+		$new_namespace  = self::get_php_namespace( $new_slug );
+		$old_identifier = self::get_php_identifier( $old_slug );
+		$replacements   = array(
+			$old_identifier . '_' => $new_identifier . '_',
+			$old_identifier       => $new_identifier,
+			$old_slug             => $new_identifier,
+			$old_name             => $new_namespace,
+		);
+
+		return strtr( $content, array_filter( $replacements, 'strlen', ARRAY_FILTER_USE_KEY ) );
+	}
+
+	private static function replace_namespace_value( $content, $old_slug, $new_slug, $old_name, $new_name, $old_slug_underscore, $new_slug_underscore ) {
 
 		// Generate placeholders
 		$placeholder_slug            = md5( $old_slug );
@@ -92,7 +310,14 @@ class CBT_Theme_Utils {
 			if ( preg_match( "/\.({$valid_extensions_regex})$/", $relative_path ) ) {
 				// Replace namespace values if provided
 				if ( $new_slug ) {
-					$contents = self::replace_namespace( $contents, $old_slug, $new_slug, $old_name, $new_name );
+					$contents = self::replace_namespace(
+						$contents,
+						$old_slug,
+						$new_slug,
+						$old_name,
+						$new_name,
+						pathinfo( $relative_path, PATHINFO_EXTENSION )
+					);
 				}
 			}
 
