@@ -85,6 +85,17 @@ export async function postUpdateThemeMetadata( theme ) {
 	} );
 }
 
+export async function postUpdateThemeSettings( payload ) {
+	return apiFetch( {
+		path: '/create-block-theme/v1/theme-settings',
+		method: 'POST',
+		data: payload,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} );
+}
+
 export async function downloadExportedTheme() {
 	return apiFetch( {
 		path: '/create-block-theme/v1/export',

@@ -10,22 +10,49 @@ import { json } from '@codemirror/lang-json';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
 
 const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 	const [ themeData, setThemeData ] = useState( '' );
-	const themeJsonData = useSelect(
-		( select ) => select( 'core' ).getCurrentTheme(),
-		[]
-	);
+	const [ themeName, setThemeName ] = useState( '' );
+	const { invalidateResolution } = useDispatch( 'core' );
 
+	// Fetch directly via the REST API on every mount so the modal always
+	// shows the on-disk theme.json — bypassing the @wordpress/core-data
+	// cache that would otherwise serve stale content when the user opens
+	// View theme.json straight after closing the Edit Theme Settings modal.
+	// Also invalidate the cached resolution so other subscribers refresh.
 	useEffect( () => {
-		if ( themeJsonData ) {
-			setThemeData(
-				JSON.stringify( themeJsonData?.theme_json, null, 2 )
-			);
-		}
-	}, [ themeJsonData ] );
+		let cancelled = false;
+		invalidateResolution( 'getCurrentTheme' );
+		apiFetch( { path: '/wp/v2/themes?status=active' } )
+			.then( ( themes ) => {
+				if ( cancelled ) {
+					return;
+				}
+				const active = Array.isArray( themes ) ? themes[ 0 ] : null;
+				if ( ! active ) {
+					return;
+				}
+				setThemeName( active?.name?.raw ?? active?.name ?? '' );
+				setThemeData(
+					JSON.stringify( active?.theme_json ?? {}, null, 2 )
+				);
+			} )
+			.catch( ( err ) => {
+				// Leave the modal showing whatever was last rendered, but
+				// surface the failure to the console so it isn't invisible.
+				// eslint-disable-next-line no-console
+				console.error(
+					'View theme.json: failed to fetch active theme',
+					err
+				);
+			} );
+		return () => {
+			cancelled = true;
+		};
+	}, [ invalidateResolution ] );
 
 	const handleSave = () => {};
 
@@ -35,7 +62,7 @@ const ThemeJsonEditorModal = ( { onRequestClose } ) => {
 			title={ sprintf(
 				// translators: %s: theme name.
 				__( 'theme.json for %s', 'create-block-theme' ),
-				themeJsonData?.name?.raw ?? ''
+				themeName
 			) }
 			onRequestClose={ onRequestClose }
 			className="create-block-theme__theme-json-modal"

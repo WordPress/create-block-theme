@@ -20,6 +20,7 @@ This plugin allows you to:
 - Create a new style variation
 - Export a theme
 - Save user changed templates and styles to the active theme
+- Edit theme settings (color presets and palette) and save them to the active theme's theme.json
 - Expand the typography controls in the block inspector while authoring a theme (opt-in, under Editor preferences)
 
 All newly created themes or style variations will include changes made within the WordPress Editor.

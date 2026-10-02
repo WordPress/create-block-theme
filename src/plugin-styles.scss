@@ -1,4 +1,5 @@
 @import "~@wordpress/base-styles/colors";
+@import "~@wordpress/base-styles/breakpoints";
 
 $modal-footer-height: 70px;
 
@@ -11,8 +12,8 @@ $modal-footer-height: 70px;
 }
 
 .create-block-theme__metadata-editor-modal__footer {
-	border-top: 1px solid #ddd;
-	background-color: #fff;
+	border-top: 1px solid $gray-300;
+	background-color: $white;
 	position: absolute;
 	bottom: 0;
 	margin: 0 -32px;
@@ -25,5 +26,97 @@ $modal-footer-height: 70px;
 	height: auto;
 	aspect-ratio: 4 / 3;
 	object-fit: cover;
+}
+
+.create-block-theme__edit-theme-settings-modal {
+	padding-bottom: $modal-footer-height;
+
+	// Drop the top border on the first PanelBody when it sits below a
+	// non-panel sibling (e.g. our PaletteSummary card) so the boundary
+	// doesn't double-up with the summary's bottom edge.
+	.components-tab-panel__tab-content > :not(.components-panel__body) + .components-panel__body {
+		border-top: 0;
+	}
+}
+
+.create-block-theme__edit-theme-settings-modal__footer {
+	border-top: 1px solid $gray-300;
+	background-color: $white;
+	position: absolute;
+	bottom: 0;
+	margin: 0 -32px;
+	padding: 16px 32px;
+	height: $modal-footer-height;
+}
+
+.cbt-palette-summary {
+	padding: 8px 0;
+	margin-bottom: 8px;
+
+	&__swatches > * + * {
+		// Overlap each subsequent swatch onto its predecessor.
+		margin-left: -8px;
+	}
+
+	&__edit {
+		text-decoration: none;
+	}
+}
+
+.cbt-color-settings-columns {
+	// Two side-by-side groups (Default presets / Custom presets) on wider
+	// modals; collapse to a single column at narrow widths.
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 32px;
+	// Top-align so the two group headers (and their first toggle) line up
+	// even when the columns contain different numbers of toggles.
+	align-items: start;
+
+	@media (min-width: $break-small) {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.cbt-palette-swatch-button {
+	min-width: 24px;
+	padding: 0;
+}
+
+.cbt-palette-section-header {
+	margin-bottom: 8px;
+
+	// Nudge the right-edge action (e.g. "+ Add a color") -8px so it aligns
+	// with the PanelBody chevron in the accordion header directly above.
+	> :last-child {
+		margin-right: -8px;
+	}
+}
+
+.cbt-palette-column-headers {
+	// Match the horizontal padding @wordpress/components Item applies to row
+	// content so column headers line up with the inputs below.
+	padding: 0 12px;
+
+	&__spacer {
+		display: inline-block;
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+	}
+
+	&__label {
+		display: block;
+		// The wrapper above already pads horizontally to match the row's
+		// Item padding, so the label sits at the same x-offset as the
+		// TextControl input directly below it.
+		padding-left: 0;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: 1.4;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: $gray-700;
+	}
 }
 
