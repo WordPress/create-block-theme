@@ -64,8 +64,14 @@ class CBT_Theme_Create {
 			$css_contents
 		);
 
-		// Add theme.json
-		CBT_Theme_Templates::add_templates_to_local( 'user', $new_theme_path, $theme['slug'] );
+		// Preserve user navigation refs and skip image/text localization in child theme templates.
+		$template_options = array(
+			'localizeText'   => false,
+			'removeNavRefs'  => false,
+			'localizeImages' => false,
+		);
+		// Add templates and theme.json.
+		CBT_Theme_Templates::add_templates_to_local( 'user', $new_theme_path, $theme['slug'], $template_options );
 		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', CBT_Theme_JSON_Resolver::export_theme_data( 'variation' ) );
 
 		// Add Screenshot

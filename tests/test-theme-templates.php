@@ -106,6 +106,26 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<!-- wp:navigation {"ref":4} /-->', $new_template->content );
 	}
 
+	/**
+	 * Ensure that navigation block refs are preserved when template options set removeNavRefs to false.
+	 */
+	public function test_not_eliminate_nav_block_ref_nested_with_template_options() {
+		$template          = new stdClass();
+		$template->slug    = 'header';
+		$template->content = '
+			<!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:navigation {"ref":4} /--></div>
+			<!-- /wp:group -->
+		';
+		$template_options  = array(
+			'localizeText'   => false,
+			'removeNavRefs'  => false,
+			'localizeImages' => false,
+		);
+		$new_template      = CBT_Theme_Templates::prepare_template_for_export( $template, null, $template_options );
+		$this->assertStringContainsString( '<!-- wp:navigation {"ref":4} /-->', $new_template->content );
+	}
+
 	public function test_eliminate_id_from_image() {
 		$template          = new stdClass();
 		$template->content = '
