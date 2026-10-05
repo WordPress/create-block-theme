@@ -208,6 +208,8 @@ class CBT_Theme_Locale {
 		switch ( $block_name ) {
 			case 'core/paragraph':
 				return array( '/(<p[^>]*>)(.*?)(<\/p>)/' );
+			case 'core/accordion-heading':
+				return array( '/(<span class="wp-block-accordion-heading__toggle-title"[^>]*>)(.*?)(<\/span>)/s' );
 			case 'core/heading':
 				return array( '/(<h[^>]*>)(.*?)(<\/h[^>]*>)/' );
 			case 'core/list-item':
@@ -313,6 +315,7 @@ class CBT_Theme_Locale {
 			switch ( $block['blockName'] ) {
 				case 'core/paragraph':
 				case 'core/heading':
+				case 'core/accordion-heading':
 				case 'core/list-item':
 				case 'core/verse':
 				case 'core/button':

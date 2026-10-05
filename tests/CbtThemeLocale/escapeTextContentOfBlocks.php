@@ -235,6 +235,16 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 <div class="wp-block-file"><a id="wp-block-file--media-1" href="http://example.org/doc.pdf"><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'%1$sMy%2$s Document\', \'test-locale-theme\' ), \'<strong>\', \'</strong>\' ); ?></a><a href="http://example.org/doc.pdf" class="wp-block-file__button wp-element-button" download><?php esc_html_e(\'Download\', \'test-locale-theme\');?></a></div>
 <!-- /wp:file -->',
 			),
+			'accordion heading'             => array(
+				'block_markup'    => '<!-- wp:accordion-heading --><h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Description</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3><!-- /wp:accordion-heading -->',
+				'expected_markup' => '<!-- wp:accordion-heading --><h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title"><?php esc_html_e(\'Description\', \'test-locale-theme\');?></span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3><!-- /wp:accordion-heading -->',
+			),
+
+			'formatted accordion heading'   => array(
+				'block_markup'    => '<!-- wp:accordion-heading --><h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title"><strong>More</strong> information</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3><!-- /wp:accordion-heading -->',
+				'expected_markup' => '<!-- wp:accordion-heading --><h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title"><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'%1$sMore%2$s information\', \'test-locale-theme\' ), \'<strong>\', \'</strong>\' ); ?></span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3><!-- /wp:accordion-heading -->',
+			),
+
 		);
 	}
 
@@ -255,5 +265,17 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 		$twice_escaped = serialize_blocks( CBT_Theme_Locale::escape_text_content_of_blocks( $blocks_again ) );
 
 		$this->assertEquals( $once_escaped, $twice_escaped, 'Re-running the escape should be a no-op.' );
+	}
+
+	/**
+	 * Already-localized Accordion headings should not be wrapped again.
+	 */
+	public function test_accordion_heading_escape_is_idempotent() {
+		$markup = '<!-- wp:accordion-heading --><h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Description</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3><!-- /wp:accordion-heading -->';
+
+		$once_escaped  = serialize_blocks( CBT_Theme_Locale::escape_text_content_of_blocks( parse_blocks( $markup ) ) );
+		$twice_escaped = serialize_blocks( CBT_Theme_Locale::escape_text_content_of_blocks( parse_blocks( $once_escaped ) ) );
+
+		$this->assertSame( $once_escaped, $twice_escaped );
 	}
 }
