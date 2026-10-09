@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/theme-templates.php';
+
 function cbt_augment_resolver_with_utilities() {
 
 	//Ultimately it is desireable for Core to have this functionality natively.
@@ -78,6 +80,12 @@ function cbt_augment_resolver_with_utilities() {
 			}
 
 			$data = $theme->get_data();
+
+			if ( class_exists( 'CBT_Theme_Templates' ) ) {
+				$parts_export_type = ( 'variation' === $content ) ? 'user' : $content;
+				$exported_parts    = CBT_Theme_Templates::get_theme_templates( $parts_export_type )->parts;
+				$data              = CBT_Theme_Templates::add_template_parts_to_theme_json_data( $data, $exported_parts );
+			}
 
 			// Add the schema.
 			if ( empty( $schema ) ) {

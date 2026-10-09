@@ -415,4 +415,138 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$new_template      = CBT_Theme_Media::make_template_images_local( $template );
 		$this->assertStringContainsString( '<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/pattern.webp', $new_template->content );
 	}
+
+	/**
+	 * Ensure that add_template_parts_to_theme_json_data adds new template parts to theme.json data.
+	 */
+	public function test_add_template_parts_to_theme_json_data_adds_new_parts() {
+		$part        = new stdClass();
+		$part->slug  = 'custom-header';
+		$part->title = 'Custom Header';
+		$part->area  = 'header';
+
+		$input_data  = array(
+			'version' => 3,
+		);
+		$output_data = CBT_Theme_Templates::add_template_parts_to_theme_json_data( $input_data, array( $part ) );
+
+		$this->assertArrayHasKey( 'templateParts', $output_data );
+		$this->assertCount( 1, $output_data['templateParts'] );
+		$this->assertSame( 'custom-header', $output_data['templateParts'][0]['name'] );
+		$this->assertSame( 'Custom Header', $output_data['templateParts'][0]['title'] );
+		$this->assertSame( 'header', $output_data['templateParts'][0]['area'] );
+	}
+
+	/**
+	 * Ensure that add_template_parts_to_theme_json_data does not overwrite or duplicate existing template parts.
+	 */
+	public function test_add_template_parts_to_theme_json_data_does_not_duplicate_existing() {
+		$part        = new stdClass();
+		$part->slug  = 'header';
+		$part->title = 'New Header Title';
+		$part->area  = 'header';
+
+		$input_data  = array(
+			'version'       => 3,
+			'templateParts' => array(
+				array(
+					'area'  => 'header',
+					'name'  => 'header',
+					'title' => 'Original Header',
+				),
+			),
+		);
+		$output_data = CBT_Theme_Templates::add_template_parts_to_theme_json_data( $input_data, array( $part ) );
+
+		$this->assertCount( 1, $output_data['templateParts'] );
+		$this->assertSame( 'Original Header', $output_data['templateParts'][0]['title'] );
+	}
+
+	/**
+	 * Ensure that add_template_parts_to_theme_json_data falls back to uncategorized and slug title when missing.
+	 */
+	public function test_add_template_parts_to_theme_json_data_defaults_area_and_title() {
+		$part       = new stdClass();
+		$part->slug = 'custom-sidebar';
+
+		$input_data  = array( 'version' => 3 );
+		$output_data = CBT_Theme_Templates::add_template_parts_to_theme_json_data( $input_data, array( $part ) );
+
+		$this->assertCount( 1, $output_data['templateParts'] );
+		$this->assertSame( 'custom-sidebar', $output_data['templateParts'][0]['name'] );
+		$this->assertSame( 'custom-sidebar', $output_data['templateParts'][0]['title'] );
+		$this->assertSame( 'uncategorized', $output_data['templateParts'][0]['area'] );
+	}
+
+	/**
+	 * Ensure that update_theme_json_template_parts persists template parts directly into theme.json on disk.
+	 */
+	public function test_update_theme_json_template_parts_updates_file() {
+		$temp_dir = get_temp_dir() . 'cbt-test-theme-' . uniqid();
+		wp_mkdir_p( $temp_dir );
+
+		$initial_json = array(
+			'version'       => 3,
+			'templateParts' => array(
+				array(
+					'area'  => 'header',
+					'name'  => 'header',
+					'title' => 'Header',
+				),
+			),
+		);
+		file_put_contents( $temp_dir . '/theme.json', wp_json_encode( $initial_json ) );
+
+		$part        = new stdClass();
+		$part->slug  = 'custom-footer';
+		$part->title = 'Custom Footer';
+		$part->area  = 'footer';
+
+		CBT_Theme_Templates::update_theme_json_template_parts( $temp_dir, array( $part ) );
+
+		$saved_content = json_decode( file_get_contents( $temp_dir . '/theme.json' ), true );
+
+		$this->assertCount( 2, $saved_content['templateParts'] );
+		$this->assertSame( 'header', $saved_content['templateParts'][0]['name'] );
+		$this->assertSame( 'custom-footer', $saved_content['templateParts'][1]['name'] );
+		$this->assertSame( 'footer', $saved_content['templateParts'][1]['area'] );
+
+		// Clean up.
+		unlink( $temp_dir . '/theme.json' );
+		rmdir( $temp_dir );
+	}
+
+	/**
+	 * Ensure that export_theme_data includes user-created template parts under templateParts in theme.json.
+	 */
+	public function test_export_theme_data_includes_template_parts() {
+		if ( ! class_exists( 'CBT_Theme_JSON_Resolver' ) ) {
+			$this->markTestSkipped( 'CBT_Theme_JSON_Resolver is not loaded.' );
+		}
+
+		$post_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_name'    => 'my-custom-header',
+				'post_title'   => 'My Custom Header',
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:paragraph --><p>Content</p><!-- /wp:paragraph -->',
+			)
+		);
+		wp_set_post_terms( $post_id, get_stylesheet(), 'wp_theme' );
+		wp_set_post_terms( $post_id, 'header', 'wp_template_part_area' );
+
+		try {
+			$json_str = CBT_Theme_JSON_Resolver::export_theme_data( 'all' );
+			$data     = json_decode( $json_str, true );
+
+			$this->assertIsArray( $data );
+			$this->assertArrayHasKey( 'templateParts', $data );
+			$names = array_column( $data['templateParts'], 'name' );
+			$this->assertContains( 'my-custom-header', $names );
+		} finally {
+			wp_delete_post( $post_id, true );
+			CBT_Theme_JSON_Resolver::clean_cached_data();
+		}
+	}
 }

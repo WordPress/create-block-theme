@@ -300,6 +300,93 @@ class CBT_Theme_Templates {
 				);
 			}
 		}
+
+		if ( ! empty( $theme_templates->parts ) ) {
+			self::update_theme_json_template_parts( $base_dir, $theme_templates->parts );
+		}
+	}
+
+	/**
+	 * Ensure each exported template part has a templateParts entry with name, title, and area
+	 * in theme.json, unless an entry for that name already exists.
+	 *
+	 * @param array $theme_json_data theme.json data array.
+	 * @param array $parts           Array of WP_Block_Template objects.
+	 * @return array Updated theme.json data array.
+	 */
+	public static function add_template_parts_to_theme_json_data( array $theme_json_data, array $parts ) {
+		if ( empty( $parts ) ) {
+			return $theme_json_data;
+		}
+
+		$existing_by_name = array();
+		if ( isset( $theme_json_data['templateParts'] ) && is_array( $theme_json_data['templateParts'] ) ) {
+			foreach ( $theme_json_data['templateParts'] as $index => $part_entry ) {
+				if ( is_array( $part_entry ) && isset( $part_entry['name'] ) ) {
+					$existing_by_name[ $part_entry['name'] ] = $index;
+				}
+			}
+		} else {
+			$theme_json_data['templateParts'] = array();
+		}
+
+		foreach ( $parts as $part ) {
+			if ( ! is_object( $part ) || empty( $part->slug ) ) {
+				continue;
+			}
+
+			$slug  = sanitize_key( $part->slug );
+			$title = ! empty( $part->title ) ? sanitize_text_field( $part->title ) : $slug;
+			$area  = ! empty( $part->area ) ? sanitize_key( $part->area ) : 'uncategorized';
+
+			if ( isset( $existing_by_name[ $slug ] ) ) {
+				$idx = $existing_by_name[ $slug ];
+				if ( empty( $theme_json_data['templateParts'][ $idx ]['area'] ) && ! empty( $area ) ) {
+					$theme_json_data['templateParts'][ $idx ]['area'] = $area;
+				}
+				if ( empty( $theme_json_data['templateParts'][ $idx ]['title'] ) && ! empty( $title ) ) {
+					$theme_json_data['templateParts'][ $idx ]['title'] = $title;
+				}
+				continue;
+			}
+
+			$theme_json_data['templateParts'][] = array(
+				'area'  => $area,
+				'name'  => $slug,
+				'title' => $title,
+			);
+			$existing_by_name[ $slug ]          = count( $theme_json_data['templateParts'] ) - 1;
+		}
+
+		return $theme_json_data;
+	}
+
+	/**
+	 * Update theme.json in the specified base directory to include entries for template parts.
+	 *
+	 * @param string $base_dir Base directory of the theme.
+	 * @param array  $parts    Array of template part objects.
+	 */
+	public static function update_theme_json_template_parts( $base_dir, array $parts ) {
+		$theme_json_path = $base_dir . DIRECTORY_SEPARATOR . 'theme.json';
+		if ( ! file_exists( $theme_json_path ) ) {
+			return;
+		}
+
+		$theme_json_raw = file_get_contents( $theme_json_path );
+		$theme_json     = json_decode( $theme_json_raw, true );
+		if ( ! is_array( $theme_json ) ) {
+			return;
+		}
+
+		$updated_theme_json = self::add_template_parts_to_theme_json_data( $theme_json, $parts );
+		if ( $updated_theme_json !== $theme_json ) {
+			file_put_contents( $theme_json_path, CBT_Theme_JSON_Resolver::stringify( $updated_theme_json ) );
+			if ( class_exists( 'CBT_Theme_JSON_Resolver' ) ) {
+				CBT_Theme_JSON_Resolver::clean_cached_data();
+			}
+			wp_get_theme()->cache_delete();
+		}
 	}
 
 	/**
