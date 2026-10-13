@@ -228,6 +228,16 @@ class CBT_Theme_Locale_EscapeBlockAttributes extends CBT_Theme_Locale_UnitTestCa
 				'block_markup'    => '<!-- wp:search {"showLabel":false,"buttonPosition":"button-inside"} /-->',
 				'expected_markup' => '<!-- wp:search {"showLabel":false,"buttonPosition":"button-inside"} /-->',
 			),
+
+			'post-excerpt with empty moreText should remain unchanged' => array(
+				'block_markup'    => '<!-- wp:post-excerpt {"moreText":""} /-->',
+				'expected_markup' => '<!-- wp:post-excerpt {"moreText":""} /-->',
+			),
+
+			'search block with empty placeholder and translatable buttonText' => array(
+				'block_markup'    => '<!-- wp:search {"placeholder":"","buttonText":"Search"} /-->',
+				'expected_markup' => '<!-- wp:search {"placeholder":"","buttonText":"<?php esc_attr_e(\'Search\', \'test-locale-theme\');?>"} /-->',
+			),
 		);
 	}
 }
