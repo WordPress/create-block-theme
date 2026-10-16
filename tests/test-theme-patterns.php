@@ -4,6 +4,196 @@
  */
 class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 
+	public function test_remove_pattern_name_metadata_preserves_other_content() {
+		$content = '<?php /* Pattern header. */ ?>' .
+			'<!-- wp:group {"metadata":{"patternName":"core/block/465","name":"Keep me"}} -->' .
+			'<!-- wp:paragraph {"metadata":{"patternName":"woocommerce/order-confirmation-totals-heading"}} -->' .
+			'<p><?php esc_html_e( "Hello", "test" ); ?></p><!-- /wp:paragraph -->' .
+			'<!-- wp:pattern {"slug":"test/keep"} /--><!-- /wp:group -->';
+
+		$result = CBT_Theme_Patterns::remove_pattern_name_metadata( $content );
+		$blocks = parse_blocks( $result );
+
+		$this->assertStringNotContainsString( 'patternName', $result );
+		$this->assertSame( array( 'name' => 'Keep me' ), $blocks[1]['attrs']['metadata'] );
+		$this->assertArrayNotHasKey( 'metadata', $blocks[1]['innerBlocks'][0]['attrs'] );
+		$this->assertStringContainsString( '<?php /* Pattern header. */ ?>', $result );
+		$this->assertStringContainsString( '<?php esc_html_e( "Hello", "test" ); ?>', $result );
+		$this->assertStringContainsString( '<!-- wp:pattern {"slug":"test/keep"} /-->', $result );
+	}
+
+	public function test_remove_pattern_name_metadata_preserves_localized_attributes() {
+		$content  = <<<'HTML'
+<!-- wp:search {"label":"<?php esc_attr_e('Search', 'test');?>","buttonText":"<?php esc_attr_e('Find', 'test');?>","metadata":{"patternName":"test/search","name":"__CBT_PATTERN_PHP_0__"}} /-->
+HTML;
+		$expected = str_replace( '"patternName":"test/search",', '', $content );
+
+		$this->assertSame( $expected, CBT_Theme_Patterns::remove_pattern_name_metadata( $content ) );
+	}
+
+	public function test_remove_pattern_name_metadata_preserves_php_attribute_tags() {
+		$php_fragments = array(
+			"<?php esc_attr_e('Search', 'test');?>",
+			"<?= esc_attr('Search') ?>",
+			'<?= esc_attr("Search") ?>',
+			"<? echo 'Search'; ?>",
+			"<?PHP echo 'Search'; ?>",
+			"<?php echo '?>'; ?>",
+		);
+
+		foreach ( $php_fragments as $php ) {
+			$content  = '<!-- wp:search {"label":"' . $php . '","metadata":{"patternName":"test/search","name":"Keep  spaces"}} /-->';
+			$expected = str_replace( '"patternName":"test/search",', '', $content );
+
+			$this->assertSame( $expected, CBT_Theme_Patterns::remove_pattern_name_metadata( $content ), $php );
+		}
+	}
+
+	public function test_remove_pattern_name_metadata_preserves_empty_objects_and_arrays() {
+		$content  = '<!-- wp:group {"metadata":{"patternName":"test/group","custom":{}},"style":{"spacing":{"padding":{}}},"allowedBlocks":[]} --><div></div><!-- /wp:group -->';
+		$expected = str_replace( '"patternName":"test/group",', '', $content );
+
+		$this->assertSame( $expected, CBT_Theme_Patterns::remove_pattern_name_metadata( $content ) );
+	}
+
+	public function test_remove_pattern_name_metadata_handles_member_positions() {
+		$cases = array(
+			array( '{"metadata":{"patternName":"test/group"},"align":"wide"}', '{"align":"wide"}' ),
+			array( '{"align":"wide","metadata":{"patternName":"test/group"},"className":"keep"}', '{"align":"wide","className":"keep"}' ),
+			array( '{"align":"wide","metadata":{"patternName":"test/group"}}', '{"align":"wide"}' ),
+			array( '{"metadata":{"patternName":"test/group","name":"Keep"}}', '{"metadata":{"name":"Keep"}}' ),
+			array( '{"metadata":{"name":"Keep","patternName":"test/group","custom":{}}}', '{"metadata":{"name":"Keep","custom":{}}}' ),
+			array( '{"metadata":{"name":"Keep","patternName":"test/group"}}', '{"metadata":{"name":"Keep"}}' ),
+		);
+
+		foreach ( $cases as list( $attributes, $expected ) ) {
+			$content = '<!-- wp:group ' . $attributes . ' -->';
+			$this->assertSame( '<!-- wp:group ' . $expected . ' -->', CBT_Theme_Patterns::remove_pattern_name_metadata( $content ), $attributes );
+		}
+	}
+
+	public function test_remove_pattern_name_metadata_removes_empty_attributes() {
+		foreach ( array( '-->', '/-->' ) as $ending ) {
+			$content = '<!-- wp:heading {"metadata":{"patternName":"test/heading"}} ' . $ending;
+			$this->assertSame( '<!-- wp:heading ' . $ending, CBT_Theme_Patterns::remove_pattern_name_metadata( $content ) );
+		}
+	}
+
+	public function test_remove_pattern_name_metadata_preserves_attribute_formatting() {
+		$content  = <<<'HTML'
+<!-- wp:group { "label":"Caf\u00e9", "url":"https:\/\/example.org\/", "opacity":1.0, "metadata": { "patternName":"test/group", "name":"Keep  spaces" }, "custom":{"patternName":"keep"} } -->
+HTML;
+		$expected = str_replace( '"patternName":"test/group", ', '', $content );
+
+		$this->assertSame( $expected, CBT_Theme_Patterns::remove_pattern_name_metadata( $content ) );
+	}
+
+	public function test_remove_pattern_name_metadata_leaves_ambiguous_or_invalid_attributes_unchanged() {
+		$cases = array(
+			'{"metadata":{"custom":{"patternName":"nested","name":"Keep nested"},"patternName":"test/group","name":"Keep"}}',
+			'{"custom":{"metadata":{"patternName":"nested"},"keep":true},"metadata":{"patternName":"test/group"}}',
+			'{"number":1e400,"metadata":{"custom":{"patternName":"nested","name":"Keep nested"},"patternName":"test/group","name":"Keep"}}',
+			'{"metadata":{"patternName":"test/group"},}',
+			'{"label":"<?php echo "Search";","metadata":{"patternName":"test/search"}}',
+			'{"metadata":{"name":"Keep  spaces"},"style":{}}',
+		);
+
+		foreach ( $cases as $attributes ) {
+			$content = '<!-- wp:group ' . $attributes . ' -->';
+			$this->assertSame( $content, CBT_Theme_Patterns::remove_pattern_name_metadata( $content ), $attributes );
+		}
+	}
+
+	public function test_save_patterns_updates_templates_parts_and_unsynced_copies() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+		$theme = $this->create_blank_theme( 'cbttesttheme-pattern-references' );
+
+		try {
+			$post    = $this->make_wp_block_post( '<!-- wp:paragraph --><p>Saved pattern</p><!-- /wp:paragraph -->' );
+			$pattern = CBT_Theme_Patterns::pattern_from_wp_block( $post );
+			$folders = get_block_theme_folders();
+			$content = '<!-- wp:block {"ref":' . $post->ID . '} /-->' .
+				'<!-- wp:paragraph {"metadata":{"patternName":"core/block/' . $post->ID . '","name":"Copy"}} --><p>Unsynced copy</p><!-- /wp:paragraph -->';
+			$files   = array(
+				get_stylesheet_directory() . '/' . $folders['wp_template'] . '/pattern-test.html',
+				get_stylesheet_directory() . '/' . $folders['wp_template_part'] . '/pattern-test.html',
+				get_stylesheet_directory() . '/patterns/existing.php',
+			);
+			foreach ( $files as $file ) {
+				wp_mkdir_p( dirname( $file ) );
+				file_put_contents( $file, $content );
+			}
+
+			// A customization containing only an unsynced copy must be saved before it is cleared.
+			$template_id = $this->factory->post->create(
+				array(
+					'post_type'    => 'wp_template',
+					'post_status'  => 'publish',
+					'post_name'    => 'unsynced-copy',
+					'post_content' => '<!-- wp:paragraph {"metadata":{"patternName":"core/block/' . $post->ID . '"}} --><p>Customized copy</p><!-- /wp:paragraph -->',
+				)
+			);
+			wp_set_object_terms( $template_id, get_stylesheet(), 'wp_theme' );
+
+			CBT_Theme_Patterns::add_patterns_to_theme(
+				array(
+					'localizeText'   => false,
+					'localizeImages' => false,
+					'removeNavRefs'  => false,
+				)
+			);
+
+			foreach ( $files as $file ) {
+				$result = file_get_contents( $file );
+				$this->assertStringContainsString( 'wp:pattern {"slug":"' . $pattern->slug . '"}', $result );
+				$this->assertStringNotContainsString( 'wp:block', $result );
+				$this->assertStringNotContainsString( 'patternName', $result );
+				$this->assertStringContainsString( '"name":"Copy"', $result );
+			}
+			$customized = file_get_contents( get_stylesheet_directory() . '/' . $folders['wp_template'] . '/unsynced-copy.html' );
+			$this->assertStringContainsString( '<p>Customized copy</p>', $customized );
+			$this->assertStringNotContainsString( 'patternName', $customized );
+			$this->assertNull( get_post( $post->ID ) );
+		} finally {
+			$this->uninstall_theme( $theme );
+		}
+	}
+
+	public function test_save_patterns_removes_metadata_without_user_patterns() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+		$theme = $this->create_blank_theme( 'cbttesttheme-pattern-metadata' );
+
+		try {
+			$this->assertEmpty( get_posts( array( 'post_type' => 'wp_block' ) ) );
+
+			$folders = get_block_theme_folders();
+			$content = '<!-- wp:group {"metadata":{"patternName":"core/block/465","name":"Keep me"}} -->' .
+				'<!-- wp:heading {"metadata":{"patternName":"woocommerce/order-confirmation-totals-heading"}} --><h2>Totals</h2><!-- /wp:heading --><!-- /wp:group -->';
+			$files   = array(
+				get_stylesheet_directory() . '/' . $folders['wp_template'] . '/pattern-test.html',
+				get_stylesheet_directory() . '/' . $folders['wp_template_part'] . '/pattern-test.html',
+				get_stylesheet_directory() . '/patterns/existing.php',
+			);
+			foreach ( $files as $file ) {
+				wp_mkdir_p( dirname( $file ) );
+				file_put_contents( $file, $content );
+			}
+
+			CBT_Theme_Patterns::add_patterns_to_theme();
+
+			foreach ( $files as $file ) {
+				$result = file_get_contents( $file );
+				$this->assertStringNotContainsString( 'patternName', $result );
+				$this->assertStringContainsString( '"name":"Keep me"', $result );
+				$this->assertStringContainsString( '<h2>Totals</h2>', $result );
+			}
+		} finally {
+			$this->uninstall_theme( $theme );
+		}
+	}
+
 	/**
 	 * Helper: build a wp_block post with the given content, return it as the
 	 * stdClass `pattern_from_wp_block` expects (post object from the loop).
@@ -420,10 +610,10 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 	 *
 	 * Mirrors the helper in Test_Create_Block_Theme_Fonts so this test class
 	 * can isolate side effects of theme-modifying operations.
+	 *
+	 * @param string $test_theme_slug Theme slug, unique when adding template files.
 	 */
-	private function create_blank_theme() {
-		$test_theme_slug = 'cbttesttheme';
-
+	private function create_blank_theme( $test_theme_slug = 'cbttesttheme' ) {
 		delete_theme( $test_theme_slug );
 
 		$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/create-blank' );
