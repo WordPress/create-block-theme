@@ -33,12 +33,6 @@ function cbt_augment_resolver_with_utilities() {
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
 				$parent_theme_json_data = static::translate( $parent_theme_json_data, $current_theme->parent()->get( 'TextDomain' ) );
 
-				// Get the schema from the parent JSON.
-				$schema = $parent_theme_json_data['$schema'];
-				if ( array_key_exists( 'schema', $parent_theme_json_data ) ) {
-					$schema = $parent_theme_json_data['$schema'];
-				}
-
 				if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
 					$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 				} else {
@@ -50,11 +44,6 @@ function cbt_augment_resolver_with_utilities() {
 			if ( 'all' === $content || 'current' === $content ) {
 				$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 				$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-
-				// Get the schema from the parent JSON.
-				if ( array_key_exists( 'schema', $theme_json_data ) ) {
-					$schema = $theme_json_data['$schema'];
-				}
 
 				if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
 					$theme_theme = new WP_Theme_JSON_Gutenberg( $theme_json_data );
@@ -79,27 +68,73 @@ function cbt_augment_resolver_with_utilities() {
 
 			$data = $theme->get_data();
 
-			// Add the schema.
-			if ( empty( $schema ) ) {
-				global $wp_version;
-				$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
-				if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
-					$theme_json_version = 'trunk';
+			// Ensure `$schema` is first and `version` second in the JSON output.
+			return static::stringify( static::add_schema_to_data( $data ) );
+		}
+
+		/**
+		 * Resolve the `$schema` URL for the active theme's theme.json.
+		 *
+		 * Prefers the schema declared by the theme (or by its parent, for child
+		 * themes) so the exported data matches the theme it was created from.
+		 * Falls back to the schema for the running WordPress/Gutenberg version.
+		 *
+		 * @return string The theme.json schema URL.
+		 */
+		public static function get_schema() {
+			$current_theme = wp_get_theme();
+
+			if ( $current_theme->parent() ) {
+				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
+				if ( ! empty( $parent_theme_json_data['$schema'] ) ) {
+					return $parent_theme_json_data['$schema'];
 				}
-				$schema = 'https://schemas.wp.org/' . $theme_json_version . '/theme.json';
 			}
-			// Ensure $schema is the first property and version is second in the JSON output.
+
+			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
+			if ( ! empty( $theme_json_data['$schema'] ) ) {
+				return $theme_json_data['$schema'];
+			}
+
+			global $wp_version;
+			$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) ) {
+				$theme_json_version = 'trunk';
+			}
+			return 'https://schemas.wp.org/' . $theme_json_version . '/theme.json';
+		}
+
+		/**
+		 * Ensure `$schema` is first, `version` second, and `title` third.
+		 *
+		 * Centralises the ordering used when writing theme.json and its style
+		 * variations so both files stay consistent and IDE-friendly.
+		 *
+		 * @param array       $data   Theme JSON data.
+		 * @param string|null $schema Optional schema URL. Resolved from the theme when omitted.
+		 * @return array The reordered data.
+		 */
+		public static function add_schema_to_data( $data, $schema = null ) {
+			// Preserve a schema already present in the data when none was passed.
+			if ( empty( $schema ) && ! empty( $data['$schema'] ) ) {
+				$schema = $data['$schema'];
+			}
+			if ( empty( $schema ) ) {
+				$schema = static::get_schema();
+			}
+			unset( $data['$schema'] );
+
 			$ordered_data = array( '$schema' => $schema );
 
-			// Add version as the second property if it exists.
-			if ( isset( $data['version'] ) ) {
-				$ordered_data['version'] = $data['version'];
-				unset( $data['version'] );
+			// Add `version` and `title` next so the file leads with metadata.
+			foreach ( array( 'version', 'title' ) as $key ) {
+				if ( isset( $data[ $key ] ) ) {
+					$ordered_data[ $key ] = $data[ $key ];
+					unset( $data[ $key ] );
+				}
 			}
 
-			// Merge the remaining data.
-			$data = array_merge( $ordered_data, $data );
-			return static::stringify( $data );
+			return array_merge( $ordered_data, $data );
 		}
 
 		/**
