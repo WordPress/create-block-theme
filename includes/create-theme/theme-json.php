@@ -37,6 +37,9 @@ class CBT_Theme_JSON {
 				$variation['settings']['typography']['fontFamilies'] = $copied_font_families;
 		}
 
+		// Match theme.json by leading the variation with `$schema` and `version`.
+		$variation = CBT_Theme_JSON_Resolver::add_schema_to_data( $variation );
+
 		file_put_contents(
 			$variation_path . $theme['slug'] . '.json',
 			CBT_Theme_JSON_Resolver::stringify( $variation )
