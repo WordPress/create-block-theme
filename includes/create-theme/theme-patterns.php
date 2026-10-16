@@ -137,11 +137,13 @@ class CBT_Theme_Patterns {
 		$args                = array(
 			'post_type'      => array( 'wp_template', 'wp_template_part' ),
 			'posts_per_page' => -1,
-			's'              => 'wp:block {"ref":' . $pattern->id . '}',
 		);
 		$find_pattern_refs   = new WP_Query( $args );
 		if ( $find_pattern_refs->have_posts() ) {
 			foreach ( $find_pattern_refs->posts as $post ) {
+				if ( false === strpos( $post->post_content, 'wp:block {"ref":' . $pattern->id . '}' ) && false === strpos( $post->post_content, '"patternName"' ) ) {
+					continue;
+				}
 				$slug = $post->post_name;
 				array_push( $templates_to_update, $slug );
 			}
@@ -151,14 +153,8 @@ class CBT_Theme_Patterns {
 		// Only update templates that reference the pattern
 		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
 
-		// List all template and pattern files in the theme
-		$base_dir       = get_stylesheet_directory();
-		$patterns       = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
-		$templates      = glob( $base_dir . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . '*.html' );
-		$template_parts = glob( $base_dir . DIRECTORY_SEPARATOR . 'template-parts' . DIRECTORY_SEPARATOR . '*.html' );
-
 		// Replace references to the local patterns in the theme
-		foreach ( array_merge( $patterns, $templates, $template_parts ) as $file ) {
+		foreach ( self::get_theme_block_files() as $file ) {
 			$file_content = file_get_contents( $file );
 			$file_content = str_replace( 'wp:block {"ref":' . $pattern->id . '}', 'wp:pattern {"slug":"' . $pattern->slug . '"}', $file_content );
 			file_put_contents( $file, $file_content );
@@ -166,6 +162,97 @@ class CBT_Theme_Patterns {
 
 		CBT_Theme_Templates::clear_user_templates_customizations();
 		CBT_Theme_Templates::clear_user_template_parts_customizations();
+	}
+
+	/**
+	 * Get the active theme's template, template part, and pattern files.
+	 *
+	 * @return string[] Theme block file paths.
+	 */
+	private static function get_theme_block_files() {
+		$base_dir         = get_stylesheet_directory();
+		$template_folders = get_block_theme_folders();
+		$patterns         = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
+		$templates        = glob( $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . '*.html' );
+		$template_parts   = glob( $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . '*.html' );
+
+		return array_merge( $patterns, $templates, $template_parts );
+	}
+
+	/**
+	 * Remove pattern names from theme files even when no user patterns remain.
+	 */
+	private static function remove_pattern_name_metadata_from_theme() {
+		foreach ( self::get_theme_block_files() as $file ) {
+			$file_content = file_get_contents( $file );
+			$updated      = self::remove_pattern_name_metadata( $file_content );
+			if ( $updated !== $file_content ) {
+				file_put_contents( $file, $updated );
+			}
+		}
+	}
+
+	/**
+	 * Remove editor-added pattern names while preserving PHP in pattern files.
+	 *
+	 * @param string $content Block markup, optionally containing PHP.
+	 * @return string Markup without patternName metadata.
+	 */
+	public static function remove_pattern_name_metadata( $content ) {
+		return preg_replace_callback(
+			'/(<!--\s+wp:\S+)\s+(\{.*?\})\s+(\/?-->)/s',
+			static function ( $matches ) {
+				// Protect trusted PHP while validating the JSON surrounding it.
+				$placeholder = '__CBT_PATTERN_PHP_';
+				while ( false !== strpos( $matches[2], $placeholder ) ) {
+					$placeholder .= '_';
+				}
+				$php_fragments   = array();
+				$attributes_json = preg_replace_callback(
+					'/<\?.*?\?>/s',
+					static function ( $php_match ) use ( &$php_fragments, $placeholder ) {
+						$key                   = $placeholder . count( $php_fragments ) . '__';
+						$php_fragments[ $key ] = $php_match[0];
+						return $key;
+					},
+					$matches[2]
+				);
+				// Decode objects as objects so empty objects do not become arrays.
+				$attributes = json_decode( $attributes_json );
+				if ( ! isset( $attributes->metadata->patternName ) ) {
+					return $matches[0];
+				}
+
+				$json_string = '"(?:[^"\\\\]|\\\\.)*"';
+				$member      = '"patternName"\s*:\s*' . $json_string;
+				unset( $attributes->metadata->patternName );
+				if ( empty( (array) $attributes->metadata ) ) {
+					$member = '"metadata"\s*:\s*\{\s*' . $member . '\s*\}';
+					unset( $attributes->metadata );
+				}
+
+				// Remove only the member and its adjacent comma, preserving other bytes.
+				$updated = preg_replace( '/' . $member . '\s*,\s*/', '', $attributes_json, 1, $count );
+				if ( ! $count ) {
+					$updated = preg_replace( '/\s*,\s*' . $member . '/', '', $attributes_json, 1, $count );
+				}
+				if ( ! $count ) {
+					$updated = preg_replace( '/' . $member . '/', '', $attributes_json, 1, $count );
+				}
+				$expected_json = wp_json_encode( $attributes );
+				if ( ! $count || false === $expected_json || wp_json_encode( json_decode( $updated ) ) !== $expected_json ) {
+					return $matches[0];
+				}
+
+				if ( empty( (array) $attributes ) ) {
+					return $matches[1] . ' ' . $matches[3];
+				}
+
+				$updated = strtr( $updated, $php_fragments );
+				return str_replace( $matches[2], $updated, $matches[0] );
+			},
+			$content
+		);
 	}
 
 	public static function prepare_pattern_for_export( $pattern, $options = null ) {
@@ -251,5 +338,7 @@ class CBT_Theme_Patterns {
 				wp_delete_post( $pattern->id, true );
 			}
 		}
+
+		self::remove_pattern_name_metadata_from_theme();
 	}
 }
