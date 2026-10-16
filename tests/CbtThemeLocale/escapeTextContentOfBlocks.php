@@ -28,12 +28,12 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 	public function data_test_escape_text_content_of_blocks() {
 		return array(
 
-			'paragraph'                     => array(
+			'paragraph'                               => array(
 				'block_markup'    => '<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center">This is a test text.</p><!-- /wp:paragraph -->',
 				'expected_markup' => '<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center"><?php esc_html_e(\'This is a test text.\', \'test-locale-theme\');?></p><!-- /wp:paragraph -->',
 			),
 
-			'paragraph on nested groups'    => array(
+			'paragraph on nested groups'              => array(
 				'block_markup'    =>
 					'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained","contentSize":"","wideSize":""}} -->
                     <div class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50)"><!-- wp:group {"style":{"spacing":{"blockGap":"0px"}},"layout":{"type":"constrained","contentSize":"565px"}} -->
@@ -52,7 +52,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:group -->',
 			),
 
-			'heading 1'                     => array(
+			'heading 1'                               => array(
 				'block_markup'    =>
 					'<!-- wp:heading {"textAlign":"center","className":"is-style-asterisk"} -->
                     <h1 class="wp-block-heading has-text-align-center is-style-asterisk">A passion for creating spaces</h1>
@@ -63,7 +63,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:heading -->',
 			),
 
-			'heading 2'                     => array(
+			'heading 2'                               => array(
 				'block_markup'    =>
 					'<!-- wp:heading {"textAlign":"center","className":"is-style-asterisk"} -->
                     <h2 class="wp-block-heading has-text-align-center is-style-asterisk">A passion for creating spaces</h2>
@@ -74,7 +74,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:heading -->',
 			),
 
-			'list item'                     => array(
+			'list item'                               => array(
 				'block_markup'    =>
 					'<!-- wp:list {"style":{"typography":{"lineHeight":"1.75"}},"className":"is-style-checkmark-list"} -->
                     <ul style="line-height:1.75" class="is-style-checkmark-list"><!-- wp:list-item -->
@@ -101,7 +101,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:list -->',
 			),
 
-			'verse'                         => array(
+			'verse'                                   => array(
 				'block_markup'    =>
 					'<!-- wp:verse {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
                     <pre class="wp-block-verse">Ya somos el olvido que seremos.<br>El polvo elemental que nos ignora<br>y que fue el rojo Adán y que es ahora<br>todos los hombres, y que no veremos.</pre>
@@ -112,7 +112,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:verse -->',
 			),
 
-			'button'                        => array(
+			'button'                                  => array(
 				'block_markup'    =>
 					'<!-- wp:button -->
                     <div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Sign up</a></div>
@@ -123,7 +123,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:button -->',
 			),
 
-			'image'                         => array(
+			'image'                                   => array(
 				'block_markup'    =>
 					'<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
                     <figure class="wp-block-image size-large"><img src="http://example.org/image.webp" alt="image alt text" class="wp-image-151"/><figcaption class="wp-element-caption">Image caption</figcaption></figure>
@@ -134,7 +134,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:image -->',
 			),
 
-			'cover'                         => array(
+			'cover'                                   => array(
 				'block_markup'    =>
 					'<!-- wp:cover {"url":"http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg","id":39,"alt":"Alternative text for cover image","dimRatio":50,"customOverlayColor":"#1d2b2f","layout":{"type":"constrained"}} -->
                     <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="background-color:#1d2b2f"></span><img class="wp-block-cover__image-background wp-image-39" alt="Alternative text for cover image" src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
@@ -149,7 +149,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:cover -->',
 			),
 
-			'media-text'                    => array(
+			'media-text'                              => array(
 				'block_markup'    =>
 					'<!-- wp:media-text {"mediaId":39,"mediaLink":"http://localhost/wp1/image/","mediaType":"image"} -->
                     <div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="http://localhost/wp1/wp-content/uploads/2024/05/image.jpeg" alt="This is alt text" class="wp-image-39 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
@@ -164,7 +164,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:media-text -->',
 			),
 
-			'pullquote'                     => array(
+			'pullquote'                               => array(
 				'block_markup'    =>
 					'<!-- wp:pullquote -->
                     <figure class="wp-block-pullquote"><blockquote><p>Yo me equivoqué y pagué, pero la pelota no se mancha.</p><cite>Diego Armando Maradona</cite></blockquote></figure>
@@ -175,7 +175,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:pullquote -->',
 			),
 
-			'table'                         => array(
+			'table'                                   => array(
 				'block_markup'    =>
 					'<!-- wp:table -->
                     <figure class="wp-block-table"><table><tbody><tr><td>Team</td><td>Points</td></tr><tr><td>Boca</td><td>74</td></tr><tr><td>River</td><td>2</td></tr></tbody></table><figcaption class="wp-element-caption">Score table</figcaption></figure>
@@ -186,7 +186,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
                     <!-- /wp:table -->',
 			),
 
-			'video'                         => array(
+			'video'                                   => array(
 				'block_markup'    => '<!-- wp:video -->
 <figure class="wp-block-video"><video controls src="http://example.org/video.mp4"></video><figcaption class="wp-element-caption">Video caption test</figcaption></figure>
 <!-- /wp:video -->',
@@ -196,7 +196,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 <!-- /wp:video -->',
 			),
 
-			'file'                          => array(
+			'file'                                    => array(
 				'block_markup'    => '<!-- wp:file {"id":42,"href":"http://example.org/doc.pdf"} -->
 <div class="wp-block-file"><a id="wp-block-file--media-1" href="http://example.org/doc.pdf">My Document</a><a href="http://example.org/doc.pdf" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->',
@@ -206,7 +206,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 <!-- /wp:file -->',
 			),
 
-			'file without download button'  => array(
+			'file without download button'            => array(
 				'block_markup'    => '<!-- wp:file {"id":42,"href":"http://example.org/doc.pdf","showDownloadButton":false} -->
 <div class="wp-block-file"><a id="wp-block-file--media-1" href="http://example.org/doc.pdf">My Document</a></div>
 <!-- /wp:file -->',
@@ -216,7 +216,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 <!-- /wp:file -->',
 			),
 
-			'file with custom button text'  => array(
+			'file with custom button text'            => array(
 				'block_markup'    => '<!-- wp:file {"id":42,"href":"http://example.org/doc.pdf"} -->
 <div class="wp-block-file"><a id="wp-block-file--media-1" href="http://example.org/doc.pdf">Annual Report</a><a href="http://example.org/doc.pdf" class="wp-block-file__button wp-element-button" download>Get the PDF</a></div>
 <!-- /wp:file -->',
@@ -226,7 +226,7 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 <!-- /wp:file -->',
 			),
 
-			'file with formatted file name' => array(
+			'file with formatted file name'           => array(
 				'block_markup'    => '<!-- wp:file {"id":42,"href":"http://example.org/doc.pdf"} -->
 <div class="wp-block-file"><a id="wp-block-file--media-1" href="http://example.org/doc.pdf"><strong>My</strong> Document</a><a href="http://example.org/doc.pdf" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->',
@@ -234,6 +234,46 @@ class CBT_Theme_Locale_EscapeTextContentOfBlocks extends CBT_Theme_Locale_UnitTe
 					'<!-- wp:file {"id":42,"href":"http://example.org/doc.pdf"} -->
 <div class="wp-block-file"><a id="wp-block-file--media-1" href="http://example.org/doc.pdf"><?php /* Translators: 1. is the start of a \'strong\' HTML element, 2. is the end of a \'strong\' HTML element */ ' . "\n" . 'echo sprintf( esc_html__( \'%1$sMy%2$s Document\', \'test-locale-theme\' ), \'<strong>\', \'</strong>\' ); ?></a><a href="http://example.org/doc.pdf" class="wp-block-file__button wp-element-button" download><?php esc_html_e(\'Download\', \'test-locale-theme\');?></a></div>
 <!-- /wp:file -->',
+			),
+
+			'heading with newlines and indentation'   => array(
+				'block_markup'    =>
+					'<!-- wp:heading {"className":"has-x-large-font-size"} -->
+<h2 class="wp-block-heading has-x-large-font-size">
+				Related products			</h2>
+<!-- /wp:heading -->',
+				'expected_markup' =>
+					'<!-- wp:heading {"className":"has-x-large-font-size"} -->
+<h2 class="wp-block-heading has-x-large-font-size"><?php esc_html_e(\'Related products\', \'test-locale-theme\');?></h2>
+<!-- /wp:heading -->',
+			),
+
+			'paragraph with newlines and indentation' => array(
+				'block_markup'    =>
+					'<!-- wp:paragraph -->
+<p>
+	No products were found matching your selection.
+</p>
+<!-- /wp:paragraph -->',
+				'expected_markup' =>
+					'<!-- wp:paragraph -->
+<p><?php esc_html_e(\'No products were found matching your selection.\', \'test-locale-theme\');?></p>
+<!-- /wp:paragraph -->',
+			),
+
+			'whitespace only block'                   => array(
+				'block_markup'    =>
+					'<!-- wp:paragraph -->
+<p>
+	
+</p>
+<!-- /wp:paragraph -->',
+				'expected_markup' =>
+					'<!-- wp:paragraph -->
+<p>
+	
+</p>
+<!-- /wp:paragraph -->',
 			),
 		);
 	}
