@@ -207,45 +207,45 @@ class CBT_Theme_Locale {
 	private static function get_text_replacement_patterns_for_html( $block_name ) {
 		switch ( $block_name ) {
 			case 'core/paragraph':
-				return array( '/(<p[^>]*>)(.*?)(<\/p>)/' );
+				return array( '/(<p[^>]*>)(.*?)(<\/p>)/s' );
 			case 'core/heading':
-				return array( '/(<h[^>]*>)(.*?)(<\/h[^>]*>)/' );
+				return array( '/(<h[^>]*>)(.*?)(<\/h[^>]*>)/s' );
 			case 'core/list-item':
-				return array( '/(<li[^>]*>)(.*?)(<\/li>)/' );
+				return array( '/(<li[^>]*>)(.*?)(<\/li>)/s' );
 			case 'core/verse':
-				return array( '/(<pre[^>]*>)(.*?)(<\/pre>)/' );
+				return array( '/(<pre[^>]*>)(.*?)(<\/pre>)/s' );
 			case 'core/button':
-				return array( '/(<a[^>]*>)(.*?)(<\/a>)/' );
+				return array( '/(<a[^>]*>)(.*?)(<\/a>)/s' );
 			case 'core/quote':
 			case 'core/pullquote':
 				return array(
-					'/(<p[^>]*>)(.*?)(<\/p>)/',
-					'/(<cite[^>]*>)(.*?)(<\/cite>)/',
+					'/(<p[^>]*>)(.*?)(<\/p>)/s',
+					'/(<cite[^>]*>)(.*?)(<\/cite>)/s',
 				);
 			case 'core/table':
 				return array(
-					'/(<td[^>]*>)(.*?)(<\/td>)/',
-					'/(<th[^>]*>)(.*?)(<\/th>)/',
-					'/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/',
+					'/(<td[^>]*>)(.*?)(<\/td>)/s',
+					'/(<th\b[^>]*>)(.*?)(<\/th>)/s',
+					'/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/s',
 				);
 			case 'core/video':
-				return array( '/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/' );
+				return array( '/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/s' );
 			case 'core/image':
 				return array(
-					'/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/',
+					'/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/s',
 					'/(alt=")(.*?)(")/',
 				);
 			case 'core/cover':
 			case 'core/media-text':
 				return array( '/(alt=")(.*?)(")/' );
 			case 'core/details':
-				return array( '/(<summary[^>]*>)(.*?)(<\/summary>)/' );
+				return array( '/(<summary[^>]*>)(.*?)(<\/summary>)/s' );
 			case 'core/file':
 				return array(
 					// File-name link: <a> without the boolean `download` attribute.
-					'/(<a(?:(?!\sdownload[\s>])[^>])*?>)(.*?)(<\/a>)/',
+					'/(<a(?:(?!\sdownload[\s>])[^>])*?>)(.*?)(<\/a>)/s',
 					// Download button: <a ... download ...>.
-					'/(<a[^>]*\sdownload[^>]*?>)(.*?)(<\/a>)/',
+					'/(<a[^>]*\sdownload[^>]*?>)(.*?)(<\/a>)/s',
 				);
 			default:
 				return null;
@@ -336,7 +336,13 @@ class CBT_Theme_Locale {
 								if ( str_ends_with( $matches[1], '="' ) ) {
 									return $matches[1] . self::escape_attribute( $matches[2] ) . $matches[3];
 								}
-								return $matches[1] . self::escape_text_content( $matches[2] ) . $matches[3];
+
+								$text = trim( $matches[2] );
+								if ( '' === $text ) {
+									return $matches[0];
+								}
+
+								return $matches[1] . self::escape_text_content( $text ) . $matches[3];
 							},
 							$content
 						);
