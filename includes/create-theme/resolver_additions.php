@@ -117,12 +117,39 @@ function cbt_augment_resolver_with_utilities() {
 		}
 
 		/**
+		 * Recursively remove null values from an array.
+		 *
+		 * The theme.json schema rejects null values and WordPress ignores them.
+		 * Empty arrays and non-null falsy values (false, 0, '') are preserved.
+		 *
+		 * @param mixed $data Data to filter.
+		 * @return mixed Data without null values.
+		 */
+		public static function strip_null_values( $data ) {
+			if ( ! is_array( $data ) ) {
+				return $data;
+			}
+
+			$clean = array();
+			foreach ( $data as $key => $value ) {
+				if ( null === $value ) {
+					continue;
+				}
+				$clean[ $key ] = self::strip_null_values( $value );
+			}
+
+			return $clean;
+		}
+
+		/**
 		 * Stringify the array data.
 		 *
 		 * $data is an array of data to be converted to a JSON string.
+		 * Null values are stripped since they are invalid in theme.json.
 		 * @return string JSON string.
 		 */
 		public static function stringify( $data ) {
+			$data = self::strip_null_values( $data );
 			$data = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 			// Convert spaces to tabs
 			return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $data );
