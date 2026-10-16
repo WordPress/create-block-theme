@@ -225,7 +225,7 @@ class CBT_Theme_Locale {
 			case 'core/table':
 				return array(
 					'/(<td[^>]*>)(.*?)(<\/td>)/s',
-					'/(<th[^>]*>)(.*?)(<\/th>)/s',
+					'/(<th\b[^>]*>)(.*?)(<\/th>)/s',
 					'/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/s',
 				);
 			case 'core/video':
