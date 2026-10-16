@@ -29,7 +29,8 @@ const PREFERENCE_SCOPE = 'create-block-theme';
 const PREFERENCE_KEY = 'create-variation';
 
 export const CreateVariationPanel = () => {
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -62,14 +63,16 @@ export const CreateVariationPanel = () => {
 
 		postCreateThemeVariation( variationPreferences )
 			.then( () => {
-				// eslint-disable-next-line no-alert
-				window.alert(
+				createSuccessNotice(
 					__(
 						'Theme variation created successfully. The editor will now reload.',
 						'create-block-theme'
-					)
+					),
+					{ type: 'snackbar' }
 				);
-				window.location.reload();
+				setTimeout( () => {
+					window.location.reload();
+				}, 1000 );
 			} )
 			.catch( ( error ) => {
 				const errorMessage =

@@ -41,7 +41,8 @@ function ResetTheme() {
 	}, [] );
 
 	const { set: setPreferences } = useDispatch( preferencesStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const [ isConfirmDialogOpen, setIsConfirmDialogOpen ] = useState( false );
 
 	const handleTogglePreference = ( key ) => {
@@ -59,20 +60,23 @@ function ResetTheme() {
 		try {
 			await resetTheme( preferences );
 			toggleConfirmDialog();
-			// eslint-disable-next-line no-alert
-			window.alert(
+			createSuccessNotice(
 				__(
 					'Theme reset successfully. The editor will now reload.',
 					'create-block-theme'
-				)
+				),
+				{ type: 'snackbar' }
 			);
-			window.location.reload();
+			setTimeout( () => {
+				window.location.reload();
+			}, 1000 );
 		} catch ( error ) {
 			createErrorNotice(
 				__(
 					'An error occurred while resetting the theme.',
 					'create-block-theme'
-				)
+				),
+				{ type: 'snackbar' }
 			);
 		}
 	};

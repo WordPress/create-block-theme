@@ -38,7 +38,7 @@ import {
 	tool,
 	copy,
 	download,
-	edit,
+	pencil,
 	code,
 	chevronLeft,
 	chevronRight,
@@ -72,11 +72,14 @@ function PluginSidebarItem( { icon, path, children, onClick } ) {
 		<ItemWrapper onClick={ onClick } path={ path }>
 			<HStack justify="flex-start">
 				<HStack justify="flex-start">
-					<Icon icon={ icon } />
+					<Icon icon={ icon } aria-hidden="true" />
 					<FlexItem>{ children }</FlexItem>
 				</HStack>
 				{ path && (
-					<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
+					<Icon
+						icon={ isRTL() ? chevronLeft : chevronRight }
+						aria-hidden="true"
+					/>
 				) }
 			</HStack>
 		</ItemWrapper>
@@ -157,7 +160,7 @@ const CreateBlockThemePlugin = () => {
 										) }
 									</PluginSidebarItem>
 									<PluginSidebarItem
-										icon={ edit }
+										icon={ pencil }
 										onClick={ () =>
 											setIsMetadataEditorOpen( true )
 										}
