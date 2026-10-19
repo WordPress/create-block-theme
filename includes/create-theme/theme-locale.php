@@ -15,6 +15,21 @@ class CBT_Theme_Locale {
 	 * @return string The escaped string.
 	 */
 	private static function escape_block_attribute( $string ) {
+		// Avoid escaping if the text is not a string.
+		if ( ! is_string( $string ) ) {
+			return $string;
+		}
+
+		// Check if string is empty.
+		if ( '' === $string ) {
+			return $string;
+		}
+
+		// Check if the text is already escaped.
+		if ( str_starts_with( $string, '<?php' ) ) {
+			return $string;
+		}
+
 		$tokenized   = self::tokenize_block_attribute_for_php_string( $string );
 		$text_domain = CBT_Theme_Utils::escape_php_single_quoted_string( wp_get_theme()->get( 'TextDomain' ) );
 
@@ -412,8 +427,8 @@ class CBT_Theme_Locale {
 				$modified        = false;
 				foreach ( $localizable_attrs as $attr_name ) {
 					if ( isset( $attrs[ $attr_name ] ) && is_string( $attrs[ $attr_name ] ) ) {
-						// Skip if already escaped.
-						if ( str_starts_with( $attrs[ $attr_name ], '<?php' ) ) {
+						// Skip if empty or already escaped.
+						if ( '' === $attrs[ $attr_name ] || str_starts_with( $attrs[ $attr_name ], '<?php' ) ) {
 							continue;
 						}
 
