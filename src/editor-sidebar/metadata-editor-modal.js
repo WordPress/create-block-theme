@@ -43,6 +43,19 @@ const ALLOWED_SCREENSHOT_MEDIA_TYPES = [
 
 const WP_MINIMUM_VERSIONS = generateWpVersions( WP_VERSION ); // eslint-disable-line no-undef
 
+const getInitialThemeTags = ( themeData ) => {
+	if ( Array.isArray( themeData?.theme_tags ) ) {
+		return themeData.theme_tags.join( ', ' );
+	}
+	if ( Array.isArray( themeData?.tags?.raw ) ) {
+		return themeData.tags.raw.join( ', ' );
+	}
+	if ( typeof themeData?.tags?.rendered === 'string' ) {
+		return themeData.tags.rendered;
+	}
+	return '';
+};
+
 export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 	const [ theme, setTheme ] = useState( {
 		name: '',
@@ -78,7 +91,7 @@ export const ThemeMetadataEditorModal = ( { onRequestClose } ) => {
 			requires_wp: themeData.requires_wp,
 			author: themeData.author.raw,
 			author_uri: themeData.author_uri.raw,
-			tags_custom: themeData.tags.rendered,
+			tags_custom: getInitialThemeTags( themeData ),
 			screenshot: themeData.screenshot,
 			recommended_plugins: themeData.readme?.recommended_plugins || '',
 			font_credits: themeData.readme?.fonts || '',

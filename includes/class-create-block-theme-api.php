@@ -153,7 +153,7 @@ class CBT_Theme_API {
 	}
 
 	/**
-	 * Add README data and theme.json data to the current theme REST API response.
+	 * Add README data, theme.json data, and normalized theme tags to the current theme REST API response.
 	 *
 	 * @param WP_REST_Response $response The response object.
 	 * @param WP_Theme          $theme    The theme object.
@@ -171,10 +171,12 @@ class CBT_Theme_API {
 
 		$data = $response->get_data();
 
-		// Add README data and theme.json data.
+		// Add README data, theme.json data, and normalized theme tags.
 		try {
 			$data['readme']     = CBT_Theme_Readme::get_sections();
 			$data['theme_json'] = CBT_Theme_JSON_Resolver::get_theme_file_contents();
+			$active_tags        = $current_theme->get( 'Tags' );
+			$data['theme_tags'] = CBT_Theme_Tags::normalize_tags( is_array( $active_tags ) ? $active_tags : array() );
 		} catch ( Exception $error ) {
 			return new WP_Error(
 				'theme_data_retrieval_failed',

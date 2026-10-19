@@ -19,10 +19,78 @@ class CBT_Theme_Tags {
 			$theme['tags-layout'] ?? array(),
 			$theme['tags-features'] ?? array(),
 		);
-		$custom_tags          = array_map( 'trim', explode( ',', $theme['tags_custom'] ?? '' ) );
-		$tags                 = array_unique( array_merge( $checkbox_tags_merged, $custom_tags ) );
+		$custom_tags          = explode( ',', $theme['tags_custom'] ?? '' );
+		$tags                 = self::normalize_tags( array_merge( $checkbox_tags_merged, $custom_tags ) );
 
 		return implode( ', ', $tags );
+	}
+
+	/**
+	 * Get mapping of lowercase feature labels and slugs to canonical slugs.
+	 *
+	 * @return array<string, string> Map of lowercase labels and slugs to canonical slugs.
+	 */
+	protected static function get_label_to_slug_map() {
+		static $map = null;
+		if ( null !== $map ) {
+			return $map;
+		}
+
+		$map = array();
+		if ( ! function_exists( 'get_theme_feature_list' ) ) {
+			return $map;
+		}
+
+		$feature_list = get_theme_feature_list( false );
+		if ( ! is_array( $feature_list ) ) {
+			return $map;
+		}
+
+		foreach ( $feature_list as $group ) {
+			if ( ! is_array( $group ) ) {
+				continue;
+			}
+			foreach ( $group as $slug => $label ) {
+				$map[ strtolower( $label ) ] = $slug;
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * Normalize an array or comma-separated list of tags to valid, lowercase WordPress theme slugs.
+	 *
+	 * @param array|string $tags Tags to normalize.
+	 * @return array Normalized list of tag slugs.
+	 */
+	public static function normalize_tags( $tags ) {
+		if ( is_string( $tags ) ) {
+			$tags = explode( ',', $tags );
+		}
+
+		if ( ! is_array( $tags ) ) {
+			return array();
+		}
+
+		$label_to_slug = self::get_label_to_slug_map();
+		$normalized    = array();
+
+		foreach ( $tags as $tag ) {
+			if ( ! is_string( $tag ) ) {
+				continue;
+			}
+
+			$tag = trim( $tag );
+			if ( '' === $tag ) {
+				continue;
+			}
+
+			$lower_tag    = strtolower( $tag );
+			$normalized[] = $label_to_slug[ $lower_tag ] ?? sanitize_title( $lower_tag );
+		}
+
+		return array_values( array_unique( array_filter( $normalized ) ) );
 	}
 
 	/**
@@ -136,6 +204,7 @@ class CBT_Theme_Tags {
 
 		$tag               = strtolower( $tag );
 		$active_theme_tags = wp_get_theme()->get( 'Tags' );
+		$active_theme_tags = is_array( $active_theme_tags ) ? self::normalize_tags( $active_theme_tags ) : array();
 		$default_tags      = self::list_default_tags();
 		$merged_tags       = array_unique( array_merge( $default_tags, $active_theme_tags ) );
 
