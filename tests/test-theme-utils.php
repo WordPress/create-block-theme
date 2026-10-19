@@ -61,4 +61,59 @@ if ( ! function_exists( 'oldslug_support' ) ) :
 		$this->assertStringContainsString( 'function new_slug_support', $updated_code_string );
 		$this->assertStringContainsString( "function_exists( 'new_slug_support' )", $updated_code_string );
 	}
+
+	public function test_stringify_strips_null_values() {
+		$data = array(
+			'version' => 3,
+			'styles'  => array(
+				'blocks' => array(
+					'core/quote' => array(
+						'border' => array(
+							'color' => null,
+							'style' => null,
+							'width' => null,
+							'left'  => array(
+								'color' => 'currentColor',
+								'style' => 'solid',
+								'width' => '4px',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$decoded = json_decode( CBT_Theme_JSON_Resolver::stringify( $data ), true );
+		$this->assertSame(
+			array(
+				'left' => array(
+					'color' => 'currentColor',
+					'style' => 'solid',
+					'width' => '4px',
+				),
+			),
+			$decoded['styles']['blocks']['core/quote']['border']
+		);
+		$this->assertStringNotContainsString( 'null', CBT_Theme_JSON_Resolver::stringify( $data ) );
+	}
+
+	public function test_strip_null_values_preserves_falsy_values() {
+		$data = array(
+			'custom' => false,
+			'zero'   => 0,
+			'empty'  => '',
+			'list'   => array(),
+			'none'   => null,
+		);
+
+		$this->assertSame(
+			array(
+				'custom' => false,
+				'zero'   => 0,
+				'empty'  => '',
+				'list'   => array(),
+			),
+			CBT_Theme_JSON_Resolver::strip_null_values( $data )
+		);
+	}
 }
