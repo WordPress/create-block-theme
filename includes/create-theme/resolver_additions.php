@@ -79,6 +79,16 @@ function cbt_augment_resolver_with_utilities() {
 
 			$data = $theme->get_data();
 
+			if ( 'current' === $content && $current_theme->parent() ) {
+				$parent_file = static::get_file_path_from_theme( 'theme.json', true );
+				if ( $parent_file ) {
+					$parent_data = static::read_json_file( $parent_file );
+					if ( is_array( $parent_data ) ) {
+						$data = static::merge_parent_preset_arrays( $data, $parent_data );
+					}
+				}
+			}
+
 			// Add the schema.
 			if ( empty( $schema ) ) {
 				global $wp_version;
@@ -100,6 +110,119 @@ function cbt_augment_resolver_with_utilities() {
 			// Merge the remaining data.
 			$data = array_merge( $ordered_data, $data );
 			return static::stringify( $data );
+		}
+
+		/**
+		 * Merge parent theme preset arrays into child theme data.
+		 *
+		 * For child themes, WordPress Core replaces indexed preset arrays (like color palettes,
+		 * font sizes, gradients) entirely rather than merging them. This method traverses
+		 * child data and backfills parent preset entries for any preset array present in child data,
+		 * with child entries overriding parent entries that share the same slug.
+		 *
+		 * @param array $child_data  Child theme data.
+		 * @param array $parent_data Parent theme data.
+		 * @return array Merged theme data.
+		 */
+		public static function merge_parent_preset_arrays( array $child_data, array $parent_data ) {
+			if ( empty( $child_data ) || empty( $parent_data ) ) {
+				return $child_data;
+			}
+
+			$result = $child_data;
+
+			foreach ( $child_data as $key => $child_value ) {
+				// Non-arrays (scalars, booleans, null) are already preserved in $result.
+				if ( ! is_array( $child_value ) ) {
+					continue;
+				}
+
+				// Associative objects (settings, color, blocks, etc.): recurse.
+				if ( ! static::is_list( $child_value ) ) {
+					$parent_subdata = ( isset( $parent_data[ $key ] ) && is_array( $parent_data[ $key ] ) ) ? $parent_data[ $key ] : array();
+					$result[ $key ] = static::merge_parent_preset_arrays( $child_value, $parent_subdata );
+					continue;
+				}
+
+				// Slug-keyed preset lists: backfill parent entries if parent defines this preset.
+				if ( static::is_preset_list( $child_value ) && isset( $parent_data[ $key ] ) && static::is_preset_list( $parent_data[ $key ] ) ) {
+					$result[ $key ] = static::merge_preset_list( $child_value, $parent_data[ $key ] );
+				}
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Check whether a value is a slug-keyed preset list (e.g. palette, fontSizes).
+		 *
+		 * @param mixed $value Value to check.
+		 * @return bool Whether the value is a preset list.
+		 */
+		private static function is_preset_list( $value ) {
+			return is_array( $value )
+				&& static::is_list( $value )
+				&& ! empty( $value )
+				&& is_array( $value[0] )
+				&& isset( $value[0]['slug'] );
+		}
+
+		/**
+		 * Merge parent and child preset lists keyed by slug.
+		 *
+		 * Preserves parent item order with child overrides replacing parent items
+		 * at their original positions, and new child entries appended.
+		 *
+		 * @param array $child_list  Child preset list.
+		 * @param array $parent_list Parent preset list.
+		 * @return array Merged preset list.
+		 */
+		private static function merge_preset_list( array $child_list, array $parent_list ) {
+			$merged        = array();
+			$slug_to_index = array();
+
+			foreach ( $parent_list as $item ) {
+				if ( is_array( $item ) && isset( $item['slug'] ) ) {
+					$slug_to_index[ $item['slug'] ] = count( $merged );
+				}
+				$merged[] = $item;
+			}
+
+			foreach ( $child_list as $item ) {
+				if ( is_array( $item ) && isset( $item['slug'] ) && isset( $slug_to_index[ $item['slug'] ] ) ) {
+					$merged[ $slug_to_index[ $item['slug'] ] ] = $item;
+				} else {
+					if ( is_array( $item ) && isset( $item['slug'] ) ) {
+						$slug_to_index[ $item['slug'] ] = count( $merged );
+					}
+					$merged[] = $item;
+				}
+			}
+
+			return $merged;
+		}
+
+		/**
+		 * Detect whether an array is a list (sequential integer keys starting at 0).
+		 * Mirrors PHP 8.1+ `array_is_list()`.
+		 *
+		 * @param array $arr Array to check.
+		 * @return bool Whether the array is a list.
+		 */
+		private static function is_list( array $arr ) {
+			if ( function_exists( 'array_is_list' ) ) {
+				return array_is_list( $arr );
+			}
+			if ( array() === $arr ) {
+				return true;
+			}
+			$expected = 0;
+			foreach ( $arr as $key => $_v ) {
+				if ( $key !== $expected++ ) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		/**
