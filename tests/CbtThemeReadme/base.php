@@ -28,13 +28,23 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 	private $orig_readme_content;
 
 	/**
+	 * Stores the original theme directories in order to restore them in tear down.
+	 *
+	 * @var array|null
+	 */
+	private $orig_theme_directories;
+
+	/**
 	 * Sets up tests.
 	 */
 	public function set_up() {
 		parent::set_up();
 
-		// Store the original active theme.
+		global $wp_theme_directories;
+
+		// Store the original active theme and theme directories.
 		$this->orig_active_theme_slug = get_option( 'stylesheet' );
+		$this->orig_theme_directories = $wp_theme_directories;
 
 		// Create a test theme directory.
 		$this->test_theme_dir = DIR_TESTDATA . '/themes/';
@@ -53,13 +63,19 @@ abstract class CBT_Theme_Readme_UnitTestCase extends WP_UnitTestCase {
 	 * Tears down tests.
 	 */
 	public function tear_down() {
-		parent::tear_down();
+		global $wp_theme_directories;
 
 		// Restore the original readme.txt content.
 		file_put_contents( CBT_Theme_Readme::file_path(), $this->orig_readme_content );
 
 		// Restore the original active theme.
 		switch_theme( $this->orig_active_theme_slug );
+
+		// Restore original theme directories and clear theme cache.
+		$wp_theme_directories = $this->orig_theme_directories;
+		wp_clean_themes_cache();
+
+		parent::tear_down();
 	}
 
 	/**
