@@ -35,7 +35,7 @@ This plugin also makes several changes to the contents of a theme, including:
 (Make sure you know what you're doing before hitting that 'Save' button 😉)
 
 = Step 1 – Setup =
-Install and activate the [Create Block Theme](https://wordpress.org/plugins/create-block-theme) plugin.
+Install and activate the plugin.
 
 There will be a new panel accessible from the WordPress Editor, which you can open by clicking on a new icon to the right of the "Save" button, at the top of the Editor.
 
