@@ -128,6 +128,7 @@ export const CreateVariationPanel = () => {
 						<Button
 							icon={ copy }
 							variant="primary"
+							disabled={ ! theme.name.trim() }
 							onClick={ handleCreateVariationClick }
 						>
 							{ __(

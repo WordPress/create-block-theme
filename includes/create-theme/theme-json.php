@@ -10,6 +10,14 @@ class CBT_Theme_JSON {
 	}
 
 	public static function add_theme_json_variation_to_local( $export_type, $theme, $save_fonts = false ) {
+		if ( '' === trim( $theme['name'] ) || '' === $theme['slug'] ) {
+			return new WP_Error(
+				'invalid_variation_name',
+				__( 'Please specify a valid variation name.', 'create-block-theme' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		$variation_path = get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR;
 
 		if ( ! file_exists( $variation_path ) ) {
