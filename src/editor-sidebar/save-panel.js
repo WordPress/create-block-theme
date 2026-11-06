@@ -99,6 +99,9 @@ export const SaveThemePanel = () => {
 			} );
 	};
 
+	const canSaveTemplatesOrPatterns =
+		preference.saveTemplates || preference.savePatterns;
+
 	return (
 		<Card size="small" isBorderless>
 			<ScreenHeader
@@ -184,13 +187,9 @@ export const SaveThemePanel = () => {
 							'Any text in a template or pattern will be localized in a pattern.',
 							'create-block-theme'
 						) }
-						disabled={
-							! preference.saveTemplates &&
-							! preference.savePatterns
-						}
+						disabled={ ! canSaveTemplatesOrPatterns }
 						checked={
-							( preference.saveTemplates ||
-								preference.savePatterns ) &&
+							canSaveTemplatesOrPatterns &&
 							preference.localizeText
 						}
 						onChange={ () =>
@@ -204,13 +203,9 @@ export const SaveThemePanel = () => {
 							'Any images in a template or pattern will be copied to a local /assets folder and referenced from there via a pattern.',
 							'create-block-theme'
 						) }
-						disabled={
-							! preference.saveTemplates &&
-							! preference.savePatterns
-						}
+						disabled={ ! canSaveTemplatesOrPatterns }
 						checked={
-							( preference.saveTemplates ||
-								preference.savePatterns ) &&
+							canSaveTemplatesOrPatterns &&
 							preference.localizeImages
 						}
 						onChange={ () =>
@@ -227,13 +222,9 @@ export const SaveThemePanel = () => {
 							'Remove Navigation Refs from the theme returning your navigation to the default state.',
 							'create-block-theme'
 						) }
-						disabled={
-							! preference.saveTemplates &&
-							! preference.savePatterns
-						}
+						disabled={ ! canSaveTemplatesOrPatterns }
 						checked={
-							( preference.saveTemplates ||
-								preference.savePatterns ) &&
+							canSaveTemplatesOrPatterns &&
 							preference.removeNavRefs
 						}
 						onChange={ () =>
@@ -250,11 +241,11 @@ export const SaveThemePanel = () => {
 							'Remove the taxonomy query from the query loop block attributes.',
 							'create-block-theme'
 						) }
-						disabled={
-							! preference.saveTemplates &&
-							! preference.savePatterns
+						disabled={ ! canSaveTemplatesOrPatterns }
+						checked={
+							canSaveTemplatesOrPatterns &&
+							preference.removeTaxQuery
 						}
-						checked={ preference.removeTaxQuery }
 						onChange={ () =>
 							handleTogglePreference( 'removeTaxQuery' )
 						}
