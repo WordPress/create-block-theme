@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/theme-urls.php';
+
 class CBT_Theme_Patterns {
 	/**
 	 * Strip PHP execution tags from user-supplied pattern body content.
@@ -174,6 +176,7 @@ class CBT_Theme_Patterns {
 				'localizeText'   => false,
 				'removeNavRefs'  => true,
 				'localizeImages' => true,
+				'localizeUrls'   => true,
 			);
 		}
 
@@ -187,6 +190,12 @@ class CBT_Theme_Patterns {
 			$pattern->media  = CBT_Theme_Media::get_media_absolute_urls_from_template( $pattern );
 			$validated_media = ! empty( $pattern->media ) ? CBT_Theme_Media::add_media_to_local( $pattern->media ) : array();
 			$pattern         = CBT_Theme_Media::make_template_images_local( $pattern, $validated_media );
+		}
+
+		// On unless explicitly disabled: the save panel has no toggle for it,
+		// so its options never contain the key.
+		if ( ! array_key_exists( 'localizeUrls', $options ) || $options['localizeUrls'] ) {
+			$pattern = CBT_Theme_URLs::make_template_urls_local( $pattern );
 		}
 
 		return $pattern;
