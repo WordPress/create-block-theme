@@ -91,12 +91,26 @@ class CBT_Theme_Templates {
 	 *
 	 * @param object $template The template to replace the namespace in.
 	 * @param string $new_slug The new theme slug.
+	 * @param bool   $preserve_pattern_slugs Keep wp:pattern references untouched (patterns stay in the original theme).
 	 * @return object The template with the namespace replaced.
 	 */
-	public static function replace_template_namespace( $template, $new_slug ) {
+	public static function replace_template_namespace( $template, $new_slug, $preserve_pattern_slugs = false ) {
 		$old_slug = wp_get_theme()->get( 'TextDomain' );
 		if ( $new_slug ) {
-			$template->content = str_replace( $old_slug, $new_slug, $template->content );
+			if ( ! $preserve_pattern_slugs ) {
+				$template->content = str_replace( $old_slug, $new_slug, $template->content );
+				return $template;
+			}
+
+			// Leave wp:pattern references untouched: the patterns they point to
+			// stay in the original (parent) theme and are not copied.
+			$parts = preg_split( '/(<!-- wp:pattern \{[^}]*\} \/-->)/', $template->content, -1, PREG_SPLIT_DELIM_CAPTURE );
+			foreach ( $parts as $i => $part ) {
+				if ( 0 === $i % 2 ) {
+					$parts[ $i ] = str_replace( $old_slug, $new_slug, $part );
+				}
+			}
+			$template->content = implode( '', $parts );
 		}
 		return $template;
 	}
@@ -189,7 +203,8 @@ class CBT_Theme_Templates {
 		}
 
 		if ( $slug ) {
-			$template = self::replace_template_namespace( $template, $slug );
+			$preserve = ! empty( $options['preservePatternSlugs'] );
+			$template = self::replace_template_namespace( $template, $slug, $preserve );
 		}
 
 		$template = self::paternize_template( $template, $slug );
@@ -428,7 +443,15 @@ class CBT_Theme_Templates {
 			if (
 				is_string( $pattern_name ) &&
 				self::is_active_theme_pattern( $pattern_name ) &&
-				self::is_block_matching_pattern( $block, $pattern_name )
+				self::is_block_matching_pattern( $block, $pattern_name ) &&
+				/**
+				 * Filters whether an unedited theme pattern is saved as a wp:pattern reference.
+				 *
+				 * @param bool   $replace      Whether to replace the block with a reference.
+				 * @param array  $block        The parsed block.
+				 * @param string $pattern_name The pattern slug.
+				 */
+				apply_filters( 'cbt_replace_with_pattern_reference', true, $block, $pattern_name )
 			) {
 				$processed[] = array(
 					'blockName'    => 'core/pattern',
@@ -470,12 +493,12 @@ class CBT_Theme_Templates {
 		// Check if pattern filePath belongs to active theme or parent theme.
 		if ( ! empty( $pattern['filePath'] ) ) {
 			$file_path      = wp_normalize_path( $pattern['filePath'] );
-			$stylesheet_dir = wp_normalize_path( get_stylesheet_directory() );
-			$template_dir   = wp_normalize_path( get_template_directory() );
+			$stylesheet_dir = trailingslashit( wp_normalize_path( get_stylesheet_directory() ) );
+			$template_dir   = trailingslashit( wp_normalize_path( get_template_directory() ) );
 
-			if ( str_starts_with( $file_path, $stylesheet_dir ) || str_starts_with( $file_path, $template_dir ) ) {
-				return true;
-			}
+			// A registered file path is authoritative: it either lives in the
+			// active/parent theme or it was registered by something else.
+			return str_starts_with( $file_path, $stylesheet_dir ) || str_starts_with( $file_path, $template_dir );
 		}
 
 		// Check if the pattern slug matches the theme's text domain or stylesheet slug prefix.
@@ -508,18 +531,6 @@ class CBT_Theme_Templates {
 			}
 		}
 
-		// Check theme block patterns directly.
-		if ( method_exists( $theme, 'get_block_patterns' ) ) {
-			$theme_patterns = $theme->get_block_patterns();
-			if ( is_array( $theme_patterns ) ) {
-				foreach ( $theme_patterns as $theme_pattern ) {
-					if ( isset( $theme_pattern['slug'] ) && $theme_pattern['slug'] === $pattern_name ) {
-						return true;
-					}
-				}
-			}
-		}
-
 		return false;
 	}
 
@@ -538,16 +549,7 @@ class CBT_Theme_Templates {
 			return false;
 		}
 
-		$pattern_blocks = parse_blocks( $pattern['content'] );
-		// Filter out empty whitespace blocks.
-		$pattern_blocks = array_values(
-			array_filter(
-				$pattern_blocks,
-				function ( $b ) {
-					return ! empty( $b['blockName'] ) || '' !== trim( isset( $b['innerHTML'] ) ? $b['innerHTML'] : '' );
-				}
-			)
-		);
+		$pattern_blocks = self::remove_empty_blocks( self::resolve_nested_pattern_references( parse_blocks( $pattern['content'] ) ) );
 
 		// Gutenberg assigns patternName only to single root blocks.
 		if ( 1 !== count( $pattern_blocks ) ) {
@@ -559,11 +561,8 @@ class CBT_Theme_Templates {
 		// Pass pattern_root through eliminate_environment_specific_content_from_block to normalize.
 		$pattern_root = self::eliminate_environment_specific_content_from_block( $pattern_root );
 
-		// Normalize candidate block attributes by removing injected pattern metadata.
+		// Strip Gutenberg-injected pattern metadata (patternName itself is stripped in normalize_attrs_for_comparison).
 		$candidate_block = $block;
-		if ( isset( $candidate_block['attrs']['metadata']['patternName'] ) ) {
-			unset( $candidate_block['attrs']['metadata']['patternName'] );
-		}
 
 		// If Gutenberg injected metadata.name matching pattern title/name, and pattern_root didn't have it, remove it.
 		if (
@@ -577,8 +576,14 @@ class CBT_Theme_Templates {
 			unset( $candidate_block['attrs']['metadata']['name'] );
 		}
 
-		if ( isset( $candidate_block['attrs']['metadata'] ) && empty( $candidate_block['attrs']['metadata'] ) ) {
-			unset( $candidate_block['attrs']['metadata'] );
+		// If Gutenberg injected metadata.categories matching pattern categories, and pattern_root didn't have it, remove it.
+		if (
+			isset( $candidate_block['attrs']['metadata']['categories'] ) &&
+			! isset( $pattern_root['attrs']['metadata']['categories'] ) &&
+			isset( $pattern['categories'] ) &&
+			$candidate_block['attrs']['metadata']['categories'] === $pattern['categories']
+		) {
+			unset( $candidate_block['attrs']['metadata']['categories'] );
 		}
 
 		return self::are_blocks_equivalent( $candidate_block, $pattern_root );
@@ -598,34 +603,34 @@ class CBT_Theme_Templates {
 			return false;
 		}
 
-		$attrs_a = self::normalize_block_attributes( isset( $block_a['attrs'] ) ? $block_a['attrs'] : array() );
-		$attrs_b = self::normalize_block_attributes( isset( $block_b['attrs'] ) ? $block_b['attrs'] : array() );
-		if ( $attrs_a !== $attrs_b ) {
-			return false;
-		}
-
-		$html_a = self::normalize_html_content( isset( $block_a['innerHTML'] ) ? $block_a['innerHTML'] : '' );
-		$html_b = self::normalize_html_content( isset( $block_b['innerHTML'] ) ? $block_b['innerHTML'] : '' );
+		$html_a = self::normalize_block_html( $block_a );
+		$html_b = self::normalize_block_html( $block_b );
 		if ( $html_a !== $html_b ) {
 			return false;
 		}
 
-		$inner_a = array_values(
-			array_filter(
-				isset( $block_a['innerBlocks'] ) ? $block_a['innerBlocks'] : array(),
-				function ( $b ) {
-					return ! empty( $b['blockName'] ) || '' !== trim( isset( $b['innerHTML'] ) ? $b['innerHTML'] : '' );
-				}
-			)
+		$attrs_a = self::normalize_attrs_for_comparison(
+			$name_a,
+			isset( $block_a['attrs'] ) ? $block_a['attrs'] : array(),
+			$html_a
 		);
-		$inner_b = array_values(
-			array_filter(
-				isset( $block_b['innerBlocks'] ) ? $block_b['innerBlocks'] : array(),
-				function ( $b ) {
-					return ! empty( $b['blockName'] ) || '' !== trim( isset( $b['innerHTML'] ) ? $b['innerHTML'] : '' );
-				}
-			)
+		$attrs_b = self::normalize_attrs_for_comparison(
+			$name_b,
+			isset( $block_b['attrs'] ) ? $block_b['attrs'] : array(),
+			$html_b
 		);
+		if ( $attrs_a !== $attrs_b ) {
+			return false;
+		}
+
+		if ( ! empty( $block_a['innerContent'] ) && ! empty( $block_b['innerContent'] ) ) {
+			if ( self::inner_content_layout( $block_a ) !== self::inner_content_layout( $block_b ) ) {
+				return false;
+			}
+		}
+
+		$inner_a = self::remove_empty_blocks( isset( $block_a['innerBlocks'] ) ? $block_a['innerBlocks'] : array() );
+		$inner_b = self::remove_empty_blocks( isset( $block_b['innerBlocks'] ) ? $block_b['innerBlocks'] : array() );
 
 		if ( count( $inner_a ) !== count( $inner_b ) ) {
 			return false;
@@ -642,7 +647,114 @@ class CBT_Theme_Templates {
 	}
 
 	/**
-	 * Recursively normalize block attributes for comparison (e.g. key sorting).
+	 * Normalize a block's attributes so equivalent pre- and post-migration
+	 * Gutenberg serializations compare equal.
+	 *
+	 * @param string $block_name Block name.
+	 * @param array  $attrs      Raw parsed block attributes.
+	 * @param string $html       Normalized innerHTML (already verified equal).
+	 * @return array Normalized attributes for comparison.
+	 */
+	private static function normalize_attrs_for_comparison( $block_name, array $attrs, $html ) {
+		$attrs = self::strip_pattern_name( $attrs );
+
+		// Gutenberg migrates legacy align/textAlign into style.typography.textAlign.
+		$text_align_blocks = array(
+			'core/paragraph',
+			'core/heading',
+			'core/button',
+			'core/site-title',
+			'core/site-tagline',
+			'core/post-title',
+			'core/post-date',
+			'core/post-terms',
+			'core/query-title',
+			'core/term-description',
+		);
+		if ( in_array( $block_name, $text_align_blocks, true ) ) {
+			if ( isset( $attrs['textAlign'] ) ) {
+				if ( ! isset( $attrs['style']['typography']['textAlign'] ) ) {
+					$attrs['style']['typography']['textAlign'] = $attrs['textAlign'];
+				}
+				unset( $attrs['textAlign'] );
+			}
+			if ( isset( $attrs['align'] ) && in_array( $attrs['align'], array( 'left', 'center', 'right', 'justify' ), true ) ) {
+				if ( ! isset( $attrs['style']['typography']['textAlign'] ) ) {
+					$attrs['style']['typography']['textAlign'] = $attrs['align'];
+				}
+				unset( $attrs['align'] );
+			}
+		}
+
+		// Gutenberg migrates core/button width (e.g. 100) into style.dimensions.width ("100%").
+		if ( 'core/button' === $block_name && isset( $attrs['width'] ) ) {
+			if ( ! isset( $attrs['style']['dimensions']['width'] ) && is_numeric( $attrs['width'] ) ) {
+				$attrs['style']['dimensions']['width'] = $attrs['width'] . '%';
+			}
+			unset( $attrs['width'] );
+		}
+
+		// Gutenberg adds default core/post-data date binding to core/post-date on parse.
+		if (
+			'core/post-date' === $block_name &&
+			isset( $attrs['metadata']['bindings']['datetime'] ) &&
+			is_array( $attrs['metadata']['bindings']['datetime'] ) &&
+			'core/post-data' === ( $attrs['metadata']['bindings']['datetime']['source'] ?? null ) &&
+			isset( $attrs['metadata']['bindings']['datetime']['args'] ) &&
+			array( 'field' => 'date' ) === $attrs['metadata']['bindings']['datetime']['args'] &&
+			2 === count( $attrs['metadata']['bindings']['datetime'] )
+		) {
+			unset( $attrs['metadata']['bindings']['datetime'] );
+			if ( empty( $attrs['metadata']['bindings'] ) ) {
+				unset( $attrs['metadata']['bindings'] );
+			}
+			if ( empty( $attrs['metadata'] ) ) {
+				unset( $attrs['metadata'] );
+			}
+		}
+
+		// Strip editor-only/HTML-derived attributes whose values are already verified via innerHTML.
+		if ( ! empty( $html ) ) {
+			$processor = new WP_HTML_Tag_Processor( $html );
+			if ( $processor->next_tag() ) {
+				if ( isset( $attrs['className'] ) && is_string( $attrs['className'] ) ) {
+					$remaining = array();
+					foreach ( preg_split( '/\s+/', trim( $attrs['className'] ), -1, PREG_SPLIT_NO_EMPTY ) as $token ) {
+						if ( ! $processor->has_class( $token ) ) {
+							$remaining[] = $token;
+						}
+					}
+					if ( empty( $remaining ) ) {
+						unset( $attrs['className'] );
+					} else {
+						$attrs['className'] = implode( ' ', $remaining );
+					}
+				}
+				if ( isset( $attrs['anchor'] ) && $processor->get_attribute( 'id' ) === $attrs['anchor'] ) {
+					unset( $attrs['anchor'] );
+				}
+			}
+
+			if ( 'core/cover' === $block_name && isset( $attrs['alt'] ) ) {
+				$img_processor = new WP_HTML_Tag_Processor( $html );
+				while ( $img_processor->next_tag( 'IMG' ) ) {
+					if ( $img_processor->get_attribute( 'alt' ) === $attrs['alt'] ) {
+						unset( $attrs['alt'] );
+						break;
+					}
+				}
+			}
+		}
+
+		if ( 'core/cover' === $block_name ) {
+			unset( $attrs['isUserOverlayColor'] );
+		}
+
+		return self::normalize_block_attributes( $attrs );
+	}
+
+	/**
+	 * Recursively normalize block attributes for comparison (drop nulls and sort keys).
 	 *
 	 * @param mixed $attrs Attributes array or value.
 	 * @return mixed Normalized attributes.
@@ -652,14 +764,40 @@ class CBT_Theme_Templates {
 			return $attrs;
 		}
 
-		ksort( $attrs );
 		foreach ( $attrs as $k => $v ) {
-			if ( is_array( $v ) ) {
+			if ( null === $v ) {
+				unset( $attrs[ $k ] );
+			} elseif ( is_array( $v ) ) {
 				$attrs[ $k ] = self::normalize_block_attributes( $v );
 			}
 		}
+		ksort( $attrs );
 
 		return $attrs;
+	}
+
+	/**
+	 * Normalize a block's HTML from innerContent chunks (trimming indentation at
+	 * inner-block boundaries) or fall back to innerHTML when innerContent is absent.
+	 *
+	 * @param array $block Parsed block.
+	 * @return string Normalized HTML string.
+	 */
+	private static function normalize_block_html( array $block ) {
+		if ( ! empty( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+			$parts = array();
+			foreach ( $block['innerContent'] as $chunk ) {
+				if ( is_string( $chunk ) ) {
+					$normalized = self::normalize_html_content( $chunk );
+					if ( '' !== $normalized ) {
+						$parts[] = $normalized;
+					}
+				}
+			}
+			return implode( '', $parts );
+		}
+
+		return self::normalize_html_content( isset( $block['innerHTML'] ) ? $block['innerHTML'] : '' );
 	}
 
 	/**
@@ -673,6 +811,135 @@ class CBT_Theme_Templates {
 			return '';
 		}
 
+		// Normalize serialization differences that do not change the rendered output:
+		// class order, trailing semicolons / spacing in style, and the auto height
+		// Gutenberg adds to resized images.
+		$processor = new WP_HTML_Tag_Processor( $html );
+		while ( $processor->next_tag() ) {
+			$class = $processor->get_attribute( 'class' );
+			if ( is_string( $class ) ) {
+				$tokens = preg_split( '/\s+/', trim( $class ), -1, PREG_SPLIT_NO_EMPTY );
+				sort( $tokens );
+				$processor->set_attribute( 'class', implode( ' ', $tokens ) );
+			}
+
+			$style = $processor->get_attribute( 'style' );
+			if ( is_string( $style ) ) {
+				$declarations = array();
+				foreach ( explode( ';', $style ) as $declaration ) {
+					$declaration = trim( preg_replace( '/\s*:\s*/', ':', $declaration ) );
+					if ( '' === $declaration ) {
+						continue;
+					}
+					if ( 'IMG' === $processor->get_tag() && 'height:auto' === $declaration ) {
+						continue;
+					}
+					$declarations[] = $declaration;
+				}
+				if ( $declarations ) {
+					$processor->set_attribute( 'style', implode( ';', $declarations ) );
+				} else {
+					$processor->remove_attribute( 'style' );
+				}
+			}
+		}
+		$html = $processor->get_updated_html();
+
+		// Treat the apostrophe entity variants as the same character.
+		$html = preg_replace( '/&#0*39;|&apos;/', "'", $html );
+
+		// Drop indentation (whitespace containing a newline or tab) next to tags,
+		// keep single meaningful spaces between inline text and tags.
+		$html = preg_replace( '/(?<=>)\s*[\r\n\t]\s*|\s*[\r\n\t]\s*(?=<)/', '', $html );
+
 		return trim( preg_replace( '/\s+/', ' ', $html ) );
+	}
+
+	/**
+	 * Remove empty freeform (whitespace-only) blocks.
+	 *
+	 * @param array $blocks Parsed blocks.
+	 * @return array Blocks without whitespace-only freeform entries.
+	 */
+	private static function remove_empty_blocks( array $blocks ) {
+		return array_values(
+			array_filter(
+				$blocks,
+				function ( $b ) {
+					return ! empty( $b['blockName'] ) || '' !== trim( isset( $b['innerHTML'] ) ? $b['innerHTML'] : '' );
+				}
+			)
+		);
+	}
+
+	/**
+	 * Expand nested core/pattern references into the blocks of the registered
+	 * pattern, as the editor does when it loads a template.
+	 *
+	 * @param array $blocks Parsed blocks.
+	 * @param int   $depth  Recursion guard against self-referencing patterns.
+	 * @return array Blocks with nested references expanded.
+	 */
+	private static function resolve_nested_pattern_references( array $blocks, $depth = 0 ) {
+		$registry = WP_Block_Patterns_Registry::get_instance();
+		$resolved = array();
+
+		foreach ( $blocks as $block ) {
+			$slug = isset( $block['attrs']['slug'] ) ? $block['attrs']['slug'] : null;
+
+			if ( 'core/pattern' === $block['blockName'] && is_string( $slug ) && $depth < 10 && $registry->is_registered( $slug ) ) {
+				$nested = $registry->get_registered( $slug );
+				if ( ! empty( $nested['content'] ) ) {
+					$nested_blocks = self::remove_empty_blocks( parse_blocks( $nested['content'] ) );
+					foreach ( self::resolve_nested_pattern_references( $nested_blocks, $depth + 1 ) as $nested_block ) {
+						$resolved[] = $nested_block;
+					}
+					continue;
+				}
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$block['innerBlocks'] = self::resolve_nested_pattern_references( $block['innerBlocks'], $depth );
+			}
+			$resolved[] = $block;
+		}
+
+		return $resolved;
+	}
+
+	/**
+	 * Describe where inner blocks sit among the text chunks of a block, ignoring
+	 * whitespace-only chunks.
+	 *
+	 * @param array $block Parsed block.
+	 * @return array Layout signature.
+	 */
+	private static function inner_content_layout( array $block ) {
+		$layout = array();
+		$inner  = isset( $block['innerContent'] ) ? $block['innerContent'] : array();
+		foreach ( $inner as $chunk ) {
+			if ( null === $chunk ) {
+				$layout[] = null;
+			} elseif ( '' !== trim( $chunk ) ) {
+				$layout[] = self::normalize_html_content( $chunk );
+			}
+		}
+		return $layout;
+	}
+
+	/**
+	 * Remove metadata.patternName (and metadata if it ends up empty) from attributes.
+	 *
+	 * @param array $attrs Block attributes.
+	 * @return array Attributes without pattern metadata.
+	 */
+	private static function strip_pattern_name( array $attrs ) {
+		if ( isset( $attrs['metadata']['patternName'] ) ) {
+			unset( $attrs['metadata']['patternName'] );
+			if ( empty( $attrs['metadata'] ) ) {
+				unset( $attrs['metadata'] );
+			}
+		}
+		return $attrs;
 	}
 }

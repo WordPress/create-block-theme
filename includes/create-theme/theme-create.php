@@ -65,7 +65,17 @@ class CBT_Theme_Create {
 		);
 
 		// Add theme.json
-		CBT_Theme_Templates::add_templates_to_local( 'user', $new_theme_path, $theme['slug'] );
+		CBT_Theme_Templates::add_templates_to_local(
+			'user',
+			$new_theme_path,
+			$theme['slug'],
+			array(
+				'localizeText'         => false,
+				'removeNavRefs'        => true,
+				'localizeImages'       => true,
+				'preservePatternSlugs' => true,
+			)
+		);
 		file_put_contents( $new_theme_path . DIRECTORY_SEPARATOR . 'theme.json', CBT_Theme_JSON_Resolver::export_theme_data( 'variation' ) );
 
 		// Add Screenshot

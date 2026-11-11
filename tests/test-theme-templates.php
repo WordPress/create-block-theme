@@ -540,4 +540,223 @@ class Test_Create_Block_Theme_Templates extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<!-- wp:pattern {"slug":"' . $pattern_slug . '"} /-->', $new_template->content );
 		$this->assertStringContainsString( '<p>Content</p>', $new_template->content );
 	}
+
+	public function test_preserve_pattern_slugs_keeps_wp_pattern_references_on_namespace_replace() {
+		$previous_stylesheet = get_stylesheet();
+		switch_theme( 'twentytwentyfive' );
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:pattern {"slug":"' . $old_slug . '/hero"} /--><!-- wp:paragraph --><p>' . $old_slug . '</p><!-- /wp:paragraph -->';
+
+		$result = CBT_Theme_Templates::replace_template_namespace( $template, 'child-theme', true );
+
+		switch_theme( $previous_stylesheet );
+
+		$this->assertStringContainsString( '<!-- wp:pattern {"slug":"' . $old_slug . '/hero"} /-->', $result->content );
+		$this->assertStringContainsString( '<p>child-theme</p>', $result->content );
+	}
+
+	public function test_namespace_replace_rewrites_pattern_references_by_default() {
+		$previous_stylesheet = get_stylesheet();
+		switch_theme( 'twentytwentyfive' );
+		$old_slug = wp_get_theme()->get( 'TextDomain' );
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:pattern {"slug":"' . $old_slug . '/hero"} /-->';
+
+		$result = CBT_Theme_Templates::replace_template_namespace( $template, 'clone-theme' );
+
+		switch_theme( $previous_stylesheet );
+
+		$this->assertStringContainsString( '{"slug":"clone-theme/hero"}', $result->content );
+	}
+
+	public function test_pattern_with_file_path_outside_active_theme_is_not_an_active_theme_pattern() {
+		$theme_slug   = wp_get_theme()->get_stylesheet();
+		$pattern_slug = $theme_slug . '/sibling-theme-pattern';
+
+		register_block_pattern(
+			$pattern_slug,
+			array(
+				'title'    => 'Sibling',
+				'content'  => '<!-- wp:paragraph --><p>x</p><!-- /wp:paragraph -->',
+				'filePath' => untrailingslashit( get_stylesheet_directory() ) . '-two/patterns/x.php',
+			)
+		);
+
+		$result = CBT_Theme_Templates::is_active_theme_pattern( $pattern_slug );
+
+		unregister_block_pattern( $pattern_slug );
+
+		$this->assertFalse( $result );
+	}
+
+	public function test_pattern_containing_nested_pattern_reference_is_replaced() {
+		$theme_slug = wp_get_theme()->get_stylesheet();
+		$inner_slug = $theme_slug . '/nested-inner';
+		$outer_slug = $theme_slug . '/nested-outer';
+
+		register_block_pattern(
+			$inner_slug,
+			array(
+				'title'   => 'Inner',
+				'content' => '<!-- wp:paragraph --><p>Inner Text</p><!-- /wp:paragraph -->',
+			)
+		);
+		register_block_pattern(
+			$outer_slug,
+			array(
+				'title'   => 'Outer',
+				'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:pattern {"slug":"' . $inner_slug . '"} /--></div><!-- /wp:group -->',
+			)
+		);
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:group {"metadata":{"patternName":"' . $outer_slug . '"}} --><div class="wp-block-group"><!-- wp:paragraph {"metadata":{"patternName":"' . $inner_slug . '"}} --><p>Inner Text</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+
+		$new_template = CBT_Theme_Templates::prepare_template_for_export( $template );
+
+		unregister_block_pattern( $inner_slug );
+		unregister_block_pattern( $outer_slug );
+
+		$this->assertStringContainsString( '<!-- wp:pattern {"slug":"' . $outer_slug . '"} /-->', $new_template->content );
+		$this->assertStringNotContainsString( 'Inner Text', $new_template->content );
+	}
+
+	public function test_pattern_reference_replacement_can_be_filtered_off() {
+		$theme_slug   = wp_get_theme()->get_stylesheet();
+		$pattern_slug = $theme_slug . '/filtered-pattern';
+
+		register_block_pattern(
+			$pattern_slug,
+			array(
+				'title'   => 'Filtered',
+				'content' => '<!-- wp:paragraph --><p>Filtered Text</p><!-- /wp:paragraph -->',
+			)
+		);
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:paragraph {"metadata":{"patternName":"' . $pattern_slug . '"}} --><p>Filtered Text</p><!-- /wp:paragraph -->';
+
+		add_filter( 'cbt_replace_with_pattern_reference', '__return_false' );
+		$new_template = CBT_Theme_Templates::prepare_template_for_export( $template );
+		remove_filter( 'cbt_replace_with_pattern_reference', '__return_false' );
+
+		unregister_block_pattern( $pattern_slug );
+
+		$this->assertStringContainsString( 'Filtered Text', $new_template->content );
+		$this->assertStringNotContainsString( 'wp:pattern', $new_template->content );
+	}
+
+	public function test_gutenberg_injected_categories_and_migrated_attrs_still_match_pattern() {
+		$theme_slug   = wp_get_theme()->get_stylesheet();
+		$pattern_slug = $theme_slug . '/gutenberg-migrated';
+
+		$pattern_content = "<!-- wp:group {\"layout\":{\"type\":\"constrained\"}} -->\n"
+			. "<div class=\"wp-block-group\">\n"
+			. "\t<!-- wp:heading {\"textAlign\":\"center\"} -->\n"
+			. "\t<h2 class=\"wp-block-heading has-text-align-center\">Title</h2>\n"
+			. "\t<!-- /wp:heading -->\n"
+			. "\t<!-- wp:paragraph {\"align\":\"center\"} -->\n"
+			. "\t<p class=\"has-text-align-center\">Body</p>\n"
+			. "\t<!-- /wp:paragraph -->\n"
+			. "</div>\n"
+			. '<!-- /wp:group -->';
+
+		register_block_pattern(
+			$pattern_slug,
+			array(
+				'title'      => 'Migrated Pattern',
+				'categories' => array( 'call-to-action' ),
+				'content'    => $pattern_content,
+			)
+		);
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:group {"metadata":{"categories":["call-to-action"],"patternName":"' . $pattern_slug . '","name":"Migrated Pattern"},"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:heading {"style":{"typography":{"textAlign":"center"}},"className":"wp-block-heading"} --><h2 class="wp-block-heading has-text-align-center">Title</h2><!-- /wp:heading --><!-- wp:paragraph {"style":{"typography":{"textAlign":"center"}}} --><p class="has-text-align-center">Body</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+
+		$new_template = CBT_Theme_Templates::prepare_template_for_export( $template );
+
+		unregister_block_pattern( $pattern_slug );
+
+		$this->assertStringContainsString( '<!-- wp:pattern {"slug":"' . $pattern_slug . '"} /-->', $new_template->content );
+		$this->assertStringNotContainsString( 'Title', $new_template->content );
+	}
+
+	public function test_changed_alignment_after_migration_stays_inline() {
+		$theme_slug   = wp_get_theme()->get_stylesheet();
+		$pattern_slug = $theme_slug . '/gutenberg-alignment-edited';
+
+		register_block_pattern(
+			$pattern_slug,
+			array(
+				'title'   => 'Alignment Edited',
+				'content' => '<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center">Body</p><!-- /wp:paragraph -->',
+			)
+		);
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:paragraph {"metadata":{"patternName":"' . $pattern_slug . '"},"style":{"typography":{"textAlign":"right"}}} --><p class="has-text-align-right">Body</p><!-- /wp:paragraph -->';
+
+		$new_template = CBT_Theme_Templates::prepare_template_for_export( $template );
+
+		unregister_block_pattern( $pattern_slug );
+
+		$this->assertStringNotContainsString( 'wp:pattern', $new_template->content );
+		$this->assertStringContainsString( 'has-text-align-right', $new_template->content );
+	}
+
+	public function test_serialization_only_html_differences_still_match_pattern() {
+		$theme_slug   = wp_get_theme()->get_stylesheet();
+		$pattern_slug = $theme_slug . '/html-normalization';
+
+		register_block_pattern(
+			$pattern_slug,
+			array(
+				'title'   => 'Html Normalization',
+				'content' => "<!-- wp:paragraph -->\n<p class=\"b a\" style=\"color:red\">We&#039;re here</p>\n<!-- /wp:paragraph -->",
+			)
+		);
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:paragraph {"metadata":{"patternName":"' . $pattern_slug . '"}} --><p class="a b" style="color:red;">We\'re here</p><!-- /wp:paragraph -->';
+
+		$new_template = CBT_Theme_Templates::prepare_template_for_export( $template );
+
+		unregister_block_pattern( $pattern_slug );
+
+		$this->assertStringContainsString( '<!-- wp:pattern {"slug":"' . $pattern_slug . '"} /-->', $new_template->content );
+	}
+
+	public function test_added_inline_space_after_normalization_stays_inline() {
+		$theme_slug   = wp_get_theme()->get_stylesheet();
+		$pattern_slug = $theme_slug . '/inline-space-edit';
+
+		register_block_pattern(
+			$pattern_slug,
+			array(
+				'title'   => 'Inline Space',
+				'content' => '<!-- wp:paragraph --><p>Hello<strong>World</strong></p><!-- /wp:paragraph -->',
+			)
+		);
+
+		$template          = new stdClass();
+		$template->slug    = 'home';
+		$template->content = '<!-- wp:paragraph {"metadata":{"patternName":"' . $pattern_slug . '"}} --><p>Hello <strong>World</strong></p><!-- /wp:paragraph -->';
+
+		$new_template = CBT_Theme_Templates::prepare_template_for_export( $template );
+
+		unregister_block_pattern( $pattern_slug );
+
+		$this->assertStringNotContainsString( 'wp:pattern', $new_template->content );
+		$this->assertStringContainsString( 'Hello <strong>World</strong>', $new_template->content );
+	}
 }
