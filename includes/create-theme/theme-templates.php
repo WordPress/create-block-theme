@@ -104,11 +104,17 @@ class CBT_Theme_Templates {
 	/**
 	 * Clear all user templates customizations.
 	 * This will remove all user templates from the database.
+	 *
+	 * @param array|null $slugs Optional list of template slugs to clear. If null,
+	 *                          all user template customizations are removed.
 	 */
-	public static function clear_user_templates_customizations() {
+	public static function clear_user_templates_customizations( $slugs = null ) {
 		$templates = get_block_templates();
 		foreach ( $templates as $template ) {
 			if ( 'custom' !== $template->source ) {
+				continue;
+			}
+			if ( null !== $slugs && ! in_array( $template->slug, $slugs, true ) ) {
 				continue;
 			}
 			wp_delete_post( $template->wp_id, true );
@@ -118,11 +124,17 @@ class CBT_Theme_Templates {
 	/**
 	 * Clear all user template-parts customizations.
 	 * This will remove all user template-parts from the database.
+	 *
+	 * @param array|null $slugs Optional list of template-part slugs to clear. If
+	 *                          null, all user template-part customizations are removed.
 	 */
-	public static function clear_user_template_parts_customizations() {
+	public static function clear_user_template_parts_customizations( $slugs = null ) {
 		$template_parts = get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template ) {
 			if ( 'custom' !== $template->source ) {
+				continue;
+			}
+			if ( null !== $slugs && ! in_array( $template->slug, $slugs, true ) ) {
 				continue;
 			}
 			wp_delete_post( $template->wp_id, true );

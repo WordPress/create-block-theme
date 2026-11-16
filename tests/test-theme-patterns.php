@@ -416,6 +416,161 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create a custom template or template-part post for the active theme.
+	 *
+	 * @param string $slug      Template slug.
+	 * @param string $content   Template content.
+	 * @param string $post_type Either 'wp_template' or 'wp_template_part'.
+	 * @return int The post ID.
+	 */
+	private function create_template_customization( $slug, $content, $post_type = 'wp_template' ) {
+		$post_id = $this->factory->post->create(
+			array(
+				'post_type'    => $post_type,
+				'post_status'  => 'publish',
+				'post_name'    => $slug,
+				'post_title'   => $slug,
+				'post_content' => $content,
+			)
+		);
+
+		wp_set_object_terms( $post_id, get_stylesheet(), 'wp_theme' );
+
+		return $post_id;
+	}
+
+	public function test_add_patterns_to_theme_keeps_customizations_that_do_not_reference_patterns() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Pattern used by a template</p><!-- /wp:paragraph -->',
+			'CBT Referenced Pattern'
+		);
+
+		$referencing_template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $pattern->ID . '} /-->'
+		);
+		$unrelated_template_id   = $this->create_template_customization(
+			'single',
+			'<!-- wp:paragraph --><p>Unsaved customization</p><!-- /wp:paragraph -->'
+		);
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		// The template that referenced the pattern was written to disk, so its
+		// database customization can be cleared.
+		$this->assertNull( get_post( $referencing_template_id ) );
+		$this->assertFileExists( get_stylesheet_directory() . '/templates/page.html' );
+
+		// The unrelated customization was never written to disk and must not be
+		// deleted.
+		$this->assertNotNull( get_post( $unrelated_template_id ) );
+		$this->assertFileDoesNotExist( get_stylesheet_directory() . '/templates/single.html' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_add_patterns_to_theme_writes_every_referencing_template_before_clearing_customizations() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$first_pattern  = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>First pattern</p><!-- /wp:paragraph -->',
+			'CBT First Pattern'
+		);
+		$second_pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Second pattern</p><!-- /wp:paragraph -->',
+			'CBT Second Pattern'
+		);
+
+		$template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $first_pattern->ID . '} /-->'
+		);
+		$part_id     = $this->create_template_customization(
+			'header',
+			'<!-- wp:block {"ref":' . $second_pattern->ID . '} /-->',
+			'wp_template_part'
+		);
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		// Both templates reference a saved pattern, so both must be written to
+		// disk before any customization is cleared.
+		$this->assertFileExists( get_stylesheet_directory() . '/templates/page.html' );
+		$this->assertFileExists( get_stylesheet_directory() . '/parts/header.html' );
+
+		$template_content = file_get_contents( get_stylesheet_directory() . '/templates/page.html' );
+		$part_content     = file_get_contents( get_stylesheet_directory() . '/parts/header.html' );
+		$this->assertStringContainsString( 'wp:pattern {"slug":"', $template_content );
+		$this->assertStringContainsString( 'wp:pattern {"slug":"', $part_content );
+
+		$this->assertNull( get_post( $template_id ) );
+		$this->assertNull( get_post( $part_id ) );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_add_patterns_to_theme_replaces_all_pattern_references_in_one_template() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$first_pattern  = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>First pattern</p><!-- /wp:paragraph -->',
+			'CBT First Shared Pattern'
+		);
+		$second_pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Second pattern</p><!-- /wp:paragraph -->',
+			'CBT Second Shared Pattern'
+		);
+
+		$template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $first_pattern->ID . '} /-->' . "\n" .
+			'<!-- wp:block {"ref":' . $second_pattern->ID . '} /-->'
+		);
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		// The template is written once on the first pattern iteration. Later
+		// iterations must not rewrite it from the database and restore the
+		// numeric references that were already replaced.
+		$template_content = file_get_contents( get_stylesheet_directory() . '/templates/page.html' );
+		$this->assertStringNotContainsString( 'wp:block {"ref":', $template_content );
+		$this->assertSame( 2, substr_count( $template_content, 'wp:pattern {"slug":"' ) );
+
+		$this->assertNull( get_post( $template_id ) );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	/**
 	 * Create a fresh test theme via the plugin's REST endpoint and activate it.
 	 *
 	 * Mirrors the helper in Test_Create_Block_Theme_Fonts so this test class

@@ -131,7 +131,20 @@ class CBT_Theme_Patterns {
 		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
 	}
 
-	public static function replace_local_pattern_references( $pattern, $options = null ) {
+	/**
+	 * Replace references to a pattern stored in the database with references
+	 * to the equivalent local pattern file.
+	 *
+	 * Templates and template parts that reference the pattern are written to
+	 * the theme filesystem. Clearing their user customizations is left to the
+	 * caller so that it can happen once every pattern has been processed.
+	 *
+	 * @param object     $pattern                   The pattern being moved to the theme.
+	 * @param array|null $options                   Export options.
+	 * @param array      $templates_already_written Slugs already written during this save.
+	 * @return array Slugs of the templates and template parts written to disk.
+	 */
+	public static function replace_local_pattern_references( $pattern, $options = null, $templates_already_written = array() ) {
 		// Find any references to pattern in templates
 		$templates_to_update = array();
 		$args                = array(
@@ -148,14 +161,26 @@ class CBT_Theme_Patterns {
 		}
 		$templates_to_update = array_unique( $templates_to_update );
 
-		// Only update templates that reference the pattern
-		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
+		// A template that references several patterns is written on the first
+		// iteration. Do not write it again from the database on later
+		// iterations: that would restore the numeric references that were
+		// already replaced with local pattern references.
+		$templates_to_update = array_values( array_diff( $templates_to_update, $templates_already_written ) );
 
-		// List all template and pattern files in the theme
-		$base_dir       = get_stylesheet_directory();
-		$patterns       = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
-		$templates      = glob( $base_dir . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . '*.html' );
-		$template_parts = glob( $base_dir . DIRECTORY_SEPARATOR . 'template-parts' . DIRECTORY_SEPARATOR . '*.html' );
+		// Only update templates that reference the pattern.
+		// Passing an empty list to add_templates_to_local() would make it fall
+		// back to exporting every template, so skip it when there is nothing
+		// to update.
+		if ( ! empty( $templates_to_update ) ) {
+			CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
+		}
+
+		// List all template and pattern files in the theme.
+		$base_dir         = get_stylesheet_directory();
+		$template_folders = get_block_theme_folders();
+		$patterns         = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
+		$templates        = glob( $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . '*.html' );
+		$template_parts   = glob( $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . '*.html' );
 
 		// Replace references to the local patterns in the theme
 		foreach ( array_merge( $patterns, $templates, $template_parts ) as $file ) {
@@ -164,8 +189,28 @@ class CBT_Theme_Patterns {
 			file_put_contents( $file, $file_content );
 		}
 
-		CBT_Theme_Templates::clear_user_templates_customizations();
-		CBT_Theme_Templates::clear_user_template_parts_customizations();
+		return $templates_to_update;
+	}
+
+	/**
+	 * Clear the user customizations for the templates that were written to disk
+	 * while saving patterns.
+	 *
+	 * Only templates that were written to disk are cleared. Other user
+	 * customizations are left untouched so they are not lost when saving
+	 * patterns without saving templates.
+	 *
+	 * @param array $template_slugs Slugs of the templates written to disk.
+	 */
+	private static function clear_saved_pattern_template_customizations( $template_slugs ) {
+		if ( empty( $template_slugs ) ) {
+			return;
+		}
+
+		$template_slugs = array_unique( $template_slugs );
+
+		CBT_Theme_Templates::clear_user_templates_customizations( $template_slugs );
+		CBT_Theme_Templates::clear_user_template_parts_customizations( $template_slugs );
 	}
 
 	public static function prepare_pattern_for_export( $pattern, $options = null ) {
@@ -206,6 +251,8 @@ class CBT_Theme_Patterns {
 			)
 		);
 
+		$templates_written = array();
+
 		if ( $pattern_query->have_posts() ) {
 			// If there is no patterns folder, create it.
 			if ( ! is_dir( $patterns_dir ) ) {
@@ -226,6 +273,11 @@ class CBT_Theme_Patterns {
 				}
 
 				if ( $pattern_exists ) {
+					// Templates written for patterns already processed still
+					// reference patterns that have been removed from the
+					// database, so clear only those before bailing out.
+					self::clear_saved_pattern_template_customizations( $templates_written );
+
 					return new WP_Error(
 						'pattern_already_exists',
 						sprintf(
@@ -245,11 +297,16 @@ class CBT_Theme_Patterns {
 					$pattern->content
 				);
 
-				self::replace_local_pattern_references( $pattern, $options );
+				$templates_written = array_merge(
+					$templates_written,
+					self::replace_local_pattern_references( $pattern, $options, $templates_written )
+				);
 
 				// Remove it from the database to ensure that these patterns are loaded from the theme.
 				wp_delete_post( $pattern->id, true );
 			}
 		}
+
+		self::clear_saved_pattern_template_customizations( $templates_written );
 	}
 }
