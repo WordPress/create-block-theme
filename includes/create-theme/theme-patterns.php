@@ -131,9 +131,27 @@ class CBT_Theme_Patterns {
 		return '<!-- wp:pattern ' . $attributes_json . ' /-->';
 	}
 
-	public static function replace_local_pattern_references( $pattern, $options = null ) {
-		// Find any references to pattern in templates
-		$templates_to_update = array();
+	/**
+	 * Replace references to a pattern stored in the database with references
+	 * to the equivalent local pattern file.
+	 *
+	 * Templates and template parts that reference the pattern are written to
+	 * the theme filesystem. Clearing their user customizations is left to
+	 * clear_saved_pattern_template_customizations() so that it can happen once
+	 * every pattern has been processed.
+	 *
+	 * @param object     $pattern                   The pattern being moved to the theme.
+	 * @param array|null $options                   Export options.
+	 * @param array      $templates_already_written Slugs already written during
+	 *                                              this save, keyed by post type.
+	 * @return array Slugs newly written to disk, keyed by post type.
+	 */
+	public static function replace_local_pattern_references( $pattern, $options = null, $templates_already_written = array() ) {
+		// Find any references to pattern in templates.
+		$templates_to_update = array(
+			'wp_template'      => array(),
+			'wp_template_part' => array(),
+		);
 		$args                = array(
 			'post_type'      => array( 'wp_template', 'wp_template_part' ),
 			'posts_per_page' => -1,
@@ -142,30 +160,97 @@ class CBT_Theme_Patterns {
 		$find_pattern_refs   = new WP_Query( $args );
 		if ( $find_pattern_refs->have_posts() ) {
 			foreach ( $find_pattern_refs->posts as $post ) {
-				$slug = $post->post_name;
-				array_push( $templates_to_update, $slug );
+				$post_type                           = 'wp_template_part' === $post->post_type ? 'wp_template_part' : 'wp_template';
+				$templates_to_update[ $post_type ][] = $post->post_name;
 			}
 		}
-		$templates_to_update = array_unique( $templates_to_update );
 
-		// Only update templates that reference the pattern
-		CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $templates_to_update );
+		$already_written = array_merge(
+			array(
+				'wp_template'      => array(),
+				'wp_template_part' => array(),
+			),
+			$templates_already_written
+		);
 
-		// List all template and pattern files in the theme
-		$base_dir       = get_stylesheet_directory();
+		$base_dir         = get_stylesheet_directory();
+		$template_folders = get_block_theme_folders();
+		$folder_by_type   = array(
+			'wp_template'      => $template_folders['wp_template'],
+			'wp_template_part' => $template_folders['wp_template_part'],
+		);
+
+		// A template that references several patterns is written on the first
+		// iteration. Do not write it again from the database on later
+		// iterations: that would restore the numeric references that were
+		// already replaced with local pattern references.
+		foreach ( $templates_to_update as $post_type => $slugs ) {
+			$slugs = array_values( array_unique( $slugs ) );
+			$slugs = array_values( array_diff( $slugs, $already_written[ $post_type ] ) );
+
+			// Only update templates that reference the pattern.
+			// Passing an empty list to add_templates_to_local() would make it
+			// fall back to exporting every template, so skip it when there is
+			// nothing to update.
+			if ( ! empty( $slugs ) ) {
+				CBT_Theme_Templates::add_templates_to_local( 'all', null, null, $options, $slugs, $post_type );
+			}
+
+			// Record only the files that exist. A failed write must not lead to
+			// the database customization being cleared.
+			$written_slugs = array();
+			foreach ( $slugs as $slug ) {
+				if ( file_exists( $base_dir . DIRECTORY_SEPARATOR . $folder_by_type[ $post_type ] . DIRECTORY_SEPARATOR . $slug . '.html' ) ) {
+					$written_slugs[] = $slug;
+				}
+			}
+			$templates_to_update[ $post_type ] = $written_slugs;
+		}
+
+		// List all template and pattern files in the theme.
 		$patterns       = glob( $base_dir . DIRECTORY_SEPARATOR . 'patterns' . DIRECTORY_SEPARATOR . '*.php' );
-		$templates      = glob( $base_dir . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . '*.html' );
-		$template_parts = glob( $base_dir . DIRECTORY_SEPARATOR . 'template-parts' . DIRECTORY_SEPARATOR . '*.html' );
+		$templates      = glob( $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template'] . DIRECTORY_SEPARATOR . '*.html' );
+		$template_parts = glob( $base_dir . DIRECTORY_SEPARATOR . $template_folders['wp_template_part'] . DIRECTORY_SEPARATOR . '*.html' );
 
-		// Replace references to the local patterns in the theme
-		foreach ( array_merge( $patterns, $templates, $template_parts ) as $file ) {
+		// Replace references to the local patterns in the theme.
+		// This runs on every iteration, even when no new file was written, so
+		// files written for an earlier pattern also lose this pattern's numeric
+		// reference.
+		$files = array_merge(
+			$patterns ? $patterns : array(),
+			$templates ? $templates : array(),
+			$template_parts ? $template_parts : array()
+		);
+		foreach ( $files as $file ) {
 			$file_content = file_get_contents( $file );
 			$file_content = str_replace( 'wp:block {"ref":' . $pattern->id . '}', 'wp:pattern {"slug":"' . $pattern->slug . '"}', $file_content );
 			file_put_contents( $file, $file_content );
 		}
 
-		CBT_Theme_Templates::clear_user_templates_customizations();
-		CBT_Theme_Templates::clear_user_template_parts_customizations();
+		return $templates_to_update;
+	}
+
+	/**
+	 * Clear the user customizations for the templates and template parts that
+	 * were written to disk while saving patterns.
+	 *
+	 * Only items that were written to disk are cleared. Other user
+	 * customizations are left untouched so they are not lost when saving
+	 * patterns without saving templates.
+	 *
+	 * @param array $templates_written Slugs written to disk, keyed by post type.
+	 */
+	private static function clear_saved_pattern_template_customizations( $templates_written ) {
+		$template_slugs      = isset( $templates_written['wp_template'] ) ? array_unique( $templates_written['wp_template'] ) : array();
+		$template_part_slugs = isset( $templates_written['wp_template_part'] ) ? array_unique( $templates_written['wp_template_part'] ) : array();
+
+		if ( ! empty( $template_slugs ) ) {
+			CBT_Theme_Templates::clear_user_templates_customizations( $template_slugs );
+		}
+
+		if ( ! empty( $template_part_slugs ) ) {
+			CBT_Theme_Templates::clear_user_template_parts_customizations( $template_part_slugs );
+		}
 	}
 
 	public static function prepare_pattern_for_export( $pattern, $options = null ) {
@@ -194,6 +279,9 @@ class CBT_Theme_Patterns {
 
 	/**
 	 * Copy the local patterns as well as any media to the theme filesystem.
+	 *
+	 * @param array|null $options Export options.
+	 * @return WP_Error|void WP_Error when a pattern file with the same name already exists.
 	 */
 	public static function add_patterns_to_theme( $options = null ) {
 		$base_dir     = get_stylesheet_directory();
@@ -204,6 +292,11 @@ class CBT_Theme_Patterns {
 				'post_type'      => 'wp_block',
 				'posts_per_page' => -1,
 			)
+		);
+
+		$templates_written = array(
+			'wp_template'      => array(),
+			'wp_template_part' => array(),
 		);
 
 		if ( $pattern_query->have_posts() ) {
@@ -219,13 +312,18 @@ class CBT_Theme_Patterns {
 
 				// Check pattern name doesn't already exist before creating the file.
 				$existing_patterns = glob( $patterns_dir . DIRECTORY_SEPARATOR . '*.php' );
-				foreach ( $existing_patterns as $existing_pattern ) {
-					if ( strpos( $existing_pattern, $pattern->name . '.php' ) !== false ) {
+				foreach ( $existing_patterns ? $existing_patterns : array() as $existing_pattern ) {
+					if ( basename( $existing_pattern ) === $pattern->name . '.php' ) {
 						$pattern_exists = true;
 					}
 				}
 
 				if ( $pattern_exists ) {
+					// Templates written for earlier patterns still have database
+					// customizations that reference patterns already removed
+					// from the database. Clear only those before bailing out.
+					self::clear_saved_pattern_template_customizations( $templates_written );
+
 					return new WP_Error(
 						'pattern_already_exists',
 						sprintf(
@@ -245,11 +343,16 @@ class CBT_Theme_Patterns {
 					$pattern->content
 				);
 
-				self::replace_local_pattern_references( $pattern, $options );
+				$written_now = self::replace_local_pattern_references( $pattern, $options, $templates_written );
+
+				$templates_written['wp_template']      = array_merge( $templates_written['wp_template'], $written_now['wp_template'] );
+				$templates_written['wp_template_part'] = array_merge( $templates_written['wp_template_part'], $written_now['wp_template_part'] );
 
 				// Remove it from the database to ensure that these patterns are loaded from the theme.
 				wp_delete_post( $pattern->id, true );
 			}
 		}
+
+		self::clear_saved_pattern_template_customizations( $templates_written );
 	}
 }
