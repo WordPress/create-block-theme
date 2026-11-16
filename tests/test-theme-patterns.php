@@ -570,6 +570,189 @@ class Test_Create_Block_Theme_Patterns extends WP_UnitTestCase {
 		$this->uninstall_theme( $test_theme_slug );
 	}
 
+	public function test_add_patterns_to_theme_keeps_unrelated_template_part_customizations() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Pattern used by a template</p><!-- /wp:paragraph -->',
+			'CBT Part Pattern'
+		);
+
+		$referencing_template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $pattern->ID . '} /-->'
+		);
+		$unrelated_part_id       = $this->create_template_customization(
+			'cbt-unrelated-part',
+			'<!-- wp:paragraph --><p>Unsaved part customization</p><!-- /wp:paragraph -->',
+			'wp_template_part'
+		);
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		$this->assertNull( get_post( $referencing_template_id ) );
+		$this->assertNotNull( get_post( $unrelated_part_id ) );
+		$this->assertFileDoesNotExist( get_stylesheet_directory() . '/parts/cbt-unrelated-part.html' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_add_patterns_to_theme_clears_written_templates_before_duplicate_pattern_error() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$older_pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Older pattern</p><!-- /wp:paragraph -->',
+			'CBT Duplicate Older'
+		);
+		$newer_pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Newer pattern</p><!-- /wp:paragraph -->',
+			'CBT Duplicate Newer'
+		);
+
+		wp_update_post(
+			array(
+				'ID'            => $older_pattern->ID,
+				'post_date'     => '2020-01-01 00:00:00',
+				'post_date_gmt' => '2020-01-01 00:00:00',
+			)
+		);
+		wp_update_post(
+			array(
+				'ID'            => $newer_pattern->ID,
+				'post_date'     => '2020-01-02 00:00:00',
+				'post_date_gmt' => '2020-01-02 00:00:00',
+			)
+		);
+
+		$older_pattern = get_post( $older_pattern->ID );
+		$newer_pattern = get_post( $newer_pattern->ID );
+
+		$template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $newer_pattern->ID . '} /-->'
+		);
+
+		// Simulate a pattern file that already exists for the older pattern.
+		$patterns_dir = get_stylesheet_directory() . '/patterns';
+		wp_mkdir_p( $patterns_dir );
+		$older_name = CBT_Theme_Patterns::pattern_from_wp_block( $older_pattern )->name;
+		file_put_contents( $patterns_dir . '/' . $older_name . '.php', '<?php' );
+
+		$result = CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'pattern_already_exists', $result->get_error_code() );
+
+		// The template written for the newer pattern is on disk, so its
+		// database customization must be cleared before the error returns.
+		$this->assertFileExists( get_stylesheet_directory() . '/templates/page.html' );
+		$this->assertNull( get_post( $template_id ) );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_add_patterns_to_theme_keeps_unrelated_part_with_same_slug_as_template() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Pattern used by a template</p><!-- /wp:paragraph -->',
+			'CBT Collision Pattern'
+		);
+
+		$template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $pattern->ID . '} /-->'
+		);
+		$part_id     = $this->create_template_customization(
+			'page',
+			'<!-- wp:paragraph --><p>Unrelated part with the same slug</p><!-- /wp:paragraph -->',
+			'wp_template_part'
+		);
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		$this->assertNull( get_post( $template_id ) );
+		$this->assertNotNull( get_post( $part_id ) );
+		$this->assertFileExists( get_stylesheet_directory() . '/templates/page.html' );
+		$this->assertFileDoesNotExist( get_stylesheet_directory() . '/parts/page.html' );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
+	public function test_add_patterns_to_theme_replaces_references_for_same_slug_in_template_and_part() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$test_theme_slug = $this->create_blank_theme();
+
+		$template_pattern = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Template pattern</p><!-- /wp:paragraph -->',
+			'CBT Collision Template Pattern'
+		);
+		$part_pattern     = $this->make_wp_block_post(
+			'<!-- wp:paragraph --><p>Part pattern</p><!-- /wp:paragraph -->',
+			'CBT Collision Part Pattern'
+		);
+
+		$template_id = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $template_pattern->ID . '} /-->'
+		);
+		$part_id     = $this->create_template_customization(
+			'page',
+			'<!-- wp:block {"ref":' . $part_pattern->ID . '} /-->',
+			'wp_template_part'
+		);
+
+		CBT_Theme_Patterns::add_patterns_to_theme(
+			array(
+				'localizeText'   => false,
+				'localizeImages' => false,
+				'removeNavRefs'  => false,
+			)
+		);
+
+		$template_content = file_get_contents( get_stylesheet_directory() . '/templates/page.html' );
+		$part_content     = file_get_contents( get_stylesheet_directory() . '/parts/page.html' );
+
+		$this->assertStringNotContainsString( 'wp:block {"ref":', $template_content );
+		$this->assertStringNotContainsString( 'wp:block {"ref":', $part_content );
+		$this->assertSame( 1, substr_count( $template_content, 'wp:pattern {"slug":"' ) );
+		$this->assertSame( 1, substr_count( $part_content, 'wp:pattern {"slug":"' ) );
+
+		$this->assertNull( get_post( $template_id ) );
+		$this->assertNull( get_post( $part_id ) );
+
+		$this->uninstall_theme( $test_theme_slug );
+	}
+
 	/**
 	 * Create a fresh test theme via the plugin's REST endpoint and activate it.
 	 *

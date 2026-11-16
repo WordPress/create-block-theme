@@ -9,16 +9,26 @@ class CBT_Theme_Templates {
 	 * Build a collection of templates and template-parts that should be exported (and modified)
 	 * based on the given export_type.
 	 *
-	 * @param string $export_type The type of export to perform. 'all', 'current', or 'user'.
-	 * @param array $templates_to_export List of specific templates to export.
+	 * @param string      $export_type         The type of export to perform. 'all', 'current', or 'user'.
+	 * @param array|null  $templates_to_export List of specific templates to export.
+	 * @param string|null $post_type           Optional. Limit the collection to 'wp_template' or
+	 *                                         'wp_template_part'. Default null returns both.
 	 * @return object An object containing the templates and parts that should be exported.
 	 */
-	public static function get_theme_templates( $export_type, $templates_to_export = null ) {
+	public static function get_theme_templates( $export_type, $templates_to_export = null, $post_type = null ) {
 
-		$templates          = get_block_templates( array( 'slug__in' => $templates_to_export ) );
-		$template_parts     = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
+		$templates          = array();
+		$template_parts     = array();
 		$exported_templates = array();
 		$exported_parts     = array();
+
+		if ( null === $post_type || 'wp_template' === $post_type ) {
+			$templates = get_block_templates( array( 'slug__in' => $templates_to_export ) );
+		}
+
+		if ( null === $post_type || 'wp_template_part' === $post_type ) {
+			$template_parts = get_block_templates( array( 'slug__in' => $templates_to_export ), 'wp_template_part' );
+		}
 
 		// build collection of templates/parts in currently activated theme
 		$templates_paths = get_block_theme_folders();
@@ -102,16 +112,19 @@ class CBT_Theme_Templates {
 	}
 
 	/**
-	 * Clear all user templates customizations.
-	 * This will remove all user templates from the database.
+	 * Clear user template customizations.
 	 *
 	 * @param array|null $slugs Optional list of template slugs to clear. If null,
-	 *                          all user template customizations are removed.
+	 *                          all custom template customizations are removed.
+	 *                          An empty array clears nothing.
 	 */
 	public static function clear_user_templates_customizations( $slugs = null ) {
 		$templates = get_block_templates();
 		foreach ( $templates as $template ) {
 			if ( 'custom' !== $template->source ) {
+				continue;
+			}
+			if ( empty( $template->wp_id ) ) {
 				continue;
 			}
 			if ( null !== $slugs && ! in_array( $template->slug, $slugs, true ) ) {
@@ -122,16 +135,19 @@ class CBT_Theme_Templates {
 	}
 
 	/**
-	 * Clear all user template-parts customizations.
-	 * This will remove all user template-parts from the database.
+	 * Clear user template-part customizations.
 	 *
 	 * @param array|null $slugs Optional list of template-part slugs to clear. If
-	 *                          null, all user template-part customizations are removed.
+	 *                          null, all custom template-part customizations are removed.
+	 *                          An empty array clears nothing.
 	 */
 	public static function clear_user_template_parts_customizations( $slugs = null ) {
 		$template_parts = get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template ) {
 			if ( 'custom' !== $template->source ) {
+				continue;
+			}
+			if ( empty( $template->wp_id ) ) {
 				continue;
 			}
 			if ( null !== $slugs && ! in_array( $template->slug, $slugs, true ) ) {
@@ -227,15 +243,24 @@ class CBT_Theme_Templates {
 	 * as well as any media to the theme filesystem.
 	 * If patterns need to be created for media or localizations they will also be added.
 	 *
-	 * @param string $export_type The type of export to perform. 'all', 'current', or 'user'.
-	 * @param string $path The path to the theme folder. If null it is assumed to be the current theme.
-	 * @param string $slug The slug of the theme. If null it is assumed to be the current theme.
-	 * @param array $options An array of options to use when exporting the templates.
-	 * @param array $templates_to_export List of specific templates to export. If null it will be fetched.
+	 * @param string      $export_type         The type of export to perform. 'all', 'current', or 'user'.
+	 * @param string|null $path                The path to the theme folder. If null it is assumed to be the current theme.
+	 * @param string|null $slug                The slug of the theme. If null it is assumed to be the current theme.
+	 * @param array|null  $options             An array of options to use when exporting the templates.
+	 * @param array|null  $templates_to_export List of specific templates to export. If null it will be fetched.
+	 * @param string|null $post_type           Optional. Limit the export to 'wp_template' or
+	 *                                         'wp_template_part'. Default null exports both.
 	 */
-	public static function add_templates_to_local( $export_type, $path = null, $slug = null, $options = null, $templates_to_export = null ) {
+	public static function add_templates_to_local( $export_type, $path = null, $slug = null, $options = null, $templates_to_export = null, $post_type = null ) {
 
-		$theme_templates  = self::get_theme_templates( $export_type, $templates_to_export );
+		// An empty list means "no templates" here, not "all templates".
+		// WordPress treats an empty slug__in filter as no filter, which would
+		// export every template.
+		if ( is_array( $templates_to_export ) && empty( $templates_to_export ) ) {
+			return;
+		}
+
+		$theme_templates  = self::get_theme_templates( $export_type, $templates_to_export, $post_type );
 		$template_folders = get_block_theme_folders();
 
 		$base_dir          = $path ? $path : get_stylesheet_directory();
