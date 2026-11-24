@@ -73,6 +73,36 @@ class Test_Create_Block_Theme_Api extends WP_UnitTestCase {
 		$this->assertSame( 401, $response->get_status() );
 	}
 
+	public function test_save_endpoint_fails_when_theme_directory_not_writable() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'single-site only' );
+		}
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+
+		$read_only_dir = sys_get_temp_dir() . '/cbt-non-writable-theme-' . uniqid();
+		wp_mkdir_p( $read_only_dir );
+		chmod( $read_only_dir, 0555 );
+
+		$filter = function () use ( $read_only_dir ) {
+			return $read_only_dir;
+		};
+		add_filter( 'stylesheet_directory', $filter );
+
+		try {
+			$request = new WP_REST_Request( 'POST', '/create-block-theme/v1/save' );
+			$request->set_param( 'saveStyle', true );
+			$response = rest_get_server()->dispatch( $request );
+
+			$this->assertSame( 403, $response->get_status() );
+			$this->assertSame( 'theme_not_writable', $response->get_data()['code'] );
+		} finally {
+			remove_filter( 'stylesheet_directory', $filter );
+			chmod( $read_only_dir, 0755 );
+			rmdir( $read_only_dir );
+		}
+	}
+
 	public function test_font_families_endpoint_still_accessible_to_admin() {
 		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin );

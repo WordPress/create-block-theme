@@ -362,6 +362,14 @@ class CBT_Theme_API {
 	 * Save the user changes to the theme and clear user changes.
 	 */
 	public function rest_save_theme( $request ) {
+		$theme_dir = get_stylesheet_directory();
+		if ( ! wp_is_writable( $theme_dir ) ) {
+			return new WP_Error(
+				'theme_not_writable',
+				__( 'The active theme directory is not writable. Please check filesystem permissions.', 'create-block-theme' ),
+				array( 'status' => 403 )
+			);
+		}
 
 		$options = $request->get_params();
 
